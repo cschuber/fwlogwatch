@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: output.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -242,9 +242,15 @@ void output_resolved(struct conn_data *input)
 
 void output_html_header()
 {
-  printf("<html><head><title>fwlogwatch output</title></head>\n");
+  char time[TIMESIZE];
+  
+  strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
+  printf("<html><head><title>fwlogwatch output: %s</title>\n", time);
+  printf("<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
+  printf("<meta http-equiv=\"expires\" content=\"0\">\n");
+  printf("</head>\n");
   printf("<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
-  printf("<font face=\"Arial, Helvetica\">\n");
+  printf("<font face=\"Arial, Helvetica\">");
   printf("<div align=\"center\">\n");
   printf("<h1>fwlogwatch output</h1>\n");
 }

@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: response.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -177,7 +177,7 @@ void remove_old()
       diff = now - this->start_time;
     if (diff >= opt.recent) {
       if(opt.verbose == 2)
-	syslog(LOG_NOTICE, "Deleting connection cache entry (%s)", this->shost);
+	syslog(LOG_NOTICE, "Deleting connection cache entry (%s)", inet_ntoa(this->shost));
       if (is_first == 1) {
 	prev = this->next;
 	free(this);
@@ -199,7 +199,7 @@ void remove_old()
   while (this_host != NULL) {
     if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
       if (opt.verbose == 2)
-	syslog(LOG_NOTICE, "Deleting host status entry (%s)", this_host->shost);
+	syslog(LOG_NOTICE, "Deleting host status entry (%s)", inet_ntoa(this_host->shost));
       if (opt.response & OPT_BLOCK)
 	remove_rule(inet_ntoa(this_host->shost));
       if (is_first == 1) {
@@ -242,7 +242,7 @@ void look_for_alert()
   this = first;
   while (this != NULL) {
     if ((this->count >= opt.threshold) && (!is_known(this->shost))) {
-      syslog(LOG_NOTICE, "ALERT: %d attempts from %s", this->count, this->shost);
+      syslog(LOG_NOTICE, "ALERT: %d attempts from %s", this->count, inet_ntoa(this->shost));
 
       host = xmalloc(sizeof(struct known_hosts));
 

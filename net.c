@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.8 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: net.c,v 1.9 2002/02/14 21:04:28 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -182,6 +182,11 @@ void handshake(int fd)
   }
 
   if (auth == 0) {
+    if(opt.verbose == 2) {
+      syslog(LOG_NOTICE, "Authorization failed (%s)", password);
+    } else if(opt.verbose) {
+      syslog(LOG_NOTICE, "Authorization failed");
+    }
     net_output(conn, "HTTP/1.0 401 Authorization Required\r\n");
     snprintf(buf, BUFSIZE, "Server: %s %s (C) %s\r\n", PACKAGE, VERSION, COPYRIGHT);
     net_output(conn, buf);
@@ -197,8 +202,11 @@ void handshake(int fd)
     net_output(conn, "Connection: close\r\n");
     net_output(conn, "Content-Type: text/html\r\n\r\n");
 
-    net_output(conn, "<html>\n<head>\n<title>fwlogwatch status</title>\n</head>\n");
-    snprintf(buf, BUFSIZE, "<body text=\"#%s\" bgcolor=\"#%s\">\n", opt.textcol, opt.bgcol);
+    net_output(conn, "<html>\n<head>\n<title>fwlogwatch status</title>\n");
+    net_output(conn, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
+    net_output(conn, "<meta http-equiv=\"expires\" content=\"0\">\n");
+    net_output(conn, "</head>\n");
+    snprintf(buf, BUFSIZE, "<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
     net_output(conn, buf);
     net_output(conn, "<font face=\"Arial, Helvetica\">\n");
     net_output(conn, "<div align=\"center\">\n<h1>fwlogwatch status</h1>\n</div>\n");
@@ -278,7 +286,7 @@ void handshake(int fd)
     }
     net_output(conn, "</table>\n<br><br>\n");
 
-    snprintf(buf, BUFSIZE, "<small>%s %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
+    snprintf(buf, BUFSIZE, "<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
     net_output(conn, buf);
     net_output(conn, "</font>\n</body>\n</html>\n");
   }

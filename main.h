@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: main.h,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.1.1"
-#define COPYRIGHT "2001-01-12 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.1.2"
+#define COPYRIGHT "2001-01-16 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 

@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: modes.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -210,13 +210,14 @@ void terminate()
 void mode_rt_response()
 {
   char buf[BUFSIZE];
-  pid_t pid;
   FILE *input;
   int retval, sock = 0;
   struct stat info;
   unsigned long size;
   fd_set rfds;
   struct timeval tv;
+#ifndef RR_DEBUG
+  pid_t pid;
 
   pid = fork();
   if (pid == -1) {
@@ -275,8 +276,10 @@ void mode_rt_response()
     perror("dup");
     exit(EXIT_FAILURE);
   }
-
   openlog("fwlogwatch", LOG_CONS, LOG_DAEMON);
+#else
+  openlog("fwlogwatch", LOG_CONS|LOG_PERROR, LOG_DAEMON);
+#endif
   syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
 
   signal(SIGTERM, terminate);

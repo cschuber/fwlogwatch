@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: utils.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,6 +73,7 @@ void free_conn_data()
     this = this->next;
     free(first);
   }
+  first = NULL;
 }
 
 void free_dns_cache()
@@ -85,6 +86,7 @@ void free_dns_cache()
     dns_this = dns_this->next;
     free(dns_first);
   }
+  dns_first = NULL;
 }
 
 void free_hosts()
@@ -97,6 +99,7 @@ void free_hosts()
     this_host = this_host->next;
     free(first_host);
   }
+  first_host = NULL;
 }
 
 void init_line()
@@ -130,7 +133,14 @@ void build_time(char *smonth, int day, int hour, int minute, int second)
   int month = 0, now, then;
   struct tm *t;
 
-  t = localtime(&opt.now);
+  if(opt.mode != REALTIME_RESPONSE) {
+    t = localtime(&opt.now);
+  } else {
+    time_t rr_now;
+
+    rr_now = time(NULL);
+    t = localtime(&rr_now);
+  }
   now = (int)mktime(t);
   if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
   if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }

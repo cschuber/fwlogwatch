@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.5 2002/02/14 21:00:01 bwess Exp $ */
+/* $Id: cisco.yy,v 1.6 2002/02/14 21:04:28 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
