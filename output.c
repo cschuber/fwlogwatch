@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: output.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -34,21 +34,21 @@ void output_timediff(time_t start, time_t end, char *td)
     return;
   }
 
-  part = diff / 86400; // days
+  part = diff / 86400; /* days */
   snprintf(td, TIMESIZE, "%02d:", part);
   diff = diff % 86400;
 
-  part = diff / 3600; // hours
+  part = diff / 3600; /* hours */
   snprintf(tmp, 4, "%02d:", part);
   strncat(td, tmp, 4);
   diff = diff % 3600;
 
-  part = diff / 60; // minutes
+  part = diff / 60; /* minutes */
   snprintf(tmp, 4, "%02d:", part);
   strncat(td, tmp, 4);
 
-  part = diff % 60;
-  snprintf(tmp, 3, "%02d", part); // seconds
+  part = diff % 60; /* seconds */
+  snprintf(tmp, 3, "%02d", part);
   strncat(td, tmp, 3);
 }
 
@@ -160,6 +160,18 @@ void output_resolved(struct conn_data *input)
   if (!opt.html)
     printf(" packet%s", (input->count == 1) ? "" : "s");
 
+  if (opt.datalen) {
+    separate(SPACE);
+
+    if (!opt.html)
+      printf("(");
+
+    printf("%d", input->datalen);
+
+    if (!opt.html)
+      printf(" bytes)");
+  }
+
   if (opt.src_ip) {
     separate(SPACE);
 
@@ -243,7 +255,7 @@ void output_resolved(struct conn_data *input)
 void output_html_header()
 {
   char time[TIMESIZE];
-  
+
   strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
   printf("<html><head><title>fwlogwatch output: %s</title>\n", time);
   printf("<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
@@ -281,6 +293,9 @@ void output_html_table()
 
   if(opt.proto)
     printf("<td>proto</td>");
+
+  if(opt.datalen)
+    printf("<td>bytes</td>");
 
   if(opt.src_ip) {
     printf("<td>source</td>");

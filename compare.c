@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: compare.c,v 1.14 2002/02/14 21:15:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +25,7 @@ void add_entry()
   strncpy(data->branchname, opt.line->branchname, SHORTLEN);
   strncpy(data->interface, opt.line->interface, SHORTLEN);
   data->protocol = opt.line->protocol;
+  data->datalen = opt.line->datalen;
   data->shost = opt.line->shost;
   data->sport = opt.line->sport;
   data->dhost = opt.line->dhost;
@@ -73,6 +74,13 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
       if (op2->protocol > op1->protocol) cond++;
     } else {
       if (op2->protocol < op1->protocol) cond++;
+    }
+    break;
+  case SORT_DATALEN:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->datalen > op1->datalen) cond++;
+    } else {
+      if (op2->datalen < op1->datalen) cond++;
     }
     break;
   case SORT_SOURCEHOST:
@@ -170,6 +178,9 @@ void sort_data()
       break;
     case 'p':
       opt.sortfield = SORT_PROTOCOL;
+      break;
+    case 'b':
+      opt.sortfield = SORT_DATALEN;
       break;
     case 'S':
       opt.sortfield = SORT_SOURCEHOST;
@@ -272,6 +283,7 @@ void build_list()
     if (strncmp(this->chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {goto no_match;}
     if (strncmp(this->hostname, opt.line->hostname, SHOSTLEN) != 0) {goto no_match;}
 
+    this->datalen = this->datalen + opt.line->datalen;
     if (opt.line->time >= this->end_time) {
       this->end_time = opt.line->time;
     } else {

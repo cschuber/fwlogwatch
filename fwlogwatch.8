@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.12 2002/02/14 21:09:41 bwess Exp $
-.TH FWLOGWATCH 8 "10 February 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.13 2002/02/14 21:15:35 bwess Exp $
+.TH FWLOGWATCH 8 "9 March 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -34,12 +34,16 @@ Differentiate destination ports.
 Specify an input file (defaults to
 .B /var/log/messages
 ). Relevant entries are automatically detected so combined log files (e.g.
-from a log host) are no problem.
+from a log host) are no problem. Compressed files are supported (except in
+realtime response mode).
 .IP \-h
 Show the available options.
-.IP \-L
-Show time of the first and the last log entry in the input file. Use the
-option -f to specify other input file than the default one.
+.IP \-L\ \fIfile\fR
+Show time of the first and the last log entry in the input
+.I file
+which can be a compressed or plain log file. Summary mode will show the
+time of the first and last packet log entry, this log times mode
+will show the time of the first and last entry overall.
 .IP \-l\ \fItime\fR
 Process recent events only. See
 .B TIME FORMAT
@@ -87,6 +91,9 @@ is only available if there is more than one packet log entry with unique
 characteristics.
 .SH "LOG SUMMARY MODE"
 This are additional options that are only available in log summary mode:
+.IP \-b
+Show the amount of data in bytes this entry represents, this is the sum of
+total packet lengths of packets matching this rule.
 .IP \-m\ \fIcount\fR
 When analyzing large log files you usually aren't interested in entries that
 have a small count. You can hide entries below a certain threshold with
@@ -113,6 +120,8 @@ duration,
 target name,
 .I p
 protocol,
+.I b
+sum of total packet lengths,
 .I S
 source host,
 .I s
@@ -131,9 +140,10 @@ Sorting is done in the order specified, so the last option is the primary
 criteria. The default is
 .I tacd
 (start with the highest count, if two counts match list the one earlier in
-time first). If you specify an empty sort string or everything else is equal
-entries will be unsorted (as they come in the log file with the most recent
-unique entry found first).
+time first) of which
+.I ta
+is built in., so if you specify an empty sort string or everything else is
+equal entries will be sorted ascending by time.
 .IP \-w
 Produce output in HTML format.
 .SH "INTERACTIVE REPORT MODE"
@@ -258,8 +268,8 @@ permissions for most functions or you can make it setgid for a
 group
 .B /var/log/messages
 is in if all you need is to be able to read this file. Only the realtime
-response mode needs superuser permissions to analyze (and in block mode
-also modify) the firewall rules.
+response mode with activated ipchains parser needs superuser permissions
+to analyze (and in block mode also modify) the firewall rules.
 .SH AUTHOR
 Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>,
 RUS-CERT http://cert.uni-stuttgart.de

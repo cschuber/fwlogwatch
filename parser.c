@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: parser.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,13 +47,21 @@ unsigned char parse_line(char *input, int linenum)
     return PARSE_NO_HIT;
   }
 
+  if(opt.recent != 0) {
+    if((opt.now - opt.line->time) > opt.recent) {
+      if(opt.verbose == 2) {
+	fprintf(stderr, "o");
+      }
+      return PARSE_TOO_OLD;
+    }
+  }
+
   if (retval == PARSE_OK) {
     {
       struct parser_options *excluded_this;
       unsigned char match = P_MATCH_NONE;
 
       excluded_this = excluded_first;
-      //while((excluded_this != NULL) && (match != P_MATCH_EXC)) {
       while(excluded_this != NULL) {
 	if((excluded_this->mode & PARSER_MODE_HOST) != 0) {
 	  /* host */
@@ -114,59 +122,11 @@ unsigned char parse_line(char *input, int linenum)
       }
     }
 
-    if(opt.recent != 0) {
-      if((opt.now - opt.line->time) > opt.recent) {
-	if(opt.verbose == 2) {
-	  fprintf(stderr, "o");
-	}
-	return PARSE_TOO_OLD;
-      }
-    }
     build_list();
     if (opt.verbose == 2)
       fprintf(stderr, ".");
   }
   return retval;
-}
-
-unsigned char get_times(FILE *fd, char *begin, char *end)
-{
-  char buf[BUFSIZE], month[3];
-  int retval, day, hour, minute, second;
-  struct stat info;
-
-  rewind(fd);
-  fgets(buf, BUFSIZE, fd);
-  retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
-  if (retval != 5) {
-    return PARSE_WRONG_FORMAT;
-  }
-  snprintf(begin, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
-
-  retval = fstat(fileno(fd), &info);
-  if (retval == -1) {
-    perror("fstat");
-    return PARSE_ERROR;
-  }
-
-  if (info.st_size > 2048) {
-    retval = fseek(fd, -1024, SEEK_END);
-    if (retval == -1) {
-      perror("fseek");
-      return PARSE_ERROR;
-    }
-  }
-
-  while(fgets(buf, BUFSIZE, fd))
-    retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
-
-  if (retval != 5) {
-    return PARSE_WRONG_FORMAT;
-  }
-
-  snprintf(end, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
-
-  return PARSE_OK;
 }
 
 int parse_time(char *input)
@@ -228,10 +188,10 @@ void select_parsers()
 	opt.format = opt.format | PARSER_NETFILTER;
 	break;
       case 'c':
-	opt.format = opt.format | PARSER_CISCO;  
+	opt.format = opt.format | PARSER_CISCO;
 	break;
       case 'f':
-	opt.format = opt.format | PARSER_IPFILTER;  
+	opt.format = opt.format | PARSER_IPFILTER;
 	break;
       default:
 	fprintf(stderr, "Unknown parser: '%c'.\n", opt.format_sel[i]);

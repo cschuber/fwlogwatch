@@ -1,4 +1,4 @@
-$Id: README,v 1.12 2002/02/14 21:09:41 bwess Exp $
+$Id: README,v 1.13 2002/02/14 21:15:35 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -26,6 +26,7 @@ FEATURES
   - Own DNS cache for faster lookups.
   - Detects and processes ipchains, netfilter/iptables, ipfilter and cisco
     log entries, even combined or only with the selected parsers.
+  - Can analyze compressed log files.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -67,7 +68,11 @@ log enough.
 
 Before compiling you may want to have a look at main.h if you want to
 change some default values. To compile on Solaris look for the corresponding
-lines at the top of the Makefile.
+lines at the top of the Makefile. Especially cisco users might want to
+activate support for long names.
+
+You will need the zlib compression library (version 1.0.9 or newer) and it's
+header files to compile fwlogwatch.
 
 A simple 'make' should be enough to obtain a working binary. If you use the
 realtime response mode you will need to install fwlogwatch with superuser

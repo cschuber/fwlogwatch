@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.13 2002/02/14 21:09:41 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.14 2002/02/14 21:15:35 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.2
+%define version 0.2.1
 
 Name: %name
 Version: %version

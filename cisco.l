@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.8 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: cisco.l,v 1.1 2002/02/14 21:15:35 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
@@ -7,6 +7,7 @@
 %{
 #define YY_NO_UNPUT
 
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 #include "main.h"
@@ -17,6 +18,7 @@ extern struct options opt;
 void cisco_parse_date(char *input, unsigned char mode);
 void cisco_parse_src(char *input, unsigned char mode);
 void cisco_parse_dst(char *input, unsigned char mode);
+void cisco_parse_if(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
@@ -35,7 +37,8 @@ PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|"pim"|{NUMBER}
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	cisco_parse_date(ciscotext, C_OPT_HOST);
 {NUMBER}":"	/* ignore */
-{NUMBER}"w"{DIGIT}"d:"	/* ignore */
+{DIGIT}"y"{DIGIT}{1,2}"w:"	/* ignore */
+{DIGIT}{1,2}"w"{DIGIT}"d:"	/* ignore */
 {DIGIT}"d"{DIGIT}{2}"h:"	/* ignore */
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}"."{DIGIT}{3}":"	cisco_parse_date(ciscotext, C_OPT_MSEC);
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}":"	cisco_parse_date(ciscotext, C_OPT_NONE);
@@ -47,7 +50,7 @@ PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|"pim"|{NUMBER}
 "-> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}" ("{NUMBER}"/"{NUMBER}"),"	cisco_parse_dst(ciscotext, C_OPT_TYPE);
 "-> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","	cisco_parse_dst(ciscotext, C_OPT_NONE);
 {NUMBER}" packet"("s")?	{ opt.line->count = atoi(ciscotext); opt.parser=opt.parser|CISCO_COUNT; }
-"("[A-Za-z0-9 /\._\*-]*")"	/* strncpy(opt.line->interface, ciscotext, SHORTLEN); */
+"("[A-Za-z0-9 /\._\*-]*")"	cisco_parse_if(ciscotext);
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
 {STRING}	fprintf(stderr, "Unrecognized token: %s\n", ciscotext);
@@ -101,19 +104,27 @@ void cisco_parse_date(char *input, unsigned char mode)
 
 void cisco_parse_src(char *input, unsigned char mode)
 {
-  char proto[5], ip[IPLEN];
+  char proto[8], ip[IPLEN];
   int shost1, shost2, shost3, shost4;
   int retval;
 
   if (mode == C_OPT_PORT) {
+#ifdef LONG_NAMES
+    retval = sscanf(input, "list %30s %30s %5s %3d.%3d.%3d.%3d(%5d)",
+#else
     retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d(%5d)",
+#endif
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if(retval != 8) return;
   } else if (mode == C_OPT_NONE) {
-    retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d",
+#ifdef LONG_NAMES
+    retval = sscanf(input, "list %30s %30s %8s %3d.%3d.%3d.%3d",
+#else
+    retval = sscanf(input, "list %10s %10s %8s %3d.%3d.%3d.%3d",
+#endif
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,
@@ -129,14 +140,14 @@ void cisco_parse_src(char *input, unsigned char mode)
   opt.parser=opt.parser|CISCO_SRC;
 
   if(strncmp(proto, "tcp", 3) == 0) opt.line->protocol = 6;
-  if(strncmp(proto, "udp", 3) == 0) opt.line->protocol = 17;
-  if(strncmp(proto, "icmp", 4) == 0) opt.line->protocol = 1;
-  if(strncmp(proto, "igmp", 4) == 0) opt.line->protocol = 2;
-  if(strncmp(proto, "gre", 3) == 0) opt.line->protocol = 47; /* RFC1701/1702 */
-  if(strncmp(proto, "ospf", 4) == 0) opt.line->protocol = 89;
-  if(strncmp(proto, "ipinip", 6) == 0) opt.line->protocol = 4;
-  if(strncmp(proto, "pim", 3) == 0) opt.line->protocol = 103;
-  if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
+  else if(strncmp(proto, "udp", 3) == 0) opt.line->protocol = 17;
+  else if(strncmp(proto, "icmp", 4) == 0) opt.line->protocol = 1;
+  else if(strncmp(proto, "igmp", 4) == 0) opt.line->protocol = 2;
+  else if(strncmp(proto, "gre", 3) == 0) opt.line->protocol = 47; /* RFC1701/1702 */
+  else if(strncmp(proto, "ospf", 4) == 0) opt.line->protocol = 89;
+  else if(strncmp(proto, "ipinip", 6) == 0) opt.line->protocol = 4;
+  else if(strncmp(proto, "pim", 3) == 0) opt.line->protocol = 103;
+  else if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
 
   if (opt.line->protocol != 0)
     opt.parser=opt.parser|CISCO_PROTO;
@@ -171,11 +182,19 @@ void cisco_parse_dst(char *input, unsigned char mode)
   opt.parser=opt.parser|CISCO_DST;
 }
 
+void cisco_parse_if(char *input)
+{
+#ifdef LONG_NAMES
+  strncpy(opt.line->interface, input, SHORTLEN);
+#else
+  strncpy(opt.line->interface, "-", SHORTLEN);
+#endif
+}
+
 unsigned char flex_cisco(char *input, int linenum)
 {
   opt.parser = 0;
   init_line();
-  strncpy(opt.line->interface, "-", SHORTLEN);
   cisco_scan_string(input);
   ciscolex();
 

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: rcfile.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,6 +149,10 @@ void parse_rcfile(char *input)
 
   /* Log summary mode */
 
+  if (strncmp(command, "data_amount", 11) == 0) {
+    opt.datalen = 1;
+    return;
+  }
   if (strncmp(command, "sort_order", 10) == 0) {
     strncpy(opt.sort_order, get_one_parameter(command+11), MAXSORTSIZE);
     return;
@@ -286,6 +290,7 @@ void parse_rcfile(char *input)
       mode_error();
     }
     opt.mode = SHOW_LOG_TIMES;
+    strncpy(opt.inputfile, get_one_parameter(command+15), FILESIZE);
     return;
   }
 

@@ -1,4 +1,4 @@
-/* $Id: ipfilter.yy,v 1.1 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.1 2002/02/14 21:15:35 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -7,6 +7,7 @@
 %{
 #define YY_NO_UNPUT
 
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 #include <netdb.h>
@@ -46,7 +47,7 @@ TARGET		[SpPbBnL]
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}			ipf_parse_ips(ipftext, IPF_OPT_NONE);
 {STRING}" -> "{STRING}											opt.parser=opt.parser|IPF_NO_HIT;
 "PR "{PROTO}												ipf_parse_proto(ipftext+3);
-"len "{NUMBER}[ ][(]?{NUMBER}[)]?									/* ignore */
+"len "{NUMBER}[ ][(]?{NUMBER}[)]?									opt.line->datalen = atoi(ipftext+4);
 "frag "{NUMBER}"@"{NUMBER}										/* ignore */
 "icmp "{DIGIT}{1,2}"/"{DIGIT}{1,2}									sscanf(ipftext, "icmp %d/%d", &opt.line->sport, &opt.line->dport);
 "for "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{PORT}" - "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{PORT}" PR "{PROTO}" len "{NUMBER}[ ]{NUMBER}	/* ignore */
@@ -55,10 +56,8 @@ TARGET		[SpPbBnL]
 "K-F"													/* ignore */
 "IN"													/* ignore */
 "OUT"													/* ignore */
-{NUMBER}[ ]{NUMBER}[ ]{NUMBER}[ ]"IN"									/* ignore */
-({HEXDIGIT}{HEXDIGIT}[ ]){15}{HEXDIGIT}{HEXDIGIT}							opt.parser=opt.parser|IPF_NO_HIT;
-({HEXDIGIT}{HEXDIGIT}[ ]){7}{HEXDIGIT}{HEXDIGIT}[ ]+.{8,32}						opt.parser=opt.parser|IPF_NO_HIT;
-({HEXDIGIT}{HEXDIGIT}[ ]){11}{HEXDIGIT}{HEXDIGIT}[ ]+.{8,32}						opt.parser=opt.parser|IPF_NO_HIT;
+{NUMBER}[ ]{NUMBER}[ ]{NUMBER}" IN"									/* ignore */
+({HEXDIGIT}{HEXDIGIT}[ ]?)+[ ]+[ -~]+									opt.parser=opt.parser|IPF_NO_HIT;
 [ \t]+		/* ignore whitespace */
 [\n]		/* ignore */
 {STRING}	fprintf(stderr, "Unrecognized token: %s\n", ipftext);
@@ -86,14 +85,22 @@ void ipf_parse_data(char *input, unsigned char mode)
   int retval;
 
   if (mode == IPF_OPT_COUNT) {
+#ifdef LONG_NAMES
+    retval = sscanf(input, "%dx %30s @%30s %30s",
+#else
     retval = sscanf(input, "%dx %10s @%10s %10s",
+#endif
 		    &opt.line->count,
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);
     if (retval != 4) return;
   } else {
+#ifdef LONG_NAMES
+    retval = sscanf(input, "%30s @%30s %30s",
+#else
     retval = sscanf(input, "%10s @%10s %10s",
+#endif
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);

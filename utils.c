@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: utils.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -128,6 +128,7 @@ void init_line()
   opt.line->branchname[0] = '\0';
   opt.line->interface[0] = '\0';
   opt.line->protocol = 0;
+  opt.line->datalen = 0;
   opt.line->shost.s_addr = 0;
   opt.line->sport = 0;
   opt.line->dhost.s_addr = 0;
@@ -161,17 +162,17 @@ void build_time(char *smonth, int day, int hour, int minute, int second)
   }
   now = (int)mktime(t);
   if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
+  else if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
+  else if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
+  else if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
+  else if (strncmp(smonth, "May", 3) == 0) { month = 4; }
+  else if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
+  else if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
+  else if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
+  else if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
+  else if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
+  else if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
+  else if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
   t->tm_mon = month;
   t->tm_mday = day;
   t->tm_hour = hour;

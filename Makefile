@@ -1,40 +1,45 @@
-# $Id: Makefile,v 1.13 2002/02/14 21:09:41 bwess Exp $
+# $Id: Makefile,v 1.14 2002/02/14 21:15:35 bwess Exp $
 
 # Linux
-CC=gcc
-CFLAGS=-pipe -O2 -Wall #-pedantic #-g #-p
-LDFLAGS=-lcrypt
+CC = gcc
+CFLAGS = -pipe -O2 -Wall #-pedantic #-g #-p
+LDFLAGS = #-g #-static -p
+LIBS = -lcrypt -lz #-lc_p
 
 # Solaris
-#LDFLAGS=-lcrypt -lnsl -lsocket
+#LIBS = -lnsl -lsocket -lz -lcrypt
 #
-#CC=gcc
-#CFLAGS=-DSOLARIS -pipe -O2 -Wall #-pedantic #-g
+#CC = gcc
+#CFLAGS = -DSOLARIS -pipe -O2 -Wall #-pedantic #-g
+#LDFLAGS = #-g
 #
-#CC=cc
-#CFLAGS=-DSOLARIS -v -fast -xCC
+#CC = cc
+#CFLAGS = -DSOLARIS -v -fast -xCC
 
 # OpenBSD
-#CC=gcc
-#CFLAGS=-pipe -O2 -Wall #-pedantic #-g #-p
-#LDFLAGS=
+#CC = gcc
+#CFLAGS = -pipe -O2 -Wall #-pedantic #-g #-p
+#LDFLAGS = #-g
+#LIBS = -lz
 
 
-# You can add -DLOGDOTS to CFLAGS if your log host logs FQDNs
-# and you only want the hostnames in the output.
+# You can add -DLOGDOTS to CFLAGS if your cisco log host logs FQDNs and you
+# only want the hostnames in the output. -DLONG_NAMES will also allow long
+# list/chain/branch/interface names.
 
 
-OBJ= cisco.o compare.o ipchains.o ipfilter.o main.o modes.o net.o netfilter.o \
-     output.o parser.o rcfile.o report.o resolve.o response.o utils.o
-FLEX=flex
-INSTALL=install
-INSTALL_PROGRAM=$(INSTALL) -s -m 0755
-INSTALL_DATA=$(INSTALL) -m 0644
-INSTALL_DIR=/usr
-CONF_DIR=/etc
-SHELL=/bin/sh
-.SUFFIXES:
-.SUFFIXES: .c .o
+LEX = flex
+LFLAGS = -B #-f #-p -p -d
+
+INSTALL = install
+INSTALL_PROGRAM = $(INSTALL) -s -m 0755
+INSTALL_DATA = $(INSTALL) -m 0644
+INSTALL_DIR = /usr
+CONF_DIR = /etc
+
+OBJS = cisco.o compare.o ipchains.o ipfilter.o main.o modes.o net.o \
+       netfilter.o output.o parser.o rcfile.o report.o resolve.o \
+       response.o utils.o
 
 all:	fwlogwatch
 
@@ -55,23 +60,14 @@ resolve.o:	main.h resolve.h
 response.o:	main.h output.h response.h
 utils.o:	main.h
 
-ipchains.c:	ipchains.yy
-	$(FLEX) ipchains.yy
-ipfilter.c:	ipfilter.yy
-	$(FLEX) ipfilter.yy
-cisco.c:	cisco.yy
-	$(FLEX) cisco.yy
-netfilter.c:	netfilter.yy
-	$(FLEX) netfilter.yy
+fwlogwatch:	$(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
-fwlogwatch:	$(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
-
-install:	
+install:	all
 	$(INSTALL_PROGRAM) fwlogwatch $(INSTALL_DIR)/local/sbin/fwlogwatch
 	$(INSTALL_DATA) fwlogwatch.8 $(INSTALL_DIR)/local/man/man8/fwlogwatch.8
 
-install-rpm:	
+install-rpm:	all
 	$(INSTALL_PROGRAM) fwlogwatch $(INSTALL_DIR)/sbin/fwlogwatch
 	$(INSTALL_DATA) fwlogwatch.8 $(INSTALL_DIR)/share/man/man8/fwlogwatch.8
 
@@ -81,14 +77,11 @@ install-config:
 
 uninstall:	
 	@rm -f $(INSTALL_DIR)/local/sbin/fwlogwatch \
-	$(INSTALL_DIR)/local/man/man8/fwlogwatch.8 \
-	$(INSTALL_DIR)/sbin/fwlogwatch \
-	$(INSTALL_DIR)/share/man/man8/fwlogwatch.8 \
-	$(CONF_DIR)/fwlogwatch.config \
-	$(CONF_DIR)/etc/fwlogwatch.template
-
-profile:	
-	$(CC) -static -g -p $(OBJ) -o fwlogwatch -lc_p $(LDFLAGS)
+		$(INSTALL_DIR)/local/man/man8/fwlogwatch.8 \
+		$(INSTALL_DIR)/sbin/fwlogwatch \
+		$(INSTALL_DIR)/share/man/man8/fwlogwatch.8 \
+		$(CONF_DIR)/fwlogwatch.config \
+		$(CONF_DIR)/etc/fwlogwatch.template
 
 clean:
-	rm -f *.o *~ *.bak ipchains.c ipfilter.c cisco.c netfilter.c fwlogwatch
+	rm -f *.o *~ *.bak fwlogwatch

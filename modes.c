@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: modes.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <syslog.h>
 #include <signal.h>
+#include <zlib.h>
 #include "main.h"
 #include "parser.h"
 #include "output.h"
@@ -22,12 +23,12 @@
 #include "net.h"
 
 extern struct options opt;
+extern struct conn_data *first;
 
 void mode_summary()
 {
-  char buf[BUFSIZE], nows[TIMESIZE], log_begin[TIMESIZE], log_end[TIMESIZE];
+  char buf[BUFSIZE], nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE];
   FILE *input, *output = NULL;
-  unsigned char valid_times = 0;
   int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0, exnum = 0;
   time_t now;
   struct passwd *gen_user;
@@ -35,9 +36,9 @@ void mode_summary()
   if (opt.verbose)
     fprintf(stderr, "Opening input file '%s'\n", opt.inputfile);
 
-  input = fopen(opt.inputfile, "r");
+  input = gzopen(opt.inputfile, "rb");
   if (input == NULL) {
-    fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
+    fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
     exit(EXIT_FAILURE);
   }
 
@@ -46,7 +47,7 @@ void mode_summary()
 
   opt.line = xmalloc(sizeof(struct log_line));
 
-  while (fgets(buf, BUFSIZE, input)) {
+  while (gzgets(input, buf, BUFSIZE) != Z_NULL) {
     ++linenum;
     hit = PARSE_NO_HIT;
     hit = parse_line(buf, linenum);
@@ -56,16 +57,18 @@ void mode_summary()
     if (hit == PARSE_EXCLUDED) { ++hitnum; ++exnum; }
   }
 
-  valid_times = get_times(input, log_begin, log_end);
-
   if (opt.verbose == 2)
     fprintf(stderr, "\n");
   if (opt.verbose)
     fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
-  retval = fclose(input);
-  if (retval == EOF) {
-    perror("fclose");
+  retval = gzclose(input);
+  if (retval != 0) {
+    if (retval != Z_ERRNO) {
+      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
+    } else {
+      perror("gzclose");
+    }
     exit(EXIT_FAILURE);
   }
 
@@ -73,6 +76,22 @@ void mode_summary()
 
   if (opt.verbose)
     fprintf(stderr, "Sorting data\n");
+
+  if(first != NULL) {
+    opt.sortfield = SORT_START_TIME;
+    opt.sortmode = ORDER_DESCENDING;
+    first = fwlw_mergesort(first);
+    if(opt.verbose == 2)
+      fprintf(stderr, ".");
+    strftime(last_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->start_time));
+    opt.sortmode = ORDER_ASCENDING;
+    first = fwlw_mergesort(first);
+    if(opt.verbose == 2)
+      fprintf(stderr, ".");
+    strftime(first_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->start_time));
+  } else {
+    first_entry[0] = '\0';
+  }
 
   sort_data();
 
@@ -134,8 +153,8 @@ void mode_summary()
   if (opt.html)
     printf("<br>\n");
 
-  if (valid_times == PARSE_OK) {
-    printf("First entry: %s. Last entry: %s.\n", log_begin, log_end);
+  if (first_entry[0] != '\0') {
+    printf("First packet log entry: %s, last: %s.\n", first_entry, last_entry);
   } else {
     printf("No valid time entries found.\n");
   }
@@ -394,24 +413,44 @@ void mode_rt_response()
 
 void mode_show_log_times()
 {
-  char log_begin[TIMESIZE], log_end[TIMESIZE];
-  unsigned char valid_times = 0;
+  char first_entry[TIMESIZE], last_entry[TIMESIZE], buf[BUFSIZE], month[3];
+  int retval = 0, day, hour, minute, second, linenum = 0;
   FILE *input;
-  int retval;
 
-  input = fopen(opt.inputfile, "r");
+  input = gzopen(opt.inputfile, "rb");
   if (input == NULL) {
-    fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
+    fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
     exit(EXIT_FAILURE);
   }
 
   if (opt.verbose)
     fprintf(stderr, "Reading '%s'\n", opt.inputfile);
 
-  valid_times = get_times(input, log_begin, log_end);
+  while ((retval != 5) && (gzgets(input, buf, BUFSIZE) != Z_NULL)) {
+    retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
+    linenum++;
+  }
 
-  if (valid_times) {
-    printf("First entry: %s\nLast entry : %s\n", log_begin, log_end);
+  if(retval == 5) {
+    snprintf(first_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
+
+    retval = 0;
+    while (gzgets(input, buf, BUFSIZE) != Z_NULL) {
+      retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
+      linenum++;
+    }
+
+    if (retval == 5) {
+      snprintf(last_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
+
+      printf("# of lines : %d\n", linenum);
+      printf("First entry: %s\n", first_entry);
+      printf("Last entry : %s\n", last_entry);
+    } else {
+      printf("# of lines : %d\n", linenum);
+      printf("First entry: %s\n", first_entry);
+    }
+
   } else {
     printf("No valid time entries found.\n");
   }
@@ -419,9 +458,13 @@ void mode_show_log_times()
   if (opt.verbose)
     fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
-  retval = fclose(input);
-  if (retval == EOF) {
-    perror("fclose");
+  retval = gzclose(input);
+  if (retval != 0) {
+    if (retval != Z_ERRNO) {
+      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
+    } else {
+      perror("gzclose");
+    }
     exit(EXIT_FAILURE);
   }
 }

@@ -1,4 +1,4 @@
-/* $Id: ipchains.yy,v 1.6 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: ipchains.l,v 1.1 2002/02/14 21:15:35 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -7,6 +7,7 @@
 %{
 #define YY_NO_UNPUT
 
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 #include "main.h"
@@ -38,7 +39,7 @@ IPCHAINS	" kernel: Packet log: "
 {STRING}[ ]{STRING}[ ]{STRING}" PROTO="{NUMBER}	ipchains_parse_data(ipchainstext);
 {STRING}" REDIRECT "{NUMBER}[ ]{STRING}" PROTO="{NUMBER}	ipchains_parse_rdata(ipchainstext);
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}":"{PORT}" "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}":"{PORT}	ipchains_parse_ips(ipchainstext);
-"L="{NUMBER}	/* ignore */
+"L="{NUMBER}	opt.line->datalen = atoi(ipchainstext+2);
 "S="{HEXNUM}	/* ignore */
 "I="{NUMBER}	/* ignore */
 "F="{HEXNUM}	/* ignore */
@@ -72,7 +73,11 @@ void ipchains_parse_data(char *input)
 {
   int retval;
 
+#ifdef LONG_NAMES
+  retval = sscanf(input, "%30s %30s %30s PROTO=%3d",
+#else
   retval = sscanf(input, "%10s %10s %10s PROTO=%3d",
+#endif
 		  opt.line->chainlabel,
 		  opt.line->branchname,
 		  opt.line->interface,
@@ -81,12 +86,16 @@ void ipchains_parse_data(char *input)
 
   opt.parser=opt.parser|IPCHAINS_DATA;
 }
- 
+
 void ipchains_parse_rdata(char *input)
 {
   int retval, port;
 
+#ifdef LONG_NAMES
+  retval = sscanf(input, "%30s REDIRECT %5d %30s PROTO=%3d",
+#else
   retval = sscanf(input, "%10s REDIRECT %5d %10s PROTO=%3d",
+#endif
 		  opt.line->chainlabel,
 		  &port,
 		  opt.line->interface,
@@ -97,7 +106,7 @@ void ipchains_parse_rdata(char *input)
 
   opt.parser=opt.parser|IPCHAINS_DATA;
 }
- 
+
 void ipchains_parse_ips(char *input)
 {
   int shost1, shost2, shost3, shost4;

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: main.h,v 1.14 2002/02/14 21:15:35 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.2"
-#define COPYRIGHT "2001-02-10 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.2.1"
+#define COPYRIGHT "2001-03-09 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -17,12 +17,17 @@
 #define IPLEN 16
 #define EMAILSIZE 80
 #define ACTIONSIZE 128
-#define SHORTLEN 10
 #define REPORTLEN 52
 #define COLORSIZE 7
 #define MAXSORTSIZE 16
 #define USERSIZE 16
 #define PASSWORDSIZE 76
+
+#ifndef LONG_NAMES
+#define SHORTLEN 10
+#else
+#define SHORTLEN 30
+#endif
 
 /* Files */
 
@@ -125,6 +130,7 @@ enum {
   SORT_DELTA_TIME,
   SORT_CHAINLABEL,
   SORT_PROTOCOL,
+  SORT_DATALEN,
   SORT_SOURCEHOST,
   SORT_SOURCEPORT,
   SORT_DESTHOST,
@@ -143,7 +149,7 @@ enum {
 #define ROWCOLOR1 "555555"
 #define ROWCOLOR2 "333333"
 
-#define SORTORDER "tacd"
+#define SORTORDER "cd"
 
 enum {
   NOSPACE,
@@ -205,6 +211,7 @@ struct log_line {
   char branchname[SHORTLEN];
   char interface[SHORTLEN];
   int protocol;
+  int datalen;
   struct in_addr shost;
   int sport;
   struct in_addr dhost;
@@ -222,6 +229,7 @@ struct conn_data {
   char branchname[SHORTLEN];
   char interface[SHORTLEN];
   int protocol;
+  int datalen;
   struct in_addr shost;
   int sport;
   struct in_addr dhost;
@@ -299,6 +307,7 @@ struct options {
   unsigned char dst_port;
   unsigned char opts;
 
+  unsigned char datalen;
   unsigned char times;
   unsigned char duration;
 

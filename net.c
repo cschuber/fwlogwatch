@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.11 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: net.c,v 1.12 2002/02/14 21:15:36 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -277,10 +277,10 @@ void handshake(int fd)
     while(this_host != NULL) {
       if (this_host->time == 0) {
 	int mask = 0;
- 
+
 	while((0 != (this_host->netmask.s_addr >> mask)) && (mask < 32))
 	  mask++;
- 
+
 	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s/%d</td><td>Known host/net</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost), mask);
       } else {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));

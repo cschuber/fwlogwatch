@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
+/* $Id: main.c,v 1.14 2002/02/14 21:15:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +23,7 @@ void usage(char *me, unsigned char exitcode)
   printf("         -d          differentiate destination ports\n");
   printf("         -f <file>   specify input file (defaults to %s)\n", INFILE);
   printf("         -h          this help\n");
-  printf("         -L          show time of first and last log entry in file\n");
+  printf("         -L <file>   show time of first and last log entry in file\n");
   printf("         -l <time>   process recent events only (defaults to off)\n");
   printf("         -n          resolve host names\n");
   printf("         -P <format> use only parsers for specific formats\n");
@@ -38,6 +38,7 @@ void usage(char *me, unsigned char exitcode)
   printf("\n");
 
   printf("Log summary mode (default):\n");
+  printf("         -b          show amount of data (sum of total packet lengths)\n");
   printf("         -m <count>  only show entries with at least so many incidents\n");
   printf("         -o <file>   specify output file\n");
   printf("         -O <order>  define the sort order (see the man page for details)\n");
@@ -73,7 +74,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000 Boris Wesslowski, RUS-CERT");
+  puts("Copyright (C) 2000,2001 Boris Wesslowski, RUS-CERT");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -120,6 +121,7 @@ void init_options()
   opt.dst_port = 0;
   opt.opts = 0;
 
+  opt.datalen = 0;
   opt.times = 0;
   opt.duration = 0;
 
@@ -201,7 +203,7 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:M:no:O:pP:RsStT:vVwW:Xyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:A:bBc:C:dDf:F:hi:I:k:l:L:m:M:no:O:pP:RsStT:vVwW:Xyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -209,6 +211,9 @@ int main(int argc, char **argv)
     case 'A':
       opt.response = opt.response | OPT_CUSTOM_ACTION;
       strncpy(opt.action, optarg, ACTIONSIZE);
+      break;
+    case 'b':
+      opt.datalen = 1;
       break;
     case 'B':
       opt.response = opt.response | OPT_BLOCK;
@@ -256,6 +261,7 @@ int main(int argc, char **argv)
 	mode_error();
       }
       opt.mode = SHOW_LOG_TIMES;
+      strncpy(opt.inputfile, optarg, FILESIZE);
       break;
     case 'm':
       opt.least = atoi(optarg);
