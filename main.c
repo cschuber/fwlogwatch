@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
+/* $Id: main.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,7 +112,7 @@ void init_options()
   strncpy(opt.inputfile, INFILE, FILESIZE);
 
   opt.line = NULL;
-  opt.nf = 0;
+  opt.parser = 0;
 
   opt.src_ip = 1;
   opt.dst_ip = 1;

@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
+/* $Id: parser.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,107 +10,26 @@
 #include "parser.h"
 #include "compare.h"
 #include "utils.h"
+#include "ipchains.h"
 #include "netfilter.h"
 #include "cisco.h"
 
 extern struct options opt;
-
-unsigned char ipchains(char *input, int linenum)
-{
-  int retval;
-  char smonth[3];
-  int month = 0, day, hour, minute, second;
-  struct tm *t;
-  int shost1, shost2, shost3, shost4;
-  int dhost1, dhost2, dhost3, dhost4;
-  int length, id, ttl, count;
-  unsigned int tos, offset;
-
-  if (strstr(input, "SYN")) {
-    retval = sscanf(input,
-		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
-		    "%10s %10s %10s "
-		    "PROTO=%3d "
-		    "%3d.%3d.%3d.%3d:%5d "
-		    "%3d.%3d.%3d.%3d:%5d "
-		    "L=%4d S=%4x I=%5d F=%6x T=%3d SYN (#%5d)\n",
-		    smonth, &day, &hour, &minute, &second, opt.line->hostname,
-		    opt.line->chainlabel, opt.line->branchname, opt.line->interface,
-		    &opt.line->protocol,
-		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
-		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport,
-		    &length, &tos, &id, &offset, &ttl, &count);
-    opt.line->syn = 1;
-  } else {
-    retval = sscanf(input,
-		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
-		    "%10s %10s %10s "
-		    "PROTO=%3d "
-		    "%3d.%3d.%3d.%3d:%5d "
-		    "%3d.%3d.%3d.%3d:%5d "
-		    "L=%4d S=%4x I=%5d F=%6x T=%3d (#%5d)\n",
-		    smonth, &day, &hour, &minute, &second, opt.line->hostname,
-		    opt.line->chainlabel, opt.line->branchname, opt.line->interface,
-		    &opt.line->protocol,
-		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
-		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport,
-		    &length, &tos, &id, &offset, &ttl, &count);
-    opt.line->syn = 0;
-  }
-  if (retval != 26) {
-    if (opt.verbose) {
-      if(linenum != 0) {
-	fprintf(stderr, "ipchains format mismatch in line %d: %d of 26 args, ignoring.\n", linenum, retval);
-      } else {
-	fprintf(stderr, "ipchains format mismatch: %d of 26 args, ignoring.\n", retval);
-      }
-    }
-    return PARSE_WRONG_FORMAT;
-  }
-
-  t = localtime(&opt.now);
-  if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
-  t->tm_mon = month;
-  t->tm_mday = day;
-  t->tm_hour = hour;
-  t->tm_min = minute;
-  t->tm_sec = second;
-  t->tm_isdst = -1;
-  opt.line->time = mktime(t);
-
-  snprintf(opt.line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-
-  snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
-
-  opt.line->count = 1;
-
-  return PARSE_OK;
-}
 
 unsigned char parse_line(char *input, int linenum)
 {
   unsigned char retval;
 
   if (strstr(input, " kernel: Packet log: ")) {
-    retval = ipchains(input, linenum);
+    retval = flex_ipchains(input, linenum);
     /* For ipchains log format see */
-    /* /usr/src/linux-2.2.17/net/ipv4/ip_fw.c */
+    /* /usr/src/linux-2.2.18/net/ipv4/ip_fw.c */
   } else if (strstr(input, "IN=")) {
     retval = flex_netfilter(input, linenum);
     /* For iptables/netfilter log format see */
-    /* /usr/src/linux-2.4.0-test10/net/ipv4/netfilter/ipt_LOG.c */
+    /* /usr/src/linux-2.4.0-test12/net/ipv4/netfilter/ipt_LOG.c */
   } else if (strstr(input, "%SEC-6-IPACCESSLOG")) {
+    /* For cisco log format see cisco online documentation */
     retval = flex_cisco(input, linenum);
   } else {
     if (opt.verbose == 2)

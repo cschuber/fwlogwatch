@@ -1,4 +1,4 @@
-/* $Id: netfilter.yy,v 1.3 2002/02/14 20:45:42 bwess Exp $ */
+/* $Id: netfilter.yy,v 1.4 2002/02/14 20:48:49 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -29,11 +29,11 @@ OCTET   {DIGIT}{1,3}
 %%
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{STRING}" kernel: "{ISTRING}	nf_parse_start(nftext);
-"IN="{STRING}?	{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.nf=opt.nf|NF_IN; }
+"IN="{STRING}?	{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.parser=opt.parser|NF_IN; }
 "OUT="{STRING}?		/* ignore */
 "MAC="({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT}	/* ignore */
-"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->shost, nftext+4, IPLEN); opt.nf=opt.nf|NF_SRC; }
-"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->dhost, nftext+4, IPLEN); opt.nf=opt.nf|NF_DST; }
+"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->shost, nftext+4, IPLEN); opt.parser=opt.parser|NF_SRC; }
+"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->dhost, nftext+4, IPLEN); opt.parser=opt.parser|NF_DST; }
 "LEN="{NUMBER}		/* ignore */
 "TOS="{HEXNUM}		/* ignore */
 "PREC="{HEXNUM}		/* ignore */
@@ -45,12 +45,12 @@ OCTET   {DIGIT}{1,3}
 "FRAG:"{NUMBER}		/* ignore */
 "PROTO="{STRING}	nf_parse_proto(nftext+6);
 "INCOMPLETE ["{NUMBER}" bytes]" /* ignore */
-"TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.nf=opt.nf|NF_TYPE; }
+"TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.parser=opt.parser|NF_TYPE; }
 "CODE="{NUMBER}		/* ignore */
 "SEQ="{NUMBER}		/* ignore */
 "ACK="{NUMBER}		/* ignore */
-"SPT="{NUMBER}		{ opt.line->sport = atoi(nftext+4); opt.nf=opt.nf|NF_SPT; }
-"DPT="{NUMBER}		{ opt.line->dport = atoi(nftext+4); opt.nf=opt.nf|NF_DPT; }
+"SPT="{NUMBER}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
+"DPT="{NUMBER}		{ opt.line->dport = atoi(nftext+4); opt.parser=opt.parser|NF_DPT; }
 "WINDOW="{NUMBER}	/* ignore */
 "RES="{HEXNUM}		/* ignore */
 "URG"			/* fixme */
@@ -112,7 +112,7 @@ void nf_parse_start(char *input)
   t->tm_isdst = -1;
   opt.line->time = mktime(t);
 
-  opt.nf=opt.nf|NF_DATE;
+  opt.parser=opt.parser|NF_DATE;
 }
 
 void nf_parse_proto(char *input)
@@ -122,12 +122,12 @@ void nf_parse_proto(char *input)
   if(strncmp(input, "ICMP", 4) == 0) opt.line->protocol = 1;
 
   if (opt.line->protocol != 0)
-    opt.nf=opt.nf|NF_PROTO;
+    opt.parser=opt.parser|NF_PROTO;
 }
 
 unsigned char flex_netfilter(char *input, int linenum)
 {
-  opt.nf = 0;
+  opt.parser = 0;
   init_line();
   nf_scan_string(input);
   nflex();
@@ -135,10 +135,10 @@ unsigned char flex_netfilter(char *input, int linenum)
   strncpy(opt.line->branchname, "-", SHORTLEN);
   opt.line->count = 1;
 
-  if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.nf == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {
+  if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {
     return PARSE_OK;
   }
-  if ((opt.line->protocol == 1) && (opt.nf == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
+  if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
     return PARSE_OK;
   }
   if(opt.verbose)

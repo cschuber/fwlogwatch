@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.2 2002/02/14 20:45:42 bwess Exp $ */
+/* $Id: cisco.yy,v 1.3 2002/02/14 20:48:49 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
@@ -21,6 +21,7 @@ void cisco_parse_dst(char *input, unsigned char mode);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9._-]*
+LOGHOST	[0-9.a-zA-Z_-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
@@ -32,8 +33,9 @@ LIST	[a-zA-Z0-9._-]*
 
 %%
 
-{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{STRING}	cisco_parse_date(ciscotext, C_OPT_HOST);
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	cisco_parse_date(ciscotext, C_OPT_HOST);
 {NUMBER}":"	/* ignore */
+{NUMBER}"w"{DIGIT}"d:"	/* ignore */
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}":"	cisco_parse_date(ciscotext, C_OPT_NONE);
 {CISCO}		/* ignore */
 "list "{LIST}[ ]{TARGET}[ ]{PROTO}[ ]{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"("{PORT}")"	cisco_parse_src(ciscotext, C_OPT_PORT);
@@ -41,7 +43,7 @@ LIST	[a-zA-Z0-9._-]*
 "-> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"("{PORT}"),"	cisco_parse_dst(ciscotext, C_OPT_PORT);
 "-> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}" ("{NUMBER}"/"{NUMBER}"),"	cisco_parse_dst(ciscotext, C_OPT_TYPE);
 "-> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","	cisco_parse_dst(ciscotext, C_OPT_NONE);
-{NUMBER}" packet"("s")?	{ opt.line->count = atoi(ciscotext); opt.cisco=opt.cisco|CISCO_COUNT; }
+{NUMBER}" packet"("s")?	{ opt.line->count = atoi(ciscotext); opt.parser=opt.parser|CISCO_COUNT; }
 "("[A-Za-z0-9 /._-]*")"	/* ignore */
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
@@ -96,7 +98,7 @@ void cisco_parse_date(char *input, unsigned char mode)
   t->tm_isdst = -1;
   opt.line->time = mktime(t);
 
-  opt.cisco=opt.cisco|CISCO_DATE;
+  opt.parser=opt.parser|CISCO_DATE;
 }
 
 void cisco_parse_src(char *input, unsigned char mode)
@@ -119,7 +121,7 @@ void cisco_parse_src(char *input, unsigned char mode)
   }
 
   snprintf(opt.line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-  opt.cisco=opt.cisco|CISCO_SRC;
+  opt.parser=opt.parser|CISCO_SRC;
 
   if(strncmp(proto, "tcp", 3) == 0) opt.line->protocol = 6;
   if(strncmp(proto, "udp", 3) == 0) opt.line->protocol = 17;
@@ -129,7 +131,7 @@ void cisco_parse_src(char *input, unsigned char mode)
   if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
 
   if (opt.line->protocol != 0)
-    opt.cisco=opt.cisco|CISCO_PROTO;
+    opt.parser=opt.parser|CISCO_PROTO;
 }
 
 void cisco_parse_dst(char *input, unsigned char mode)
@@ -151,19 +153,19 @@ void cisco_parse_dst(char *input, unsigned char mode)
   }
 
   snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
-  opt.cisco=opt.cisco|CISCO_DST;
+  opt.parser=opt.parser|CISCO_DST;
 }
 
 unsigned char flex_cisco(char *input, int linenum)
 {
-  opt.cisco = 0;
+  opt.parser = 0;
   init_line();
   cisco_scan_string(input);
   ciscolex();
 
   strncpy(opt.line->interface, "-", SHORTLEN);
 
-  if (opt.cisco == (CISCO_DATE|CISCO_SRC|CISCO_PROTO|CISCO_DST|CISCO_COUNT)) {
+  if (opt.parser == (CISCO_DATE|CISCO_SRC|CISCO_PROTO|CISCO_DST|CISCO_COUNT)) {
     return PARSE_OK;
   } else {
     if(opt.verbose)

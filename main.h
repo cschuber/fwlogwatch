@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
+/* $Id: main.h,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.27"
-#define COPYRIGHT "2000-12-10 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.28"
+#define COPYRIGHT "2000-12-26 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -48,7 +48,13 @@ enum {
   PARSE_TOO_OLD
 };
 
-/* Netfilter support */
+/* ipchains support */
+
+#define IPCHAINS_DATE 1
+#define IPCHAINS_DATA 2
+#define IPCHAINS_IPS 4
+
+/* netfilter support */
 
 #define NF_DATE 1
 #define NF_IN 2
@@ -59,7 +65,7 @@ enum {
 #define NF_DPT 64
 #define NF_TYPE 128
 
-/* Cisco support */
+/* cisco support */
 
 #define CISCO_DATE 1
 #define CISCO_SRC 2
@@ -223,8 +229,7 @@ struct options {
   char inputfile[FILESIZE];
 
   struct log_line *line;
-  unsigned char nf;
-  unsigned char cisco;
+  unsigned char parser;
 
   unsigned char src_ip;
   unsigned char dst_ip;

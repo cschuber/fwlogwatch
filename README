@@ -1,4 +1,4 @@
-$Id: README,v 1.6 2002/02/14 20:45:42 bwess Exp $
+$Id: README,v 1.7 2002/02/14 20:48:49 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -57,11 +57,32 @@ only works for ipchains. It is assumed that if you use netfilter or cisco
 you know how to get it to produce usable log entries.
 
 
+INSTALLATION
+For ipchains you will need at least kernel 2.2.10 (which you should have
+updated for security reasons anyway), kernel versions before 2.2.10 don't
+log enough.
+
+Before compiling you may want to have a look at main.h if you want to
+change some default values. To compile on Solaris look for the corresponding
+lines at the top of the Makefile.
+
+A simple 'make' should be enough to obtain a working binary. If you use the
+realtime response mode you will need to install fwlogwatch with superuser
+permissions. If all you need is read access to the system's standard log
+file (e.g. /var/log/messages) you can use group permissions.
+'make install' will install the binary (in /usr/local/sbin) and the man
+page, 'make install-config' will also install a sample configuration file
+and template in /etc.
+
+You can define the TMPDIR environment variable if you don't want fwlogwatch
+to create it's temporary files (only needed in report mode) in /tmp.
+
+
 BASICS (for ipchains)
 - Create an ipchains packet filter with allow rules for all connections you
   need, as tight as possible.
 
-- Your default policy should be DENY:
+- Your default policies should be DENY:
 
     ipchains -P input DENY
     ipchains -P forward DENY
@@ -85,37 +106,17 @@ BASICS (for ipchains)
   rule before the logging rule above (or use the block response mode).
 
 
-INSTALLATION
-For ipchains you will need at least kernel 2.2.10 (which you should have
-updated for security reasons anyway), kernel versions before 2.2.10 don't
-log enough.
-
-Before compiling you may want to have a look at main.h if you want to
-change some default values. To compile on Solaris look for the corresponding
-lines at the top of the Makefile.
-
-A simple 'make' should be enough to obtain a working binary. If you use the
-realtime response mode you will need to install fwlogwatch with superuser
-permissions. If all you need is read access to the systems standard log
-file (e.g. /var/log/messages) you can use group permissions.
-'make install' will install the binary (in /usr/local/sbin) and the man
-page, 'make install-config' will also install a sample configuration file
-and template in /etc.
-
-You can define the TMPDIR environment variable if you don't want fwlogwatch
-to create it's temporary files in /tmp.
-
-
 CONFIGURATION AND EXAMPLES
 - You should make a configuration file for each function you want, look at
   the included sample file, it should be easy to adapt it to your needs.
 
-- If you want a HTML summary 'log.html' of all packet filter entries at
-  most one day old from the file 'messages' with timestamps, time intervals,
-  resolved IP addresses and service names and with connections separated by
-  protocol, source and destination ports and TCP options you would use
+- If you want a HTML summary 'log.html' of all packet filter entries at most
+  one day old representing at least two connection attempts logged to the
+  file 'messages' with output including timestamps, time intervals, resolved
+  IP addresses and service names and with connections separated by protocol,
+  source and destination ports and TCP options you would use
 
-    fwlogwatch -v -v -s -d -t -z -y -n -p -w -l 1d -o log.html -f messages
+  fwlogwatch -v -v -s -d -t -z -y -n -p -w -l 1d -m 2 -o log.html -f messages
 
 - If you want to use fwlogwatch as a CGI, e.g. to have a quick look at
   what happened in the last hour when you get a notification:

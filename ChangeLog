@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.5 2002/02/14 20:45:42 bwess Exp $
+$Id: ChangeLog,v 1.6 2002/02/14 20:48:49 bwess Exp $
+
+Version 0.0.28 2000-12-26
+- Rewrote ipchains parser (converted to flex)
+- Added support for cisco uptime log format
 
 Version 0.0.27 2000-12-08
 - Solaris portability patches
