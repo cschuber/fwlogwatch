@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
+/* $Id: output.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -236,7 +236,7 @@ void output_resolved(struct conn_data *input)
   if(opt.html) {
     printf("</td></tr>\n");
   } else {
-    printf(".\n");
+    printf("\n");
   }
 }
 

@@ -1,4 +1,7 @@
-$Id: ChangeLog,v 1.7 2002/02/14 20:54:34 bwess Exp $
+$Id: ChangeLog,v 1.8 2002/02/14 21:00:01 bwess Exp $
+
+Version 0.1.1 2001-01-12
+- Various small fixes
 
 Version 0.1 2001-01-07
 - Rewrote IP Address handling code

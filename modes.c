@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
+/* $Id: modes.c,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,7 +121,7 @@ void mode_summary()
   printf("of %d entries in the file ", linenum);
   printf("\"%s\" are packet logs, ", opt.inputfile);
   retval = list_stats();
-  printf("%d %s unique connection caracteristics.\n", retval, (retval==1)?"has":"have");
+  printf("%d %s unique connection characteristics.\n", retval, (retval==1)?"has":"have");
 
   if (opt.html)
     printf("<br>\n");

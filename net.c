@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.7 2002/02/14 20:54:34 bwess Exp $ */
+/* $Id: net.c,v 1.8 2002/02/14 21:00:01 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,7 +140,11 @@ void handshake(int fd)
   typedef int socklen_t; /* undefined and not unsigned as in linux */
 #endif
   int conn, retval;
+#ifndef IRIX
   socklen_t socks;
+#else
+  size_t socks;
+#endif
   struct sockaddr_in sac;
   char buf[BUFSIZE], nows[TIMESIZE], password[PASSWORDSIZE], salt[2], *pnt;
   time_t now;

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
+/* $Id: main.h,v 1.10 2002/02/14 21:00:01 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.1"
-#define COPYRIGHT "2001-01-07 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.1.1"
+#define COPYRIGHT "2001-01-12 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -90,7 +90,9 @@ enum {
 enum {
   C_OPT_NONE,
   C_OPT_HOST,
+  C_OPT_MSEC,
   C_OPT_PORT,
+  C_OPT_MISSING,
   C_OPT_TYPE
 };
 

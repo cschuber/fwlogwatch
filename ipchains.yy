@@ -1,4 +1,4 @@
-/* $Id: ipchains.yy,v 1.2 2002/02/14 20:54:34 bwess Exp $ */
+/* $Id: ipchains.yy,v 1.3 2002/02/14 21:00:01 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -21,7 +21,7 @@ void ipchains_parse_ips(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-STRING	[a-zA-Z][a-zA-Z0-9._-]*
+STRING	[a-zA-Z-][a-zA-Z0-9._-]*
 LOGHOST	[0-9.a-zA-Z_-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
