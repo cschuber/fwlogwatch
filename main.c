@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: main.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,9 +9,11 @@
 #include "rcfile.h"
 #include "parser.h"
 #include "modes.h"
+#include "utils.h"
 
 struct options opt;
 extern char *optarg;
+extern struct known_hosts *first_host;
 
 void usage(char *me, char exitcode)
 {
@@ -38,6 +40,7 @@ void usage(char *me, char exitcode)
 
   printf("Log summary mode (default):\n");
   printf("         -o <file>   specify output file\n");
+  printf("         -O <order>  define the sort order (see the man page for details)\n");
   printf("         -w          HTML output\n");
   printf("\n");
 
@@ -53,12 +56,14 @@ void usage(char *me, char exitcode)
 
   printf("Realtime response mode:\n");
   printf("         -R          realtime response as daemon (default action: log only)\n");
-  printf("         -a <count>  alert threshold (defaults to %d)\n", ALERT);
+  printf("         -a <count>  alert threshold (defaults to %d entries)\n", ALERT);
   printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
+  printf("         -k <IP>     add this IP address to the list of known hosts\n");
   printf("         -m <email>  send email notifications on incidents\n");
   printf("         -B          block host completely with new firewall rule\n");
   printf("         -W <host>   send a winpopup alert message to host\n");
   printf("         -A <action> custom action to take when threshold is reached\n");
+  printf("         -X          activate internal status information web server\n");
   printf("\n");
 
   if (exitcode == EXIT_SUCCESS)
@@ -178,13 +183,14 @@ int main(int argc, char **argv)
   char rcfile[FILESIZE];
   unsigned char alt_rcfile = 0;
   int iopt;
+  struct known_hosts *host;
 
   init_options();
 
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:l:Lm:no:pRsStT:vVwW:yz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:no:O:pRsStT:vVwW:Xyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -225,6 +231,13 @@ int main(int argc, char **argv)
     case 'I':
       strncpy(opt.templatefile, optarg, FILESIZE);
       break;
+    case 'k':
+      host = xmalloc(sizeof(struct known_hosts));
+      host->time = 0;
+      strncpy(host->shost, optarg, IPLEN);
+      host->next = first_host;
+      first_host = host;
+      break;
     case 'l':
       opt.recent = parse_time(optarg);
       break;
@@ -241,6 +254,9 @@ int main(int argc, char **argv)
     case 'o':
       strncpy(opt.outputfile, optarg, FILESIZE);
       opt.use_out = 1;
+      break;
+    case 'O':
+      strncpy(opt.sort_order, optarg, MAXSORTSIZE);
       break;
     case 'p':
       opt.proto = 1;
@@ -272,6 +288,9 @@ int main(int argc, char **argv)
     case 'W':
       opt.response = opt.response | OPT_NOTIFY_SMB;
       strncpy(opt.smb_host, optarg, SHOSTLEN);
+      break;
+    case 'X':
+      opt.status = 1;
       break;
     case 'y':
       opt.opts = 1;

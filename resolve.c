@@ -1,4 +1,4 @@
-/* $Id: resolve.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: resolve.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

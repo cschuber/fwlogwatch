@@ -1,7 +1,7 @@
 .\"
-.\" $Id: fwlogwatch.8,v 1.2 2002/02/14 20:25:35 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.3 2002/02/14 20:29:42 bwess Exp $
 .\"
-.TH FWLOGWATCH 8 "27 October 2000" RUS-CERT
+.TH FWLOGWATCH 8 "01 November 2000" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -74,6 +74,41 @@ packet.
 This are additional options that are only available in log summary mode:
 .IP \-o\ \fIfile\fR
 Specify output file.
+.IP \-O\ \fIorder\fR
+This is the sort order of the summary. Since entries often are
+equal in certain fields you can sort by several fields one after another
+(the sort algorithm is stable, so equal entries will remain sorted in the
+order they were sorted before). The sort string can be composed 8 fields of
+the form 
+.B ab
+where
+.B a
+is the sort criteria:
+.I c
+count,
+.I S
+source host,
+.I D
+destination host,
+.I s
+source port,
+.I t
+start time and
+.I z
+duration.
+.B b
+is the direction:
+.I a
+ascending and
+.I d
+descending.
+Sorting is done in the order specified, so the last option is the primary
+criteria. The default is
+.I tacd
+(start with the highest count, if two counts match list the one earlier in
+time first). If you specify an empty sort string or everything else is equal
+entries will be unsorted (as they come in the log file with the most recent
+unique entry found first).
 .IP \-w
 Produce output in HTML format.
 .SH "INTERACTIVE REPORT MODE"
@@ -106,6 +141,10 @@ Alert threshold. Notify or start countermeasures if this limit is reached.
 Defaults to 5.
 .IP \-l\ \fItime\fR
 Forget events that happened this long ago (defaults to 1 day).
+.IP \-k\ \fIIP\fR
+This option defines a host that will never be blocked or other actions taken
+against. To specify more than one, use the -k parameter again for each IP
+address you want to add.
 .IP \-m\ \fIemail\fR
 Send an email notification to the specified
 .I email
@@ -122,11 +161,37 @@ Send a winpopup alert message to the windows machine
 .IR host .
 .IP \-A\ \fIaction\fR
 This custom action is executed in a shell.
+.IP \-X
+Activate the internal web server to monitor the current status of the program.
+Use the configuration file to change it's options. The default user name is
+.B admin
+and the default password is
+.B fwlogwat
+since DES can only encrypt 8 characters. By default it listens on port
+888 and only allows connections from localhost.
 .SH "TIME FORMAT"
-Time is specified as 'nx' where n is a natural number and x is one of the
-following: \'s' for seconds (default if you don't specify anything), \'m'
-for minutes, \'h' for hours, \'d' for days, \'w' for weeks, \'M' for months
-and \'y' for years.
+Time is specified as
+.B nx
+where
+.B n
+is a natural number and
+.B x
+is one of the
+following: 
+.I s
+for seconds (default if you don't specify anything),
+.I m
+for minutes,
+.I h
+for hours,
+.I d
+for days,
+.I w
+for weeks,
+.I M
+for months and
+.I y
+for years.
 .SH FILES
 .IP \fB/etc/fwlogwatch.config\fR
 Default configuration file.
@@ -134,19 +199,15 @@ Default configuration file.
 Default template for incident reports.
 .IP \fB/var/log/messages\fR
 Default input log file.
-.SH "FEATURES ONLY IN CONFIG FILE"
-The following features are only available in the config file and not on the
-command line, they are presented and explained in the sample config file.
+.SH "FEATURES ONLY IN CONFIGURATION FILE"
+The following features are only available in the configuration file and not
+on the command line, they are presented and explained in the sample
+configuration file.
 .IP HTML\ colors
-The colors of the HTML output page can be changed.
-.IP sort\ options
-Sort options and criteria of the summary output can be customized.
-.IP trusted\ hosts
-Hosts that will never be blocked or other actions taken against can be
-defined.
-.IP status\ server
-In realtime response mode you can see the state of the program through a web
-interface.
+The colors of the HTML output page can be customized.
+.IP status\ server\ options
+The host that can access the web interface, the port it listens to and the
+user and password can be changed.
 .SH SECURITY
 Since
 .B fwlogwatch

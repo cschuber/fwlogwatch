@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2002/02/14 20:25:35 bwess Exp $
+# $Id: Makefile,v 1.4 2002/02/14 20:29:42 bwess Exp $
 
 CC=gcc
 CFLAGS=-pipe -O2 -Wall #-pedantic -g -p

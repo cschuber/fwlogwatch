@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: parser.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,10 +36,34 @@ unsigned char parse_line(char *input, int linenum)
   line = xmalloc(sizeof(struct log_line));
 
   if (strstr(input, "SYN")) {
-    retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: %10s %10s %10s PROTO=%3d %3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d L=%4d S=%4x I=%5d F=%6x T=%3d SYN (#%5d)\n", smonth, &day, &hour, &minute, &second, line->hostname, line->chainlabel, line->branchname, line->interface, &line->protocol, &shost1, &shost2, &shost3, &shost4, &line->sport, &dhost1, &dhost2, &dhost3, &dhost4, &line->dport, &length, &tos, &id, &offset, &ttl, &count);
+    retval = sscanf(input,
+		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
+		    "%10s %10s %10s "
+		    "PROTO=%3d "
+		    "%3d.%3d.%3d.%3d:%5d "
+		    "%3d.%3d.%3d.%3d:%5d "
+		    "L=%4d S=%4x I=%5d F=%6x T=%3d SYN (#%5d)\n",
+		    smonth, &day, &hour, &minute, &second, line->hostname,
+		    line->chainlabel, line->branchname, line->interface,
+		    &line->protocol,
+		    &shost1, &shost2, &shost3, &shost4, &line->sport,
+		    &dhost1, &dhost2, &dhost3, &dhost4, &line->dport,
+		    &length, &tos, &id, &offset, &ttl, &count);
     line->syn = 1;
   } else {
-    retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: %10s %10s %10s PROTO=%3d %3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d L=%4d S=%4x I=%5d F=%6x T=%3d (#%5d)\n", smonth, &day, &hour, &minute, &second, line->hostname, line->chainlabel, line->branchname, line->interface, &line->protocol, &shost1, &shost2, &shost3, &shost4, &line->sport, &dhost1, &dhost2, &dhost3, &dhost4, &line->dport, &length, &tos, &id, &offset, &ttl, &count);
+    retval = sscanf(input,
+		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
+		    "%10s %10s %10s "
+		    "PROTO=%3d "
+		    "%3d.%3d.%3d.%3d:%5d "
+		    "%3d.%3d.%3d.%3d:%5d "
+		    "L=%4d S=%4x I=%5d F=%6x T=%3d (#%5d)\n",
+		    smonth, &day, &hour, &minute, &second, line->hostname,
+		    line->chainlabel, line->branchname, line->interface,
+		    &line->protocol,
+		    &shost1, &shost2, &shost3, &shost4, &line->sport,
+		    &dhost1, &dhost2, &dhost3, &dhost4, &line->dport,
+		    &length, &tos, &id, &offset, &ttl, &count);
     line->syn = 0;
   }
   if (retval != 26) {
@@ -54,12 +78,7 @@ unsigned char parse_line(char *input, int linenum)
     return 2;
   }
 
-  t = gmtime(&opt.now);
-  t->tm_mday = day;
-  t->tm_hour = hour + 1;
-  t->tm_min = minute;
-  t->tm_sec = second;
-
+  t = localtime(&opt.now);
   if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
   if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
   if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
@@ -72,9 +91,12 @@ unsigned char parse_line(char *input, int linenum)
   if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
   if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
   if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
-
   t->tm_mon = month;
-
+  t->tm_mday = day;
+  t->tm_hour = hour;
+  t->tm_min = minute;
+  t->tm_sec = second;
+  t->tm_isdst = -1;
   line->time = mktime(t);
 
   if(opt.recent != 0) {

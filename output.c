@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: output.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -19,14 +19,6 @@ void separate(char space)
       printf(" ");
     }
   }
-}
-
-void output_time(time_t time, char *stime)
-{
-  struct tm *tm;
-
-  tm = gmtime(&time);
-  strftime(stime, TIMESIZE, "%b %d %H:%M:%S", tm);
 }
 
 void output_timediff(time_t start, time_t end, char *td)
@@ -96,7 +88,7 @@ void output_resolved(struct conn_data *input)
     if(!opt.html)
       printf("[");
 
-    output_time(input->start_time, time);
+    strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->start_time));
     printf("%s", time);
 
     separate(SPACE);
@@ -105,7 +97,7 @@ void output_resolved(struct conn_data *input)
       printf("to ");
 
     if(input->end_time != 0) {
-      output_time(input->end_time, time);
+      strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->end_time));
       printf("%s", time);
     } else {
       printf("-");

@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: compare.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -167,7 +167,7 @@ void sort_data()
       field = DELTA_TIME;
       break;
     default:
-      fprintf(stderr, "Error in sort string ('%c'), ignoring.\n", opt.sort_order[i]);
+      fprintf(stderr, "Error in sort string: '%c', order expected, ignoring.\n", opt.sort_order[i]);
       error = 1;
     }
 
@@ -181,18 +181,18 @@ void sort_data()
 	mode = BIGGERFIRST;
 	break;
       default:
-	fprintf(stderr, "Error in sort string ('%c'), ignoring.\n", opt.sort_order[i]);
+	fprintf(stderr, "Error in sort string: '%c', direction expected, ignoring.\n", opt.sort_order[i]);
 	error = 1;
       }
     } else {
       error = 1;
     }
 
+    i++;
     if (error == 0) {
       sort_list(field, mode);
       if (opt.verbose == 2)
 	fprintf(stderr, ".");
-      i++;
     }
   }
 }

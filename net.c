@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.1 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: net.c,v 1.2 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "main.h"
 #include "output.h"
+#include "response.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -197,36 +198,69 @@ int handshake(int fd)
     net_output(conn, "<div align=\"center\">\n<h1>fwlogwatch status</h1>\n</div>\n");
     net_output(conn, "<h2>General info</h2>\n");
 
+    net_output(conn, "<table border=\"0\">\n");
     strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-    snprintf(buf, BUFSIZE, "The daemon was started %s.<br>\n", nows);
+    snprintf(buf, BUFSIZE, "<tr><td>The daemon was started</td><td>%s</td></tr>\n", nows);
     net_output(conn, buf);
 
     now = time(NULL);
     strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
-    snprintf(buf, BUFSIZE, "Now it's %s.<br>\n", nows);
+    snprintf(buf, BUFSIZE, "<tr><td>Now it's</td><td>%s</td></tr>\n", nows);
     net_output(conn, buf);
 
-    snprintf(buf, BUFSIZE, "Alert threshold: %d entries.<br>\nDiscard timeout: %d seconds.<br>\n", opt.threshold, opt.recent);
+    output_timediff(opt.now, now, nows);
+    snprintf(buf, BUFSIZE, "<tr><td>Running time:</td><td>%s</td></tr>\n", nows);
     net_output(conn, buf);
 
-    snprintf(buf, BUFSIZE, "Response: log%s%s%s%s.<br>\n",
-	     (opt.response & OPT_BLOCK)?", block":"",
-	     (opt.response & OPT_NOTIFY_SMB)?", smb notification":"",
-	     (opt.response & OPT_NOTIFY_EMAIL)?", email notification":"",
-	     (opt.response & OPT_CUSTOM_ACTION)?", custom action":"");
+    snprintf(buf, BUFSIZE, "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n<tr><td>Discard timeout:</td><td>%d seconds</td></tr>\n", opt.threshold, opt.recent);
     net_output(conn, buf);
+
+    {
+      char buf2[BUFSIZE];
+
+      show_mode_opts(buf2);
+      snprintf(buf, BUFSIZE, "<tr><td>Response mode:</td><td>%s</td></tr>\n", buf2);
+    }
+    net_output(conn, buf);
+
+    net_output(conn, "</table>\n");
     
+    net_output(conn, "<h2>Connection cache</h2>\n");
+    net_output(conn, "<table border=\"0\">\n");
+    snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>count</td><td>IP address</td><td>remaining time</td></tr>\n", opt.rowcol1);
+    net_output(conn, buf);
+    this = first;
+    while(this != NULL) {
+      time_t remaining;
+
+      if (this->end_time != 0) {
+	remaining = opt.recent - (now - this->end_time);
+      } else {
+	remaining = opt.recent - (now - this->start_time);
+      }
+      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td><td>%s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, this->shost, (int)remaining);
+      if (color == 1) {
+	color = 2;
+      } else {
+	color = 1;
+      }
+      net_output(conn, buf);
+      this = this->next;
+    }
+    net_output(conn, "</table>\n<br>\n");
+
+    color = 1;
     net_output(conn, "<h2>Host status</h2>\n");
     net_output(conn, "<table border=\"0\">\n");
-    snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>IP address</td><td>status</td></tr>\n", opt.rowcol1);
+    snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>IP address</td><td>status</td><td>remaining time</td></tr>\n", opt.rowcol1);
     net_output(conn, buf);
     this_host = first_host;
     while(this_host != NULL) {
       if (this_host->time == 0) {
-	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Known host</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost);
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Known host</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost);
       } else {
-	output_time(this_host->time, nows);
-	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Blocked since %s</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost, nows);
+	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Added %s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost, nows, (int)(opt.recent - (now - this_host->time)));
       }
       if (color == 1) {
 	color = 2;
@@ -235,24 +269,6 @@ int handshake(int fd)
       }
       net_output(conn, buf);
       this_host = this_host->next;
-    }
-    net_output(conn, "</table>\n<br>\n");
-
-    color = 1;
-    net_output(conn, "<h2>Connection cache</h2>\n");
-    net_output(conn, "<table border=\"0\">\n");
-    snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>#</td><td>IP address</td></tr>\n", opt.rowcol1);
-    net_output(conn, buf);
-    this = first;
-    while(this != NULL) {
-      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td><td>%s</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, this->shost);
-      if (color == 1) {
-	color = 2;
-      } else {
-	color = 1;
-      }
-      net_output(conn, buf);
-      this = this->next;
     }
     net_output(conn, "</table>\n<br><br>\n");
 

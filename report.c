@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: report.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -226,7 +226,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
 
   strncpy(data->cc, opt.cc, EMAILSIZE);
 
-  strftime(stime, TIMESIZE, "%Y%m%d", gmtime(&this->start_time));
+  strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
   snprintf(data->subject, EMAILSIZE, "Incident report %s-%s", stime, this->shost);
 
   if(opt.src_ip)
@@ -252,10 +252,10 @@ void fill_report(struct conn_data *this, struct report_data *data)
   snprintf(data->count, SHORTLEN, "%d", this->count);
 
   if(opt.times) {
-    output_time(this->start_time, stime);
+    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->start_time));
     strncpy(data->t_start, stime, TIMESIZE);
 
-    output_time(this->end_time, stime);
+    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
     strncpy(data->t_end, stime, TIMESIZE);
 
     now = time(NULL);
@@ -313,7 +313,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
     data->syn[0] = '\0';
   }
 
-  strftime(stime, TIMESIZE, "%Y%m%d", gmtime(&this->start_time));
+  strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
   snprintf(data->tracking, REPORTLEN, "%s-%s", stime, this->shost);
 }
 

@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: utils.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +38,8 @@ void run_command(char *buf)
 {
   pid_t pid;
 
-  if (strstr(buf, "%") != NULL) {
-    syslog(LOG_NOTICE, "Not executing buffer containing format string.");
+  if (strstr(buf, "[invalid]") != NULL) {
+    syslog(LOG_NOTICE, "Not executing buffer containing invalid string");
     return;
   }
 

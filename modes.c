@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: modes.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -188,7 +188,7 @@ void mode_rt_response()
   char buf[BUFSIZE];
   pid_t pid;
   FILE *input;
-  int retval, sock;
+  int retval, sock = 0;
   struct stat info;
   unsigned long size;
   fd_set rfds;
@@ -205,11 +205,12 @@ void mode_rt_response()
   }
 
   openlog("fwlogwatch", LOG_CONS|LOG_PERROR, LOG_DAEMON);
-  syslog(LOG_NOTICE, "Starting");
+  syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
 
   signal(SIGTERM, terminate);
 
-  sock = prepare_socket();
+  if(opt.status)
+    sock = prepare_socket();
 
   look_for_log_rules();
 
@@ -220,16 +221,8 @@ void mode_rt_response()
 	 (opt.recent < 3600)?"second":"hour",
 	 ((opt.recent == 1) || (opt.recent == 3600))?"":"s");
 
-
-  syslog(LOG_NOTICE, "Response mode: log incident%s%s%s%s%s%s%s%s",
-	 (opt.response & OPT_BLOCK)?", block host":"",
-	 (opt.response & OPT_NOTIFY_EMAIL)?", email notification to ":"",
-	 (opt.response & OPT_NOTIFY_EMAIL)?opt.recipient:"",
-	 (opt.response & OPT_NOTIFY_SMB)?", winpopup notification on host ":"",
-	 (opt.response & OPT_NOTIFY_SMB)?opt.smb_host:"",
-	 (opt.response & OPT_CUSTOM_ACTION)?", custom action '":"",
-	 (opt.response & OPT_CUSTOM_ACTION)?opt.action:"",
-	 (opt.response & OPT_CUSTOM_ACTION)?"'":"");
+  show_mode_opts(buf);
+  syslog(LOG_NOTICE, "Response mode: %s", buf);
 
   if(opt.response & OPT_BLOCK)
     modify_firewall(ADD_CHAIN);
@@ -254,27 +247,31 @@ void mode_rt_response()
   size = info.st_size;
 
   while (1) {
-    FD_ZERO(&rfds);
-    FD_SET(sock, &rfds);
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    retval = select(sock+1, &rfds, NULL, NULL, &tv);
-    if (retval) {
-      handshake(sock);
+    if(opt.status) {
+      FD_ZERO(&rfds);
+      FD_SET(sock, &rfds);
+      tv.tv_sec = 1;
+      tv.tv_usec = 0;
+      retval = select(sock+1, &rfds, NULL, NULL, &tv);
+      if (retval) {
+	handshake(sock);
+      }
     } else {
-      retval = fstat(fileno(input), &info);
-      if (retval == -1) {
-	syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-	log_exit();
+      sleep(1);
+    }
+
+    retval = fstat(fileno(input), &info);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+      log_exit();
+    }
+    remove_old();
+    if(size != info.st_size) {
+      size = info.st_size;
+      while (fgets(buf, BUFSIZE, input)) {
+	parse_line(buf, 0);
       }
-      if(size != info.st_size) {
-	size = info.st_size;
-	while (fgets(buf, BUFSIZE, input)) {
-	  parse_line(buf, 0);
-	}
-	remove_old();
-	look_for_alert();
-      }
+      look_for_alert();
     }
   }
 }

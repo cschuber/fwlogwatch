@@ -1,4 +1,4 @@
-/* $Id: compare.h,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: compare.h,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #ifndef _COMPARE_H
 #define _COMPARE_H

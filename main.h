@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
+/* $Id: main.h,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.23"
-#define COPYRIGHT "2000-10-29 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.24"
+#define COPYRIGHT "2000-11-02 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -95,8 +95,9 @@ enum {
 #define SMBCLIENT "/usr/bin/smbclient"
 #define LISTENHOST "127.0.0.1"
 #define LISTENPORT 888
-#define DEFAULT_USER "fwlogwatch"
-#define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwatch */
+#define DEFAULT_USER "admin"
+#define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
+					    DES only supports 8 characters */
 
 #define OPT_LOG 0x01
 #define OPT_BLOCK 0x02
