@@ -1,10 +1,9 @@
-/* $Id: report.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: report.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include <errno.h>
 #include "main.h"
 #include "resolve.h"

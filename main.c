@@ -1,10 +1,9 @@
-/* $Id: main.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: main.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include "main.h"
 #include "rcfile.h"
 #include "parser.h"
@@ -39,6 +38,7 @@ void usage(char *me, char exitcode)
   printf("\n");
 
   printf("Log summary mode (default):\n");
+  printf("         -m <count>  only show entries with at least so many incidents\n");
   printf("         -o <file>   specify output file\n");
   printf("         -O <order>  define the sort order (see the man page for details)\n");
   printf("         -w          HTML output\n");
@@ -59,7 +59,7 @@ void usage(char *me, char exitcode)
   printf("         -a <count>  alert threshold (defaults to %d entries)\n", ALERT);
   printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
   printf("         -k <IP>     add this IP address to the list of known hosts\n");
-  printf("         -m <email>  send email notifications on incidents\n");
+  printf("         -M <email>  send email notifications on incidents\n");
   printf("         -B          block host completely with new firewall rule\n");
   printf("         -W <host>   send a winpopup alert message to host\n");
   printf("         -A <action> custom action to take when threshold is reached\n");
@@ -99,7 +99,10 @@ void info()
 
 void init_options()
 {
-  char *user, host[SHOSTLEN], domain[SHOSTLEN];
+  char *user, host[SHOSTLEN];
+#ifndef SOLARIS
+  char domain[SHOSTLEN];
+#endif
   int retval;
 
   opt.mode = LOG_SUMMARY;
@@ -147,6 +150,7 @@ void init_options()
   opt.recent = 0;
 
   opt.threshold = 0;
+  opt.least = 0;
   opt.sender[0] = '\0';
   strncpy(opt.recipient, CERT, EMAILSIZE);
   opt.cc[0] = '\0';
@@ -169,6 +173,7 @@ void init_options()
     perror("gethostname");
     return;
   }
+#ifndef SOLARIS
   retval = getdomainname(domain, SHOSTLEN);
   if (retval == -1) {
     perror("getdomainname");
@@ -177,8 +182,11 @@ void init_options()
   if (strlen(domain) > 0) {
     snprintf(opt.sender, EMAILSIZE, "%s@%s.%s", user, host, domain);
   } else {
+#endif
     snprintf(opt.sender, EMAILSIZE, "%s@%s", user, host);
+#ifndef SOLARIS
   }
+#endif
 }
 
 int main(int argc, char **argv)
@@ -193,7 +201,7 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:no:O:pRsStT:vVwW:Xyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:M:no:O:pRsStT:vVwW:Xyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -248,6 +256,9 @@ int main(int argc, char **argv)
       opt.mode = SHOW_LOG_TIMES;
       break;
     case 'm':
+      opt.least = atoi(optarg);
+      break;
+    case 'M':
       opt.response = opt.response | OPT_NOTIFY_EMAIL;
       strncpy(opt.recipient, optarg, EMAILSIZE);
       break;

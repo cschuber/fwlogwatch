@@ -1,4 +1,4 @@
-/* $Id: utils.h,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: utils.h,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H

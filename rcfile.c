@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: rcfile.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,6 +154,10 @@ void parse_rcfile(char *input)
   }
   if (strncmp(command, "recent", 6) == 0) {
     opt.recent = parse_time(get_one_parameter(command+7));
+    return;
+  }
+  if (strncmp(command, "at_least", 8) == 0) {
+    opt.least = get_num_parameter(command+9);
     return;
   }
 

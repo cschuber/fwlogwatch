@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: compare.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -290,7 +290,7 @@ void show_list()
 
   this = first;
   while (this != NULL) {
-    if(this->count > opt.threshold) {
+    if(this->count > opt.least && this->count > opt.threshold) {
       output_resolved(this);
       if (opt.html) {
 	if (opt.html == 1) {

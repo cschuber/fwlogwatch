@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: main.h,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.26"
-#define COPYRIGHT "2000-11-11 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.27"
+#define COPYRIGHT "2000-12-10 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -148,6 +148,8 @@ enum {
 
 /* Data structures */
 
+#include <time.h>
+
 struct log_line {
   time_t time;
   char hostname[SHOSTLEN];
@@ -260,6 +262,7 @@ struct options {
   int recent;
 
   int threshold;
+  int least;
   char sender[EMAILSIZE];
   char recipient[EMAILSIZE];
   char cc[EMAILSIZE];

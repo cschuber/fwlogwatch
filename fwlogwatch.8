@@ -1,7 +1,7 @@
 .\"
-.\" $Id: fwlogwatch.8,v 1.5 2002/02/14 20:42:15 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.6 2002/02/14 20:45:42 bwess Exp $
 .\"
-.TH FWLOGWATCH 8 "11 November 2000" RUS-CERT
+.TH FWLOGWATCH 8 "10 December 2000" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -75,6 +75,10 @@ is only available if the connection attempt entry consists of more than one
 packet.
 .SH "LOG SUMMARY MODE"
 This are additional options that are only available in log summary mode:
+.IP \-m\ \fIcount\fR
+When analyzing large logfiles you usually aren't interested in entries that
+have a small count. You can hide entries below a certain threshold with
+this option.
 .IP \-o\ \fIfile\fR
 Specify output file.
 .IP \-O\ \fIorder\fR
@@ -148,7 +152,7 @@ Forget events that happened this long ago (defaults to 1 day).
 This option defines a host that will never be blocked or other actions taken
 against. To specify more than one, use the -k parameter again for each IP
 address you want to add.
-.IP \-m\ \fIemail\fR
+.IP \-M\ \fIemail\fR
 Send an email notification to the specified
 .I email
 address.

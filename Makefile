@@ -1,10 +1,20 @@
-# $Id: Makefile,v 1.6 2002/02/14 20:42:14 bwess Exp $
+# $Id: Makefile,v 1.7 2002/02/14 20:45:42 bwess Exp $
+
+# Linux
+CFLAGS=-pipe -O2 -Wall #-pedantic -g -p
+LDFLAGS=-lcrypt
+
+# Solaris
+#CFLAGS=-DSOLARIS -pipe -O2 -Wall #-pedantic -g
+#LDFLAGS=-lcrypt -lnsl -lsocket
+
+# You can add -DLOGDOTS to CFLAGS if your log host logs FQDNs
+# and you only want the hostnames in the output.
+
 
 CC=gcc
-CFLAGS=-pipe -O2 -Wall #-pedantic -g -p
 OBJ= cisco.o compare.o main.o modes.o net.o netfilter.o output.o parser.o \
   rcfile.o report.o resolve.o response.o utils.o
-LDFLAGS=-lcrypt #-lefence
 FLEX=flex
 INSTALL=install
 INSTALL_PROGRAM=$(INSTALL) -s -m 0755

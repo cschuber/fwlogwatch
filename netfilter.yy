@@ -1,4 +1,4 @@
-/* $Id: netfilter.yy,v 1.2 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: netfilter.yy,v 1.3 2002/02/14 20:45:42 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -8,7 +8,6 @@
 #define YY_NO_UNPUT
 
 #include <string.h>
-#include <time.h>
 #include "main.h"
 #include "utils.h"
 

@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: parser.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -181,7 +181,7 @@ int parse_time(char *input)
 
   string = strdup(input);
   pnt = string;
-  while (isdigit(*pnt)) {
+  while (isdigit((int)*pnt)) {
     pnt++;
   }
   c = *pnt;

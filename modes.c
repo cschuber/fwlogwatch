@@ -1,12 +1,12 @@
-/* $Id: modes.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: modes.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -30,6 +30,7 @@ void mode_summary()
   unsigned char valid_times = 0;
   int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0;
   time_t now;
+  struct passwd *gen_user;
 
   if (opt.verbose)
     fprintf(stderr, "Opening input file '%s'\n", opt.inputfile);
@@ -81,12 +82,12 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, "Opening output file '%s'\n", opt.outputfile);
 
-    output = fopen(opt.outputfile, "w");
+    fflush(stdout);
+    output = freopen(opt.outputfile, "w", stdout);
     if (output == NULL) {
-      fprintf(stderr, "fopen %s: %s\n", opt.outputfile, strerror(errno));
+      fprintf(stderr, "freopen %s: %s\n", opt.outputfile, strerror(errno));
       exit(EXIT_FAILURE);
     }
-    stdout = output;
   }
 
   if (opt.html)
@@ -94,7 +95,18 @@ void mode_summary()
 
   now = time(NULL);
   strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
-  printf("Generated %s.\n", nows);
+  printf("Generated %s by ", nows);
+
+  gen_user = getpwuid(getuid());
+  if (gen_user != NULL) {
+    if (gen_user->pw_gecos != '\0') {
+      printf("%s.\n", gen_user->pw_gecos);
+    } else {
+      printf("%s.\n", gen_user->pw_name);
+    }
+  } else {
+    printf("unknown user.\n");
+  }
 
   if (opt.html)
     printf("<br>\n");
@@ -146,6 +158,13 @@ void mode_summary()
       printf("<br>\n");
 
     printf("All entries are from the same interface: \"%s\".\n", opt.interface);
+  }
+
+  if(opt.least > 0) {
+    if(opt.html)
+      printf("<br>\n");
+
+    printf("Only entries with a count larger than %d are shown.\n", opt.least);
   }
 
   if (opt.html)

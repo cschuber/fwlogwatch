@@ -1,10 +1,9 @@
-/* $Id: net.c,v 1.4 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: net.c,v 1.5 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include <errno.h>
 #include <syslog.h>
 #include <crypt.h>
@@ -44,7 +43,7 @@ int prepare_socket()
     log_exit();
   }
 
-  retval = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &x, sizeof(x));
+  retval = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void *)&x, sizeof(x));
   if (retval == -1) {
     syslog(LOG_NOTICE, "setsockopt: %s", strerror(errno));
     log_exit();
@@ -55,7 +54,7 @@ int prepare_socket()
   sa.sin_port = htons(opt.listenport);
   sa.sin_addr = ina;
 
-  retval = bind(fd, &sa, sizeof(sa));
+  retval = bind(fd, (struct sockaddr *)&sa, sizeof(sa));
   if (retval == -1) {
     syslog(LOG_NOTICE, "bind: %s", strerror(errno));
     log_exit();
@@ -137,6 +136,9 @@ void net_output(int fd, char *buf)
 
 void handshake(int fd)
 {
+#ifdef SOLARIS
+  typedef int socklen_t; /* undefined and not unsigned as in linux */
+#endif
   int conn, retval;
   socklen_t socks;
   struct sockaddr_in sac;
@@ -148,7 +150,7 @@ void handshake(int fd)
 
   socks = sizeof(struct sockaddr_in);
 
-  conn = accept(fd, &sac, &socks);
+  conn = accept(fd, (struct sockaddr *)&sac, &socks);
   if (conn == -1) {
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
     return;

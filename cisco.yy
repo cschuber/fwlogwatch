@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.1 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: cisco.yy,v 1.2 2002/02/14 20:45:42 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
@@ -8,7 +8,6 @@
 #define YY_NO_UNPUT
 
 #include <string.h>
-#include <time.h>
 #include <ctype.h>
 #include "main.h"
 #include "utils.h"
@@ -28,7 +27,7 @@ OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
 CISCO	"%SEC-6-IPACCESSLOG"("P"|"DP"|"RP"|"NP"|"S")":"
 TARGET	"denied"|"permitted"
-PROTO	"tcp"|"udp"|"icmp"|"igmp"|{NUMBER}
+PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|{NUMBER}
 LIST	[a-zA-Z0-9._-]*
 
 %%
@@ -54,6 +53,9 @@ LIST	[a-zA-Z0-9._-]*
 void cisco_parse_date(char *input, unsigned char mode)
 {
   char smonth[3];
+#ifdef LOGDOTS
+  char *remove_dot;
+#endif
   int month = 0, day, hour, minute, second;
   struct tm *t;
 
@@ -61,6 +63,11 @@ void cisco_parse_date(char *input, unsigned char mode)
     sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
 	   smonth, &day, &hour, &minute, &second,
 	   opt.line->hostname);
+#ifdef LOGDOTS
+    remove_dot = strstr(opt.line->hostname, ".");
+    if(remove_dot != NULL)
+      *remove_dot = '\0';
+#endif
   } else if (mode == C_OPT_NONE) {
     sscanf(input, "%3s %2d %2d:%2d:%2d:",
 	   smonth, &day, &hour, &minute, &second);
@@ -118,7 +125,8 @@ void cisco_parse_src(char *input, unsigned char mode)
   if(strncmp(proto, "udp", 3) == 0) opt.line->protocol = 17;
   if(strncmp(proto, "icmp", 4) == 0) opt.line->protocol = 1;
   if(strncmp(proto, "igmp", 4) == 0) opt.line->protocol = 2;
-  if(isdigit(proto[0])) opt.line->protocol = atoi(proto);
+  if(strncmp(proto, "gre", 3) == 0) opt.line->protocol = 47; /* RFC1701/1702 */
+  if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
 
   if (opt.line->protocol != 0)
     opt.cisco=opt.cisco|CISCO_PROTO;

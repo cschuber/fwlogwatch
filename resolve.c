@@ -1,9 +1,10 @@
-/* $Id: resolve.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
+/* $Id: resolve.c,v 1.7 2002/02/14 20:45:42 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #include <netdb.h>
 #include <ctype.h>
 #include "resolve.h"
@@ -21,7 +22,10 @@ char * resolve_protocol(int proto)
   if (protoent != NULL) {
     return (protoent->p_name);
   } else {
-    return ("unknown");
+    char *number;
+    number = xmalloc(4);
+    snprintf(number, 4, "%d", proto);
+    return (number);
   }
 }
 
@@ -48,8 +52,10 @@ char * resolve_hostname(char *ip)
   struct hostent *reverse, *forward;
   struct in_addr inaddr;
   struct dns_cache *dns;
-  int retval;
   char *pnt;
+#ifndef SOLARIS
+  int retval;
+#endif
 
   dns = dns_first;
   while(dns != NULL) {
@@ -62,8 +68,16 @@ char * resolve_hostname(char *ip)
     dns = dns->next;
   }
 
+#ifndef SOLARIS
   retval = inet_aton(ip, &inaddr);
   if (retval != 0) {
+#else
+#ifndef INADDR_NONE
+#define INADDR_NONE -1
+#endif
+  inaddr.s_addr = inet_addr(ip);
+  if (inaddr.s_addr != INADDR_NONE) {
+#endif
     if(opt.verbose)
       fprintf(stderr, "Resolving %s\n", ip);
 
@@ -81,7 +95,7 @@ char * resolve_hostname(char *ip)
 
       pnt = reverse->h_name;
       while (*pnt != '\0') {
-	if (isalnum(*pnt) || *pnt == '.' || *pnt == '-') {
+	if (isalnum((int)*pnt) || *pnt == '.' || *pnt == '-') {
 	  pnt++;
 	  continue;
 	} else {
