@@ -1,4 +1,4 @@
-/* $Id: ipfilter.l,v 1.2 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.3 2002/02/14 21:26:30 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -40,6 +40,7 @@ TARGET		[SpPbBnL]
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}				ipf_parse_date(ipftext);
 {IPFILTER}												/* ignore */
+("[ID "{NUMBER}" "{STRING}"]")?										/* ignore */
 {DIGIT}{2}":"{DIGIT}{2}":"{DIGIT}{2}"."{DIGIT}{6}							/* ignore */
 {STRING}[ ]"@"{NUMBER}":"{NUMBER}[ ]{TARGET}								ipf_parse_data(ipftext, IPF_OPT_NONE);
 {NUMBER}"x"[ ]+{STRING}[ ]"@"{NUMBER}":"{NUMBER}[ ]{TARGET}						ipf_parse_data(ipftext, IPF_OPT_COUNT);
@@ -85,7 +86,7 @@ void ipf_parse_data(char *input, unsigned char mode)
   int retval;
 
   if (mode == IPF_OPT_COUNT) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, "%dx %30s @%30s %30s",
 #else
     retval = sscanf(input, "%dx %10s @%10s %10s",
@@ -96,7 +97,7 @@ void ipf_parse_data(char *input, unsigned char mode)
 		    opt.line->branchname);
     if (retval != 4) return;
   } else {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, "%30s @%30s %30s",
 #else
     retval = sscanf(input, "%10s @%10s %10s",

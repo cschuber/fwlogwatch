@@ -1,4 +1,4 @@
-/* $Id: cisco_pix.l,v 1.1 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: cisco_pix.l,v 1.2 2002/02/14 21:26:30 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
@@ -95,7 +95,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
   int retval;
 
   if (mode == CP_OPT_ITCP) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, " %30s TCP connection %30s from %3d.%3d.%3d.%3d/%5d",
 #else
     retval = sscanf(input, " %10s TCP connection %10s from %3d.%3d.%3d.%3d/%5d",
@@ -106,7 +106,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
     opt.line->protocol = 6;
     if(retval != 7) return;
   } else if (mode == CP_OPT_TCP) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, " %30s TCP (no connection) from %3d.%3d.%3d.%3d/%5d",
 #else
     retval = sscanf(input, " %10s TCP (no connection) from %3d.%3d.%3d.%3d/%5d",
@@ -117,7 +117,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
     opt.line->protocol = 6;
     if(retval != 6) return;
   } else if (mode == CP_OPT_UDP) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, " %30s %30s UDP from %3d.%3d.%3d.%3d/%5d",
 #else
     retval = sscanf(input, " %10s %10s UDP from %3d.%3d.%3d.%3d/%5d",
@@ -128,7 +128,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
     opt.line->protocol = 17;
     if(retval != 7) return;
   } else if (mode == CP_OPT_ICMP) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, "%3d.%3d.%3d.%3d %30s to ping",
 #else
     retval = sscanf(input, "%3d.%3d.%3d.%3d %10s to ping",

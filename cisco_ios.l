@@ -1,4 +1,4 @@
-/* $Id: cisco_ios.l,v 1.1 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: cisco_ios.l,v 1.2 2002/02/14 21:26:30 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -109,7 +109,7 @@ void cisco_ios_parse_src(char *input, unsigned char mode)
   int retval;
 
   if (mode == CI_OPT_PORT) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, "list %30s %30s %5s %3d.%3d.%3d.%3d(%5d)",
 #else
     retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d(%5d)",
@@ -120,7 +120,7 @@ void cisco_ios_parse_src(char *input, unsigned char mode)
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if(retval != 8) return;
   } else if (mode == CI_OPT_NONE) {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
     retval = sscanf(input, "list %30s %30s %8s %3d.%3d.%3d.%3d",
 #else
     retval = sscanf(input, "list %10s %10s %8s %3d.%3d.%3d.%3d",
@@ -184,7 +184,7 @@ void cisco_ios_parse_dst(char *input, unsigned char mode)
 
 void cisco_ios_parse_if(char *input)
 {
-#ifdef LONG_NAMES
+#ifndef SHORT_NAMES
   strncpy(opt.line->interface, input, SHORTLEN);
 #else
   strncpy(opt.line->interface, "-", SHORTLEN);

@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: utils.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include "main.h"
 

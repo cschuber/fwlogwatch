@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: main.h,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.3"
-#define COPYRIGHT "2001-04-08 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.3.1"
+#define COPYRIGHT "2001-05-25 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -22,10 +22,10 @@
 #define USERSIZE 16
 #define PASSWORDSIZE 76
 
-#ifndef LONG_NAMES
-#define SHORTLEN 10
-#else
+#ifndef SHORT_NAMES
 #define SHORTLEN 30
+#else
+#define SHORTLEN 10
 #endif
 
 /* Files */
@@ -90,6 +90,13 @@ enum {
 #define NF_SPT 32
 #define NF_DPT 64
 #define NF_TYPE 128
+
+enum {
+  NF_OPT_NOPREFIX,
+  NF_OPT_PREFIX,
+  NF_OPT_SRC,
+  NF_OPT_DST
+};
 
 /* cisco ios support */
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 2002/02/14 21:21:20 bwess Exp $
+# $Id: Makefile,v 1.16 2002/02/14 21:26:30 bwess Exp $
 
 # Linux
 CC = gcc
@@ -23,10 +23,10 @@ LIBS = -lcrypt -lz #-lc_p
 #LIBS = -lz
 
 
-# You might want to add -DLONG_NAMES to CFLAGS (especially if you want to
-# parse cisco logs) to allow long list/chain/branch/interface names.
-# You can also add -DLOGDOTS if your cisco log host logs FQDNs and you
-# only want the hostnames in the output.
+# You might want to add -DSHORT_NAMES to CFLAGS if you only intend to
+# analyze log formats with short list/chain/branch/interface names like
+# ipchains. You can also add -DLOGDOTS if your cisco log host logs FQDNs
+# and you only want the hostnames in the output.
 
 
 LEX = flex

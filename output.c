@@ -1,7 +1,8 @@
-/* $Id: output.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: output.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <time.h>
@@ -334,7 +335,11 @@ void output_raw_data(struct conn_data *input)
 
   this = first;
   while (this != NULL) {
+#ifndef __OpenBSD__
     printf("%d;%ld;%ld;"
+#else
+    printf("%d;%d;%d;"
+#endif
 	   "%s;%s;%s;"
 	   "%s;%d;"
 	   "%u;%d;"

@@ -1,4 +1,4 @@
-/* $Id: response.h,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: response.h,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
 
 #ifndef _RESPONSE_H
 #define _RESPONSE_H

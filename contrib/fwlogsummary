@@ -1,8 +1,15 @@
 #!/bin/sh
-# $Id: fwlogsummary.cgi,v 1.14 2002/02/14 21:21:20 bwess Exp $
+# $Id: fwlogsummary,v 1.1 2002/02/14 21:26:30 bwess Exp $
 
-# You could run this from crontab:
-# 30 * * * * /path/fwlogsummary
+# You can invoke this script directly from the command line or from cron.
+# With respective permissions it can also be run as cgi by the webserver
+# if you remove the comment characters from the following lines:
+
+#echo 'Content-type: text/plain'
+#echo
+#echo -n 'fwlogsummary invoked on '
+#date
+
 
 RECENT="-l 1h"
 WEBDIR="/home/httpd/html/fwlogwatch";
@@ -53,7 +60,7 @@ cat <<EOF > $WEBDIR/index.html
 Press the back button of your browser to return here.<br>
 <br>
 <hr>
-\$Id: fwlogsummary.cgi,v 1.14 2002/02/14 21:21:20 bwess Exp $
+\$Id: fwlogsummary,v 1.1 2002/02/14 21:26:30 bwess Exp $
 </font>
 </body>
 </html>

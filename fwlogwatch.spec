@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.15 2002/02/14 21:21:20 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.16 2002/02/14 21:26:30 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.3
+%define version 0.3.1
 
 Name: %name
 Version: %version
@@ -17,8 +17,8 @@ Patch: %name-%version-paths.patch
 BuildRoot: /var/tmp/%name-buildroot
 
 %description
-fwlogwatch produces ipchains, netfilter/iptables, ipfilter, cisco IOS and
-cisco PIX log summary reports in text and HTML form and has a lot of
+fwlogwatch produces ipchains, netfilter/iptables, ipfilter, Cisco IOS and
+Cisco PIX log summary reports in text and HTML form and has a lot of
 options to find and display relevant patterns in connection attempts. With
 the data found it can also generate customizable incident reports from a
 template and send them to abuse contacts at offending sites or CERT
@@ -50,4 +50,4 @@ make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 %config /etc/fwlogwatch.config
 %config /etc/fwlogwatch.template
 %doc AUTHORS COPYING CREDITS ChangeLog README
-%doc contrib/fwlogsummary.cgi contrib/fwlogsummary.small.cgi
+%doc contrib/fwlogsummary contrib/fwlogsummary_small.cgi

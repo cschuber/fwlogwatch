@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.13 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: net.c,v 1.14 2002/02/14 21:26:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <syslog.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #ifndef __OpenBSD__

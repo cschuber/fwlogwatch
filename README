@@ -1,4 +1,4 @@
-$Id: README,v 1.14 2002/02/14 21:21:20 bwess Exp $
+$Id: README,v 1.15 2002/02/14 21:26:30 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -136,7 +136,7 @@ CONFIGURATION AND EXAMPLES
   permissions to read the log file).
 
 - A script for generation of 8 general summaries is also included, use
-  it as 'fwlogsummary.cgi [logfile]' (it will use the output directory
+  it as 'fwlogsummary [logfile]' (it will use the output directory
   /home/httpd/html/fwlogwatch as default) and look at the index.html file
   to select the level of detail you need.
 

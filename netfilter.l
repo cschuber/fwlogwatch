@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.2 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: netfilter.l,v 1.3 2002/02/14 21:26:30 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -16,13 +16,14 @@
 extern struct options opt;
 
 void nf_parse_start(char *input);
+void nf_parse_prefix(char *input, unsigned char mode);
 void nf_parse_ip(char *input, unsigned char mode);
 void nf_parse_proto(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
-ISTRING	[a-zA-HJ-Z0-9.-]*
+PREFIX	[a-zA-Z0-9.:=_ -]+
 LOGHOST	[0-9.a-zA-Z_-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
@@ -34,12 +35,13 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 
 %%
 
-{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}" kernel: "{ISTRING}	nf_parse_start(nftext);
-"IN="{STRING}?		{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.parser=opt.parser|NF_IN; }
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start(nftext);
+" kernel: IN="{STRING}?			nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
+" kernel: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
 "OUT="{STRING}?		/* ignore */
 "MAC="(({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
-"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_SRC);
-"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_DST);
+"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);
+"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_DST);
 "LEN="{NUMBER}		opt.line->datalen = atoi(nftext+4);
 "TOS="{HEXNUM}		/* ignore */
 "PREC="{HEXNUM}		/* ignore */
@@ -81,20 +83,15 @@ void nf_parse_start(char *input)
   char smonth[3];
 
   retval = sscanf(input,
-#ifdef LONG_NAMES
-		  "%3s %2d %2d:%2d:%2d %32s kernel: %30s",
+#ifndef SHORT_NAMES
+		  "%3s %2d %2d:%2d:%2d %32s",
 #else
-		  "%3s %2d %2d:%2d:%2d %32s kernel: %10s",
+		  "%3s %2d %2d:%2d:%2d %32s",
 #endif
 		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname,
-		  opt.line->chainlabel);
-  if (retval != 7) {
-    if (retval == 6) {
-      strncpy(opt.line->chainlabel, "-", SHORTLEN);
-    } else {
-      return;
-    }
+		  opt.line->hostname);
+  if (retval != 6) {
+    return;
   }
 
   build_time(smonth, day, hour, minute, second);
@@ -102,9 +99,35 @@ void nf_parse_start(char *input)
   opt.parser=opt.parser|NF_DATE;
 }
 
+void nf_parse_prefix(char *input, unsigned char mode)
+{
+  int i=0;
+
+  if(mode == NF_OPT_PREFIX) {
+    while (i < strlen(input)) {
+      if(input[i] == 'I') {
+	if (input[i+1] == 'N') {
+	  if (input[i+2] == '=') {
+	    input[i] = '\0';
+	    strncpy(opt.line->chainlabel, input, SHORTLEN);
+	    strncpy(opt.line->interface, input+i+3, SHORTLEN);
+	    break;
+	  }
+	}
+      }
+      i++;
+    }
+  } else {
+    strncpy(opt.line->chainlabel, "-", SHORTLEN);
+    strncpy(opt.line->interface, input, SHORTLEN);
+  }
+
+  opt.parser=opt.parser|NF_IN;
+}
+
 void nf_parse_ip(char *input, unsigned char mode)
 {
-  if (mode == NF_SRC) {
+  if (mode == NF_OPT_SRC) {
     if(convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR) return;
     opt.parser=opt.parser|NF_SRC;
   } else {

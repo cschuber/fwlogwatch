@@ -1,8 +1,9 @@
-/* $Id: compare.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
+/* $Id: compare.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include "compare.h"
 #include "output.h"
@@ -43,72 +44,72 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
   switch(opt.sortfield) {
   case SORT_COUNT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->count > op1->count) cond++;
+      if (op1->count > op2->count) cond++;
     } else {
-      if (op2->count < op1->count) cond++;
+      if (op1->count < op2->count) cond++;
     }
     break;
   case SORT_START_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->start_time > op1->start_time) cond++;
+      if (op1->start_time > op2->start_time) cond++;
     } else {
-      if (op2->start_time < op1->start_time) cond++;
+      if (op1->start_time < op2->start_time) cond++;
     }
     break;
   case SORT_DELTA_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if ((op2->end_time - op2->start_time) > (op1->end_time - op1->start_time)) cond++;
+      if ((op1->end_time - op1->start_time) > (op2->end_time - op2->start_time)) cond++;
     } else {
-      if ((op2->end_time - op2->start_time) < (op1->end_time - op1->start_time)) cond++;
+      if ((op1->end_time - op1->start_time) < (op2->end_time - op2->start_time)) cond++;
     }
     break;
   case SORT_CHAINLABEL:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) < 0) cond++;
-    } else {
       if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) > 0) cond++;
+    } else {
+      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) < 0) cond++;
     }
     break;
   case SORT_PROTOCOL:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->protocol > op1->protocol) cond++;
+      if (op1->protocol > op2->protocol) cond++;
     } else {
-      if (op2->protocol < op1->protocol) cond++;
+      if (op1->protocol < op2->protocol) cond++;
     }
     break;
   case SORT_DATALEN:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->datalen > op1->datalen) cond++;
+      if (op1->datalen > op2->datalen) cond++;
     } else {
-      if (op2->datalen < op1->datalen) cond++;
+      if (op1->datalen < op2->datalen) cond++;
     }
     break;
   case SORT_SOURCEHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op2->shost.s_addr) > ntohl(op1->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr)) cond++;
     } else {
-      if (ntohl(op2->shost.s_addr) < ntohl(op1->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr)) cond++;
     }
     break;
   case SORT_SOURCEPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->sport > op1->sport) cond++;
+      if (op1->sport > op2->sport) cond++;
     } else {
-      if (op2->sport < op1->sport) cond++;
+      if (op1->sport < op2->sport) cond++;
     }
     break;
   case SORT_DESTHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op2->dhost.s_addr) > ntohl(op1->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr)) cond++;
     } else {
-      if (ntohl(op2->dhost.s_addr) < ntohl(op1->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr)) cond++;
     }
     break;
   case SORT_DESTPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op2->dport > op1->dport) cond++;
+      if (op1->dport > op2->dport) cond++;
     } else {
-      if (op2->dport < op1->dport) cond++;
+      if (op1->dport < op2->dport) cond++;
     }
     break;
   default:
@@ -118,42 +119,52 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
   return cond;
 }
 
-struct conn_data *merge(struct conn_data *list1, struct conn_data *list2)
-{
-  if (list1 == NULL) return list2;
-  else if (list2 == NULL) return list1;
-  else if (compare(list1, list2)) {
-    list1->next = merge(list1->next, list2);
-    return list1;
+struct conn_data *fwlw_mergesort(struct conn_data *list) {
+  struct conn_data *p, *q, *e, *tail;
+  int size, merges, psize, qsize, i;
+
+  if(list != NULL) {
+    size = 1;
+    while(1) {
+      p = list;
+      list = tail = NULL;
+      merges = 0;
+      while (p != NULL) {
+	merges++;
+	q = p;
+	psize = 0;
+	for (i = 0; i < size; i++) {
+	  psize++;
+	  q = q->next;
+	  if (q == NULL) break;
+	}
+	qsize = size;
+	while (psize > 0 || ((qsize > 0) && (q != NULL))) {
+	  if (psize == 0) {
+	    e = q; q = q->next; qsize--;
+	  } else if (qsize == 0 || (q == NULL)) {
+	    e = p; p = p->next; psize--;
+	  } else if (compare(p,q) <= 0) {
+	    e = p; p = p->next; psize--;
+	  } else {
+	    e = q; q = q->next; qsize--;
+	  }
+	  if (tail != NULL) {
+	    tail->next = e;
+	  } else {
+	    list = e;
+	  }
+	  tail = e;
+	}
+	p = q;
+      }
+      tail->next = NULL;
+      if (merges <= 1)
+	return list;
+      size *= 2;
+    }
   } else {
-    list2->next = merge(list1, list2->next);
-    return list2;
-  }
-}
-
-struct conn_data *split(struct conn_data *list1)
-{
-  struct conn_data *list2;
-
-  if (list1 == NULL) return NULL;
-  else if (list1->next == NULL) return NULL;
-  else  {
-    list2 = list1->next;
-    list1->next = list2->next;
-    list2->next = split(list2->next);
-    return list2;
-  }
-}
-
-struct conn_data *fwlw_mergesort(struct conn_data *list1)
-{
-  struct conn_data *list2;
-
-  if (list1 == NULL) return NULL;
-  else if (list1->next == NULL) return list1;
-  else {
-    list2 = split(list1);
-    return merge(fwlw_mergesort(list1), fwlw_mergesort(list2));
+    return NULL;
   }
 }
 
