@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: compare.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,40 +138,107 @@ void sort_list(int field, char mode)
   }
 }
 
+void sort_data()
+{
+  unsigned char i = 0, error, field = 0, mode = 0;
+
+  while (opt.sort_order[i] != '\0') {
+    error = 0;
+    switch (opt.sort_order[i]) {
+    case 'c':
+      field = COUNT;
+      break;
+    case 'S':
+      field = SOURCEHOST;
+      break;
+    case 'D':
+      field = DESTHOST;
+      break;
+    case 's':
+      field = SOURCEPORT;
+      break;
+    case 'd':
+      field = DESTPORT;
+      break;
+    case 't':
+      field = START_TIME;
+      break;
+    case 'z':
+      field = DELTA_TIME;
+      break;
+    default:
+      fprintf(stderr, "Error in sort string ('%c'), ignoring.\n", opt.sort_order[i]);
+      error = 1;
+    }
+
+    i++;
+    if (opt.sort_order[i] != '\0') {
+      switch (opt.sort_order[i]) {
+      case 'a':
+	mode = SMALLERFIRST;
+	break;
+      case 'd':
+	mode = BIGGERFIRST;
+	break;
+      default:
+	fprintf(stderr, "Error in sort string ('%c'), ignoring.\n", opt.sort_order[i]);
+	error = 1;
+      }
+    } else {
+      error = 1;
+    }
+
+    if (error == 0) {
+      sort_list(field, mode);
+      if (opt.verbose == 2)
+	fprintf(stderr, ".");
+      i++;
+    }
+  }
+}
+
 void build_list(struct log_line *input)
 {
   struct conn_data *this;
 
-  if (strlen(opt.hostname) > 0) {
-    if (strncmp(opt.hostname, input->hostname, SHOSTLEN) != 0) {
-      opt.loghost = 1;
+  if (opt.loghost == 0) {
+    if (opt.hostname[0] != '\0') {
+      if (strncmp(opt.hostname, input->hostname, SHOSTLEN) != 0) {
+	opt.loghost = 1;
+      }
+    } else {
+      strncpy(opt.hostname, input->hostname, SHOSTLEN);
     }
-  } else {
-    strncpy(opt.hostname, input->hostname, SHOSTLEN);
   }
 
-  if (strlen(opt.chainlabel) > 0) {
-    if (strncmp(opt.chainlabel, input->chainlabel, SHORTLEN) != 0) {
-      opt.chains = 1;
+  if(opt.chains == 0) {
+    if (opt.chainlabel[0] != '\0') {
+      if (strncmp(opt.chainlabel, input->chainlabel, SHORTLEN) != 0) {
+	opt.chains = 1;
+      }
+    } else {
+      strncpy(opt.chainlabel, input->chainlabel, SHORTLEN);
     }
-  } else {
-    strncpy(opt.chainlabel, input->chainlabel, SHORTLEN);
   }
 
-  if (strlen(opt.branchname) > 0) {
-    if (strncmp(opt.branchname, input->branchname, SHORTLEN) != 0) {
-      opt.branches = 1;
+  if(opt.branches == 0) {
+    if (opt.branchname[0] != '\0') {
+      if (strncmp(opt.branchname, input->branchname, SHORTLEN) != 0) {
+	opt.branches = 1;
+      }
+    } else {
+      strncpy(opt.branchname, input->branchname, SHORTLEN);
     }
-  } else {
-    strncpy(opt.branchname, input->branchname, SHORTLEN);
   }
 
-  if (strlen(opt.interface) > 0) {
-    if (strncmp(opt.interface, input->interface, SHORTLEN) != 0) {
-      opt.ifs = 1;
+  if (opt.ifs == 0) {
+    if (opt.interface[0] != '\0') {
+      if (strncmp(opt.interface, input->interface, SHORTLEN) != 0) {
+	opt.ifs = 1;
+      }
+    } else {
+      strncpy(opt.interface, input->interface, SHORTLEN);
     }
-  } else {
-    strncpy(opt.interface, input->interface, SHORTLEN);
   }
 
   this = first;

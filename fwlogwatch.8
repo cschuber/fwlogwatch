@@ -1,7 +1,7 @@
 .\"
-.\" $Id: fwlogwatch.8,v 1.1 2002/02/14 20:09:16 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.2 2002/02/14 20:25:35 bwess Exp $
 .\"
-.TH FWLOGWATCH 8 "22 October 2000" RUS-CERT
+.TH FWLOGWATCH 8 "27 October 2000" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -63,8 +63,8 @@ In very verbose mode while parsing the log file you will see "." for
 relevant packet filter log entries, "o" for packet filter log entries that
 are too old and "_" for entries that are not packet filter logs.
 .IP \-y
-Differentiate tcp options (syn/ack). All connections with a syn are listed
-separately, other tcp options are not available because ipchains can't log
+Differentiate TCP options (SYN/ACK). All connections with a SYN are listed
+separately, other TCP options are not available because ipchains can't log
 them.
 .IP \-z
 Show time interval between start and end time of connection attempts. This
@@ -106,6 +106,10 @@ Alert threshold. Notify or start countermeasures if this limit is reached.
 Defaults to 5.
 .IP \-l\ \fItime\fR
 Forget events that happened this long ago (defaults to 1 day).
+.IP \-m\ \fIemail\fR
+Send an email notification to the specified
+.I email
+address.
 .IP \-B
 Block host completely with new firewall rule. A new chain for
 .B fwlogwatch
@@ -118,7 +122,7 @@ Send a winpopup alert message to the windows machine
 .IR host .
 .IP \-A\ \fIaction\fR
 This custom action is executed in a shell.
-.SH TIME FORMAT
+.SH "TIME FORMAT"
 Time is specified as 'nx' where n is a natural number and x is one of the
 following: \'s' for seconds (default if you don't specify anything), \'m'
 for minutes, \'h' for hours, \'d' for days, \'w' for weeks, \'M' for months
@@ -130,6 +134,19 @@ Default configuration file.
 Default template for incident reports.
 .IP \fB/var/log/messages\fR
 Default input log file.
+.SH "FEATURES ONLY IN CONFIG FILE"
+The following features are only available in the config file and not on the
+command line, they are presented and explained in the sample config file.
+.IP HTML\ colors
+The colors of the HTML output page can be changed.
+.IP sort\ options
+Sort options and criteria of the summary output can be customized.
+.IP trusted\ hosts
+Hosts that will never be blocked or other actions taken against can be
+defined.
+.IP status\ server
+In realtime response mode you can see the state of the program through a web
+interface.
 .SH SECURITY
 Since
 .B fwlogwatch

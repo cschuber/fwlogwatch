@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: response.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,8 +10,8 @@
 #include "output.h"
 #include "utils.h"
 
-extern struct conn_data *first;
 extern struct options opt;
+extern struct conn_data *first;
 struct known_hosts *first_host = NULL;
 
 void modify_firewall(unsigned char action)
@@ -40,7 +40,7 @@ void modify_firewall(unsigned char action)
 
   if (action == ADD_CHAIN) {
     if(!found_label) {
-      syslog(LOG_NOTICE, "Adding %s chain.", CHAINLABEL);
+      syslog(LOG_NOTICE, "Adding %s chain", CHAINLABEL);
 
       snprintf(buf, BUFSIZE, "%s -N %s", IPCHAINS, CHAINLABEL);
       run_command(buf);
@@ -51,7 +51,7 @@ void modify_firewall(unsigned char action)
   }
   if (action == REMOVE_CHAIN) {
     if(found_label) {
-      syslog(LOG_NOTICE, "Removing %s chain.", CHAINLABEL);
+      syslog(LOG_NOTICE, "Removing %s chain", CHAINLABEL);
 
       snprintf(buf, BUFSIZE, "%s -D input -j %s", IPCHAINS, CHAINLABEL);
       run_command(buf);
@@ -69,7 +69,7 @@ void add_rule(char *ip)
 {
   char buf[BUFSIZE];
 
-  syslog(LOG_NOTICE, "Adding block for %s.", ip);
+  syslog(LOG_NOTICE, "Adding block for %s", ip);
 
   snprintf(buf, BUFSIZE, "%s -A %s -s %s -j DENY", IPCHAINS, CHAINLABEL, ip);
   run_command(buf);
@@ -79,7 +79,7 @@ void remove_rule(char *ip)
 {
   char buf[BUFSIZE];
 
-  syslog(LOG_NOTICE, "Removing block for %s.", ip);
+  syslog(LOG_NOTICE, "Removing block for %s", ip);
 
   snprintf(buf, BUFSIZE, "%s -D %s -s %s -j DENY", IPCHAINS, CHAINLABEL, ip);
   run_command(buf);
@@ -91,7 +91,7 @@ unsigned char is_known(char *shost)
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (strncmp(this_host->shost, shost, IPLEN) != 0) {
+    if (strncmp(this_host->shost, shost, IPLEN) == 0) {
       return 1;
     }
     this_host = this_host->next;
@@ -115,7 +115,7 @@ void remove_old()
 	diff = now - this->next->start_time;
       }
       if (diff > opt.recent) {
-	syslog(LOG_NOTICE, "Deleting old entry (timediff: %d).", (int)diff);
+	syslog(LOG_NOTICE, "Deleting old entry (timediff: %d)", (int)diff);
 	temp = this->next;
 	this->next = this->next->next;
 	free(temp);
@@ -128,7 +128,7 @@ void remove_old()
 	diff = now - this->start_time;
       }
       if (diff > opt.recent) {
-	syslog(LOG_NOTICE, "Deleting last entry (timediff: %d).", (int)diff);
+	syslog(LOG_NOTICE, "Deleting last entry (timediff: %d)", (int)diff);
 	first = NULL;
 	free(this);
 	break;
@@ -146,9 +146,9 @@ void remove_old()
       }
       diff = now - this_host->next->time;
       if (diff > opt.recent) {
-	if(opt.response == BLOCK)
+	if(opt.response & OPT_BLOCK)
 	  remove_rule(this_host->shost);
-	syslog(LOG_NOTICE, "Deleting old hosts entry (timediff: %d).", (int)diff);
+	syslog(LOG_NOTICE, "Deleting old hosts entry (timediff: %d)", (int)diff);
 	temp_host = this_host->next;
 	this_host->next = this_host->next->next;
 	free(temp_host);
@@ -161,15 +161,15 @@ void remove_old()
       }
       diff = now - this_host->time;
       if (diff > opt.recent) {
-	if(opt.response == BLOCK)
+	if(opt.response & OPT_BLOCK)
 	  remove_rule(this_host->shost);
-	syslog(LOG_NOTICE, "Deleting last hosts entry (timediff: %d).", (int)diff);
+	syslog(LOG_NOTICE, "Deleting last hosts entry (timediff: %d)", (int)diff);
 	first_host = NULL;
 	free(this_host);
 	break;
       }
     }
-    this = this->next;
+    this_host = this_host->next;
   }
 }
 
@@ -208,9 +208,9 @@ void look_for_log_rules()
   }
 
   if (found > 0) {
-    syslog(LOG_NOTICE, "%u logging firewall rule%s defined.", found, (found == 1)?"":"s");
+    syslog(LOG_NOTICE, "%u logging firewall rule%s defined", found, (found == 1)?"":"s");
   } else {
-    syslog(LOG_NOTICE, "No logging firewall rules defined, exiting.");
+    syslog(LOG_NOTICE, "No logging firewall rules defined, exiting");
     exit(EXIT_FAILURE);
   }
 }
@@ -233,17 +233,23 @@ void look_for_alert()
       host->next = first_host;
       first_host = host;
 
-      switch(opt.response) {
-      case BLOCK:
+      if(opt.response & OPT_BLOCK) {
 	add_rule(this->shost);
-	break;
-      case NOTIFY_SMB:
-	snprintf(buf, BUFSIZE, "%s -N -M %s 'Alert: %d connection attempts from %s'", SMBCLIENT, opt.action, this->count, this->shost);
+      }
+      if(opt.response & OPT_NOTIFY_EMAIL) {
+	snprintf(buf, BUFSIZE,
+		 "%s | %s -s 'fwlogwatch alert: %d connection attempt%s from %s' %s",
+		 ECHO, MAIL,
+		 this->count, (this->count == 1)?"":"s",
+		 this->shost, opt.recipient);
 	run_command(buf);
-	break;
-      case CUSTOM_ACTION:
+      }
+      if(opt.response & OPT_NOTIFY_SMB) {
+	snprintf(buf, BUFSIZE, "%s -N -M %s 'fwlogwatch alert: %d connection attempts from %s'", SMBCLIENT, opt.smb_host, this->count, this->shost);
+	run_command(buf);
+      }
+      if(opt.response & OPT_CUSTOM_ACTION) {
 	run_command(opt.action);
-	break;
       }
     }
     this = this->next;

@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: main.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,13 +32,13 @@ void usage(char *me, char exitcode)
   printf("         -t          show start and end times\n");
   printf("         -V          show version and copyright info\n");
   printf("         -v          verbose, specify twice for more info\n");
-  printf("         -y          differentiate tcp options (syn/ack)\n");
+  printf("         -y          differentiate TCP options (SYN/ACK)\n");
   printf("         -z          show time interval\n");
   printf("\n");
 
   printf("Log summary mode (default):\n");
   printf("         -o <file>   specify output file\n");
-  printf("         -w          html output\n");
+  printf("         -w          HTML output\n");
   printf("\n");
 
   printf("Interactive report mode:\n");
@@ -54,7 +54,8 @@ void usage(char *me, char exitcode)
   printf("Realtime response mode:\n");
   printf("         -R          realtime response as daemon (default action: log only)\n");
   printf("         -a <count>  alert threshold (defaults to %d)\n", ALERT);
-  printf("         -l <time>   forget events this old (defaults to %d)\n", FORGET);
+  printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
+  printf("         -m <email>  send email notifications on incidents\n");
   printf("         -B          block host completely with new firewall rule\n");
   printf("         -W <host>   send a winpopup alert message to host\n");
   printf("         -A <action> custom action to take when threshold is reached\n");
@@ -111,9 +112,16 @@ void init_options()
 
   opt.times = 0;
   opt.duration = 0;
+
+  strncpy(opt.sort_order, SORTORDER, MAXSORTSIZE);
+
   opt.html = 0;
   opt.use_out = 0;
   opt.outputfile[0] = '\0';
+  strncpy(opt.textcol, TEXTCOLOR, COLORSIZE);
+  strncpy(opt.bgcol, BGCOLOR, COLORSIZE);
+  strncpy(opt.rowcol1, ROWCOLOR1, COLORSIZE);
+  strncpy(opt.rowcol2, ROWCOLOR2, COLORSIZE);
 
   opt.loghost = 0;
   opt.hostname[0] = '\0';
@@ -136,9 +144,13 @@ void init_options()
   opt.cc[0] = '\0';
   strncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
-  opt.response = 0;
+  opt.response = OPT_LOG;
   opt.action[0] = '\0';
-
+  opt.status = 0;
+  strncpy(opt.listenhost, LISTENHOST, IPLEN);
+  opt.listenport = LISTENPORT;
+  strncpy(opt.user, DEFAULT_USER, USERSIZE);
+  strncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
 
   user = getenv("USER");
   if (user == NULL) {
@@ -172,17 +184,17 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:l:Lno:pRsStT:vVwW:yz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:l:Lm:no:pRsStT:vVwW:yz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
       break;
     case 'A':
-      opt.response = CUSTOM_ACTION;
+      opt.response = opt.response | OPT_CUSTOM_ACTION;
       strncpy(opt.action, optarg, ACTIONSIZE);
       break;
     case 'B':
-      opt.response = BLOCK;
+      opt.response = opt.response | OPT_BLOCK;
       break;
     case 'c':
       strncpy(rcfile, optarg, FILESIZE);
@@ -219,6 +231,10 @@ int main(int argc, char **argv)
     case 'L':
       opt.mode = SHOW_LOG_TIMES;
       break;
+    case 'm':
+      opt.response = opt.response | OPT_NOTIFY_EMAIL;
+      strncpy(opt.recipient, optarg, EMAILSIZE);
+      break;
     case 'n':
       opt.resolve = 1;
       break;
@@ -254,8 +270,8 @@ int main(int argc, char **argv)
       opt.html = 1;
       break;
     case 'W':
-      opt.response = NOTIFY_SMB;
-      strncpy(opt.action, optarg, ACTIONSIZE);
+      opt.response = opt.response | OPT_NOTIFY_SMB;
+      strncpy(opt.smb_host, optarg, SHOSTLEN);
       break;
     case 'y':
       opt.opts = 1;
@@ -286,9 +302,11 @@ int main(int argc, char **argv)
     mode_summary();
     break;
   case REALTIME_RESPONSE:
+    if (opt.src_ip == 0)
+      opt.src_ip = 1;
     if (opt.threshold == 0)
       opt.threshold = ALERT;
-    if (opt.response == 0)
+    if (opt.recent == 0)
       opt.recent = FORGET;
     mode_rt_response();
     break;
@@ -298,7 +316,7 @@ int main(int argc, char **argv)
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Exiting.\n");
+    fprintf(stderr, "Exiting\n");
 
   return 0;
 }

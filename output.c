@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: output.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -83,9 +83,9 @@ void output_resolved(struct conn_data *input)
 
   if (opt.html) {
     if (opt.html == 1) {
-      printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", ROWCOLOR2);
+      printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", opt.rowcol2);
     } else {
-      printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", ROWCOLOR1);
+      printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", opt.rowcol1);
     }
   }
   printf("%d", input->count);
@@ -240,7 +240,7 @@ void output_resolved(struct conn_data *input)
 void output_html_header()
 {
   printf("<html><head><title>fwlogwatch output</title></head>\n");
-  printf("<body text=\"#%s\" bgcolor=\"#%s\">\n", TEXTCOLOR, BGCOLOR);
+  printf("<body text=\"#%s\" bgcolor=\"#%s\">\n", opt.textcol, opt.bgcol);
   printf("<font face=\"Arial, Helvetica\">\n");
   printf("<div align=\"center\">\n");
   printf("<h1>fwlogwatch output</h1>\n");
@@ -250,7 +250,7 @@ void output_html_table()
 {
   printf("<br><br>\n");
   printf("<table border=\"0\">\n");
-  printf("<tr bgcolor=\"#%s\" align=\"center\"><td>#</td>", ROWCOLOR1);
+  printf("<tr bgcolor=\"#%s\" align=\"center\"><td>#</td>", opt.rowcol1);
 
   if(opt.times)
     printf("<td>start</td><td>end</td>");

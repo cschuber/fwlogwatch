@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: report.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +12,8 @@
 #include "response.h"
 #include "utils.h"
 
-extern struct conn_data *first;
 extern struct options opt;
+extern struct conn_data *first;
 
 void generate_header(FILE *fd, struct report_data *data, unsigned char options)
 {

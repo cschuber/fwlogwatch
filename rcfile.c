@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: rcfile.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,6 +115,10 @@ void parse_rcfile(char *input)
 
   /* Log summary mode */
 
+  if (strncmp(command, "sort_order", 10) == 0) {
+    strncpy(opt.sort_order, get_one_parameter(command+11), MAXSORTSIZE);
+    return;
+  }
   if (strncmp(command, "times", 5) == 0) {
     opt.times = 1;
     return;
@@ -125,6 +129,22 @@ void parse_rcfile(char *input)
   }
   if (strncmp(command, "html", 4) == 0) {
     opt.html = 1;
+    return;
+  }
+  if (strncmp(command, "textcolor", 9) == 0) {
+    strncpy(opt.textcol, get_one_parameter(command+10), COLORSIZE);
+    return;
+  }
+  if (strncmp(command, "bgcolor", 7) == 0) {
+    strncpy(opt.bgcol, get_one_parameter(command+8), COLORSIZE);
+    return;
+  }
+  if (strncmp(command, "rowcolor1", 9) == 0) {
+    strncpy(opt.rowcol1, get_one_parameter(command+10), COLORSIZE);
+    return;
+  }
+  if (strncmp(command, "rowcolor2", 9) == 0) {
+    strncpy(opt.rowcol2, get_one_parameter(command+10), COLORSIZE);
     return;
   }
   if (strncmp(command, "output", 6) == 0) {
@@ -172,17 +192,22 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "block", 5) == 0) {
-    opt.response = BLOCK;
+    opt.response = opt.response | OPT_BLOCK;
+    return;
+  }
+  if (strncmp(command, "email_notify", 12) == 0) {
+    opt.response = opt.response | OPT_NOTIFY_EMAIL;
+    strncpy(opt.recipient, get_one_parameter(command+13), EMAILSIZE);
     return;
   }
   if (strncmp(command, "smb_notify", 10) == 0) {
-    opt.response = NOTIFY_SMB;
-    strncpy(opt.action, get_one_parameter(command+11), FILESIZE);
+    opt.response = opt.response | OPT_NOTIFY_SMB;
+    strncpy(opt.smb_host, get_one_parameter(command+11), SHOSTLEN);
     return;
   }
   if (strncmp(command, "action", 6) == 0) {
-    opt.response = CUSTOM_ACTION;
-    strncpy(opt.action, get_parameter(command+7), FILESIZE);
+    opt.response = opt.response | OPT_CUSTOM_ACTION;
+    strncpy(opt.action, get_parameter(command+7), ACTIONSIZE);
     return;
   }
   if (strncmp(command, "known_host", 10) == 0) {
@@ -191,6 +216,26 @@ void parse_rcfile(char *input)
     strncpy(host->shost, get_one_parameter(command+11), IPLEN);
     host->next = first_host;
     first_host = host;
+    return;
+  }
+  if (strncmp(command, "server_status", 13) == 0) {
+    opt.status = 1;
+    return;
+  }
+  if (strncmp(command, "listen_to", 9) == 0) {
+    strncpy(opt.listenhost, get_one_parameter(command+10), IPLEN);
+    return;
+  }
+  if (strncmp(command, "listen_port", 11) == 0) {
+    opt.listenport = get_num_parameter(command+12);
+    return;
+  }
+  if (strncmp(command, "status_user", 11) == 0) {
+    strncpy(opt.user, get_one_parameter(command+12), USERSIZE);
+    return;
+  }
+  if (strncmp(command, "status_password", 15) == 0) {
+    strncpy(opt.password, get_one_parameter(command+16), PASSWORDSIZE);
     return;
   }
 
@@ -202,7 +247,7 @@ void parse_rcfile(char *input)
   }
 
 
-  printf("Unrecognized option in rcfile: '%s'\n", command);
+  printf("Unrecognized option in rcfile: %s", command);
 
   free(command);
 }

@@ -1,10 +1,11 @@
-/* $Id: modes.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: modes.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,6 +18,7 @@
 #include "report.h"
 #include "response.h"
 #include "utils.h"
+#include "net.h"
 
 extern struct options opt;
 
@@ -28,6 +30,9 @@ void mode_summary()
   int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0;
   time_t now;
 
+  if (opt.verbose)
+    fprintf(stderr, "Opening input file '%s'\n", opt.inputfile);
+
   input = fopen(opt.inputfile, "r");
   if (input == NULL) {
     fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
@@ -35,7 +40,7 @@ void mode_summary()
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Reading \"%s\"\n", opt.inputfile);
+    fprintf(stderr, "Processing\n");
 
   while (fgets(buf, BUFSIZE, input)) {
     ++linenum;
@@ -51,7 +56,7 @@ void mode_summary()
   if (opt.verbose == 2)
     fprintf(stderr, "\n");
   if (opt.verbose)
-    fprintf(stderr, "Closing \"%s\"\n", opt.inputfile);
+    fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
   retval = fclose(input);
   if (retval == EOF) {
@@ -60,11 +65,16 @@ void mode_summary()
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Processing...\n");
+    fprintf(stderr, "Sorting data\n");
+
+  sort_data();
+
+  if (opt.verbose == 2)
+    fprintf(stderr, "\n");
 
   if (opt.use_out) {
     if (opt.verbose)
-      fprintf(stderr, "Opening \"%s\"\n", opt.outputfile);
+      fprintf(stderr, "Opening output file '%s'\n", opt.outputfile);
 
     output = fopen(opt.outputfile, "w");
     if (output == NULL) {
@@ -141,15 +151,6 @@ void mode_summary()
   if(opt.mode == INTERACTIVE_REPORT)
     printf("Reporting threshold: %d\n\n", opt.threshold);
 
-  if (opt.src_ip)
-    sort_list(SOURCEHOST, SMALLERFIRST);
-  if (opt.src_port)
-    sort_list(SOURCEPORT, SMALLERFIRST);
-  if (opt.dst_port)
-    sort_list(DESTPORT, SMALLERFIRST);
-  sort_list(DELTA_TIME, BIGGERFIRST);
-  sort_list(START_TIME, SMALLERFIRST);
-  sort_list(COUNT, BIGGERFIRST);
   show_list();
 
   if(opt.mode == INTERACTIVE_REPORT)
@@ -163,7 +164,7 @@ void mode_summary()
 
   if (opt.use_out) {
     if (opt.verbose)
-      fprintf(stderr, "Closing \"%s\"\n", opt.outputfile);
+      fprintf(stderr, "Closing '%s'\n", opt.outputfile);
 
     retval = fclose(output);
     if (retval == EOF) {
@@ -175,9 +176,9 @@ void mode_summary()
 
 void terminate()
 {
-  syslog(LOG_NOTICE, "SIGTERM caught, cleaning up.");
+  syslog(LOG_NOTICE, "SIGTERM caught, cleaning up");
   free_hosts();
-  if(opt.response == BLOCK)
+  if(opt.response & OPT_BLOCK)
     modify_firewall(REMOVE_CHAIN);
   log_exit();
 }
@@ -187,9 +188,11 @@ void mode_rt_response()
   char buf[BUFSIZE];
   pid_t pid;
   FILE *input;
-  int retval;
+  int retval, sock;
   struct stat info;
   unsigned long size;
+  fd_set rfds;
+  struct timeval tv;
 
   pid = fork();
   if (pid == -1) {
@@ -202,31 +205,33 @@ void mode_rt_response()
   }
 
   openlog("fwlogwatch", LOG_CONS|LOG_PERROR, LOG_DAEMON);
-  syslog(LOG_NOTICE, "Starting.");
+  syslog(LOG_NOTICE, "Starting");
 
   signal(SIGTERM, terminate);
 
+  sock = prepare_socket();
+
   look_for_log_rules();
 
-  syslog(LOG_NOTICE, "Alert threshold is %d attempt%s.", opt.threshold, (opt.threshold == 1)?"":"s");
+  syslog(LOG_NOTICE, "Alert threshold is %d attempt%s", opt.threshold, (opt.threshold == 1)?"":"s");
 
-  syslog(LOG_NOTICE, "Events older than %d second%s are discarded.", opt.recent, (opt.recent == 1)?"":"s");
+  syslog(LOG_NOTICE, "Events older than %d %s%s are discarded",
+	 (opt.recent < 3600)?opt.recent:opt.recent/3600,
+	 (opt.recent < 3600)?"second":"hour",
+	 ((opt.recent == 1) || (opt.recent == 3600))?"":"s");
 
-  switch(opt.response) {
-  case BLOCK:
-    syslog(LOG_NOTICE, "Response mode is: block.");
-    break;
-  case NOTIFY_SMB:
-    syslog(LOG_NOTICE, "Response mode is: winpopup notification on host '%s'.", opt.action);
-    break;
-  case CUSTOM_ACTION:
-    syslog(LOG_NOTICE, "Response mode is: custom action '%s'.", opt.action);
-    break;
-  default:
-    syslog(LOG_NOTICE, "Response mode is: log only. ");
-  }
 
-  if(opt.response == BLOCK)
+  syslog(LOG_NOTICE, "Response mode: log incident%s%s%s%s%s%s%s%s",
+	 (opt.response & OPT_BLOCK)?", block host":"",
+	 (opt.response & OPT_NOTIFY_EMAIL)?", email notification to ":"",
+	 (opt.response & OPT_NOTIFY_EMAIL)?opt.recipient:"",
+	 (opt.response & OPT_NOTIFY_SMB)?", winpopup notification on host ":"",
+	 (opt.response & OPT_NOTIFY_SMB)?opt.smb_host:"",
+	 (opt.response & OPT_CUSTOM_ACTION)?", custom action '":"",
+	 (opt.response & OPT_CUSTOM_ACTION)?opt.action:"",
+	 (opt.response & OPT_CUSTOM_ACTION)?"'":"");
+
+  if(opt.response & OPT_BLOCK)
     modify_firewall(ADD_CHAIN);
 
   input = fopen(opt.inputfile, "r");
@@ -249,25 +254,28 @@ void mode_rt_response()
   size = info.st_size;
 
   while (1) {
-    retval = fstat(fileno(input), &info);
-    if (retval == -1) {
-      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-      log_exit();
+    FD_ZERO(&rfds);
+    FD_SET(sock, &rfds);
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+    retval = select(sock+1, &rfds, NULL, NULL, &tv);
+    if (retval) {
+      handshake(sock);
+    } else {
+      retval = fstat(fileno(input), &info);
+      if (retval == -1) {
+	syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+	log_exit();
+      }
+      if(size != info.st_size) {
+	size = info.st_size;
+	while (fgets(buf, BUFSIZE, input)) {
+	  parse_line(buf, 0);
+	}
+	remove_old();
+	look_for_alert();
+      }
     }
-
-    if(size == info.st_size) {
-      sleep(1);
-      continue;
-    }
-
-    size = info.st_size;
-
-    while (fgets(buf, BUFSIZE, input)) {
-      parse_line(buf, 0);
-    }
-
-    remove_old();
-    look_for_alert();
   }
 }
 
@@ -285,7 +293,7 @@ void mode_show_log_times()
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Reading \"%s\"\n", opt.inputfile);
+    fprintf(stderr, "Reading '%s'\n", opt.inputfile);
 
   valid_times = get_times(input, log_begin, log_end);
 
@@ -296,7 +304,7 @@ void mode_show_log_times()
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Closing \"%s\"\n", opt.inputfile);
+    fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
   retval = fclose(input);
   if (retval == EOF) {

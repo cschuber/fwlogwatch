@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: main.h,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.22"
-#define COPYRIGHT "2000-10-22 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.23"
+#define COPYRIGHT "2000-10-29 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -19,6 +19,10 @@
 #define ACTIONSIZE 128
 #define SHORTLEN 10
 #define REPORTLEN 52
+#define COLORSIZE 7
+#define MAXSORTSIZE 16
+#define USERSIZE 16
+#define PASSWORDSIZE 76
 
 /* Files */
 
@@ -58,6 +62,8 @@ enum {
 #define ROWCOLOR1 "555555"
 #define ROWCOLOR2 "333333"
 
+#define SORTORDER "tacd"
+
 enum {
   NOSPACE,
   SPACE
@@ -84,13 +90,19 @@ enum {
 #define FORGET 86400
 #define IPCHAINS "/sbin/ipchains"
 #define CHAINLABEL "flwblock"
+#define ECHO "/bin/echo"
+#define MAIL "/bin/mail"
 #define SMBCLIENT "/usr/bin/smbclient"
+#define LISTENHOST "127.0.0.1"
+#define LISTENPORT 888
+#define DEFAULT_USER "fwlogwatch"
+#define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwatch */
 
-enum {
-  BLOCK,
-  NOTIFY_SMB,
-  CUSTOM_ACTION
-};
+#define OPT_LOG 0x01
+#define OPT_BLOCK 0x02
+#define OPT_NOTIFY_EMAIL 0x04
+#define OPT_NOTIFY_SMB 0x08
+#define OPT_CUSTOM_ACTION 0x10
 
 enum {
   ADD_CHAIN,
@@ -179,9 +191,16 @@ struct options {
 
   unsigned char times;
   unsigned char duration;
+
+  char sort_order[MAXSORTSIZE];
+
   unsigned char html;
   unsigned char use_out;
   char outputfile[FILESIZE];
+  char textcol[COLORSIZE];
+  char bgcol[COLORSIZE];
+  char rowcol1[COLORSIZE];
+  char rowcol2[COLORSIZE];
 
   unsigned char loghost;
   char hostname[SHOSTLEN];
@@ -206,6 +225,12 @@ struct options {
 
   unsigned char response;
   char action[ACTIONSIZE];
+  char smb_host[SHOSTLEN];
+  unsigned char status;
+  char listenhost[IPLEN];
+  int listenport;
+  char user[USERSIZE];
+  char password[PASSWORDSIZE];
 };
 
 #endif

@@ -1,11 +1,11 @@
-$Id: README,v 1.1 2002/02/14 20:09:16 bwess Exp $
+$Id: README,v 1.2 2002/02/14 20:25:35 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a linux ipchains packet filter log analyzer with incident
 report and realtime response capability.
 
-It is available from http://www.kyb.uni-stuttgart.de/boris/software.shtml
-for now and will be on the RUS-CERT website http://cert.uni-stuttgart.de soon.
+It is available from the RUS-CERT website http://cert.uni-stuttgart.de and
+http://www.kyb.uni-stuttgart.de/boris/software.shtml
 
 
 FEATURES
@@ -17,9 +17,9 @@ FEATURES
     log is from a single host, the same happens with the chains, targets
     and interfaces).
   - Can separate recent from old entries and detects timewarps in log files.
-  - Plain text and html output.
+  - Plain text and HTML output with sort options.
   - Integrated resolver for protocols, services and host names.
-  - Own dns cache for faster lookups.
+  - Own DNS cache for faster lookups.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -37,6 +37,8 @@ FEATURES
   - In block mode a new chain for fwlogwatch is added and attackers are
     completely blocked with new firewall rules. Supports trusted hosts
     (anti-spoof).
+  - The current status of the program can be followed through a web
+    interface.
 
 The commented config file supports and explains all options and will get
 you started quickly.
@@ -71,24 +73,29 @@ BASICS
 
 
 INSTALLATION
-A simple 'make' should be enough to obtain a working binary. If you use
-the realtime response mode or access the standard messages file you will
-need to install fwlogwatch with superuser permissions. 'make install'
-will put the binary in /usr/local/sbin, and the config file and a sample
+You may want to have a look at main.h if you want to change some default
+values.
+
+A simple 'make' should be enough to obtain a working binary. If you use the
+realtime response mode you will need to install fwlogwatch with superuser
+permissions. If all you need is read access to the systems standard log
+file (e.g. /var/log/messages) you can use group permissions.
+'make install' will install the binary (in /usr/local/sbin) and the man
+page, 'make install-config' will also install a sample config file and
 template in /etc.
 
 You can define the TMPDIR environment variable if you don't want fwlogwatch
-to create it's temporary files in /tmp/.
+to create it's temporary files in /tmp.
 
 
 CONFIGURATION AND EXAMPLES
 - You should make a config file for each function you want, look at the
   included sample file, it should be easy to adapt it to your needs.
 
-- If you want a html summary 'log.html' of all packet filter entries at
+- If you want a HTML summary 'log.html' of all packet filter entries at
   most one day old from the file 'messages' with timestamps, time intervals,
-  resolved ip addresses and service names and with connections separated by
-  protocol, source and destination ports and tcp options you would use
+  resolved IP addresses and service names and with connections separated by
+  protocol, source and destination ports and TCP options you would use
 
     fwlogwatch -v -v -s -d -t -z -y -n -p -w -l 1d -o log.html -f messages
 
@@ -96,7 +103,7 @@ CONFIGURATION AND EXAMPLES
   what happened in the last hour when you get a notification:
   Copy the file fwlogwatch.small.cgi to a place where your web server
   can execute it (fwlogwatch must be reachable and have enough
-  permissions to read the log file, e.g. setgid root).
+  permissions to read the log file).
 
 - A script for generation of 8 general summaries is also included, use
   it as 'fwlogsummary.cgi [logfile]' (it will use the output directory
@@ -105,9 +112,10 @@ CONFIGURATION AND EXAMPLES
 
 - You might want to replace your /etc/services file by the one supplied
   with nmap, a lot more services will be recognized, you can also add the
-  icmp types (don't assign one to 0 since it is the ipchains default).
+  ICMP types (don't assign one to 0 since it is the ipchains default).
 
 
 FEEDBACK
 If you find a bug or have an idea for a new feature please send an email
-to boris.wesslowski@rus.uni-stuttgart.de
+to Boris.Wesslowski@RUS.Uni-Stuttgart.DE
+

@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
+/* $Id: utils.c,v 1.3 2002/02/14 20:25:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@ void *xmalloc(int size)
 
 void log_exit()
 {
-  syslog(LOG_NOTICE, "Exiting.");
+  syslog(LOG_NOTICE, "Exiting");
   exit(EXIT_FAILURE);
 }
 
@@ -44,7 +44,7 @@ void run_command(char *buf)
   }
 
   if(opt.verbose == 2) {
-    syslog(LOG_NOTICE, "Executing \"%s\".", buf);
+    syslog(LOG_NOTICE, "Executing '%s'", buf);
   }
 
   pid = fork();
