@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.3 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: cisco.yy,v 1.4 2002/02/14 20:54:34 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
@@ -27,9 +27,9 @@ NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
 CISCO	"%SEC-6-IPACCESSLOG"("P"|"DP"|"RP"|"NP"|"S")":"
-TARGET	"denied"|"permitted"
-PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|{NUMBER}
 LIST	[a-zA-Z0-9._-]*
+TARGET	"denied"|"permitted"
+PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|{NUMBER}
 
 %%
 
@@ -54,12 +54,11 @@ LIST	[a-zA-Z0-9._-]*
 
 void cisco_parse_date(char *input, unsigned char mode)
 {
+  int day, hour, minute, second;
   char smonth[3];
 #ifdef LOGDOTS
   char *remove_dot;
 #endif
-  int month = 0, day, hour, minute, second;
-  struct tm *t;
 
   if (mode == C_OPT_HOST) {
     sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
@@ -77,33 +76,14 @@ void cisco_parse_date(char *input, unsigned char mode)
     return;
   }
 
-  t = localtime(&opt.now);
-  if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
-  t->tm_mon = month;
-  t->tm_mday = day;
-  t->tm_hour = hour;
-  t->tm_min = minute;
-  t->tm_sec = second;
-  t->tm_isdst = -1;
-  opt.line->time = mktime(t);
+  build_time(smonth, day, hour, minute, second);
 
   opt.parser=opt.parser|CISCO_DATE;
 }
 
 void cisco_parse_src(char *input, unsigned char mode)
 {
-  char proto[5];
+  char proto[5], ip[IPLEN];
   int shost1, shost2, shost3, shost4;
 
   if (mode == C_OPT_PORT) {
@@ -120,7 +100,9 @@ void cisco_parse_src(char *input, unsigned char mode)
 	   &shost1, &shost2, &shost3, &shost4);
   }
 
-  snprintf(opt.line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
+  snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
+  if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
+
   opt.parser=opt.parser|CISCO_SRC;
 
   if(strncmp(proto, "tcp", 3) == 0) opt.line->protocol = 6;
@@ -128,6 +110,8 @@ void cisco_parse_src(char *input, unsigned char mode)
   if(strncmp(proto, "icmp", 4) == 0) opt.line->protocol = 1;
   if(strncmp(proto, "igmp", 4) == 0) opt.line->protocol = 2;
   if(strncmp(proto, "gre", 3) == 0) opt.line->protocol = 47; /* RFC1701/1702 */
+  if(strncmp(proto, "ospf", 4) == 0) opt.line->protocol = 89;
+  if(strncmp(proto, "ipinip", 6) == 0) opt.line->protocol = 4;
   if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
 
   if (opt.line->protocol != 0)
@@ -136,6 +120,7 @@ void cisco_parse_src(char *input, unsigned char mode)
 
 void cisco_parse_dst(char *input, unsigned char mode)
 {
+  char ip[IPLEN];
   int dhost1, dhost2, dhost3, dhost4;
 
   if (mode == C_OPT_PORT) {
@@ -152,7 +137,9 @@ void cisco_parse_dst(char *input, unsigned char mode)
     return;
   }
 
-  snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+  snprintf(ip, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+  if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
+
   opt.parser=opt.parser|CISCO_DST;
 }
 

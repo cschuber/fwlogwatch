@@ -1,4 +1,4 @@
-/* $Id: netfilter.yy,v 1.4 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: netfilter.yy,v 1.5 2002/02/14 20:54:34 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -8,32 +8,37 @@
 #define YY_NO_UNPUT
 
 #include <string.h>
+#include <ctype.h>
 #include "main.h"
 #include "utils.h"
 
 extern struct options opt;
 
 void nf_parse_start(char *input);
+void nf_parse_ip(char *input, unsigned char mode);
 void nf_parse_proto(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
 ISTRING	[a-zA-HJ-Z0-9.-]*
+LOGHOST	[0-9.a-zA-Z_-]*
 DIGIT	[0-9]
-HEXDIGIT	[0-9a-fA-F]
 NUMBER	{DIGIT}+
+OCTET	{DIGIT}{1,3}
+PORT	{DIGIT}{1,5}
+HEXDIGIT	[0-9a-fA-F]
 HEXNUM	"0x"{HEXDIGIT}+
-OCTET   {DIGIT}{1,3}
+PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 
 %%
 
-{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{STRING}" kernel: "{ISTRING}	nf_parse_start(nftext);
-"IN="{STRING}?	{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.parser=opt.parser|NF_IN; }
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}" kernel: "{ISTRING}	nf_parse_start(nftext);
+"IN="{STRING}?		{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.parser=opt.parser|NF_IN; }
 "OUT="{STRING}?		/* ignore */
 "MAC="({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT}	/* ignore */
-"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->shost, nftext+4, IPLEN); opt.parser=opt.parser|NF_SRC; }
-"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->dhost, nftext+4, IPLEN); opt.parser=opt.parser|NF_DST; }
+"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_SRC);
+"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_DST);
 "LEN="{NUMBER}		/* ignore */
 "TOS="{HEXNUM}		/* ignore */
 "PREC="{HEXNUM}		/* ignore */
@@ -43,22 +48,22 @@ OCTET   {DIGIT}{1,3}
 "DF"			/* ignore */
 "MF"			/* ignore */
 "FRAG:"{NUMBER}		/* ignore */
-"PROTO="{STRING}	nf_parse_proto(nftext+6);
-"INCOMPLETE ["{NUMBER}" bytes]" /* ignore */
+"PROTO="{PROTO}		nf_parse_proto(nftext+6);
+"INCOMPLETE ["{NUMBER}" bytes]"	/* ignore */
 "TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.parser=opt.parser|NF_TYPE; }
 "CODE="{NUMBER}		/* ignore */
 "SEQ="{NUMBER}		/* ignore */
 "ACK="{NUMBER}		/* ignore */
-"SPT="{NUMBER}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
-"DPT="{NUMBER}		{ opt.line->dport = atoi(nftext+4); opt.parser=opt.parser|NF_DPT; }
+"SPT="{PORT}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
+"DPT="{PORT}		{ opt.line->dport = atoi(nftext+4); opt.parser=opt.parser|NF_DPT; }
 "WINDOW="{NUMBER}	/* ignore */
 "RES="{HEXNUM}		/* ignore */
-"URG"			/* fixme */
-"ACK"			/* fixme */
-"PSH"			/* fixme */
-"RST"			/* fixme */
-"SYN"			opt.line->syn = 1;
-"FIN"			/* fixme */
+"URG"			opt.line->flags = opt.line->flags | TCP_URG;
+"ACK"			opt.line->flags = opt.line->flags | TCP_ACK;
+"PSH"			opt.line->flags = opt.line->flags | TCP_PSH;
+"RST"			opt.line->flags = opt.line->flags | TCP_RST;
+"SYN"			opt.line->flags = opt.line->flags | TCP_SYN;
+"FIN"			opt.line->flags = opt.line->flags | TCP_FIN;
 "URGP="{NUMBER}		/* ignore */
 "OPT ("[0-9A-F]*")"	/* ignore */
 "SPI="{HEXNUM}		/* ignore */
@@ -71,10 +76,8 @@ OCTET   {DIGIT}{1,3}
 
 void nf_parse_start(char *input)
 {
-  int retval;
+  int retval, day, hour, minute, second;
   char smonth[3];
-  int month = 0, day, hour, minute, second;
-  struct tm *t;
 
   retval = sscanf(input,
 		  "%3s %2d %2d:%2d:%2d %32s kernel: %10s",
@@ -91,35 +94,33 @@ void nf_parse_start(char *input)
     }
   }
 
-  t = localtime(&opt.now);
-  if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
-  t->tm_mon = month;
-  t->tm_mday = day;
-  t->tm_hour = hour;
-  t->tm_min = minute;
-  t->tm_sec = second;
-  t->tm_isdst = -1;
-  opt.line->time = mktime(t);
+  build_time(smonth, day, hour, minute, second);
 
   opt.parser=opt.parser|NF_DATE;
 }
 
+void nf_parse_ip(char *input, unsigned char mode)
+{
+  if (mode == NF_SRC) {
+    if(convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR) return;
+    opt.parser=opt.parser|NF_SRC;
+  } else {
+    if(convert_ip(input, &opt.line->dhost) == IN_ADDR_ERROR) return;
+    opt.parser=opt.parser|NF_DST;
+  }
+}
+
 void nf_parse_proto(char *input)
 {
-  if(strncmp(input, "TCP", 3) == 0) opt.line->protocol = 6;
-  if(strncmp(input, "UDP", 3) == 0) opt.line->protocol = 17;
-  if(strncmp(input, "ICMP", 4) == 0) opt.line->protocol = 1;
+  if(isdigit((int)input[0])) {
+    opt.line->protocol = atoi(input);
+  } else {
+    if(strncmp(input, "TCP", 3) == 0) opt.line->protocol = 6;
+    if(strncmp(input, "UDP", 3) == 0) opt.line->protocol = 17;
+    if(strncmp(input, "ICMP", 4) == 0) opt.line->protocol = 1;
+    if(strncmp(input, "ESP", 3) == 0) opt.line->protocol = 50;
+    if(strncmp(input, "AH", 2) == 0) opt.line->protocol = 51;
+  }
 
   if (opt.line->protocol != 0)
     opt.parser=opt.parser|NF_PROTO;

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: rcfile.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -164,6 +164,9 @@ void parse_rcfile(char *input)
   /* Interactive report mode */
 
   if (strncmp(command, "interactive", 11) == 0) {
+    if (opt.mode != LOG_SUMMARY) {
+      mode_error();
+    }
     opt.mode = INTERACTIVE_REPORT;
     opt.threshold = get_num_parameter(command+12);
     return;
@@ -188,6 +191,9 @@ void parse_rcfile(char *input)
   /* Realtime response mode */
 
   if (strncmp(command, "realtime_response", 17) == 0) {
+    if (opt.mode != LOG_SUMMARY) {
+      mode_error();
+    }
     opt.mode = REALTIME_RESPONSE;
     return;
   }
@@ -216,8 +222,12 @@ void parse_rcfile(char *input)
   }
   if (strncmp(command, "known_host", 10) == 0) {
     host = xmalloc(sizeof(struct known_hosts));
+    if(convert_ip(get_one_parameter(command+11), &host->shost) == IN_ADDR_ERROR) {
+      printf("(known host)\n");
+      free(host);
+      return;
+    }
     host->time = 0;
-    strncpy(host->shost, get_one_parameter(command+11), IPLEN);
     host->next = first_host;
     first_host = host;
     return;
@@ -246,6 +256,9 @@ void parse_rcfile(char *input)
   /* Show log times mode */
 
   if (strncmp(command, "show_log_times", 14) == 0) {
+    if (opt.mode != LOG_SUMMARY) {
+      mode_error();
+    }
     opt.mode = SHOW_LOG_TIMES;
     return;
   }

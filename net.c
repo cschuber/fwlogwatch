@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.6 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: net.c,v 1.7 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -240,7 +240,7 @@ void handshake(int fd)
       } else {
 	remaining = opt.recent - (now - this->start_time);
       }
-      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td><td>%s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, this->shost, (int)remaining);
+      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td><td>%s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, inet_ntoa(this->shost), (int)remaining);
       if (color == 1) {
 	color = 2;
       } else {
@@ -259,10 +259,10 @@ void handshake(int fd)
     this_host = first_host;
     while(this_host != NULL) {
       if (this_host->time == 0) {
-	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Known host</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost);
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Known host</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost));
       } else {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
-	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Added %s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->shost, nows, (int)(opt.recent - (now - this_host->time)));
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Added %s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost), nows, (int)(opt.recent - (now - this_host->time)));
       }
       if (color == 1) {
 	color = 2;

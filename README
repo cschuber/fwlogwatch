@@ -1,4 +1,4 @@
-$Id: README,v 1.7 2002/02/14 20:48:49 bwess Exp $
+$Id: README,v 1.8 2002/02/14 20:54:34 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -50,11 +50,11 @@ get you started quickly.
 
 
 NETFILTER AND CISCO SUPPORT
-fwlogwatch features iptables/netfilter and cisco log file support, it can
-even parse combined log files. Some restrictions apply because not all
+fwlogwatch also features iptables/netfilter and cisco log file support, it
+can even parse combined log files. Some restrictions apply because not all
 fields exist or make sense in all log file types. Realtime response mode
-only works for ipchains. It is assumed that if you use netfilter or cisco
-you know how to get it to produce usable log entries.
+only works for ipchains. It is assumed that if you use netfilter or a cisco
+product you know how to get them to produce usable log entries through syslog.
 
 
 INSTALLATION
@@ -130,8 +130,10 @@ CONFIGURATION AND EXAMPLES
   to select the level of detail you need.
 
 - You might want to replace your /etc/services file by the one supplied
-  with nmap, a lot more services will be recognized, you can also add the
-  ICMP types (don't assign one to 0 since it is the ipchains default).
+  with nmap (http://www.insecure.org/nmap/), a lot more services will be
+  recognized, you can also add the ICMP types (don't assign one to type 0
+  since it is the ipchains default). The same applies to /etc/protocols,
+  you can use RFC 1700 (Assigned Numbers) to extend your version.
 
 
 FEEDBACK

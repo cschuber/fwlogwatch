@@ -1,4 +1,4 @@
-/* $Id: output.h,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: output.h,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #ifndef _OUTPUT_H
 #define _OUTPUT_H
@@ -10,5 +10,6 @@ void output_resolved(struct conn_data *input);
 void output_html_header();
 void output_html_table();
 void output_html_footer();
+void output_raw_data(struct conn_data *input);
 
 #endif

@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: response.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +6,7 @@
 #include <time.h>
 #include <errno.h>
 #include <syslog.h>
+#include <arpa/inet.h>
 #include "response.h"
 #include "output.h"
 #include "utils.h"
@@ -200,7 +201,7 @@ void remove_old()
       if (opt.verbose == 2)
 	syslog(LOG_NOTICE, "Deleting host status entry (%s)", this_host->shost);
       if (opt.response & OPT_BLOCK)
-	remove_rule(this_host->shost);
+	remove_rule(inet_ntoa(this_host->shost));
       if (is_first == 1) {
 	prev_host = this_host->next;
 	free(this_host);
@@ -218,13 +219,13 @@ void remove_old()
   }
 }
 
-unsigned char is_known(char *shost)
+unsigned char is_known(struct in_addr shost)
 {
   struct known_hosts *this_host;
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (strncmp(this_host->shost, shost, IPLEN) == 0) {
+    if (this_host->shost.s_addr == shost.s_addr) {
       return 1;
     }
     this_host = this_host->next;
@@ -246,26 +247,26 @@ void look_for_alert()
       host = xmalloc(sizeof(struct known_hosts));
 
       host->time = time(NULL);
-      strncpy(host->shost, this->shost, IPLEN);
+      host->shost.s_addr = this->shost.s_addr;
       host->next = first_host;
       first_host = host;
 
       if(opt.response & OPT_BLOCK) {
-	add_rule(this->shost);
+	add_rule(inet_ntoa(this->shost));
       }
       if(opt.response & OPT_NOTIFY_EMAIL) {
 	snprintf(buf, BUFSIZE,
 		 "%s | %s -s 'fwlogwatch alert: %d connection attempt%s from %s' %s",
 		 P_ECHO, P_MAIL,
 		 this->count, (this->count == 1)?"":"s",
-		 this->shost, opt.recipient);
+		 inet_ntoa(this->shost), opt.recipient);
 	run_command(buf);
       }
       if(opt.response & OPT_NOTIFY_SMB) {
 	snprintf(buf, BUFSIZE,
 		 "%s 'fwlogwatch alert: %d connection attempts from %s' | %s -M %s",
 		 P_ECHO,
-		 this->count, this->shost,
+		 this->count, inet_ntoa(this->shost),
 		 P_SMBCLIENT, opt.smb_host);
 	run_command(buf);
       }

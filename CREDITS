@@ -1,6 +1,6 @@
-$Id: CREDITS,v 1.7 2002/02/14 20:48:49 bwess Exp $
+$Id: CREDITS,v 1.8 2002/02/14 20:54:34 bwess Exp $
 
-This Program was written by
+This program was written by
 Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
 
 Thanks go to the following persons:
@@ -24,3 +24,6 @@ Didier Contis <didier@ece.gatech.edu>
 
 Werner Fleck <w.fleck@PopNet.de> / <fwlogwatch@flexoft.net>
   for reporting ipchains parser omissions and building a first debian package.
+
+Michael Reichardt <Michael.Reichardt@guug.de>
+  for reporting a conflict in time warp detection.

@@ -1,4 +1,10 @@
-$Id: ChangeLog,v 1.6 2002/02/14 20:48:49 bwess Exp $
+$Id: ChangeLog,v 1.7 2002/02/14 20:54:34 bwess Exp $
+
+Version 0.1 2001-01-07
+- Rewrote IP Address handling code
+- Small parser and output extensions
+- Added mode collision detection
+- Fixed time calculation problem and warp detection
 
 Version 0.0.28 2000-12-26
 - Rewrote ipchains parser (converted to flex)

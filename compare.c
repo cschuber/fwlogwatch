@@ -1,8 +1,9 @@
-/* $Id: compare.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: compare.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 #include "compare.h"
 #include "output.h"
 #include "utils.h"
@@ -24,11 +25,11 @@ void add_entry()
   strncpy(data->branchname, opt.line->branchname, SHORTLEN);
   strncpy(data->interface, opt.line->interface, SHORTLEN);
   data->protocol = opt.line->protocol;
-  strncpy(data->shost, opt.line->shost, IPLEN);
+  data->shost = opt.line->shost;
   data->sport = opt.line->sport;
-  strncpy(data->dhost, opt.line->dhost, IPLEN);
+  data->dhost = opt.line->dhost;
   data->dport = opt.line->dport;
-  data->syn = opt.line->syn;
+  data->flags = opt.line->flags;
 
   data->next = first;
   first = data;
@@ -61,19 +62,19 @@ void sort_list(int field, char mode)
 	break;
       case SOURCEHOST:
 	if (mode) {
-	  if (strncmp(this->shost, next->shost, IPLEN) < 0)
+	  if (ntohl(this->shost.s_addr) < ntohl(next->shost.s_addr))
 	    cond = 1;
 	} else {
-	  if (strncmp(next->shost, this->shost, IPLEN) < 0)
+	  if (ntohl(this->shost.s_addr) > ntohl(next->shost.s_addr))
 	    cond = 1;
 	}
 	break;
       case DESTHOST:
 	if (mode) {
-	  if (strncmp(this->dhost, next->dhost, IPLEN) < 0)
+	  if (ntohl(this->dhost.s_addr) < ntohl(next->dhost.s_addr))
 	    cond = 1;
 	} else {
-	  if (strncmp(next->dhost, this->dhost, IPLEN) < 0)
+	  if (ntohl(this->dhost.s_addr) > ntohl(next->dhost.s_addr))
 	    cond = 1;
 	}
 	break;
@@ -200,6 +201,7 @@ void sort_data()
 void build_list()
 {
   struct conn_data *this;
+  char stime[TIMESIZE];
 
   if (opt.loghost == 0) {
     if (opt.hostname[0] != '\0') {
@@ -243,12 +245,12 @@ void build_list()
 
   this = first;
   while (this != NULL) {
+    if ((opt.dst_ip) && (this->dhost.s_addr != opt.line->dhost.s_addr)) {goto no_match;}
+    if ((opt.src_ip) && (this->shost.s_addr != opt.line->shost.s_addr)) {goto no_match;}
     if ((opt.dst_port) && (this->dport != opt.line->dport)) {goto no_match;}
     if ((opt.src_port) && (this->sport != opt.line->sport)) {goto no_match;}
     if ((opt.proto) && (this->protocol != opt.line->protocol)) {goto no_match;}
-    if ((opt.opts) && (this->syn != opt.line->syn)) {goto no_match;}
-    if ((opt.src_ip) && (strncmp(this->shost, opt.line->shost, IPLEN) != 0)) {goto no_match;}
-    if ((opt.dst_ip) && (strncmp(this->dhost, opt.line->dhost, IPLEN) != 0)) {goto no_match;}
+    if ((opt.opts) && (this->flags != opt.line->flags)) {goto no_match;}
     if (strncmp(this->interface, opt.line->interface, SHORTLEN) != 0) {goto no_match;}
     if (strncmp(this->branchname, opt.line->branchname, SHORTLEN) != 0) {goto no_match;}
     if (strncmp(this->chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {goto no_match;}
@@ -257,9 +259,12 @@ void build_list()
     if (opt.line->time >= this->end_time) {
       this->end_time = opt.line->time;
     } else {
-      if(opt.verbose)
-	fprintf(stderr, "Timewarp in log file (%d < %d), ignoring.\n", (int)opt.line->time, (int)this->end_time);
-      return;
+      if(opt.verbose) {
+	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
+	fprintf(stderr, "Timewarp in log file (%s", stime);
+	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&opt.line->time));
+	fprintf(stderr, " < %s).\n", stime);
+      }
     }
 
     this->count += opt.line->count;

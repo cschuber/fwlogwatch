@@ -1,4 +1,4 @@
-/* $Id: resolve.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: resolve.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,83 +47,68 @@ char * resolve_service(int port, char *proto)
   return ("-");
 }
 
-char * resolve_hostname(char *ip)
+char * resolve_hostname(struct in_addr ip)
 {
   struct hostent *reverse, *forward;
-  struct in_addr inaddr;
   struct dns_cache *dns;
   char *pnt;
-#ifndef SOLARIS
-  int retval;
-#endif
 
   dns = dns_first;
   while(dns != NULL) {
-    if (strncmp(ip, dns->ip, IPLEN) == 0) {
+    if (ip.s_addr == dns->ip.s_addr) {
       if(opt.verbose) {
-	fprintf(stderr, "Resolving %s from cache\n", ip);
+	fprintf(stderr, "Resolving %s from cache\n", inet_ntoa(ip));
       }
       return (dns->fqdn);
     }
     dns = dns->next;
   }
 
-#ifndef SOLARIS
-  retval = inet_aton(ip, &inaddr);
-  if (retval != 0) {
-#else
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
-  inaddr.s_addr = inet_addr(ip);
-  if (inaddr.s_addr != INADDR_NONE) {
-#endif
-    if(opt.verbose)
-      fprintf(stderr, "Resolving %s\n", ip);
+  if(opt.verbose)
+    fprintf(stderr, "Resolving %s\n", inet_ntoa(ip));
 
-    reverse = gethostbyaddr((char *)&inaddr.s_addr, sizeof(struct in_addr), AF_INET);
+  reverse = gethostbyaddr((void *)&ip.s_addr, sizeof(struct in_addr), AF_INET);
 
-    dns = xmalloc(sizeof(struct dns_cache));
-    strncpy(dns->ip, ip, IPLEN);
+  dns = xmalloc(sizeof(struct dns_cache));
+  dns->ip.s_addr = ip.s_addr;
 
-    if((reverse != NULL) && (reverse->h_name != NULL)) {
-      if (reverse->h_length > sizeof(struct in_addr)) {
-	fprintf(stderr, "Wrong host name size\n");
-	reverse->h_length = sizeof(struct in_addr);
-	reverse->h_name[reverse->h_length] = '\0';
-      }
-
-      pnt = reverse->h_name;
-      while (*pnt != '\0') {
-	if (isalnum((int)*pnt) || *pnt == '.' || *pnt == '-') {
-	  pnt++;
-	  continue;
-	} else {
-	  *pnt = '_';
-	  pnt++;
-	}
-      }
-
-      if(opt.verbose)
-	fprintf(stderr, "Resolving %s\n", reverse->h_name);
-
-      forward = gethostbyname(reverse->h_name);
-      if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
-	if (strncmp(ip, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
-	  strncpy(dns->fqdn, reverse->h_name, HOSTLEN);
-	} else {
-	  snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup: %s]", reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
-	}
-      } else {
-	snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup failed]", reverse->h_name);
-      }
-    } else {
-      strncpy(dns->fqdn, "-", HOSTLEN);
+  if((reverse != NULL) && (reverse->h_name != NULL)) {
+    if (reverse->h_length > sizeof(struct in_addr)) {
+      fprintf(stderr, "Wrong host name size\n");
+      reverse->h_length = sizeof(struct in_addr);
+      reverse->h_name[reverse->h_length] = '\0';
     }
 
-    dns->next = dns_first;
-    dns_first = dns;
+    pnt = reverse->h_name;
+    while (*pnt != '\0') {
+      if (isalnum((int)*pnt) || *pnt == '.' || *pnt == '-') {
+	pnt++;
+	continue;
+      } else {
+	*pnt = '_';
+	pnt++;
+      }
+    }
+
+    if(opt.verbose)
+      fprintf(stderr, "Resolving %s\n", reverse->h_name);
+
+    forward = gethostbyname(reverse->h_name);
+    if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
+      if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
+	strncpy(dns->fqdn, reverse->h_name, HOSTLEN);
+      } else {
+	snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup: %s]", reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
+      }
+    } else {
+      snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup failed]", reverse->h_name);
+    }
+  } else {
+    strncpy(dns->fqdn, "-", HOSTLEN);
   }
+
+  dns->next = dns_first;
+  dns_first = dns;
 
   return (dns->fqdn);
 }

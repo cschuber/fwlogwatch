@@ -1,10 +1,11 @@
-/* $Id: report.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: report.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <arpa/inet.h>
 #include "main.h"
 #include "resolve.h"
 #include "output.h"
@@ -226,10 +227,10 @@ void fill_report(struct conn_data *this, struct report_data *data)
   strncpy(data->cc, opt.cc, EMAILSIZE);
 
   strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
-  snprintf(data->subject, EMAILSIZE, "Incident report %s-%s", stime, this->shost);
+  snprintf(data->subject, EMAILSIZE, "Incident report %s-%s", stime, inet_ntoa(this->shost));
 
   if(opt.src_ip)
-    strncpy(data->shost, this->shost, IPLEN);
+    strncpy(data->shost, inet_ntoa(this->shost), IPLEN);
   else
     data->shost[0] = '\0';
 
@@ -239,7 +240,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
     data->shostname[0] = '\0';
 
   if(opt.dst_ip)
-    strncpy(data->dhost, this->dhost, IPLEN);
+    strncpy(data->dhost, inet_ntoa(this->dhost), IPLEN);
   else
     data->dhost[0] = '\0';
 
@@ -303,8 +304,8 @@ void fill_report(struct conn_data *this, struct report_data *data)
   }
 
   if (opt.opts) {
-    if (this->syn == 0) {
-      strncpy(data->syn, "ACKs only", SHORTLEN);
+    if (this->flags & TCP_SYN) {
+      strncpy(data->syn, "no SYNs", SHORTLEN);
     } else {
       strncpy(data->syn, "SYNs only", SHORTLEN);
     }
@@ -313,7 +314,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
   }
 
   strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
-  snprintf(data->tracking, REPORTLEN, "%s-%s", stime, this->shost);
+  snprintf(data->tracking, REPORTLEN, "%s-%s", stime, inet_ntoa(this->shost));
 }
 
 void modify_report(struct report_data *data)

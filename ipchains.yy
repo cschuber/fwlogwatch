@@ -1,4 +1,4 @@
-/* $Id: ipchains.yy,v 1.1 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: ipchains.yy,v 1.2 2002/02/14 20:54:34 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -44,7 +44,7 @@ IPCHAINS	" kernel: Packet log: "
 "F="{HEXNUM}	/* ignore */
 "T="{NUMBER}	/* ignore */
 "O="{HEXNUM}	/* ignore */
-"SYN"		opt.line->syn = 1;
+"SYN"		opt.line->flags = TCP_SYN;
 "(#"{NUMBER}")"	/* ignore */
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
@@ -55,34 +55,14 @@ IPCHAINS	" kernel: Packet log: "
 
 void ipchains_parse_date(char *input)
 {
+  int day, hour, minute, second;
   char smonth[3];
-  int month = 0, day, hour, minute, second;
-  struct tm *t;
 
   sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
 	 smonth, &day, &hour, &minute, &second,
 	 opt.line->hostname);
 
-  t = localtime(&opt.now);
-  if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
-  t->tm_mon = month;
-  t->tm_mday = day;
-  t->tm_hour = hour;
-  t->tm_min = minute;
-  t->tm_sec = second;
-  t->tm_isdst = -1;
-  opt.line->time = mktime(t);
+  build_time(smonth, day, hour, minute, second);
 
   opt.parser=opt.parser|IPCHAINS_DATE;
 }
@@ -117,13 +97,17 @@ void ipchains_parse_ips(char *input)
 {
   int shost1, shost2, shost3, shost4;
   int dhost1, dhost2, dhost3, dhost4;
+  char ip[IPLEN];
 
   sscanf(input, "%3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d",
 	 &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
 	 &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
 
-  snprintf(opt.line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-  snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+  snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
+  if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
+
+  snprintf(ip, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+  if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
 
   opt.parser=opt.parser|IPCHAINS_IPS;
 }

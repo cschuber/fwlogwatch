@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: main.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ struct options opt;
 extern char *optarg;
 extern struct known_hosts *first_host;
 
-void usage(char *me, char exitcode)
+void usage(char *me, unsigned char exitcode)
 {
   printf("%s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
   printf("Usage: %s [options]\n", me);
@@ -66,10 +66,7 @@ void usage(char *me, char exitcode)
   printf("         -X          activate internal status information web server\n");
   printf("\n");
 
-  if (exitcode == EXIT_SUCCESS)
-    exit(EXIT_SUCCESS);
-  else
-    exit(EXIT_FAILURE);
+  exit(exitcode);
 }
 
 void info()
@@ -236,6 +233,9 @@ int main(int argc, char **argv)
       usage(argv[0], EXIT_SUCCESS);
       break;
     case 'i':
+      if (opt.mode != LOG_SUMMARY) {
+	mode_error();
+      }
       opt.mode = INTERACTIVE_REPORT;
       opt.threshold = atoi(optarg);
       break;
@@ -244,8 +244,12 @@ int main(int argc, char **argv)
       break;
     case 'k':
       host = xmalloc(sizeof(struct known_hosts));
+      if(convert_ip(optarg, &host->shost) == IN_ADDR_ERROR) {
+	printf("(known host)\n");
+	free(host);
+	exit(EXIT_FAILURE);
+      }
       host->time = 0;
-      strncpy(host->shost, optarg, IPLEN);
       host->next = first_host;
       first_host = host;
       break;
@@ -253,6 +257,9 @@ int main(int argc, char **argv)
       opt.recent = parse_time(optarg);
       break;
     case 'L':
+      if (opt.mode != LOG_SUMMARY) {
+	mode_error();
+      }
       opt.mode = SHOW_LOG_TIMES;
       break;
     case 'm':
@@ -276,6 +283,9 @@ int main(int argc, char **argv)
       opt.proto = 1;
       break;
     case 'R':
+      if (opt.mode != LOG_SUMMARY) {
+	mode_error();
+      }
       opt.mode = REALTIME_RESPONSE;
       break;
     case 's':

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: main.h,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.28"
-#define COPYRIGHT "2000-12-26 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.1"
+#define COPYRIGHT "2001-01-07 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -47,6 +47,20 @@ enum {
   PARSE_WRONG_FORMAT,
   PARSE_TOO_OLD
 };
+
+enum {
+  IN_ADDR_OK,
+  IN_ADDR_ERROR
+};
+
+/* TCP flags */
+
+#define TCP_SYN 1
+#define TCP_ACK 2
+#define TCP_FIN 4
+#define TCP_RST 8
+#define TCP_PSH 16
+#define TCP_URG 32
 
 /* ipchains support */
 
@@ -155,6 +169,7 @@ enum {
 /* Data structures */
 
 #include <time.h>
+#include <netinet/in.h>
 
 struct log_line {
   time_t time;
@@ -163,11 +178,11 @@ struct log_line {
   char branchname[SHORTLEN];
   char interface[SHORTLEN];
   int protocol;
-  char shost[IPLEN];
+  struct in_addr shost;
   int sport;
-  char dhost[IPLEN];
+  struct in_addr dhost;
   int dport;
-  unsigned char syn;
+  unsigned char flags;
   int count;
 };
 
@@ -180,16 +195,16 @@ struct conn_data {
   char branchname[SHORTLEN];
   char interface[SHORTLEN];
   int protocol;
-  char shost[IPLEN];
+  struct in_addr shost;
   int sport;
-  char dhost[IPLEN];
+  struct in_addr dhost;
   int dport;
-  unsigned char syn;
+  unsigned char flags;
   struct conn_data *next;
 };
 
 struct dns_cache {
-  char ip[IPLEN];
+  struct in_addr ip;
   char fqdn[HOSTLEN];
   struct dns_cache *next;
 };
@@ -217,7 +232,7 @@ struct report_data {
 
 struct known_hosts {
   time_t time;
-  char shost[IPLEN];
+  struct in_addr shost;
   struct known_hosts *next;
 };
 

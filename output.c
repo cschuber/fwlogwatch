@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.8 2002/02/14 20:48:49 bwess Exp $ */
+/* $Id: output.c,v 1.9 2002/02/14 20:54:34 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +9,7 @@
 #include "resolve.h"
 
 extern struct options opt;
+extern struct conn_data *first;
 
 void separate(char space)
 {
@@ -165,7 +166,7 @@ void output_resolved(struct conn_data *input)
     if (!opt.html)
       printf("from ");
 
-    printf("%s", input->shost);
+    printf("%s", inet_ntoa(input->shost));
 
     if(opt.resolve) {
       output_res_common(resolve_hostname(input->shost));
@@ -189,7 +190,7 @@ void output_resolved(struct conn_data *input)
     if (!opt.html)
       printf("to ");
 
-    printf("%s", input->dhost);
+    printf("%s", inet_ntoa(input->dhost));
 
     if(opt.resolve) {
       output_res_common(resolve_hostname(input->dhost));
@@ -210,15 +211,25 @@ void output_resolved(struct conn_data *input)
   if(opt.opts) {
     separate(NOSPACE);
 
-    if (input->syn == 1) {
-      if (opt.html) {
+    if ((input->flags & (TCP_ACK|TCP_FIN|TCP_RST|TCP_PSH|TCP_URG)) != 0) {
+      if (!opt.html)
+	printf(" ");
+
+      if (input->flags & TCP_SYN) { printf("s"); } else { printf ("-"); }
+      if (input->flags & TCP_ACK) { printf("a"); } else { printf ("-"); }
+      if (input->flags & TCP_FIN) { printf("f"); } else { printf ("-"); }
+      if (input->flags & TCP_RST) { printf("r"); } else { printf ("-"); }
+      if (input->flags & TCP_PSH) { printf("p"); } else { printf ("-"); }
+      if (input->flags & TCP_URG) { printf("u"); } else { printf ("-"); }
+    } else {
+      if (input->flags & TCP_SYN) {
+	if (!opt.html)
+	  printf(" ");
 	printf("SYN");
       } else {
-	printf(" SYN");
+	if (opt.html)
+	  printf("-");
       }
-    } else {
-      if (opt.html)
-	printf("-");
     }
   }
 
@@ -232,7 +243,7 @@ void output_resolved(struct conn_data *input)
 void output_html_header()
 {
   printf("<html><head><title>fwlogwatch output</title></head>\n");
-  printf("<body text=\"#%s\" bgcolor=\"#%s\">\n", opt.textcol, opt.bgcol);
+  printf("<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
   printf("<font face=\"Arial, Helvetica\">\n");
   printf("<div align=\"center\">\n");
   printf("<h1>fwlogwatch output</h1>\n");
@@ -292,6 +303,28 @@ void output_html_table()
 void output_html_footer()
 {
   printf("</table></div><br>\n");
-  printf("<small>%s %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
+  printf("<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
   printf("</font></body></html>\n");
+}
+
+void output_raw_data(struct conn_data *input)
+{
+  struct conn_data *this;
+
+  this = first;
+  while (this != NULL) {
+    printf("%d;%ld;%ld;"
+	   "%s;%s;%s;"
+	   "%s;%d;"
+	   "%u;%d;"
+	   "%u;%d;"
+	   "%d\n",
+	   input->count, input->start_time, input->end_time,
+	   input->hostname, input->chainlabel, input->branchname,
+	   input->interface, input->protocol,
+	   ntohl(input->shost.s_addr), input->sport,
+	   ntohl(input->dhost.s_addr), input->dport,
+	   input->flags);
+    this = this->next;
+  }
 }
