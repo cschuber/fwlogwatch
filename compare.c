@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: compare.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,137 +35,153 @@ void add_entry()
   first = data;
 }
 
-void sort_list(int field, char mode)
+unsigned char compare(struct conn_data *op1, struct conn_data *op2)
 {
-  struct conn_data *prev, *this, *next;
-  char changed = 1, start_of_chain, cond;
+  unsigned char cond = 0;
 
-  while (changed) {
-    changed = 0;
-    start_of_chain = 1;
-
-    prev = this = first;
-
-    while (this != NULL && this->next != NULL) {
-      next = this->next;
-
-      cond = 0;
-      switch(field) {
-      case COUNT:
-	if (mode) {
-	  if (next->count > this->count)
-	    cond = 1;
-	} else {
-	  if (next->count < this->count)
-	    cond = 1;
-	}
-	break;
-      case SOURCEHOST:
-	if (mode) {
-	  if (ntohl(this->shost.s_addr) < ntohl(next->shost.s_addr))
-	    cond = 1;
-	} else {
-	  if (ntohl(this->shost.s_addr) > ntohl(next->shost.s_addr))
-	    cond = 1;
-	}
-	break;
-      case DESTHOST:
-	if (mode) {
-	  if (ntohl(this->dhost.s_addr) < ntohl(next->dhost.s_addr))
-	    cond = 1;
-	} else {
-	  if (ntohl(this->dhost.s_addr) > ntohl(next->dhost.s_addr))
-	    cond = 1;
-	}
-	break;
-      case SOURCEPORT:
-	if (mode) {
-	  if (next->sport > this->sport)
-	    cond = 1;
-	} else {
-	  if (next->sport < this->sport)
-	    cond = 1;
-	}
-	break;
-      case DESTPORT:
-	if (mode) {
-	  if (next->dport > this->dport)
-	    cond = 1;
-	} else {
-	  if (next->dport < this->dport)
-	    cond = 1;
-	}
-	break;
-      case START_TIME:
-	if (mode) {
-	  if (next->start_time > this->start_time)
-	    cond = 1;
-	} else {
-	  if (next->start_time < this->start_time)
-	    cond = 1;
-	}
-	break;
-      case DELTA_TIME:
-	if (mode) {
-	  if ((next->end_time - next->start_time) > (this->end_time - this->start_time))
-	    cond = 1;
-	} else {
-	  if ((next->end_time - next->start_time) < (this->end_time - this->start_time))
-	    cond = 1;
-	}
-	break;
-      default:
-	fprintf(stderr, "conn_sort_up: wrong mode\n");
-      }
-
-      if (cond == 1) {
-	this->next = next->next;
-	next->next = this;
-	if (start_of_chain) {
-	  prev = first = next;
-	  --start_of_chain;
-	} else {
-	  prev->next = next;
-	  prev = next;
-	}
-	changed = 1;
-      } else {
-	prev = this;
-	this = next;
-	if (start_of_chain)
-	  --start_of_chain;
-      }
+  switch(opt.sortfield) {
+  case SORT_COUNT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->count > op1->count) cond++;
+    } else {
+      if (op2->count < op1->count) cond++;
     }
+    break;
+  case SORT_START_TIME:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->start_time > op1->start_time) cond++;
+    } else {
+      if (op2->start_time < op1->start_time) cond++;
+    }
+    break;
+  case SORT_DELTA_TIME:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if ((op2->end_time - op2->start_time) > (op1->end_time - op1->start_time)) cond++;
+    } else {
+      if ((op2->end_time - op2->start_time) < (op1->end_time - op1->start_time)) cond++;
+    }
+    break;
+  case SORT_CHAINLABEL:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) < 0) cond++;
+    } else {
+      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) > 0) cond++;
+    }
+    break;
+  case SORT_PROTOCOL:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->protocol > op1->protocol) cond++;
+    } else {
+      if (op2->protocol < op1->protocol) cond++;
+    }
+    break;
+  case SORT_SOURCEHOST:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (ntohl(op2->shost.s_addr) > ntohl(op1->shost.s_addr)) cond++;
+    } else {
+      if (ntohl(op2->shost.s_addr) < ntohl(op1->shost.s_addr)) cond++;
+    }
+    break;
+  case SORT_SOURCEPORT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->sport > op1->sport) cond++;
+    } else {
+      if (op2->sport < op1->sport) cond++;
+    }
+    break;
+  case SORT_DESTHOST:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (ntohl(op2->dhost.s_addr) > ntohl(op1->dhost.s_addr)) cond++;
+    } else {
+      if (ntohl(op2->dhost.s_addr) < ntohl(op1->dhost.s_addr)) cond++;
+    }
+    break;
+  case SORT_DESTPORT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op2->dport > op1->dport) cond++;
+    } else {
+      if (op2->dport < op1->dport) cond++;
+    }
+    break;
+  default:
+    fprintf(stderr, "conn_sort_up: wrong mode\n");
+  }
+
+  return cond;
+}
+
+struct conn_data *merge(struct conn_data *list1, struct conn_data *list2)
+{
+  if (list1 == NULL) return list2;
+  else if (list2 == NULL) return list1;
+  else if (compare(list1, list2)) {
+    list1->next = merge(list1->next, list2);
+    return list1;
+  } else {
+    list2->next = merge(list1, list2->next);
+    return list2;
+  }
+}
+
+struct conn_data *split(struct conn_data *list1)
+{
+  struct conn_data *list2;
+
+  if (list1 == NULL) return NULL;
+  else if (list1->next == NULL) return NULL;
+  else  {
+    list2 = list1->next;
+    list1->next = list2->next;
+    list2->next = split(list2->next);
+    return list2;
+  }
+}
+
+struct conn_data *mergesort(struct conn_data *list1)
+{
+  struct conn_data *list2;
+
+  if (list1 == NULL) return NULL;
+  else if (list1->next == NULL) return list1;
+  else {
+    list2 = split(list1);
+    return merge(mergesort(list1), mergesort(list2));
   }
 }
 
 void sort_data()
 {
-  unsigned char i = 0, error, field = 0, mode = 0;
+  unsigned char i = 0, error;
 
   while (opt.sort_order[i] != '\0') {
     error = 0;
     switch (opt.sort_order[i]) {
     case 'c':
-      field = COUNT;
-      break;
-    case 'S':
-      field = SOURCEHOST;
-      break;
-    case 'D':
-      field = DESTHOST;
-      break;
-    case 's':
-      field = SOURCEPORT;
-      break;
-    case 'd':
-      field = DESTPORT;
+      opt.sortfield = SORT_COUNT;
       break;
     case 't':
-      field = START_TIME;
+      opt.sortfield = SORT_START_TIME;
       break;
     case 'z':
-      field = DELTA_TIME;
+      opt.sortfield = SORT_DELTA_TIME;
+      break;
+    case 'n':
+      opt.sortfield = SORT_CHAINLABEL;
+      break;
+    case 'p':
+      opt.sortfield = SORT_PROTOCOL;
+      break;
+    case 'S':
+      opt.sortfield = SORT_SOURCEHOST;
+      break;
+    case 's':
+      opt.sortfield = SORT_SOURCEPORT;
+      break;
+    case 'D':
+      opt.sortfield = SORT_DESTHOST;
+      break;
+    case 'd':
+      opt.sortfield = SORT_DESTPORT;
       break;
     default:
       fprintf(stderr, "Error in sort string: '%c', order expected, ignoring.\n", opt.sort_order[i]);
@@ -176,10 +192,10 @@ void sort_data()
     if (opt.sort_order[i] != '\0') {
       switch (opt.sort_order[i]) {
       case 'a':
-	mode = SMALLERFIRST;
+	opt.sortmode = ORDER_ASCENDING;
 	break;
       case 'd':
-	mode = BIGGERFIRST;
+	opt.sortmode = ORDER_DESCENDING;
 	break;
       default:
 	fprintf(stderr, "Error in sort string: '%c', direction expected, ignoring.\n", opt.sort_order[i]);
@@ -191,7 +207,7 @@ void sort_data()
 
     i++;
     if (error == 0) {
-      sort_list(field, mode);
+      first = mergesort(first);
       if (opt.verbose == 2)
 	fprintf(stderr, ".");
     }

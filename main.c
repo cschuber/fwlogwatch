@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: main.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +12,6 @@
 
 struct options opt;
 extern char *optarg;
-extern struct known_hosts *first_host;
 
 void usage(char *me, unsigned char exitcode)
 {
@@ -58,7 +57,7 @@ void usage(char *me, unsigned char exitcode)
   printf("         -R          realtime response as daemon (default action: log only)\n");
   printf("         -a <count>  alert threshold (defaults to %d entries)\n", ALERT);
   printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
-  printf("         -k <IP>     add this IP address to the list of known hosts\n");
+  printf("         -k <IP/net> add this IP address or net to the list of known hosts\n");
   printf("         -M <email>  send email notifications on incidents\n");
   printf("         -B          block host completely with new firewall rule\n");
   printf("         -W <host>   send a winpopup alert message to host\n");
@@ -122,6 +121,8 @@ void init_options()
   opt.duration = 0;
 
   strncpy(opt.sort_order, SORTORDER, MAXSORTSIZE);
+  opt.sortfield = 0;
+  opt.sortmode = 0;
 
   opt.html = 0;
   opt.use_out = 0;
@@ -191,7 +192,6 @@ int main(int argc, char **argv)
   char rcfile[FILESIZE];
   unsigned char alt_rcfile = 0;
   int iopt;
-  struct known_hosts *host;
 
   init_options();
 
@@ -243,15 +243,7 @@ int main(int argc, char **argv)
       strncpy(opt.templatefile, optarg, FILESIZE);
       break;
     case 'k':
-      host = xmalloc(sizeof(struct known_hosts));
-      if(convert_ip(optarg, &host->shost) == IN_ADDR_ERROR) {
-	printf("(known host)\n");
-	free(host);
-	exit(EXIT_FAILURE);
-      }
-      host->time = 0;
-      host->next = first_host;
-      first_host = host;
+      add_host_ip_net(optarg, KNOWN_HOST);
       break;
     case 'l':
       opt.recent = parse_time(optarg);

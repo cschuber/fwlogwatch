@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: modes.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -283,6 +283,17 @@ void mode_rt_response()
   syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
 
   signal(SIGTERM, terminate);
+
+  input = fopen(PIDFILE, "w");
+  if (input == NULL) {
+    syslog(LOG_NOTICE, "fopen %s: %s\n", PIDFILE, strerror(errno));
+  } else {
+    fprintf(input, "%d\n", (int)getpid());
+    retval = fclose(input);
+    if (retval == EOF) {
+      syslog(LOG_NOTICE, "fclose %s: %s\n", PIDFILE, strerror(errno));
+    }
+  }
 
   if(opt.status)
     sock = prepare_socket();

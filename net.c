@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.9 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: net.c,v 1.10 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -209,7 +209,8 @@ void handshake(int fd)
     snprintf(buf, BUFSIZE, "<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
     net_output(conn, buf);
     net_output(conn, "<font face=\"Arial, Helvetica\">\n");
-    net_output(conn, "<div align=\"center\">\n<h1>fwlogwatch status</h1>\n</div>\n");
+    net_output(conn, "<div align=\"center\">\n<h1>fwlogwatch status</h1>\n");
+    net_output(conn, "<a href=\"/\">Reload</a><br>\n</div>\n");
     net_output(conn, "<h2>General info</h2>\n");
 
     net_output(conn, "<table border=\"0\">\n");
@@ -271,7 +272,12 @@ void handshake(int fd)
     this_host = first_host;
     while(this_host != NULL) {
       if (this_host->time == 0) {
-	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Known host</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost));
+	int mask = 0;
+ 
+	while((0 != (this_host->netmask.s_addr >> mask)) && (mask < 32))
+	  mask++;
+ 
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s/%d</td><td>Known host/net</td><td>-</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost), mask);
       } else {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
 	snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%s</td><td>Added %s</td><td>%d</td></tr>\n", (color == 1)?opt.rowcol2:opt.rowcol1, inet_ntoa(this_host->shost), nows, (int)(opt.recent - (now - this_host->time)));

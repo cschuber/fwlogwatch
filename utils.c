@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: utils.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +31,10 @@ void *xmalloc(int size)
 
 void log_exit()
 {
+  if(unlink(PIDFILE) == -1) {
+    if(opt.verbose)
+      syslog(LOG_NOTICE, "unlink %s: %s", PIDFILE, strerror(errno));
+  }
   syslog(LOG_NOTICE, "Exiting");
   exit(EXIT_FAILURE);
 }
@@ -186,4 +190,42 @@ unsigned char convert_ip(char *ip, struct in_addr *addr)
     return IN_ADDR_ERROR;
   }
   return IN_ADDR_OK;
+}
+
+unsigned long int parse_cidr(char *input)
+{
+  int mask = 32;
+  char *pnt;
+
+  pnt = strstr(input, "/");
+  if (pnt != NULL) {
+    mask = atoi(pnt+1);
+    if ((mask < 0) || (mask > 32)) {
+      printf("Error in CIDR format: %s\n", input);
+      exit(EXIT_FAILURE);
+    }
+    *pnt = '\0';
+  }
+  if (mask == 0) {
+    return 0;
+  } else {
+    return (0xFFFFFFFF >> (32-mask));
+  }
+}
+
+void add_host_ip_net(char *input, time_t time)
+{
+  struct known_hosts *host;
+
+  host = xmalloc(sizeof(struct known_hosts));
+  host->time = time;
+  host->netmask.s_addr = parse_cidr(input);
+  if(convert_ip(input, &host->shost) == IN_ADDR_ERROR) {
+    printf("(known host)\n");
+    free(host);
+    exit(EXIT_FAILURE);
+  }
+  host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
+  host->next = first_host;
+  first_host = host;
 }

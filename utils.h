@@ -1,4 +1,4 @@
-/* $Id: utils.h,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: utils.h,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -13,5 +13,6 @@ void init_line();
 void mode_error();
 void build_time(char *smonth, int day, int hour, int minute, int second);
 unsigned char convert_ip(char *ip, struct in_addr *addr);
+void add_host_ip_net(char *input, time_t time);
 
 #endif

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: main.h,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.1.2"
-#define COPYRIGHT "2001-01-16 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.1.3"
+#define COPYRIGHT "2001-01-22 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -28,6 +28,7 @@
 
 #define INFILE "/var/log/messages"
 #define RCFILE "/etc/fwlogwatch.config"
+#define PIDFILE "/var/run/fwlogwatch.pid"
 
 /* Modes */
 
@@ -99,18 +100,20 @@ enum {
 /* Sorting */
 
 enum {
-  SMALLERFIRST,
-  BIGGERFIRST
+  SORT_COUNT,
+  SORT_START_TIME,
+  SORT_DELTA_TIME,
+  SORT_CHAINLABEL,
+  SORT_PROTOCOL,
+  SORT_SOURCEHOST,
+  SORT_SOURCEPORT,
+  SORT_DESTHOST,
+  SORT_DESTPORT
 };
 
 enum {
-  COUNT,
-  SOURCEHOST,
-  DESTHOST,
-  SOURCEPORT,
-  DESTPORT,
-  START_TIME,
-  DELTA_TIME
+  ORDER_ASCENDING,
+  ORDER_DESCENDING
 };
 
 /* Log summary mode */
@@ -156,6 +159,8 @@ enum {
 #define DEFAULT_USER "admin"
 #define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
 					    DES only supports 8 characters */
+
+#define KNOWN_HOST 0
 
 #define OPT_LOG 0x01
 #define OPT_BLOCK 0x02
@@ -235,6 +240,7 @@ struct report_data {
 struct known_hosts {
   time_t time;
   struct in_addr shost;
+  struct in_addr netmask;
   struct known_hosts *next;
 };
 
@@ -259,6 +265,8 @@ struct options {
   unsigned char duration;
 
   char sort_order[MAXSORTSIZE];
+  unsigned char sortfield;
+  unsigned char sortmode;
 
   unsigned char html;
   unsigned char use_out;

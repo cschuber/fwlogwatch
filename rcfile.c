@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: rcfile.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +11,6 @@
 #include "utils.h"
 
 extern struct options opt;
-extern struct known_hosts *first_host;
 
 char * get_one_parameter(char *string)
 {
@@ -61,7 +60,6 @@ int get_num_parameter(char *string)
 void parse_rcfile(char *input)
 {
   char *command;
-  struct known_hosts *host;
 
   while (*input == ' ' || *input == '\t')
     ++input;
@@ -221,15 +219,7 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "known_host", 10) == 0) {
-    host = xmalloc(sizeof(struct known_hosts));
-    if(convert_ip(get_one_parameter(command+11), &host->shost) == IN_ADDR_ERROR) {
-      printf("(known host)\n");
-      free(host);
-      return;
-    }
-    host->time = 0;
-    host->next = first_host;
-    first_host = host;
+    add_host_ip_net(command+11, KNOWN_HOST);
     return;
   }
   if (strncmp(command, "server_status", 13) == 0) {

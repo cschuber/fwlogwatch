@@ -1,5 +1,8 @@
-Name: fwlogwatch
-Version: 0.1.2
+%define name fwlogwatch
+%define version 0.1.3
+
+Name: %name
+Version: %version
 Release: 1
 Group: Applications/Utilities
 Packager: Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
@@ -7,7 +10,7 @@ Vendor: RUS-CERT
 URL: http://cert.uni-stuttgart.de/projects/fwlogwatch/
 Copyright: GPL
 Summary: Firewall log analyzer, report generator and realtime response agent
-Source: fwlogwatch-0.1.2.tar.gz
+Source: %name-%version.tar.gz
 
 %description
 fwlogwatch produces ipchains, netfilter/iptables and cisco log summary
@@ -19,7 +22,7 @@ it can also run as daemon and report anomalies or start countermeasures.
 
 %prep
 
-%setup -n fwlogwatch-0.1.2
+%setup -n %name-%version
 
 %build
 make
@@ -33,10 +36,5 @@ make install-config
 /usr/share/man/man8/fwlogwatch.8
 %config /etc/fwlogwatch.config
 %config /etc/fwlogwatch.template
-%doc AUTHORS
-%doc COPYING
-%doc CREDITS
-%doc ChangeLog
-%doc README
-%doc contrib/fwlogsummary.cgi
-%doc contrib/fwlogsummary.small.cgi
+%doc AUTHORS COPYING CREDITS ChangeLog README
+%doc contrib/fwlogsummary.cgi contrib/fwlogsummary.small.cgi

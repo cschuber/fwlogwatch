@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.11 2002/02/14 21:04:28 bwess Exp $ */
+/* $Id: response.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,9 +11,9 @@
 #include "output.h"
 #include "utils.h"
 
+struct known_hosts *first_host = NULL;
 extern struct options opt;
 extern struct conn_data *first;
-struct known_hosts *first_host = NULL;
 
 void look_for_log_rules()
 {
@@ -225,7 +225,7 @@ unsigned char is_known(struct in_addr shost)
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (this_host->shost.s_addr == shost.s_addr) {
+    if (this_host->shost.s_addr == (shost.s_addr & this_host->netmask.s_addr)) {
       return 1;
     }
     this_host = this_host->next;
@@ -236,7 +236,6 @@ unsigned char is_known(struct in_addr shost)
 void look_for_alert()
 {
   struct conn_data *this;
-  struct known_hosts *host;
   char buf[BUFSIZE];
 
   this = first;
@@ -244,12 +243,7 @@ void look_for_alert()
     if ((this->count >= opt.threshold) && (!is_known(this->shost))) {
       syslog(LOG_NOTICE, "ALERT: %d attempts from %s", this->count, inet_ntoa(this->shost));
 
-      host = xmalloc(sizeof(struct known_hosts));
-
-      host->time = time(NULL);
-      host->shost.s_addr = this->shost.s_addr;
-      host->next = first_host;
-      first_host = host;
+      add_host_ip_net(inet_ntoa(this->shost), time(NULL));
 
       if(opt.response & OPT_BLOCK) {
 	add_rule(inet_ntoa(this->shost));
