@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: modes.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -331,7 +331,7 @@ void mode_rt_response_core()
   char buf[BUFSIZE];
   int retval;
   struct stat info;
-  unsigned long size = 0;
+  off_t size = 0;
   fd_set rfds;
   struct timeval tv;
 
@@ -352,10 +352,12 @@ void mode_rt_response_core()
       tv.tv_usec = 0;
       retval = select(opt.sock+1, &rfds, NULL, NULL, &tv);
       if (retval == -1) {
-	syslog(LOG_NOTICE, "select: %s", strerror(errno));
-	exit(EXIT_FAILURE);
+	if(errno != EINTR) {
+	  syslog(LOG_NOTICE, "select: %s", strerror(errno));
+	  exit(EXIT_FAILURE);
+	}
       }
-      if (retval) {
+      if (retval > 0) {
 	handshake();
       }
     } else {
@@ -504,6 +506,35 @@ void mode_rt_response()
     modify_firewall(FW_START);
   }
 
+  mode_rt_response_open();
+
+  if(opt.run_as[0] != '\0') {
+    uid_t olduid;
+    gid_t oldgid;
+    struct passwd *pwe;
+
+    pwe = getpwnam(opt.run_as);
+    if(pwe == NULL) {
+      syslog(LOG_NOTICE, "User to run as was not found");
+      log_exit(EXIT_FAILURE);
+    }
+    olduid = getuid();
+    oldgid = getgid();
+    retval = setgid(pwe->pw_gid);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "setgid: %s", strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
+    retval = setuid(pwe->pw_uid);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "setuid: %s", strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
+    syslog(LOG_NOTICE, "Changed uid from %d to %d, gid from %d to %d", olduid, getuid(), oldgid, getgid());
+  } else {
+    syslog(LOG_NOTICE, "Running with uid %d, gid %d", getuid(), getgid());
+  }
+
   if(opt.threshold == 1) {
     syslog(LOG_NOTICE, _("Alert threshold is one attempt"));
   } else {
@@ -521,8 +552,6 @@ void mode_rt_response()
   syslog(LOG_NOTICE, _("Response mode: log%s%s"),
 	 (opt.response & OPT_NOTIFY)?_(", notify"):"",
 	 (opt.response & OPT_RESPOND)?_(", respond"):"");
-
-  mode_rt_response_open();
 
   if(!opt.std_in) {
     retval = fseek(opt.inputfd, 0, SEEK_END);

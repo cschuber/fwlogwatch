@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: main.h,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.5.2"
-#define COPYRIGHT "2002-01-27 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.6"
+#define COPYRIGHT "2002-02-24 Boris Wesslowski, RUS-CERT"
 
 /* i18n */
 
@@ -59,6 +59,7 @@ enum {
 #define PARSER_CISCO_IOS 4
 #define PARSER_IPFILTER 8
 #define PARSER_CISCO_PIX 16
+#define PARSER_WIN_XP 32
 
 enum {
   PARSE_OK,
@@ -321,12 +322,16 @@ struct known_hosts {
 struct parser_options {
   unsigned char mode;
   unsigned long int value;
+  char svalue[SHORTLEN];
   struct parser_options *next;
 };
 
 #define PARSER_MODE_NOT 1
-#define PARSER_MODE_HOST 2 /* host or port */
-#define PARSER_MODE_SRC 4 /* source or destination */
+#define PARSER_MODE_HOST 2
+#define PARSER_MODE_PORT 4
+#define PARSER_MODE_SRC 8
+#define PARSER_MODE_CHAIN 16
+#define PARSER_MODE_BRANCH 32
 
 enum {
   P_MATCH_NONE,
@@ -406,6 +411,7 @@ struct options {
   char pidfile[FILESIZE];
   char notify_script[FILESIZE];
   char respond_script[FILESIZE];
+  char run_as[USERSIZE];
   unsigned char status;
   int sock;
   char listenif[IPLEN];

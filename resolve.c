@@ -1,4 +1,4 @@
-/* $Id: resolve.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: resolve.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,7 +75,7 @@ char * resolve_hostname(struct in_addr ip)
   dns->ip.s_addr = ip.s_addr;
 
   if((reverse != NULL) && (reverse->h_name != NULL)) {
-    if (reverse->h_length > sizeof(struct in_addr)) {
+    if ((unsigned int)reverse->h_length > sizeof(struct in_addr)) {
       fprintf(stderr, _("Wrong host name size\n"));
       reverse->h_length = sizeof(struct in_addr);
       reverse->h_name[reverse->h_length] = '\0';

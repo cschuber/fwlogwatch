@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.7 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: netfilter.l,v 1.8 2002/02/24 14:27:30 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -103,7 +103,7 @@ void nf_parse_start(char *input)
 
 void nf_parse_prefix(char *input, unsigned char mode)
 {
-  int i=0;
+  size_t i=0;
 
   if(mode == NF_OPT_PREFIX) {
     while (i < strlen(input)) {

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
-"POT-Creation-Date: 2002-01-20 19:16+0100\n"
+"POT-Creation-Date: 2002-02-24 12:53+0100\n"
 "PO-Revision-Date: 2002-01-27 16:17+0100\n"
 "Last-Translator: Ivan F. Martinez <ivanfm@ecodigit.com.br>\n"
 "Language-Team: -\n"
@@ -238,7 +238,7 @@ msgid "You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 msgstr ""
 "Você pode contactar o autor via <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 
-#: ../main.c:397
+#: ../main.c:398
 msgid "Exiting\n"
 msgstr "Terminando\n"
 
@@ -255,7 +255,7 @@ msgstr "Abrindo arquivo de entrada '%s'\n"
 msgid "Processing\n"
 msgstr "Processando\n"
 
-#: ../modes.c:98 ../modes.c:272 ../modes.c:605
+#: ../modes.c:98 ../modes.c:272 ../modes.c:634
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "Fechando '%s'\n"
@@ -321,7 +321,7 @@ msgstr "%d entradas foram excluidas pela configuração.\n"
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "Primeiro pacote registrado: %s, ultimo: %s.\n"
 
-#: ../modes.c:206 ../modes.c:600
+#: ../modes.c:206 ../modes.c:629
 msgid "No valid time entries found.\n"
 msgstr "Nenhum registro de horario valido encontrado.\n"
 
@@ -371,67 +371,67 @@ msgstr "SIGHUP recebido, ignorando"
 msgid "SIGHUP caught, reopening log file"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:394
+#: ../modes.c:396
 msgid "SIGTERM caught, cleaning up"
 msgstr "SIGTERM recebido, fechando"
 
-#: ../modes.c:476
+#: ../modes.c:478
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "Iniciando (pid %d)"
 
-#: ../modes.c:508
+#: ../modes.c:539
 msgid "Alert threshold is one attempt"
 msgstr "Limite de alerta em uma tentativa"
 
-#: ../modes.c:510
+#: ../modes.c:541
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Limite de alerta : %d tentativas"
 
-#: ../modes.c:514
+#: ../modes.c:545
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "Eventos anteriores a %d segundo(s) são discartados"
 
-#: ../modes.c:517
+#: ../modes.c:548
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "Eventos anteriores a %d houra(s) são discartados"
 
-#: ../modes.c:521
+#: ../modes.c:552
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "Modo de resposta : registra%s%s"
 
-#: ../modes.c:522 ../net.c:302
+#: ../modes.c:553 ../net.c:302
 msgid ", notify"
 msgstr ", avisa"
 
-#: ../modes.c:523 ../net.c:303
+#: ../modes.c:554 ../net.c:303
 msgid ", respond"
 msgstr ", responde"
 
-#: ../modes.c:550
+#: ../modes.c:579
 msgid "Reading standard input\n"
 msgstr "Lendo entrada padrão(stdin)\n"
 
-#: ../modes.c:559
+#: ../modes.c:588
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "Lendo '%s'\n"
 
-#: ../modes.c:593
+#: ../modes.c:622
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "no. de linhas : %d\n"
 
-#: ../modes.c:594
+#: ../modes.c:623
 #, c-format
 msgid "First entry: %s\n"
 msgstr "Primeiro registro: %s\n"
 
-#: ../modes.c:597
+#: ../modes.c:626
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "Ultimo registro : %s\n"
@@ -591,109 +591,109 @@ msgstr "Coneão fechada"
 msgid " to "
 msgstr " para "
 
-#: ../output.c:261
+#: ../output.c:259
 msgid " packet"
 msgstr " pacote"
 
-#: ../output.c:263
+#: ../output.c:261
 msgid " packets"
 msgstr " pacotes"
 
-#: ../output.c:267
+#: ../output.c:265
 #, c-format
 msgid " (%d bytes)"
 msgstr " (%d bytes)"
 
-#: ../output.c:271
+#: ../output.c:269
 #, c-format
 msgid " from %s"
 msgstr " de %s"
 
-#: ../output.c:289 ../output.c:304
+#: ../output.c:287 ../output.c:302
 #, c-format
 msgid " port %d"
 msgstr " porta %d"
 
-#: ../output.c:296
+#: ../output.c:294
 #, c-format
 msgid " to %s"
 msgstr " para %s"
 
-#: ../output.c:354
+#: ../output.c:352
 msgid "<td>start</td>"
 msgstr "<td>inicio</td>"
 
-#: ../output.c:357
+#: ../output.c:355
 msgid "<td>end</td>"
 msgstr "<td>termino</td>"
 
-#: ../output.c:360
+#: ../output.c:358
 msgid "<td>interval</td>"
 msgstr "<td>intervalo</td>"
 
-#: ../output.c:363
+#: ../output.c:361
 msgid "<td>loghost</td>"
 msgstr "<td>servidor</td>"
 
-#: ../output.c:366
+#: ../output.c:364
 msgid "<td>chain</td>"
 msgstr "<td>chain</td>"
 
-#: ../output.c:369
+#: ../output.c:367
 msgid "<td>target</td>"
 msgstr "<td>destino</td>"
 
-#: ../output.c:372
+#: ../output.c:370
 msgid "<td>interface</td>"
 msgstr "<td>interface</td>"
 
-#: ../output.c:375
+#: ../output.c:373
 msgid "<td>proto</td>"
 msgstr "<td>protocolo</td>"
 
-#: ../output.c:378
+#: ../output.c:376
 msgid "<td>bytes</td>"
 msgstr "<td>bytes</td>"
 
-#: ../output.c:381
+#: ../output.c:379
 msgid "<td>source</td>"
 msgstr "<td>origem</td>"
 
-#: ../output.c:383 ../output.c:397
+#: ../output.c:381 ../output.c:395
 msgid "<td>hostname</td>"
 msgstr "<td>maquina</td>"
 
-#: ../output.c:385
+#: ../output.c:383
 msgid "<td>whois information</td>"
 msgstr "<td>informação whois</td>"
 
-#: ../output.c:389 ../output.c:401
+#: ../output.c:387 ../output.c:399
 msgid "<td>port</td>"
 msgstr "<td>porta</td>"
 
-#: ../output.c:391 ../output.c:403
+#: ../output.c:389 ../output.c:401
 msgid "<td>service</td>"
 msgstr "<td>serviço</td>"
 
-#: ../output.c:395
+#: ../output.c:393
 msgid "<td>destination</td>"
 msgstr "<td>destino</td>"
 
-#: ../output.c:407
+#: ../output.c:405
 msgid "<td>opts</td>"
 msgstr "<td>opções</td>"
 
-#: ../parser.c:218
+#: ../parser.c:237
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr "Tipo desconhecido: '%c'.\n"
 
-#: ../rcfile.c:327
+#: ../rcfile.c:347
 #, c-format
 msgid "Unrecognized option in rcfile: %s"
 msgstr "Opção desconhecida no arquivo rc: %s"
 
-#: ../rcfile.c:345
+#: ../rcfile.c:365
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr "%s não é um arquivo padrão, ignorando.\n"
@@ -942,10 +942,10 @@ msgstr "Verificando informação whios para %s\n"
 msgid "lookup failed: %s\n"
 msgstr "resolução falhou: %s\n"
 
-#: ../main.h:191
+#: ../main.h:192
 msgid "fwlogwatch summary"
 msgstr "Resumo do fwlogwatch"
 
-#: ../main.h:215
+#: ../main.h:216
 msgid "fwlogwatch status"
 msgstr "Situação do fwlogwatch"

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-01-20 19:16+0100\n"
+"POT-Creation-Date: 2002-02-24 12:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,7 +227,7 @@ msgstr ""
 msgid "You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 msgstr ""
 
-#: ../main.c:397
+#: ../main.c:398
 msgid "Exiting\n"
 msgstr ""
 
@@ -244,7 +244,7 @@ msgstr ""
 msgid "Processing\n"
 msgstr ""
 
-#: ../modes.c:98 ../modes.c:272 ../modes.c:605
+#: ../modes.c:98 ../modes.c:272 ../modes.c:634
 #, c-format
 msgid "Closing '%s'\n"
 msgstr ""
@@ -310,7 +310,7 @@ msgstr ""
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr ""
 
-#: ../modes.c:206 ../modes.c:600
+#: ../modes.c:206 ../modes.c:629
 msgid "No valid time entries found.\n"
 msgstr ""
 
@@ -358,67 +358,67 @@ msgstr ""
 msgid "SIGHUP caught, reopening log file"
 msgstr ""
 
-#: ../modes.c:394
+#: ../modes.c:396
 msgid "SIGTERM caught, cleaning up"
 msgstr ""
 
-#: ../modes.c:476
+#: ../modes.c:478
 #, c-format
 msgid "Starting (pid %d)"
 msgstr ""
 
-#: ../modes.c:508
+#: ../modes.c:539
 msgid "Alert threshold is one attempt"
 msgstr ""
 
-#: ../modes.c:510
+#: ../modes.c:541
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr ""
 
-#: ../modes.c:514
+#: ../modes.c:545
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr ""
 
-#: ../modes.c:517
+#: ../modes.c:548
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr ""
 
-#: ../modes.c:521
+#: ../modes.c:552
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr ""
 
-#: ../modes.c:522 ../net.c:302
+#: ../modes.c:553 ../net.c:302
 msgid ", notify"
 msgstr ""
 
-#: ../modes.c:523 ../net.c:303
+#: ../modes.c:554 ../net.c:303
 msgid ", respond"
 msgstr ""
 
-#: ../modes.c:550
+#: ../modes.c:579
 msgid "Reading standard input\n"
 msgstr ""
 
-#: ../modes.c:559
+#: ../modes.c:588
 #, c-format
 msgid "Reading '%s'\n"
 msgstr ""
 
-#: ../modes.c:593
+#: ../modes.c:622
 #, c-format
 msgid "# of lines : %d\n"
 msgstr ""
 
-#: ../modes.c:594
+#: ../modes.c:623
 #, c-format
 msgid "First entry: %s\n"
 msgstr ""
 
-#: ../modes.c:597
+#: ../modes.c:626
 #, c-format
 msgid "Last entry : %s\n"
 msgstr ""
@@ -567,109 +567,109 @@ msgstr ""
 msgid " to "
 msgstr ""
 
-#: ../output.c:261
+#: ../output.c:259
 msgid " packet"
 msgstr ""
 
-#: ../output.c:263
+#: ../output.c:261
 msgid " packets"
 msgstr ""
 
-#: ../output.c:267
+#: ../output.c:265
 #, c-format
 msgid " (%d bytes)"
 msgstr ""
 
-#: ../output.c:271
+#: ../output.c:269
 #, c-format
 msgid " from %s"
 msgstr ""
 
-#: ../output.c:289 ../output.c:304
+#: ../output.c:287 ../output.c:302
 #, c-format
 msgid " port %d"
 msgstr ""
 
-#: ../output.c:296
+#: ../output.c:294
 #, c-format
 msgid " to %s"
 msgstr ""
 
-#: ../output.c:354
+#: ../output.c:352
 msgid "<td>start</td>"
 msgstr ""
 
-#: ../output.c:357
+#: ../output.c:355
 msgid "<td>end</td>"
 msgstr ""
 
-#: ../output.c:360
+#: ../output.c:358
 msgid "<td>interval</td>"
 msgstr ""
 
-#: ../output.c:363
+#: ../output.c:361
 msgid "<td>loghost</td>"
 msgstr ""
 
-#: ../output.c:366
+#: ../output.c:364
 msgid "<td>chain</td>"
 msgstr ""
 
-#: ../output.c:369
+#: ../output.c:367
 msgid "<td>target</td>"
 msgstr ""
 
-#: ../output.c:372
+#: ../output.c:370
 msgid "<td>interface</td>"
 msgstr ""
 
-#: ../output.c:375
+#: ../output.c:373
 msgid "<td>proto</td>"
 msgstr ""
 
-#: ../output.c:378
+#: ../output.c:376
 msgid "<td>bytes</td>"
 msgstr ""
 
-#: ../output.c:381
+#: ../output.c:379
 msgid "<td>source</td>"
 msgstr ""
 
-#: ../output.c:383 ../output.c:397
+#: ../output.c:381 ../output.c:395
 msgid "<td>hostname</td>"
 msgstr ""
 
-#: ../output.c:385
+#: ../output.c:383
 msgid "<td>whois information</td>"
 msgstr ""
 
-#: ../output.c:389 ../output.c:401
+#: ../output.c:387 ../output.c:399
 msgid "<td>port</td>"
 msgstr ""
 
-#: ../output.c:391 ../output.c:403
+#: ../output.c:389 ../output.c:401
 msgid "<td>service</td>"
 msgstr ""
 
-#: ../output.c:395
+#: ../output.c:393
 msgid "<td>destination</td>"
 msgstr ""
 
-#: ../output.c:407
+#: ../output.c:405
 msgid "<td>opts</td>"
 msgstr ""
 
-#: ../parser.c:218
+#: ../parser.c:237
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr ""
 
-#: ../rcfile.c:327
+#: ../rcfile.c:347
 #, c-format
 msgid "Unrecognized option in rcfile: %s"
 msgstr ""
 
-#: ../rcfile.c:345
+#: ../rcfile.c:365
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr ""
@@ -906,10 +906,10 @@ msgstr ""
 msgid "lookup failed: %s\n"
 msgstr ""
 
-#: ../main.h:191
+#: ../main.h:192
 msgid "fwlogwatch summary"
 msgstr ""
 
-#: ../main.h:215
+#: ../main.h:216
 msgid "fwlogwatch status"
 msgstr ""

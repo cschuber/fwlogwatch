@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: parser.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +15,7 @@
 #include "ipchains.h"
 #include "ipfilter.h"
 #include "netfilter.h"
+#include "win_xp.h"
 
 struct parser_options *excluded_first;
 extern struct options opt;
@@ -54,6 +55,8 @@ unsigned char parse_line(char *input, int linenum)
   } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-2-"))) {
     /* For cisco log format see CCO */
     retval = flex_cisco_pix(input, linenum);
+  } else if (opt.format & PARSER_WIN_XP){
+    retval = win_xp(input, linenum);
   } else {
     retval = PARSE_NO_HIT;
   }
@@ -81,9 +84,7 @@ unsigned char parse_line(char *input, int linenum)
       excluded_this = excluded_first;
       while(excluded_this != NULL) {
 	if((excluded_this->mode & PARSER_MODE_HOST) != 0) {
-	  /* host */
 	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    /* source */
 	    if(opt.line->shost.s_addr == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
@@ -92,7 +93,6 @@ unsigned char parse_line(char *input, int linenum)
 	      }
 	    }
 	  } else {
-	    /* destination */
 	    if(opt.line->dhost.s_addr == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
@@ -101,11 +101,10 @@ unsigned char parse_line(char *input, int linenum)
 	      }
 	    }
 	  }
-	} else {
-	  /* port */
+	}
+	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_PORT) != 0) {
 	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    /* source */
-	    if(opt.line->sport == excluded_this->value) {
+	    if((unsigned long int)opt.line->sport == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
@@ -113,13 +112,30 @@ unsigned char parse_line(char *input, int linenum)
 	      }
 	    }
 	  } else {
-	    /* destination */
-	    if(opt.line->dport == excluded_this->value) {
+	    if((unsigned long int)opt.line->dport == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
 		match = P_MATCH_INC;
 	      }
+	    }
+	  }
+	}
+	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
+	  if(strncmp(opt.line->chainlabel, excluded_this->svalue, SHORTLEN) == 0) {
+	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	      match = P_MATCH_EXC;
+	    } else {
+	      match = P_MATCH_INC;
+	    }
+	  }
+	}
+	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
+	  if(strncmp(opt.line->branchname, excluded_this->svalue, SHORTLEN) == 0) {
+	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	      match = P_MATCH_EXC;
+	    } else {
+	      match = P_MATCH_INC;
 	    }
 	  }
 	}
@@ -213,6 +229,9 @@ void select_parsers()
 	break;
       case 'f':
 	opt.format = opt.format | PARSER_IPFILTER;
+	break;
+      case 'w':
+	opt.format = opt.format | PARSER_WIN_XP;
 	break;
       default:
 	fprintf(stderr, _("Unknown parser: '%c'.\n"), opt.format_sel[i]);

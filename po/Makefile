@@ -1,10 +1,11 @@
-# $Id: Makefile,v 1.3 2002/02/14 21:55:19 bwess Exp $
+# $Id: Makefile,v 1.4 2002/02/24 14:27:31 bwess Exp $
 
 all:	
 	msgfmt -v -o de.mo de.po
 	msgfmt -v -o pt_BR.mo pt_BR.po
+	msgfmt -v -o sv.mo sv.po
 	msgfmt -v -o zh_CN.mo zh_CN.po
-	msgfmt -v -o se.mo se.po
+	msgfmt -v -o zh_TW.mo zh_TW.po
 
 strings:	
 	xgettext -d fwlogwatch -k_ ../*.c ../*.h
@@ -12,8 +13,9 @@ strings:
 merge:	
 	msgmerge -v -o de.po.new de.po fwlogwatch.pot
 	msgmerge -v -o pt_BR.po.new pt_BR.po fwlogwatch.pot
+	msgmerge -v -o sv.po.new sv.po fwlogwatch.pot
 	msgmerge -v -o zh_CN.po.new zh_CN.po fwlogwatch.pot
-	msgmerge -v -o se.po.new se.po fwlogwatch.pot
+	msgmerge -v -o zh_TW.po.new zh_TW.po fwlogwatch.pot
 
 clean:
 	rm -f *~ *.mo

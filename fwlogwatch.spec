@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.20 2002/02/14 21:55:19 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.21 2002/02/24 14:27:30 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.5.2
+%define version 0.6
 
 Name: %name
 Version: %version
@@ -41,7 +41,9 @@ mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man8
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/de/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/pt_BR/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/sv/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh_CN/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh_TW/LC_MESSAGES
 make install INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 make install-i18n INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
@@ -56,6 +58,8 @@ make install-i18n INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 %config(noreplace) /etc/rc.d/init.d/fwlogwatch
 %lang(de) /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
 %lang(pt_BR) /usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+%lang(sv) /usr/share/locale/sv/LC_MESSAGES/fwlogwatch.mo
 %lang(zh_CN) /usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
+%lang(zh_TW) /usr/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo
 %doc AUTHORS COPYING CREDITS ChangeLog README
 %doc contrib/fwlogsummary.cgi contrib/fwlogsummary_small.cgi

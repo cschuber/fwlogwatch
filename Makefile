@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.20 2002/02/14 21:55:19 bwess Exp $
+# $Id: Makefile,v 1.21 2002/02/24 14:27:30 bwess Exp $
 
 # Linux
 CC = gcc
-CFLAGS = -pipe -O2 -Wall #-pedantic #-g #-p
+CFLAGS = -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = #-g #-static -p
 LIBS = -lcrypt -lz #-lc_p
 
@@ -42,7 +42,7 @@ INSTALL_DATA = $(INSTALL) -m 0644
 
 OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o \
        main.o modes.o net.o netfilter.o output.o parser.o \
-       rcfile.o report.o resolve.o response.o utils.o whois.o
+       rcfile.o report.o resolve.o response.o utils.o whois.o win_xp.o
 
 all:	fwlogwatch
 
@@ -58,13 +58,14 @@ net.o:		main.h utils.h
 netfilter.o:	main.h utils.h
 output.o:	main.h output.h resolve.h
 parser.o:	cisco_ios.h cisco_pix.h compare.h ipchains.h ipfilter.h \
-		main.h netfilter.h parser.h
+		main.h netfilter.h parser.h win_xp.h
 rcfile.o:	main.h parser.h rcfile.h
 report.o:	main.h output.h resolve.h response.h
 resolve.o:	main.h resolve.h
 response.o:	main.h output.h response.h
 utils.o:	main.h
 whois.o:	main.h utils.h
+win_xp.o:	main.h utils.h
 
 fwlogwatch:	$(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
@@ -83,7 +84,9 @@ install-i18n:
 	cd po; make
 	$(INSTALL_DATA) po/de.mo /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
 	$(INSTALL_DATA) po/pt_BR.mo /usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/sv.mo /usr/share/locale/sv/LC_MESSAGES/fwlogwatch.mo
 	$(INSTALL_DATA) po/zh_CN.mo /usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/zh_TW.mo /usr/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo
 
 uninstall:
 	@rm -f /usr/local/sbin/fwlogwatch \
@@ -92,7 +95,9 @@ uninstall:
 		/usr/local/man/man8/fwlogwatch.8 \
 		/usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
 		/usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
+		/usr/share/locale/sv/LC_MESSAGES/fwlogwatch.mo \
 		/usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo \
+		/usr/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo \
 		/etc/fwlogwatch.config \
 		/etc/fwlogwatch.template
 

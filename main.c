@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: main.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -175,6 +175,7 @@ void init_options()
   opt.pidfile[0] = '\0';
   xstrncpy(opt.notify_script, FWLW_NOTIFY, FILESIZE);
   xstrncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
+  opt.run_as[0] = '\0';
   opt.status = 0;
   opt.sock = 0;
   xstrncpy(opt.listenif, LISTENIF, IPLEN);

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: rcfile.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,35 +119,51 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "exclude_src_host", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC|PARSER_MODE_NOT);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC|PARSER_MODE_NOT);
     return;
   }
   if (strncmp(command, "exclude_src_port", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_SRC|PARSER_MODE_NOT);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_PORT|PARSER_MODE_SRC|PARSER_MODE_NOT);
     return;
   }
   if (strncmp(command, "exclude_dst_host", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_NOT);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_NOT);
     return;
   }
   if (strncmp(command, "exclude_dst_port", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_NOT);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_PORT|PARSER_MODE_NOT);
     return;
   }
   if (strncmp(command, "include_src_host", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC);
     return;
   }
   if (strncmp(command, "include_src_port", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_SRC);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_PORT|PARSER_MODE_SRC);
     return;
   }
   if (strncmp(command, "include_dst_host", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), PARSER_MODE_HOST);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_HOST);
     return;
   }
   if (strncmp(command, "include_dst_port", 16) == 0) {
-    add_exclude_hp(get_one_parameter(command+16), 0);
+    add_exclude_hpb(get_one_parameter(command+16), PARSER_MODE_PORT);
+    return;
+  }
+  if (strncmp(command, "exclude_chain", 13) == 0) {
+    add_exclude_hpb(get_parameter(command+14), PARSER_MODE_CHAIN|PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "include_chain", 13) == 0) {
+    add_exclude_hpb(get_parameter(command+14), PARSER_MODE_CHAIN);
+    return;
+  }
+  if (strncmp(command, "exclude_branch", 14) == 0) {
+    add_exclude_hpb(get_parameter(command+15), PARSER_MODE_BRANCH|PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "include_branch", 14) == 0) {
+    add_exclude_hpb(get_parameter(command+15), PARSER_MODE_BRANCH);
     return;
   }
   if (strncmp(command, "sort_order", 10) == 0) {
@@ -258,7 +274,11 @@ void parse_rcfile(char *input)
   if (strncmp(command, "pidfile", 7) == 0) {
     xstrncpy(opt.pidfile, get_one_parameter(command+8), FILESIZE);
     return;
-  }  
+  }
+  if (strncmp(command, "run_as", 6) == 0) {
+    xstrncpy(opt.run_as, get_one_parameter(command+7), USERSIZE);
+    return;
+  }
   if (strncmp(command, "alert_threshold", 15) == 0) {
     opt.threshold = get_num_parameter(command+16);
     return;
@@ -274,11 +294,11 @@ void parse_rcfile(char *input)
   if (strncmp(command, "notification_script", 19) == 0) {
     xstrncpy(opt.notify_script, get_one_parameter(command+20), FILESIZE);
     return;
-  }  
+  }
   if (strncmp(command, "response_script", 15) == 0) {
     xstrncpy(opt.respond_script, get_one_parameter(command+16), FILESIZE);
     return;
-  }  
+  }
   if (strncmp(command, "known_host", 10) == 0) {
     add_known_host(get_one_parameter(command+11));
     return;

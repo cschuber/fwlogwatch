@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: utils.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -275,7 +275,7 @@ void add_known_host(char *ip)
   first_host = host;
 }
 
-void add_exclude_hp(char *input, unsigned char mode)
+void add_exclude_hpb(char *input, unsigned char mode)
 {
   struct parser_options *excluded_this;
   struct in_addr ip;
@@ -289,8 +289,12 @@ void add_exclude_hp(char *input, unsigned char mode)
       exit(EXIT_FAILURE);
     }
     excluded_this->value = ip.s_addr;
-  } else {
+  }
+  if(mode & PARSER_MODE_PORT) {
     excluded_this->value = atoi(input);
+  }
+  if(mode & (PARSER_MODE_CHAIN | PARSER_MODE_BRANCH)) {
+    xstrncpy(excluded_this->svalue, input, SHORTLEN);
   }
   excluded_this->next = excluded_first;
   excluded_first = excluded_this;

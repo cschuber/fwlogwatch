@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.4 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: whois.c,v 1.5 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -212,10 +212,10 @@ struct whois_entry * whois(struct in_addr ip)
     }
     we = we->next;
   }
- 
+
   if(opt.verbose)
     fprintf(stderr, _("Looking up whois info for %s\n"), inet_ntoa(ip));
- 
+
   we = xmalloc(sizeof(struct whois_entry));
   whois_from_ip(ip, we);
   if (we->as_number != 0) {

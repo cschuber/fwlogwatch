@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: fwlogwatch 0.5\n"
-"POT-Creation-Date: 2002-01-20 19:16+0100\n"
-"PO-Revision-Date: 2001-11-11 00:20+0100\n"
+"Project-Id-Version: fwlogwatch 0.5.2\n"
+"POT-Creation-Date: 2002-02-24 12:53+0100\n"
+"PO-Revision-Date: 2002-02-05 14:20+0100\n"
 "Last-Translator: Xiaojun Yang\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=GB2312\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../compare.c:124
@@ -40,7 +40,7 @@ msgstr "全局选项: \n"
 #: ../main.c:22
 #, c-format
 msgid "         -c <file>   specify config file (defaults to %s)\n"
-msgstr "        -c <文件>\t指定配置文件 (缺省 %s) \n"
+msgstr "        -c <文件>   \t指定配置文件 (缺省 %s) \n"
 
 #: ../main.c:23
 msgid "         -D          do not differentiate destination IP addresses\n"
@@ -51,9 +51,8 @@ msgid "         -d          differentiate destination ports\n"
 msgstr "        -d          \t区分目标端口\n"
 
 #: ../main.c:25
-#, fuzzy
 msgid "         -e          show end times\n"
-msgstr "        -t          \t显示开始与结束时间\n"
+msgstr "        -e          \t显示结束时间\n"
 
 #: ../main.c:26
 #, c-format
@@ -73,9 +72,8 @@ msgid "         -l <time>   process recent events only (defaults to off)\n"
 msgstr "        -l <时间>   \t只处理当前事件 (缺省为关闭)\n"
 
 #: ../main.c:30
-#, fuzzy
 msgid "         -N          resolve service names\n"
-msgstr "        -n          \t解析域名\n"
+msgstr "        -N          \t解析域名\n"
 
 #: ../main.c:31
 msgid "         -n          resolve host names\n"
@@ -83,7 +81,7 @@ msgstr "        -n          \t解析域名\n"
 
 #: ../main.c:32
 msgid "         -P <format> use only parsers for specific formats\n"
-msgstr "        -P <格式>  \n"
+msgstr "        -P <格式>   \t只使用对于特殊格式的分析器\n"
 
 #: ../main.c:33
 msgid "         -p          differentiate protocols\n"
@@ -98,9 +96,8 @@ msgid "         -s          differentiate source ports\n"
 msgstr "        -s          \t区分源端口\n"
 
 #: ../main.c:36
-#, fuzzy
 msgid "         -t          show start times\n"
-msgstr "        -t          \t显示开始与结束时间\n"
+msgstr "        -t          \t显示开始时间\n"
 
 #: ../main.c:37
 msgid "         -V          show version and copyright info\n"
@@ -120,17 +117,17 @@ msgstr "        -z          \t显示时间间隔\n"
 
 #: ../main.c:43
 msgid "Log summary mode (default):\n"
-msgstr ""
+msgstr "登陆摘要模式 (缺省):\n"
 
 #: ../main.c:44
 msgid ""
 "         -b          show amount of data (sum of total packet lengths)\n"
-msgstr "        -b\t\t显示数据量 (所有数据包长度的总和)\n"
+msgstr "        -b          \t显示数据量 (所有数据包长度的总和)\n"
 
 #: ../main.c:45
 msgid ""
 "         -m <count>  only show entries with at least so many incidents\n"
-msgstr "\t-m <数量> \t只显示至少有这么多数量的记录\n"
+msgstr "        -m <数量> \t只显示至少有这么多数量的记录\n"
 
 #: ../main.c:46
 msgid "         -o <file>   specify output file\n"
@@ -139,7 +136,7 @@ msgstr "        -o <文件>   \t指定输出文件\n"
 #: ../main.c:47
 msgid ""
 "         -O <order>  define the sort order (see the man page for details)\n"
-msgstr "\t-O <排序方法> \t对输出进行排序 (具体参见相应文档\n"
+msgstr "        -O <排序方法> \t对输出进行排序 (具体参见相应文档\n"
 
 #: ../main.c:48
 msgid "         -w          HTML output\n"
@@ -164,7 +161,7 @@ msgstr "        -F <email>  \t发信人地址\n"
 #: ../main.c:55
 #, c-format
 msgid "                     (defaults to '%s')\n"
-msgstr "                   \t(缺省为 '%s')\n"
+msgstr "                     \t(缺省为 '%s')\n"
 
 #: ../main.c:56
 msgid ""
@@ -191,41 +188,41 @@ msgstr "实时回应模式:\n"
 #: ../main.c:63
 msgid ""
 "         -R          realtime response as daemon (default action: log only)\n"
-msgstr "\t-R \t\t实时回应作为传输代理程序 (缺省: 只有运行记录)\n"
+msgstr "\t-R          \t实时回应作为传输代理程序 (缺省: 只有运行记录)\n"
 
 #: ../main.c:64
 #, c-format
 msgid "         -a <count>  alert threshold (defaults to %d entries)\n"
-msgstr "\t-a <数量>   \t警告流 (缺省 %d 记录)\n"
+msgstr "        -a <数量> \t警告流 (缺省 %d 记录)\n"
 
 #: ../main.c:65
 #, c-format
 msgid "         -l <time>   forget events this old (defaults to %d hours)\n"
-msgstr "\t-l <时间>   \t忽略此时间前旧事件 (缺省: %d小时)\n"
+msgstr "        -l <时间>   \t忽略此时间前旧事件 (缺省: %d小时)\n"
 
 #: ../main.c:66
 msgid ""
 "         -k <IP/net> add this IP address or net to the list of known hosts\n"
-msgstr "\t-k <IP/网络> \t将此IP地址加入到已知主机列表中\n"
+msgstr "        -k <IP/网络> \t将此IP地址加入到已知主机列表中\n"
 
 #: ../main.c:67
 msgid ""
 "         -A          invoke notification script if threshold is reached\n"
-msgstr "\t-A\t\t如果有流进入启动通知文本\n"
+msgstr "        -A           \t如果有流进入启动通知文本\n"
 
 #: ../main.c:68
 msgid "         -B          invoke response action script (e.g. block host)\n"
-msgstr "\t-B\t    \t启动回应文本 (比如 切断主机与外部联系)\n"
+msgstr "        -B          \t启动回应文本 (比如 切断主机与外部联系)\n"
 
 #: ../main.c:69
 msgid "         -X          activate internal status information web server\n"
-msgstr "\t-X          \t启动内部状态信息web服务器\n"
+msgstr "        -X          \t启动内部状态信息web服务器\n"
 
 #: ../main.c:95
 msgid "You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 msgstr "请使用以下地址与作者联系实际<Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 
-#: ../main.c:397
+#: ../main.c:398
 msgid "Exiting\n"
 msgstr "退出\n"
 
@@ -242,7 +239,7 @@ msgstr "打开输入文件 '%s'\n"
 msgid "Processing\n"
 msgstr "处理\n"
 
-#: ../modes.c:98 ../modes.c:272 ../modes.c:605
+#: ../modes.c:98 ../modes.c:272 ../modes.c:634
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "关闭 '&s'\n"
@@ -278,7 +275,7 @@ msgstr "(并且 %d 有错误)"
 #: ../modes.c:180
 #, c-format
 msgid "of %d entries in the file "
-msgstr ""
+msgstr "文件中%d的记录"
 
 #: ../modes.c:181
 #, c-format
@@ -308,7 +305,7 @@ msgstr "%d记录在配置时被删除\n"
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "第一条数据包登陆记录: %s, 最后一条: %s.\n"
 
-#: ../modes.c:206 ../modes.c:600
+#: ../modes.c:206 ../modes.c:629
 msgid "No valid time entries found.\n"
 msgstr "没找到有效时间记录\n"
 
@@ -358,67 +355,67 @@ msgstr "捕捉到SIGHUP, 忽略"
 msgid "SIGHUP caught, reopening log file"
 msgstr "捕捉到SIGHUP, 重新打开log文件"
 
-#: ../modes.c:394
+#: ../modes.c:396
 msgid "SIGTERM caught, cleaning up"
 msgstr "捕捉到SIGTERM, 清除内存"
 
-#: ../modes.c:476
+#: ../modes.c:478
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "开始 (pid %d)"
 
-#: ../modes.c:508
+#: ../modes.c:539
 msgid "Alert threshold is one attempt"
 msgstr "警告threshold是一次尝试"
 
-#: ../modes.c:510
+#: ../modes.c:541
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "警告threshold是%d次尝试"
 
-#: ../modes.c:514
+#: ../modes.c:545
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "在%d秒之前的事件将不受理"
 
-#: ../modes.c:517
+#: ../modes.c:548
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "在%d小时之前的事件将不受理"
 
-#: ../modes.c:521
+#: ../modes.c:552
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "回应模式: log%s%s"
 
-#: ../modes.c:522 ../net.c:302
+#: ../modes.c:553 ../net.c:302
 msgid ", notify"
 msgstr "通知"
 
-#: ../modes.c:523 ../net.c:303
+#: ../modes.c:554 ../net.c:303
 msgid ", respond"
 msgstr ". 回答"
 
-#: ../modes.c:550
+#: ../modes.c:579
 msgid "Reading standard input\n"
 msgstr "读取标准输入\n"
 
-#: ../modes.c:559
+#: ../modes.c:588
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "读 '%s'\n"
 
-#: ../modes.c:593
+#: ../modes.c:622
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "行数 : %d\n"
 
-#: ../modes.c:594
+#: ../modes.c:623
 #, c-format
 msgid "First entry: %s\n"
 msgstr "第一条记录:  %s\n"
 
-#: ../modes.c:597
+#: ../modes.c:626
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "最后一条记录 : %s\n"
@@ -463,9 +460,8 @@ msgid "<td>Source port</td>"
 msgstr "<td>源端口</td>"
 
 #: ../net.c:170 ../net.c:178
-#, fuzzy
 msgid "<td>Service</td>"
-msgstr "<td>源</td>"
+msgstr "<td>服务</td>"
 
 #: ../net.c:175
 msgid "<td>Destination port</td>"
@@ -576,117 +572,112 @@ msgid "Connection closed"
 msgstr "关闭联接"
 
 #: ../output.c:199
-#, fuzzy
 msgid " to "
-msgstr "到"
+msgstr " 至 "
 
-#: ../output.c:261
+#: ../output.c:259
 msgid " packet"
 msgstr "数据包"
 
-#: ../output.c:263
+#: ../output.c:261
 msgid " packets"
 msgstr "数据包"
 
-#: ../output.c:267
-#, fuzzy, c-format
+#: ../output.c:265
+#, c-format
 msgid " (%d bytes)"
-msgstr "字节)"
+msgstr " (%d 字节)"
 
-#: ../output.c:271
-#, fuzzy, c-format
+#: ../output.c:269
+#, c-format
 msgid " from %s"
-msgstr "从"
+msgstr "从 %s"
 
-#: ../output.c:289 ../output.c:304
-#, fuzzy, c-format
+#: ../output.c:287 ../output.c:302
+#, c-format
 msgid " port %d"
-msgstr "端口"
+msgstr " 端口 %d"
 
-#: ../output.c:296
-#, fuzzy, c-format
+#: ../output.c:294
+#, c-format
 msgid " to %s"
-msgstr "到"
+msgstr " 至 %s"
 
-#: ../output.c:354
-#, fuzzy
+#: ../output.c:352
 msgid "<td>start</td>"
-msgstr "<td>目标</td>"
+msgstr "<td>开始</td>"
 
-#: ../output.c:357
-#, fuzzy
+#: ../output.c:355
 msgid "<td>end</td>"
-msgstr "<td>任何</td>"
+msgstr "<td>结束</td>"
 
-#: ../output.c:360
+#: ../output.c:358
 msgid "<td>interval</td>"
 msgstr "<td>间距</td>"
 
-#: ../output.c:363
+#: ../output.c:361
 msgid "<td>loghost</td>"
 msgstr "<td>log主机</td>"
 
-#: ../output.c:366
+#: ../output.c:364
 msgid "<td>chain</td>"
 msgstr "<td>chain</td>"
 
-#: ../output.c:369
+#: ../output.c:367
 msgid "<td>target</td>"
 msgstr "<td>目标</td>"
 
-#: ../output.c:372
+#: ../output.c:370
 msgid "<td>interface</td>"
 msgstr "<td>界面</td>"
 
-#: ../output.c:375
+#: ../output.c:373
 msgid "<td>proto</td>"
 msgstr "<td>传输协议</td>"
 
-#: ../output.c:378
+#: ../output.c:376
 msgid "<td>bytes</td>"
 msgstr "<td>字节</td>"
 
-#: ../output.c:381
+#: ../output.c:379
 msgid "<td>source</td>"
 msgstr "<td>源</td>"
 
-#: ../output.c:383 ../output.c:397
+#: ../output.c:381 ../output.c:395
 msgid "<td>hostname</td>"
 msgstr "<td>主机名</td>"
 
-#: ../output.c:385
+#: ../output.c:383
 msgid "<td>whois information</td>"
 msgstr "<td>whois信息</td>"
 
-#: ../output.c:389 ../output.c:401
-#, fuzzy
+#: ../output.c:387 ../output.c:399
 msgid "<td>port</td>"
-msgstr "<td>传输协议</td>"
+msgstr "<td>端口</td>"
 
-#: ../output.c:391 ../output.c:403
-#, fuzzy
+#: ../output.c:389 ../output.c:401
 msgid "<td>service</td>"
-msgstr "<td>源</td>"
+msgstr "<td>服务</td>"
 
-#: ../output.c:395
+#: ../output.c:393
 msgid "<td>destination</td>"
 msgstr "<td>目标</td>"
 
-#: ../output.c:407
+#: ../output.c:405
 msgid "<td>opts</td>"
 msgstr "<td>选项</td>"
 
-#: ../parser.c:218
+#: ../parser.c:237
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr "不知parser: '%c'.\n"
 
-#: ../rcfile.c:327
+#: ../rcfile.c:347
 #, c-format
 msgid "Unrecognized option in rcfile: %s"
 msgstr "配置文件中不明选项: %s"
 
-#: ../rcfile.c:345
+#: ../rcfile.c:365
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr "%s 不是标准文件, 忽略.\n"
@@ -773,7 +764,7 @@ msgstr "事件报告 %s-%s"
 #: ../report.c:299 ../report.c:314
 #, c-format
 msgid "%d (unknown)"
-msgstr ""
+msgstr "%d (不详)"
 
 #: ../report.c:325
 msgid "no SYNs"
@@ -932,38 +923,10 @@ msgstr "为 %s 寻找whois信息\n"
 msgid "lookup failed: %s\n"
 msgstr "搜索失败: %s\n"
 
-#: ../main.h:191
+#: ../main.h:192
 msgid "fwlogwatch summary"
-msgstr ""
+msgstr "fwlogwatch 统计摘要"
 
-#: ../main.h:215
+#: ../main.h:216
 msgid "fwlogwatch status"
-msgstr ""
-
-#~ msgid ""
-#~ "<html>\n"
-#~ "<head>\n"
-#~ "<title>fwlogwatch status</title>\n"
-#~ msgstr ""
-#~ "<html>\n"
-#~ "<head>\n"
-#~ "<title>fwlogwatch状态</title>\n"
-
-#~ msgid ""
-#~ "<div align=\"center\">\n"
-#~ "<h1>fwlogwatch status</h1>\n"
-#~ msgstr ""
-#~ "<div align=\"center\">\n"
-#~ "<h1>fwlogwatch状态</h1>\n"
-
-#~ msgid "<html><head><title>fwlogwatch output: %s</title>\n"
-#~ msgstr "<html><head><title>fwlogwatch输出: %s</title>\n"
-
-#~ msgid "<h1>fwlogwatch output</h1>\n"
-#~ msgstr "<h1>fwlogwatch输出</h1>\n"
-
-#~ msgid "<td>start</td><td>end</td>"
-#~ msgstr "<td>开始</td><td>end</td>"
-
-#~ msgid "<td>port</td><td>service</td>"
-#~ msgstr "<td>端口</td><td>服务</td>"
+msgstr "fwlogwatch 状态"

@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
+/* $Id: output.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -197,7 +197,6 @@ void output_plain(struct conn_data *input)
   if(opt.etimes) {
     if(!first)
       printf(_(" to "));
-
     if(input->end_time != 0) {
       strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->end_time));
       printf("%s", time);
@@ -210,7 +209,6 @@ void output_plain(struct conn_data *input)
   if(opt.duration) {
     if(!first)
       printf(" ");
-
     output_timediff(input->start_time, input->end_time, time);
     if(strlen(time) > 0) {
       printf("%s", time);
@@ -223,28 +221,28 @@ void output_plain(struct conn_data *input)
   if(opt.loghost) {
     if(!first)
       printf(" ");
-    printf(" %s", input->hostname);
+    printf("%s", input->hostname);
     first = 0;
   }
 
   if(opt.chains) {
     if(!first)
       printf(" ");
-    printf(" %s", input->chainlabel);
+    printf("%s", input->chainlabel);
     first = 0;
   }
 
   if(opt.branches) {
     if(!first)
       printf(" ");
-    printf(" %s", input->branchname);
+    printf("%s", input->branchname);
     first = 0;
   }
 
   if(opt.ifs) {
     if(!first)
       printf(" ");
-    printf(" %s", input->interface);
+    printf("%s", input->interface);
     first = 0;
   }
 
@@ -288,8 +286,8 @@ void output_plain(struct conn_data *input)
   if (opt.src_port) {
     printf(_(" port %d"), input->sport);
 
-    if (opt.sresolve) 
-      printf(" %s", resolve_service(input->sport, proto));
+    if (opt.sresolve)
+      printf(" (%s)", resolve_service(input->sport, proto));
   }
 
   if (opt.dst_ip) {
@@ -303,8 +301,8 @@ void output_plain(struct conn_data *input)
   if (opt.dst_port) {
     printf(_(" port %d"), input->dport);
 
-    if (opt.sresolve) 
-      printf(" %s", resolve_service(input->dport, proto));
+    if (opt.sresolve)
+      printf(" (%s)", resolve_service(input->dport, proto));
   }
 
   if(opt.opts) {
