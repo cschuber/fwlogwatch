@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: output.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -265,20 +265,20 @@ void output_html_table()
   if(opt.proto)
     printf("<td>proto</td>");
 
-  if(opt.src_ip)
+  if(opt.src_ip) {
     printf("<td>source</td>");
-
-  if(opt.resolve)
-    printf("<td>hostname</td>");
+    if(opt.resolve)
+      printf("<td>hostname</td>");
+  }
 
   if (opt.src_port)
     printf("<td>port</td><td>service</td>");
 
-  if(opt.dst_ip)
+  if(opt.dst_ip) {
     printf("<td>destination</td>");
-
-  if(opt.resolve)
-    printf("<td>hostname</td>");
+    if(opt.resolve)
+      printf("<td>hostname</td>");
+  }
 
   if (opt.dst_port)
     printf("<td>port</td><td>service</td>");

@@ -1,4 +1,4 @@
-/* $Id: modes.h,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: modes.h,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #ifndef _MODES_H
 #define _MODES_H

@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: main.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,6 +107,9 @@ void init_options()
   opt.verbose = 0;
   opt.resolve = 0;
   strncpy(opt.inputfile, INFILE, FILESIZE);
+
+  opt.line = NULL;
+  opt.nf = 0;
 
   opt.src_ip = 1;
   opt.dst_ip = 1;
@@ -337,5 +340,5 @@ int main(int argc, char **argv)
   if (opt.verbose)
     fprintf(stderr, "Exiting\n");
 
-  return 0;
+  return EXIT_SUCCESS;
 }

@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: modes.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <syslog.h>
 #include <signal.h>
 #include "main.h"
@@ -42,13 +43,15 @@ void mode_summary()
   if (opt.verbose)
     fprintf(stderr, "Processing\n");
 
+  opt.line = xmalloc(sizeof(struct log_line));
+
   while (fgets(buf, BUFSIZE, input)) {
     ++linenum;
-    hit = 0;
+    hit = PARSE_NO_HIT;
     hit = parse_line(buf, linenum);
-    if (hit == 1) { ++hitnum; }
-    if (hit == 2) { ++errnum; }
-    if (hit == 3) { ++oldnum; }
+    if (hit == PARSE_OK) { ++hitnum; }
+    if (hit == PARSE_WRONG_FORMAT) { ++errnum; }
+    if (hit == PARSE_TOO_OLD) { ++oldnum; }
   }
 
   valid_times = get_times(input, log_begin, log_end);
@@ -63,6 +66,8 @@ void mode_summary()
     perror("fclose");
     exit(EXIT_FAILURE);
   }
+
+  free(opt.line);
 
   if (opt.verbose)
     fprintf(stderr, "Sorting data\n");
@@ -109,7 +114,7 @@ void mode_summary()
   if (opt.html)
     printf("<br>\n");
 
-  if (valid_times) {
+  if (valid_times == PARSE_OK) {
     printf("First entry: %s. Last entry: %s.\n", log_begin, log_end);
   } else {
     printf("No valid time entries found.\n");
@@ -199,12 +204,60 @@ void mode_rt_response()
     perror("fork");
     exit(EXIT_FAILURE);
   }
-
   if (pid != 0) {
-    exit(EXIT_SUCCESS);
+    _exit(EXIT_SUCCESS);
+  }
+  pid = setsid();
+  if (pid == -1) {
+    perror("setsid");
+    exit(EXIT_FAILURE);
+  }
+  pid = fork();
+  if (pid == -1) {
+    perror("fork");
+    exit(EXIT_FAILURE);
+  }
+  if (pid != 0) {
+    _exit(EXIT_SUCCESS);
+  }
+  retval = chdir("/");
+  if (retval == -1) {
+    perror("chdir");
+    exit(EXIT_FAILURE);
+  }
+  /* umask() */
+  retval = close(2);
+  if (retval == -1) {
+    perror("close");
+    exit(EXIT_FAILURE);
+  }
+  retval = close(1);
+  if (retval == -1) {
+    perror("close");
+    exit(EXIT_FAILURE);
+  }
+  retval = close(0);
+  if (retval == -1) {
+    perror("close");
+    exit(EXIT_FAILURE);
+  }
+  retval = open("/dev/null",O_RDWR);
+  if (retval == -1) {
+    perror("open");
+    exit(EXIT_FAILURE);
+  }
+  retval = dup(0);
+  if (retval == -1) {
+    perror("dup");
+    exit(EXIT_FAILURE);
+  }
+  retval = dup(0);
+  if (retval == -1) {
+    perror("dup");
+    exit(EXIT_FAILURE);
   }
 
-  openlog("fwlogwatch", LOG_CONS|LOG_PERROR, LOG_DAEMON);
+  openlog("fwlogwatch", LOG_CONS, LOG_DAEMON);
   syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
 
   signal(SIGTERM, terminate);
@@ -269,7 +322,9 @@ void mode_rt_response()
     if(size != info.st_size) {
       size = info.st_size;
       while (fgets(buf, BUFSIZE, input)) {
+	opt.line = xmalloc(sizeof(struct log_line));
 	parse_line(buf, 0);
+	free(opt.line);
       }
       look_for_alert();
     }

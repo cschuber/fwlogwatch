@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: parser.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,12 +10,12 @@
 #include "parser.h"
 #include "compare.h"
 #include "utils.h"
+#include "netfilter.h"
 
 extern struct options opt;
 
-unsigned char parse_line(char *input, int linenum)
+unsigned char ipchains(char *input, int linenum)
 {
-  struct log_line *line;
   int retval;
   char smonth[3];
   int month = 0, day, hour, minute, second;
@@ -25,16 +25,6 @@ unsigned char parse_line(char *input, int linenum)
   int length, id, ttl, count;
   unsigned int tos, offset;
 
-  if (!strstr(input, " kernel: Packet log: ")) {
-    if (opt.verbose == 2)
-      fprintf(stderr, "_");
-    return 0;
-  }
-
-  /* see /usr/src/linux-2.2.17/net/ipv4/ip_fw.c line 421 */
-
-  line = xmalloc(sizeof(struct log_line));
-
   if (strstr(input, "SYN")) {
     retval = sscanf(input,
 		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
@@ -43,13 +33,13 @@ unsigned char parse_line(char *input, int linenum)
 		    "%3d.%3d.%3d.%3d:%5d "
 		    "%3d.%3d.%3d.%3d:%5d "
 		    "L=%4d S=%4x I=%5d F=%6x T=%3d SYN (#%5d)\n",
-		    smonth, &day, &hour, &minute, &second, line->hostname,
-		    line->chainlabel, line->branchname, line->interface,
-		    &line->protocol,
-		    &shost1, &shost2, &shost3, &shost4, &line->sport,
-		    &dhost1, &dhost2, &dhost3, &dhost4, &line->dport,
+		    smonth, &day, &hour, &minute, &second, opt.line->hostname,
+		    opt.line->chainlabel, opt.line->branchname, opt.line->interface,
+		    &opt.line->protocol,
+		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
+		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport,
 		    &length, &tos, &id, &offset, &ttl, &count);
-    line->syn = 1;
+    opt.line->syn = 1;
   } else {
     retval = sscanf(input,
 		    "%3s %2d %2d:%2d:%2d %32s kernel: Packet log: "
@@ -58,13 +48,13 @@ unsigned char parse_line(char *input, int linenum)
 		    "%3d.%3d.%3d.%3d:%5d "
 		    "%3d.%3d.%3d.%3d:%5d "
 		    "L=%4d S=%4x I=%5d F=%6x T=%3d (#%5d)\n",
-		    smonth, &day, &hour, &minute, &second, line->hostname,
-		    line->chainlabel, line->branchname, line->interface,
-		    &line->protocol,
-		    &shost1, &shost2, &shost3, &shost4, &line->sport,
-		    &dhost1, &dhost2, &dhost3, &dhost4, &line->dport,
+		    smonth, &day, &hour, &minute, &second, opt.line->hostname,
+		    opt.line->chainlabel, opt.line->branchname, opt.line->interface,
+		    &opt.line->protocol,
+		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
+		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport,
 		    &length, &tos, &id, &offset, &ttl, &count);
-    line->syn = 0;
+    opt.line->syn = 0;
   }
   if (retval != 26) {
     if (opt.verbose) {
@@ -74,8 +64,7 @@ unsigned char parse_line(char *input, int linenum)
 	fprintf(stderr, "\nFormat mismatch: %d of 26 args, ignored.\n", retval);
       }
     }
-    free(line);
-    return 2;
+    return PARSE_WRONG_FORMAT;
   }
 
   t = localtime(&opt.now);
@@ -97,29 +86,47 @@ unsigned char parse_line(char *input, int linenum)
   t->tm_min = minute;
   t->tm_sec = second;
   t->tm_isdst = -1;
-  line->time = mktime(t);
+  opt.line->time = mktime(t);
 
-  if(opt.recent != 0) {
-    if((opt.now - line->time) > opt.recent) {
-      if(opt.verbose == 2) {
-	fprintf(stderr, "o");
-      }
-      free(line);
-      return 3;
-    }
+  snprintf(opt.line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
+
+  snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+
+  return PARSE_OK;
+}
+
+unsigned char parse_line(char *input, int linenum)
+{
+  int retval;
+
+  if (strstr(input, " kernel: Packet log: ")) {
+    retval = ipchains(input, linenum);
+    /* For ipchains log format see */
+    /* /usr/src/linux-2.2.17/net/ipv4/ip_fw.c */
+  } else if (strstr(input, "IN=")) {
+    retval = flex_netfilter(input);
+    /* For iptables/netfilter log format see */
+    /* /usr/src/linux-2.4.0-test10/net/ipv4/netfilter/ipt_LOG.c */
+  } else {
+    if (opt.verbose == 2)
+      fprintf(stderr, "_");
+    return PARSE_NO_HIT;
   }
 
-  snprintf(line->shost, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-
-  snprintf(line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
-
-  build_list(line);
-
-  if (opt.verbose == 2)
-    fprintf(stderr, ".");
-
-  free(line);
-  return 1;
+  if (retval == PARSE_OK) {
+    if(opt.recent != 0) {
+      if((opt.now - opt.line->time) > opt.recent) {
+	if(opt.verbose == 2) {
+	  fprintf(stderr, "o");
+	}
+	return PARSE_TOO_OLD;
+      }
+    }
+    build_list();
+    if (opt.verbose == 2)
+      fprintf(stderr, ".");
+  }
+  return retval;
 }
 
 unsigned char get_times(FILE *fd, char *begin, char *end)
@@ -132,21 +139,21 @@ unsigned char get_times(FILE *fd, char *begin, char *end)
   fgets(buf, BUFSIZE, fd);
   retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
   if (retval != 5) {
-    return 0;
+    return PARSE_WRONG_FORMAT;
   }
   snprintf(begin, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
 
   retval = fstat(fileno(fd), &info);
   if (retval == -1) {
     perror("fstat");
-    return 0;
+    return PARSE_ERROR;
   }
 
   if (info.st_size > 2048) {
     retval = fseek(fd, -1024, SEEK_END);
     if (retval == -1) {
       perror("fseek");
-      return 0;
+      return PARSE_ERROR;
     }
   }
 
@@ -154,12 +161,12 @@ unsigned char get_times(FILE *fd, char *begin, char *end)
     retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
 
   if (retval != 5) {
-    return 0;
+    return PARSE_WRONG_FORMAT;
   }
 
   snprintf(end, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
 
-  return 1;
+  return PARSE_OK;
 }
 
 int parse_time(char *input)

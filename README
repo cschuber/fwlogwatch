@@ -1,8 +1,8 @@
-$Id: README,v 1.3 2002/02/14 20:29:42 bwess Exp $
+$Id: README,v 1.4 2002/02/14 20:36:55 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
-RUS-CERT. It is a linux ipchains packet filter log analyzer with incident
-report and realtime response capability.
+RUS-CERT. It is a linux ipchains/iptables packet filter log analyzer with
+incident report and realtime response capability.
 
 It is available from the RUS-CERT website http://cert.uni-stuttgart.de and
 http://www.kyb.uni-stuttgart.de/boris/software.shtml
@@ -89,6 +89,12 @@ and template in /etc.
 
 You can define the TMPDIR environment variable if you don't want fwlogwatch
 to create it's temporary files in /tmp.
+
+
+NETFILTER SUPPORT
+This release of fwlogwatch has alpha iptables/netfilter support, it can
+even parse combined ipchains/iptables log files but right now only log
+summary and interactive report mode are usable.
 
 
 CONFIGURATION AND EXAMPLES

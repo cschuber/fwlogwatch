@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: main.h,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.24"
-#define COPYRIGHT "2000-11-02 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.25"
+#define COPYRIGHT "2000-11-06 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -37,6 +37,27 @@ enum {
   REALTIME_RESPONSE,
   SHOW_LOG_TIMES
 };
+
+/* Parser */
+
+enum {
+  PARSE_OK,
+  PARSE_ERROR,
+  PARSE_NO_HIT,
+  PARSE_WRONG_FORMAT,
+  PARSE_TOO_OLD
+};
+
+/* Netfilter support */
+
+#define NF_DATE 1
+#define NF_IN 2
+#define NF_SRC 4
+#define NF_DST 8
+#define NF_PROTO 16
+#define NF_SPT 32
+#define NF_DPT 64
+#define NF_TYPE 128
 
 /* Sorting */
 
@@ -182,6 +203,9 @@ struct options {
   unsigned char verbose;
   unsigned char resolve;
   char inputfile[FILESIZE];
+
+  struct log_line *line;
+  unsigned char nf;
 
   unsigned char src_ip;
   unsigned char dst_ip;

@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.4 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: compare.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,25 +10,25 @@
 struct conn_data *first = NULL;
 extern struct options opt;
 
-void add_entry(struct log_line *input)
+void add_entry()
 {
   struct conn_data *data;
 
   data = xmalloc(sizeof(struct conn_data));
 
   data->count = 1;
-  data->start_time = input->time;
+  data->start_time = opt.line->time;
   data->end_time = 0;
-  strncpy(data->hostname, input->hostname, SHOSTLEN);
-  strncpy(data->chainlabel, input->chainlabel, SHORTLEN);
-  strncpy(data->branchname, input->branchname, SHORTLEN);
-  strncpy(data->interface, input->interface, SHORTLEN);
-  data->protocol = input->protocol;
-  strncpy(data->shost, input->shost, IPLEN);
-  data->sport = input->sport;
-  strncpy(data->dhost, input->dhost, IPLEN);
-  data->dport = input->dport;
-  data->syn = input->syn;
+  strncpy(data->hostname, opt.line->hostname, SHOSTLEN);
+  strncpy(data->chainlabel, opt.line->chainlabel, SHORTLEN);
+  strncpy(data->branchname, opt.line->branchname, SHORTLEN);
+  strncpy(data->interface, opt.line->interface, SHORTLEN);
+  data->protocol = opt.line->protocol;
+  strncpy(data->shost, opt.line->shost, IPLEN);
+  data->sport = opt.line->sport;
+  strncpy(data->dhost, opt.line->dhost, IPLEN);
+  data->dport = opt.line->dport;
+  data->syn = opt.line->syn;
 
   data->next = first;
   first = data;
@@ -197,67 +197,67 @@ void sort_data()
   }
 }
 
-void build_list(struct log_line *input)
+void build_list()
 {
   struct conn_data *this;
 
   if (opt.loghost == 0) {
     if (opt.hostname[0] != '\0') {
-      if (strncmp(opt.hostname, input->hostname, SHOSTLEN) != 0) {
+      if (strncmp(opt.hostname, opt.line->hostname, SHOSTLEN) != 0) {
 	opt.loghost = 1;
       }
     } else {
-      strncpy(opt.hostname, input->hostname, SHOSTLEN);
+      strncpy(opt.hostname, opt.line->hostname, SHOSTLEN);
     }
   }
 
   if(opt.chains == 0) {
     if (opt.chainlabel[0] != '\0') {
-      if (strncmp(opt.chainlabel, input->chainlabel, SHORTLEN) != 0) {
+      if (strncmp(opt.chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {
 	opt.chains = 1;
       }
     } else {
-      strncpy(opt.chainlabel, input->chainlabel, SHORTLEN);
+      strncpy(opt.chainlabel, opt.line->chainlabel, SHORTLEN);
     }
   }
 
   if(opt.branches == 0) {
     if (opt.branchname[0] != '\0') {
-      if (strncmp(opt.branchname, input->branchname, SHORTLEN) != 0) {
+      if (strncmp(opt.branchname, opt.line->branchname, SHORTLEN) != 0) {
 	opt.branches = 1;
       }
     } else {
-      strncpy(opt.branchname, input->branchname, SHORTLEN);
+      strncpy(opt.branchname, opt.line->branchname, SHORTLEN);
     }
   }
 
   if (opt.ifs == 0) {
     if (opt.interface[0] != '\0') {
-      if (strncmp(opt.interface, input->interface, SHORTLEN) != 0) {
+      if (strncmp(opt.interface, opt.line->interface, SHORTLEN) != 0) {
 	opt.ifs = 1;
       }
     } else {
-      strncpy(opt.interface, input->interface, SHORTLEN);
+      strncpy(opt.interface, opt.line->interface, SHORTLEN);
     }
   }
 
   this = first;
   while (this != NULL) {
-    if (strncmp(this->hostname, input->hostname, SHOSTLEN) != 0) {goto no_match;}
-    if (strncmp(this->chainlabel, input->chainlabel, SHOSTLEN) != 0) {goto no_match;}
-    if (strncmp(this->branchname, input->branchname, SHOSTLEN) != 0) {goto no_match;}
-    if (strncmp(this->interface, input->interface, SHOSTLEN) != 0) {goto no_match;}
-    if ((opt.src_ip) && (strncmp(this->shost, input->shost, IPLEN) != 0)) {goto no_match;}
-    if ((opt.dst_ip) && (strncmp(this->dhost, input->dhost, IPLEN) != 0)) {goto no_match;}
-    if ((opt.proto) && (this->protocol != input->protocol)) {goto no_match;}
-    if ((opt.src_port) && (this->sport != input->sport)) {goto no_match;}
-    if ((opt.dst_port) && (this->dport != input->dport)) {goto no_match;}
-    if ((opt.opts) && (this->syn != input->syn)) {goto no_match;}
+    if ((opt.dst_port) && (this->dport != opt.line->dport)) {goto no_match;}
+    if ((opt.src_port) && (this->sport != opt.line->sport)) {goto no_match;}
+    if ((opt.proto) && (this->protocol != opt.line->protocol)) {goto no_match;}
+    if ((opt.opts) && (this->syn != opt.line->syn)) {goto no_match;}
+    if ((opt.src_ip) && (strncmp(this->shost, opt.line->shost, IPLEN) != 0)) {goto no_match;}
+    if ((opt.dst_ip) && (strncmp(this->dhost, opt.line->dhost, IPLEN) != 0)) {goto no_match;}
+    if (strncmp(this->interface, opt.line->interface, SHOSTLEN) != 0) {goto no_match;}
+    if (strncmp(this->branchname, opt.line->branchname, SHOSTLEN) != 0) {goto no_match;}
+    if (strncmp(this->chainlabel, opt.line->chainlabel, SHOSTLEN) != 0) {goto no_match;}
+    if (strncmp(this->hostname, opt.line->hostname, SHOSTLEN) != 0) {goto no_match;}
 
-    if (input->time >= this->end_time) {
-      this->end_time = input->time;
+    if (opt.line->time >= this->end_time) {
+      this->end_time = opt.line->time;
     } else {
-      fprintf(stderr, "\nTimewarp in log file (%d < %d), ignoring.\n", (int)input->time, (int)this->end_time);
+      fprintf(stderr, "\nTimewarp in log file (%d < %d), ignoring.\n", (int)opt.line->time, (int)this->end_time);
       return;
     }
 
@@ -267,7 +267,7 @@ void build_list(struct log_line *input)
   no_match: this = this->next;
   }
 
- add_entry(input);
+ add_entry();
 }
 
 int list_stats()

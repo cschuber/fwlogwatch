@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogsummary.cgi,v 1.3 2002/02/14 20:29:42 bwess Exp $
+# $Id: fwlogsummary.cgi,v 1.4 2002/02/14 20:36:55 bwess Exp $
 
 # You could run this from crontab:
 # 30 * * * * /path/fwlogsummary
@@ -53,7 +53,7 @@ cat <<EOF > $WEBDIR/index.html
 Press the back button of your browser to return here.<br>
 <br>
 <hr>
-\$Id: fwlogsummary.cgi,v 1.3 2002/02/14 20:29:42 bwess Exp $
+\$Id: fwlogsummary.cgi,v 1.4 2002/02/14 20:36:55 bwess Exp $
 </font>
 </body>
 </html>

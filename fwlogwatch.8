@@ -1,7 +1,7 @@
 .\"
-.\" $Id: fwlogwatch.8,v 1.3 2002/02/14 20:29:42 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.4 2002/02/14 20:36:55 bwess Exp $
 .\"
-.TH FWLOGWATCH 8 "01 November 2000" RUS-CERT
+.TH FWLOGWATCH 8 "06 November 2000" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -9,9 +9,9 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .RI [ options ]
 .SH DESCRIPTION
 .B fwlogwatch
-produces ipchains log summary reports in text and HTML form,
-from the data found it can produce customizable incident reports from a
-template and send them to abuse contacts at offending sites or CERT
+produces ipchains and iptables/netfilter log summary reports in text and
+HTML form, with the data found it can produce customizable incident reports
+from a template and send them to abuse contacts at offending sites or CERT
 coordination centers. Finally, it can also run as daemon and report
 anomalies or start countermeasures.
 .SH OPTIONS
@@ -64,8 +64,8 @@ relevant packet filter log entries, "o" for packet filter log entries that
 are too old and "_" for entries that are not packet filter logs.
 .IP \-y
 Differentiate TCP options (SYN/ACK). All connections with a SYN are listed
-separately, other TCP options are not available because ipchains can't log
-them.
+separately, other TCP flags are not available because ipchains doesn't log
+them (although netfilter does).
 .IP \-z
 Show time interval between start and end time of connection attempts. This
 is only available if the connection attempt entry consists of more than one
@@ -79,7 +79,7 @@ This is the sort order of the summary. Since entries often are
 equal in certain fields you can sort by several fields one after another
 (the sort algorithm is stable, so equal entries will remain sorted in the
 order they were sorted before). The sort string can be composed 8 fields of
-the form 
+the form
 .B ab
 where
 .B a
@@ -177,7 +177,7 @@ where
 is a natural number and
 .B x
 is one of the
-following: 
+following:
 .I s
 for seconds (default if you don't specify anything),
 .I m

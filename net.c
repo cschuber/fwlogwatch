@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.2 2002/02/14 20:29:42 bwess Exp $ */
+/* $Id: net.c,v 1.3 2002/02/14 20:36:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -135,7 +135,7 @@ void net_output(int fd, char *buf)
   write(fd, buf, strlen(buf));
 }
 
-int handshake(int fd)
+void handshake(int fd)
 {
   int conn, retval;
   socklen_t socks;
@@ -151,7 +151,7 @@ int handshake(int fd)
   conn = accept(fd, &sac, &socks);
   if (conn == -1) {
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
-    return 1;
+    return;
   }
 
   if(opt.verbose)
@@ -224,7 +224,7 @@ int handshake(int fd)
     net_output(conn, buf);
 
     net_output(conn, "</table>\n");
-    
+
     net_output(conn, "<h2>Connection cache</h2>\n");
     net_output(conn, "<table border=\"0\">\n");
     snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>count</td><td>IP address</td><td>remaining time</td></tr>\n", opt.rowcol1);
@@ -285,5 +285,5 @@ int handshake(int fd)
   if(opt.verbose)
     syslog(LOG_NOTICE, "Connection closed");
 
-  return 0;
+  return;
 }
