@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.1 2002/02/14 19:43:03 bwess Exp $ */
+/* $Id: modes.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,7 +138,7 @@ void mode_summary()
   else
     printf("\n");
 
-  if(opt.threshold > 0)
+  if(opt.mode == INTERACTIVE_REPORT)
     printf("Reporting threshold: %d\n\n", opt.threshold);
 
   if (opt.src_ip)
@@ -152,7 +152,7 @@ void mode_summary()
   sort_list(COUNT, BIGGERFIRST);
   show_list();
 
-  if(opt.threshold > 0)
+  if(opt.mode == INTERACTIVE_REPORT)
     report();
 
   if (opt.html)

@@ -1,7 +1,7 @@
-# $Id: Makefile,v 1.1 2002/02/14 19:43:03 bwess Exp $
+# $Id: Makefile,v 1.2 2002/02/14 20:09:16 bwess Exp $
 
 CC=gcc
-CFLAGS=-pipe -O2 -Wall -pedantic #-g -p
+CFLAGS=-pipe -O2 -Wall #-pedantic -g -p
 OBJ=main.o rcfile.o modes.o parser.o compare.o output.o resolve.o \
     report.o response.o utils.o
 LDFLAGS=#-lefence
@@ -26,7 +26,7 @@ install:
 	install -s -m 0755 fwlogwatch /usr/local/sbin/fwlogwatch
 	install -m 0644 fwlogwatch.config /etc/fwlogwatch.config
 	install -m 0644 fwlogwatch.template /etc/fwlogwatch.template
-	install -m 0644 fwlogwatch.1 /usr/local/man/man1/fwlogwatch.1
+	install -m 0644 fwlogwatch.8 /usr/local/man/man8/fwlogwatch.8
 
 clean:
 	rm -f *.o *~ fwlogwatch

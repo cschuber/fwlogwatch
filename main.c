@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.1 2002/02/14 19:43:03 bwess Exp $ */
+/* $Id: main.c,v 1.2 2002/02/14 20:09:16 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -275,11 +275,10 @@ int main(int argc, char **argv)
   if ((opt.src_port == 1) || (opt.dst_port == 1))
     opt.proto = 1;
 
-  if (opt.threshold > 0)
+  if (opt.mode != LOG_SUMMARY) {
     opt.html = 0;
-
-  if (opt.mode != LOG_SUMMARY)
     opt.use_out = 0;
+  }
 
   switch (opt.mode) {
   case LOG_SUMMARY:

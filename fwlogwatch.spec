@@ -1,12 +1,12 @@
 Name: fwlogwatch
-Version: 0.0.21
+Version: 0.0.22
 Release: 1
 Group: Applications/Utilities
 Packager: Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
 URL: http://www.kyb.uni-stuttgart.de/boris/software.shtml
 Copyright: GPL
 Summary: Firewall log analyzer, report generator and realtime response agent
-Source: fwlogwatch-0.0.21.tar.gz
+Source: fwlogwatch-0.0.22.tar.gz
 
 %description
 fwlogwatch produces ipchains log summary reports in text and HTML form,
@@ -17,7 +17,7 @@ anomalies or start countermeasures.
 
 %prep
 
-%setup -n fwlogwatch-0.0.21
+%setup -n fwlogwatch-0.0.22
 
 %build
 make
@@ -26,10 +26,13 @@ make
 make install
 
 %files
-/usr/local/sbin/fwlogwatch
-/usr/local/man/man1/fwlogwatch.1
+/usr/sbin/fwlogwatch
+/usr/man/man8/fwlogwatch.8
 %config /etc/fwlogwatch.config
 %config /etc/fwlogwatch.template
 %doc AUTHORS
 %doc COPYING
+%doc CREDITS
 %doc README
+%doc contrib/fwlogsummary.cgi
+%doc contrib/fwlogsummary.small.cgi
