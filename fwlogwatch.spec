@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.16 2002/02/14 21:26:30 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.17 2002/02/14 21:32:47 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.3.1
+%define version 0.4
 
 Name: %name
 Version: %version
@@ -38,7 +38,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man8
 mkdir -p $RPM_BUILD_ROOT/usr/sbin
-mkdir -p $RPM_BUILD_ROOT/etc
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 make install INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 
@@ -46,8 +46,9 @@ make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 /usr/sbin/fwlogwatch
 /usr/sbin/fwlw_notify
 /usr/sbin/fwlw_respond
+/etc/rc.d/init.d/fwlogwatch
 /usr/share/man/man8/fwlogwatch.8.gz
 %config /etc/fwlogwatch.config
 %config /etc/fwlogwatch.template
 %doc AUTHORS COPYING CREDITS ChangeLog README
-%doc contrib/fwlogsummary contrib/fwlogsummary_small.cgi
+%doc contrib/fwlogsummary.cgi contrib/fwlogsummary_small.cgi

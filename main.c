@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: main.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +43,7 @@ void usage(char *me, unsigned char exitcode)
   printf("         -o <file>   specify output file\n");
   printf("         -O <order>  define the sort order (see the man page for details)\n");
   printf("         -w          HTML output\n");
+  printf("         -W          activate whois lookups for source addresses\n");
   printf("\n");
 
   printf("Interactive report mode:\n");
@@ -102,9 +103,11 @@ void init_options()
   int retval;
 
   opt.mode = LOG_SUMMARY;
+  opt.inputfd = NULL;
 
   opt.verbose = 0;
   opt.resolve = 0;
+  opt.whois_lookup = 0;
   strncpy(opt.inputfile, INFILE, FILESIZE);
 
   opt.line = NULL;
@@ -160,9 +163,12 @@ void init_options()
   strncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
   opt.response = OPT_LOG;
+  opt.pidfile[0] = '\0';
   opt.status = 0;
-  strncpy(opt.listenhost, LISTENHOST, IPLEN);
+  opt.sock = 0;
+  strncpy(opt.listenif, LISTENIF, IPLEN);
   opt.listenport = LISTENPORT;
+  opt.listento[0] = '\0';
   strncpy(opt.user, DEFAULT_USER, USERSIZE);
   strncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
 
@@ -202,7 +208,7 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDf:F:hi:I:k:l:L:m:no:O:pP:RsStT:vVwXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDf:F:hi:I:k:l:L:m:no:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -306,6 +312,9 @@ int main(int argc, char **argv)
       break;
     case 'w':
       opt.html = 1;
+      break;
+    case 'W':
+      opt.whois_lookup = 1;
       break;
     case 'X':
       opt.status = 1;

@@ -1,10 +1,10 @@
-/* $Id: utils.h,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: utils.h,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
 
 void *xmalloc(int size);
-void log_exit();
+void log_exit(unsigned char returncode);
 void run_command(char *buf);
 void free_conn_data();
 void free_dns_cache();
@@ -14,6 +14,7 @@ void init_line();
 void mode_error();
 void build_time(char *smonth, int day, int hour, int minute, int second);
 unsigned char convert_ip(char *ip, struct in_addr *addr);
+unsigned long int parse_cidr(char *input);
 void add_known_host(char *ip);
 void add_exclude_hp(char *input, unsigned char mode);
 

@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.3 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: netfilter.l,v 1.4 2002/02/14 21:32:47 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -23,7 +23,7 @@ void nf_parse_proto(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
-PREFIX	[a-zA-Z0-9.:=_ -]+
+PREFIX	[ -~]+
 LOGHOST	[0-9.a-zA-Z_-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
@@ -70,6 +70,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 "URGP="{NUMBER}		/* ignore */
 "OPT ("[0-9A-F]*")"	/* ignore */
 "SPI="{HEXNUM}		/* ignore */
+"GATEWAY="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	/* ignore */
+"[".+"]"		/* ignore */
 [ ]+			/* ignore whitespace */
 [\n]			return 0;
 {STRING}		if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", nftext);

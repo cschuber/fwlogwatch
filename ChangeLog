@@ -1,4 +1,14 @@
-$Id: ChangeLog,v 1.14 2002/02/14 21:26:30 bwess Exp $
+$Id: ChangeLog,v 1.15 2002/02/14 21:32:47 bwess Exp $
+
+Version 0.4 2001-08-19
+- Added whois information lookup
+- Added sorting by end time
+- Changed pid file handling
+- Renamed and introduced new listen_to option (bind_to)
+- Implemented SIGHUP handling (e.g. for log rotation)
+- Updated CGI scripts
+- Added init script for redhat linux
+- Various small fixes
 
 Version 0.3.1 2001-05-25
 - Rewrote netfilter prefix parsing code

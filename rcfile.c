@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: rcfile.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -198,6 +198,10 @@ void parse_rcfile(char *input)
     opt.least = get_num_parameter(command+9);
     return;
   }
+  if (strncmp(command, "whois_lookup", 12) == 0) {
+    opt.whois_lookup = 1;
+    return;
+  }
 
   /* Interactive report mode */
 
@@ -235,6 +239,10 @@ void parse_rcfile(char *input)
     opt.mode = REALTIME_RESPONSE;
     return;
   }
+  if (strncmp(command, "pidfile", 7) == 0) {
+    strncpy(opt.pidfile, get_one_parameter(command+8), FILESIZE);
+    return;
+  }  
   if (strncmp(command, "alert_threshold", 15) == 0) {
     opt.threshold = get_num_parameter(command+16);
     return;
@@ -255,12 +263,16 @@ void parse_rcfile(char *input)
     opt.status = 1;
     return;
   }
-  if (strncmp(command, "listen_to", 9) == 0) {
-    strncpy(opt.listenhost, get_one_parameter(command+10), IPLEN);
+  if (strncmp(command, "bind_to", 7) == 0) {
+    strncpy(opt.listenif, get_one_parameter(command+8), IPLEN);
     return;
   }
   if (strncmp(command, "listen_port", 11) == 0) {
     opt.listenport = get_num_parameter(command+12);
+    return;
+  }
+  if (strncmp(command, "listen_to", 9) == 0) {
+    strncpy(opt.listento, get_one_parameter(command+10), IPLEN);
     return;
   }
   if (strncmp(command, "status_user", 11) == 0) {

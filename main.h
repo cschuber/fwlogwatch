@@ -1,26 +1,27 @@
-/* $Id: main.h,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: main.h,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.3.1"
-#define COPYRIGHT "2001-05-25 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.4"
+#define COPYRIGHT "2001-08-19 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
 #define BUFSIZE 1024
 #define FILESIZE 256
-#define TIMESIZE 32
+#define TIMESIZE 40
 #define HOSTLEN 256
 #define SHOSTLEN 32
 #define IPLEN 16
 #define EMAILSIZE 80
 #define REPORTLEN 52
 #define COLORSIZE 7
-#define MAXSORTSIZE 16
+#define MAXSORTSIZE 24
 #define USERSIZE 16
 #define PASSWORDSIZE 76
+#define CMDLEN 16
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 30
@@ -32,7 +33,6 @@
 
 #define INFILE "/var/log/messages"
 #define RCFILE "/etc/fwlogwatch.config"
-#define PIDFILE "/var/run/fwlogwatch.pid"
 
 /* Modes */
 
@@ -149,6 +149,7 @@ enum {
 enum {
   SORT_COUNT,
   SORT_START_TIME,
+  SORT_END_TIME,
   SORT_DELTA_TIME,
   SORT_CHAINLABEL,
   SORT_PROTOCOL,
@@ -163,6 +164,11 @@ enum {
   ORDER_ASCENDING,
   ORDER_DESCENDING
 };
+
+/* WHOIS lookup */
+
+#define RADB "whois.ra.net"
+#define WHOIS 43
 
 /* Log summary mode */
 
@@ -199,7 +205,7 @@ enum {
 #define FORGET 86400
 #define FWLW_NOTIFY "/usr/local/sbin/fwlw_notify"
 #define FWLW_RESPOND "/usr/local/sbin/fwlw_respond"
-#define LISTENHOST "127.0.0.1"
+#define LISTENIF "127.0.0.1"
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
 #define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
@@ -263,6 +269,14 @@ struct dns_cache {
   struct dns_cache *next;
 };
 
+struct whois_entry {
+  char ip_route[SHOSTLEN];
+  int as_number;
+  char ip_descr[SHOSTLEN];
+  char as_descr[SHOSTLEN];
+  struct whois_entry *next;
+};
+
 struct report_data {
   char sender[EMAILSIZE];
   char recipient[EMAILSIZE];
@@ -314,9 +328,11 @@ enum {
 
 struct options {
   unsigned char mode;
+  FILE *inputfd;
 
   unsigned char verbose;
   unsigned char resolve;
+  unsigned char whois_lookup;
   char inputfile[FILESIZE];
 
   struct log_line *line;
@@ -372,9 +388,12 @@ struct options {
   char templatefile[FILESIZE];
 
   unsigned char response;
+  char pidfile[FILESIZE];
   unsigned char status;
-  char listenhost[IPLEN];
+  int sock;
+  char listenif[IPLEN];
   int listenport;
+  char listento[IPLEN];
   char user[USERSIZE];
   char password[PASSWORDSIZE];
 };

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2002/02/14 21:26:30 bwess Exp $
+# $Id: Makefile,v 1.17 2002/02/14 21:32:47 bwess Exp $
 
 # Linux
 CC = gcc
@@ -37,9 +37,9 @@ INSTALL_PROGRAM = $(INSTALL) -s -m 0755
 INSTALL_SCRIPT = $(INSTALL) -m 0755
 INSTALL_DATA = $(INSTALL) -m 0644
 
-OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o main.o \
-       modes.o net.o netfilter.o output.o parser.o rcfile.o report.o \
-       resolve.o response.o utils.o
+OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o \
+       main.o modes.o net.o netfilter.o output.o parser.o \
+       rcfile.o report.o resolve.o response.o utils.o whois.o
 
 all:	fwlogwatch
 
@@ -60,14 +60,15 @@ report.o:	main.h output.h resolve.h response.h
 resolve.o:	main.h resolve.h
 response.o:	main.h output.h response.h
 utils.o:	main.h
+whois.o:	main.h utils.h
 
 fwlogwatch:	$(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 install:	all
 	$(INSTALL_PROGRAM) fwlogwatch /usr/local/sbin/fwlogwatch
-	$(INSTALL_SCRIPT) fwlw_notify /usr/local/sbin/fwlw_notify
-	$(INSTALL_SCRIPT) fwlw_respond /usr/local/sbin/fwlw_respond
+	$(INSTALL_SCRIPT) contrib/fwlw_notify /usr/local/sbin/fwlw_notify
+	$(INSTALL_SCRIPT) contrib/fwlw_respond /usr/local/sbin/fwlw_respond
 	$(INSTALL_DATA) fwlogwatch.8 /usr/local/man/man8/fwlogwatch.8
 
 install-config:

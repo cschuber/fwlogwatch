@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: modes.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +28,7 @@ extern struct conn_data *first;
 void mode_summary()
 {
   char buf[BUFSIZE], nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE];
-  FILE *input, *output = NULL;
+  FILE *output = NULL;
   int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0, exnum = 0;
   time_t now;
   struct passwd *gen_user;
@@ -36,8 +36,8 @@ void mode_summary()
   if (opt.verbose)
     fprintf(stderr, "Opening input file '%s'\n", opt.inputfile);
 
-  input = gzopen(opt.inputfile, "rb");
-  if (input == NULL) {
+  opt.inputfd = gzopen(opt.inputfile, "rb");
+  if (opt.inputfd == NULL) {
     fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
     exit(EXIT_FAILURE);
   }
@@ -47,7 +47,7 @@ void mode_summary()
 
   opt.line = xmalloc(sizeof(struct log_line));
 
-  while (gzgets(input, buf, BUFSIZE) != Z_NULL) {
+  while (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL) {
     ++linenum;
     hit = PARSE_NO_HIT;
     hit = parse_line(buf, linenum);
@@ -75,10 +75,10 @@ void mode_summary()
   if (opt.verbose)
     fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
-  retval = gzclose(input);
+  retval = gzclose(opt.inputfd);
   if (retval != 0) {
     if (retval != Z_ERRNO) {
-      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
+      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
     } else {
       perror("gzclose");
     }
@@ -239,44 +239,111 @@ void mode_summary()
   }
 }
 
-void terminate()
-{
-  syslog(LOG_NOTICE, "SIGTERM caught, cleaning up");
-  free_hosts();
-  if(opt.response & OPT_RESPOND)
-    modify_firewall(FW_STOP);
-  log_exit();
-}
-
 void check_pidfile()
 {
   struct stat *sbuf;
 
   sbuf = xmalloc(sizeof(struct stat));
-  if (stat(PIDFILE, sbuf) != -1) {
+  if (stat(opt.pidfile, sbuf) != -1) {
     fprintf(stderr, "Warning: pidfile exists, another fwlogwatch might be running.\n");
   } else {
     if ((errno != ENOENT) && (errno != EACCES)){
-      fprintf(stderr, "stat %s: %d, %s\n", PIDFILE, errno, strerror(errno));
+      fprintf(stderr, "stat %s: %d, %s\n", opt.pidfile, errno, strerror(errno));
       exit(EXIT_FAILURE);
     }
   }
   free(sbuf);
 }
 
-void mode_rt_response()
+void mode_rt_response_open()
+{
+  opt.inputfd = fopen(opt.inputfile, "r");
+  if (opt.inputfd == NULL) {
+    syslog(LOG_NOTICE, "fopen %s: %s", opt.inputfile, strerror(errno));
+    log_exit(EXIT_FAILURE);
+  }
+}
+
+void mode_rt_response_restart()
+{
+  int retval;
+
+  syslog(LOG_NOTICE, "SIGHUP caught, reopening log file");
+
+  retval = fclose(opt.inputfd);
+  if(retval == EOF)
+    syslog(LOG_NOTICE, "fclose %s: %s", opt.inputfile, strerror(errno));
+
+  mode_rt_response_open();
+  signal(SIGHUP, mode_rt_response_restart);
+}
+
+void mode_rt_response_core()
 {
   char buf[BUFSIZE];
-  FILE *input;
-  int retval, sock = 0;
+  int retval;
   struct stat info;
   unsigned long size;
   fd_set rfds;
   struct timeval tv;
+
+  retval = fstat(fileno(opt.inputfd), &info);
+  if (retval == -1) {
+    syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+    log_exit(EXIT_FAILURE);
+  }
+  size = info.st_size;
+
+  while (1) {
+    if(opt.status) {
+      FD_ZERO(&rfds);
+      FD_SET(opt.sock, &rfds);
+      tv.tv_sec = 1;
+      tv.tv_usec = 0;
+      retval = select(opt.sock+1, &rfds, NULL, NULL, &tv);
+      if (retval) {
+	handshake();
+      }
+    } else {
+      sleep(1);
+    }
+
+    retval = fstat(fileno(opt.inputfd), &info);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
+    remove_old();
+    if(size != info.st_size) {
+      size = info.st_size;
+      while (fgets(buf, BUFSIZE, opt.inputfd)) {
+	opt.line = xmalloc(sizeof(struct log_line));
+	parse_line(buf, 0);
+	free(opt.line);
+      }
+      look_for_alert();
+    }
+  }
+}
+
+void mode_rt_response_terminate()
+{
+  syslog(LOG_NOTICE, "SIGTERM caught, cleaning up");
+  free_hosts();
+  if(opt.response & OPT_RESPOND)
+    modify_firewall(FW_STOP);
+  log_exit(EXIT_SUCCESS);
+}
+
+void mode_rt_response()
+{
+  int retval;
+  FILE *pidfile;
 #ifndef RR_DEBUG
   pid_t pid;
 
-  check_pidfile();
+  if(opt.pidfile[0] != '\0')
+    check_pidfile();
 
   pid = fork();
   if (pid == -1) {
@@ -341,21 +408,23 @@ void mode_rt_response()
 #endif
   syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
 
-  signal(SIGTERM, terminate);
+  signal(SIGTERM, mode_rt_response_terminate);
 
-  input = fopen(PIDFILE, "w");
-  if (input == NULL) {
-    syslog(LOG_NOTICE, "fopen %s: %s\n", PIDFILE, strerror(errno));
-  } else {
-    fprintf(input, "%d\n", (int)getpid());
-    retval = fclose(input);
-    if (retval == EOF) {
-      syslog(LOG_NOTICE, "fclose %s: %s\n", PIDFILE, strerror(errno));
+  if(opt.pidfile[0] != '\0') {
+    pidfile = fopen(opt.pidfile, "w");
+    if (pidfile == NULL) {
+      syslog(LOG_NOTICE, "fopen %s: %s\n", opt.pidfile, strerror(errno));
+    } else {
+      fprintf(pidfile, "%d\n", (int)getpid());
+      retval = fclose(pidfile);
+      if (retval == EOF) {
+	syslog(LOG_NOTICE, "fclose %s: %s\n", opt.pidfile, strerror(errno));
+      }
     }
   }
 
   if(opt.status)
-    sock = prepare_socket();
+    prepare_socket();
 
   if((opt.format & PARSER_IPCHAINS) != 0)
     check_for_ipchains();
@@ -379,55 +448,16 @@ void mode_rt_response()
 	 (opt.response & OPT_NOTIFY)?", notify":"",
 	 (opt.response & OPT_RESPOND)?", respond":"");
 
-  input = fopen(opt.inputfile, "r");
-  if (input == NULL) {
-    syslog(LOG_NOTICE, "fopen %s: %s", opt.inputfile, strerror(errno));
-    log_exit();
-  }
+  mode_rt_response_open();
 
-  retval = fseek(input, 0, SEEK_END);
+  retval = fseek(opt.inputfd, 0, SEEK_END);
   if (retval == -1) {
     syslog(LOG_NOTICE, "fseek %s: %s", opt.inputfile, strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
-  retval = fstat(fileno(input), &info);
-  if (retval == -1) {
-    syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-    log_exit();
-  }
-  size = info.st_size;
-
-  while (1) {
-    if(opt.status) {
-      FD_ZERO(&rfds);
-      FD_SET(sock, &rfds);
-      tv.tv_sec = 1;
-      tv.tv_usec = 0;
-      retval = select(sock+1, &rfds, NULL, NULL, &tv);
-      if (retval) {
-	handshake(sock);
-      }
-    } else {
-      sleep(1);
-    }
-
-    retval = fstat(fileno(input), &info);
-    if (retval == -1) {
-      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-      log_exit();
-    }
-    remove_old();
-    if(size != info.st_size) {
-      size = info.st_size;
-      while (fgets(buf, BUFSIZE, input)) {
-	opt.line = xmalloc(sizeof(struct log_line));
-	parse_line(buf, 0);
-	free(opt.line);
-      }
-      look_for_alert();
-    }
-  }
+  signal(SIGHUP, mode_rt_response_restart);
+  mode_rt_response_core();
 }
 
 void mode_show_log_times()

@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: output.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -8,6 +8,7 @@
 #include <time.h>
 #include "output.h"
 #include "resolve.h"
+#include "whois.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -72,8 +73,8 @@ void output_res_common(char *text)
 
 void output_resolved(struct conn_data *input)
 {
-  char *proto;
-  char time[TIMESIZE];
+  char *proto, time[TIMESIZE], buf[HOSTLEN];
+  struct whois_entry *we;
 
   if (opt.html) {
     if (opt.html == 1) {
@@ -183,6 +184,21 @@ void output_resolved(struct conn_data *input)
 
     if(opt.resolve) {
       output_res_common(resolve_hostname(input->shost));
+    }
+
+    if(opt.whois_lookup) {
+      separate(SPACE);
+      we = whois(input->shost);
+      if (we != NULL) {
+	snprintf(buf, HOSTLEN, "%s %s AS%d %s", we->ip_route, we->ip_descr, we->as_number, we->as_descr);
+      } else {
+	snprintf(buf, HOSTLEN, "-");
+      }
+      if(!opt.html) {
+	printf("[%s]", buf);
+      } else {
+	printf("%s", buf);
+      }
     }
   }
 
@@ -302,6 +318,8 @@ void output_html_table()
     printf("<td>source</td>");
     if(opt.resolve)
       printf("<td>hostname</td>");
+    if(opt.whois_lookup)
+      printf("<td>whois information</td>");
   }
 
   if (opt.src_port)
@@ -337,9 +355,6 @@ void output_raw_data(struct conn_data *input)
   while (this != NULL) {
 #ifndef __OpenBSD__
     printf("%d;%ld;%ld;"
-#else
-    printf("%d;%d;%d;"
-#endif
 	   "%s;%s;%s;"
 	   "%s;%d;"
 	   "%u;%d;"
@@ -351,6 +366,20 @@ void output_raw_data(struct conn_data *input)
 	   ntohl(input->shost.s_addr), input->sport,
 	   ntohl(input->dhost.s_addr), input->dport,
 	   input->flags);
+#else
+    printf("%d;%d;%d;"
+	   "%s;%s;%s;"
+	   "%s;%d;"
+	   "%u;%d;"
+	   "%u;%d;"
+	   "%d\n",
+	   input->count, input->start_time, input->end_time,
+	   input->hostname, input->chainlabel, input->branchname,
+	   input->interface, input->protocol,
+	   ntohl(input->shost.s_addr), input->sport,
+	   ntohl(input->dhost.s_addr), input->dport,
+	   input->flags);
+#endif
     this = this->next;
   }
 }

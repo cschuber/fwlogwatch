@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.14 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: net.c,v 1.15 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,44 +36,42 @@ void secure_read(int file, char *data_out, int maxlen)
   data_out[--j] = 0;
 }
 
-int prepare_socket()
+void prepare_socket()
 {
-  int fd, retval, x;
+  int retval, x;
   struct sockaddr_in sa;
   struct in_addr ina;
 
-  fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (fd == -1) {
+  opt.sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (opt.sock == -1) {
     syslog(LOG_NOTICE, "socket: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
-  retval = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void *)&x, sizeof(x));
+  retval = setsockopt(opt.sock, SOL_SOCKET, SO_REUSEADDR, (void *)&x, sizeof(x));
   if (retval == -1) {
     syslog(LOG_NOTICE, "setsockopt: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
-  ina.s_addr = inet_addr(opt.listenhost);
+  ina.s_addr = inet_addr(opt.listenif);
   sa.sin_family = AF_INET;
   sa.sin_port = htons(opt.listenport);
   sa.sin_addr = ina;
 
-  retval = bind(fd, (struct sockaddr *)&sa, sizeof(sa));
+  retval = bind(opt.sock, (struct sockaddr *)&sa, sizeof(sa));
   if (retval == -1) {
     syslog(LOG_NOTICE, "bind: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
-  retval = listen(fd, 1);
+  retval = listen(opt.sock, 1);
   if (retval == -1) {
     syslog(LOG_NOTICE, "listen: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
   syslog(LOG_NOTICE, "Listening on %s port %i", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
-
-  return fd;
 }
 
 /*
@@ -139,7 +137,7 @@ void net_output(int fd, char *buf)
   write(fd, buf, strlen(buf));
 }
 
-void handshake(int fd)
+void handshake()
 {
 #ifdef SOLARIS
   typedef int socklen_t; /* undefined and not unsigned as in linux */
@@ -159,9 +157,18 @@ void handshake(int fd)
 
   socks = sizeof(struct sockaddr_in);
 
-  conn = accept(fd, (struct sockaddr *)&sac, &socks);
+  conn = accept(opt.sock, (struct sockaddr *)&sac, &socks);
   if (conn == -1) {
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
+    return;
+  }
+
+  if((opt.listento[0] != '\0') && (strncmp(opt.listento,inet_ntoa(sac.sin_addr),IPLEN) != 0)) {
+    syslog(LOG_NOTICE, "Rejected connect from unallowed ip %s port %i", inet_ntoa(sac.sin_addr), ntohs(sac.sin_port));
+    retval = close(conn);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "close: %s", strerror(errno));
+    }
     return;
   }
 

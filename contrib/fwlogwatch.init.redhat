@@ -1,0 +1,79 @@
+#!/bin/sh
+# $Id: fwlogwatch.init.redhat,v 1.1 2002/02/14 21:32:47 bwess Exp $
+#
+# Init file for fwlogwatch on redhat linux systems
+#
+# chkconfig: 2345 90 10
+# description: Firewall log analysis with realtime response
+#
+# processname: fwlogwatch
+# config: /etc/fwlogwatch.config
+# pidfile: /var/run/fwlogwatch.pid
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+RETVAL=0
+prog="fwlogwatch"
+
+# Some functions to make the below more readable
+FWLOGWATCH=/usr/local/sbin/fwlogwatch
+PID_FILE=/var/run/fwlogwatch.pid
+
+
+start()
+{
+	echo -n $"Starting $prog:"
+	initlog -c "$FWLOGWATCH -R -A -X -Pn" && success || failure
+	RETVAL=$?
+	[ "$RETVAL" = 0 ] && touch /var/lock/subsys/fwlogwatch
+	echo
+}
+
+stop()
+{
+	echo -n $"Stopping $prog:"
+	killproc $FWLOGWATCH -TERM
+	RETVAL=$?
+	[ "$RETVAL" = 0 ] && rm -f /var/lock/subsys/fwlogwatch
+	echo
+}
+
+reload()
+{
+	echo -n $"Reloading $prog:"
+	killproc $FWLOGWATCH -HUP
+	RETVAL=$?
+	echo
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		reload
+		;;
+	condrestart)
+		if [ -f /var/lock/subsys/fwlogwatch ] ; then
+			stop
+			sleep 3
+			start
+		fi
+		;;
+	status)
+		status $FWLOGWATCH
+		RETVAL=$?
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
+		RETVAL=1
+esac
+exit $RETVAL

@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: utils.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,14 +31,16 @@ void *xmalloc(int size)
   return ptr;
 }
 
-void log_exit()
+void log_exit(unsigned char returncode)
 {
-  if(unlink(PIDFILE) == -1) {
-    if(opt.verbose)
-      syslog(LOG_NOTICE, "unlink %s: %s", PIDFILE, strerror(errno));
+  if(opt.pidfile[0] != '\0') {
+    if(unlink(opt.pidfile) == -1) {
+      if(opt.verbose)
+	syslog(LOG_NOTICE, "unlink %s: %s", opt.pidfile, strerror(errno));
+    }
   }
   syslog(LOG_NOTICE, "Exiting");
-  exit(EXIT_FAILURE);
+  exit(returncode);
 }
 
 void run_command(char *buf)
@@ -57,13 +59,13 @@ void run_command(char *buf)
   pid = fork();
   if (pid == -1) {
     syslog(LOG_NOTICE, "fork: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
   if (pid == 0) {
     execl("/bin/sh", "/bin/sh", "-c", buf, NULL);
     syslog(LOG_NOTICE, "execl: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
   wait(NULL);
@@ -202,7 +204,7 @@ unsigned char convert_ip(char *ip, struct in_addr *addr)
   if (addr->s_addr == INADDR_NONE) {
 #endif
     if (opt.verbose)
-      printf("IP address error: %s\n", ip);
+      fprintf(stderr, "IP address error: %s\n", ip);
     return IN_ADDR_ERROR;
   }
   return IN_ADDR_OK;
@@ -217,7 +219,7 @@ unsigned long int parse_cidr(char *input)
   if (pnt != NULL) {
     mask = atoi(pnt+1);
     if ((mask < 0) || (mask > 32)) {
-      printf("Error in CIDR format: %s\n", input);
+      fprintf(stderr, "Error in CIDR format: %s\n", input);
       exit(EXIT_FAILURE);
     }
     *pnt = '\0';

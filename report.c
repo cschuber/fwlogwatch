@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: report.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -164,10 +164,10 @@ void generate_with_template(struct report_data *data)
   tmpdir = getenv("TMPDIR");
   if (tmpdir == NULL) {
     file = xmalloc(strlen(FILENAME) + strlen("/tmp/") + 1);
-    sprintf(file, "/tmp/%s", FILENAME);
+    snprintf(file, strlen(FILENAME)+strlen("/tmp/")+1, "/tmp/%s", FILENAME);
   } else {
     file = xmalloc(strlen(FILENAME) + strlen(tmpdir) + 1);
-    sprintf(file, "%s%s", tmpdir, FILENAME);
+    snprintf(file, strlen(FILENAME)+strlen(tmpdir)+1, "%s%s", tmpdir, FILENAME);
   }
 
   filedes = mkstemp(file);

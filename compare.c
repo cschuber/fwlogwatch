@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: compare.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +54,13 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
       if (op1->start_time > op2->start_time) cond++;
     } else {
       if (op1->start_time < op2->start_time) cond++;
+    }
+    break;
+  case SORT_END_TIME:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->end_time > op2->end_time) cond++;
+    } else {
+      if (op1->end_time < op2->end_time) cond++;
     }
     break;
   case SORT_DELTA_TIME:
@@ -180,6 +187,9 @@ void sort_data()
       break;
     case 't':
       opt.sortfield = SORT_START_TIME;
+      break;
+    case 'e':
+      opt.sortfield = SORT_END_TIME;
       break;
     case 'z':
       opt.sortfield = SORT_DELTA_TIME;

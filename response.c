@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.16 2002/02/14 21:26:30 bwess Exp $ */
+/* $Id: response.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +33,7 @@ void check_for_ipchains()
   fd = fopen("/proc/net/ip_fwchains", "r");
   if (fd == NULL) {
     syslog(LOG_NOTICE, "fopen /proc/net/ip_fwchains: %s", strerror(errno));
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
   while (fgets(buf, BUFSIZE, fd)) {
@@ -57,7 +57,7 @@ void check_for_ipchains()
     syslog(LOG_NOTICE, "%u logging ipchains firewall rule%s defined", found, (found == 1)?"":"s");
   } else {
     syslog(LOG_NOTICE, "No logging ipchains firewall rules defined, format was requested");
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 }
 
@@ -72,14 +72,14 @@ void check_script_perms(char *name)
   if (retval == -1) {
     syslog(LOG_NOTICE, "stat %s: %s", name, strerror(errno));
     free(buf);
-    log_exit();
+    log_exit(EXIT_FAILURE);
   }
 
   if((getuid() == 0) || (geteuid() == 0)) {
     if ((buf->st_mode & (S_IWGRP|S_IWOTH)) != 0) {
       syslog(LOG_NOTICE, "%s is group/world writable", FWLW_NOTIFY);
       free(buf);
-      log_exit();
+      log_exit(EXIT_FAILURE);
     }
   }
 

@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.15 2002/02/14 21:26:30 bwess Exp $
-.TH FWLOGWATCH 8 "3 April 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.16 2002/02/14 21:32:47 bwess Exp $
+.TH FWLOGWATCH 8 "28 July 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -7,12 +7,12 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .RI [ options ]
 .SH DESCRIPTION
 .B fwlogwatch
-produces ipchains, netfilter/iptables, ipfilter and cisco log summary
-reports in text and HTML form and has a lot of options to find and display
-relevant patterns in packet logs. With the data found it can produce
-customizable incident reports from a template and send them to abuse
-contacts at offending sites or CERT coordination centers. Finally, it can
-also run as daemon and report anomalies or start countermeasures.
+produces ipchains, netfilter/iptables, cisco IOS, cisco PIX and ipfilter
+log summary reports in text and HTML form and has a lot of options to find
+and display relevant patterns in packet logs. With the data found it can
+produce customizable incident reports from a template and send them to
+abuse contacts at offending sites or CERT coordination centers. Finally, it
+can also run as daemon and report anomalies or start countermeasures.
 
 .SH OPTIONS
 The global options for all modes (at least where they make sense) are:
@@ -51,7 +51,8 @@ below for the time options.
 .IP \-n
 Enable DNS lookups. Host names will be resolved (reverse and forward lookup
 with a warning if they don't match). This makes summary generation very
-slow if a lot of different hosts appear in the log file.
+slow if a lot of different hosts appear in the log file. Resolved host names
+are cached.
 .IP \-P\ \fIformat\fR
 Only use certain parsers, where the log
 .I format
@@ -96,7 +97,8 @@ characteristics.
 This are additional options that are only available in log summary mode:
 .IP \-b
 Show the amount of data in bytes this entry represents, this is the sum of
-total packet lengths of packets matching this rule.
+total packet lengths of packets matching this rule (obviously only available
+for log formats that contain this information).
 .IP \-m\ \fIcount\fR
 When analyzing large log files you usually aren't interested in entries that
 have a small count. You can hide entries below a certain threshold with
@@ -107,7 +109,7 @@ Specify an output file.
 This is the sort order of the summary. Since entries often are
 equal in certain fields you can sort by several fields one after another
 (the sort algorithm is stable, so equal entries will remain sorted in the
-order they were sorted before). The sort string can be composed of up to 8
+order they were sorted before). The sort string can be composed of up to 11
 fields of the form
 .B ab
 where
@@ -117,6 +119,8 @@ is the sort criteria:
 count,
 .I t
 start time,
+.I e
+end time,
 .I z
 duration,
 .I n
@@ -124,7 +128,7 @@ target name,
 .I p
 protocol,
 .I b
-sum of total packet lengths,
+byte count (sum of total packet lengths),
 .I S
 source host,
 .I s
@@ -145,10 +149,13 @@ criteria. The default is
 (start with the highest count, if two counts match list the one earlier in
 time first) of which
 .I ta
-is built in., so if you specify an empty sort string or everything else is
+is built in, so if you specify an empty sort string or everything else is
 equal entries will be sorted ascending by time.
 .IP \-w
 Produce output in HTML format.
+.IP \-W
+Look up information about the source addresses in the whois database. This
+is slow, please don't stress the registry with too many queries.
 .SH "INTERACTIVE REPORT MODE"
 .IP \-i\ \fIcount\fR
 Enter interactive report mode.
@@ -172,8 +179,9 @@ Template file for report (defaults to
 .SH "REALTIME RESPONSE MODE"
 .IP \-R
 Enter realtime response mode. This means: detach, check if the firewall is
-configured correctly and run as daemon until the SIGTERM signal (kill) is
-received. All output can be followed in the system log.
+configured correctly and run as daemon until the TERM signal (kill) is
+received. The HUP signal forces a reload of the input file (useful e.g. for
+log rotation). All output can be followed in the system log.
 .IP \-a\ \fIcount\fR
 Alert threshold. Notify or start countermeasures if this limit is reached.
 Defaults to 5.
@@ -197,7 +205,7 @@ A new chain for
 actions is inserted in the input chain and block rules added as needed.
 The chain and its content is removed if
 .B fwlogwatch
-is terminated normally. The default scripts contains actions for ipchains
+is terminated normally. The default scripts contain actions for ipchains
 and netfilter, you can modify them or add others as you like.
 .IP \-X
 Activate the internal web server to monitor the current status of the program.
@@ -245,9 +253,9 @@ on the command line, they are presented and explained in the sample
 configuration file.
 .IP HTML\ colors
 The colors of the HTML output page can be customized.
-.IP status\ server\ options
-The host that can access the web interface, the port it listens to and the
-user and password can be changed.
+.IP realtime\ response\ options
+The host that can access the web interface, the port it listens on, the
+user and password and the pid file handling can be changed.
 .IP host\ and\ port\ selection\ and\ exclusion
 Hosts and ports to be summarized can be selected or excluded.
 .SH "NETFILTER, IPFILTER AND CISCO SUPPORT"

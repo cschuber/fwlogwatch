@@ -1,4 +1,4 @@
-$Id: CREDITS,v 1.15 2002/02/14 21:26:30 bwess Exp $
+$Id: CREDITS,v 1.16 2002/02/14 21:32:47 bwess Exp $
 
 This program was written by
 Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
@@ -8,7 +8,7 @@ Oliver Goebel <Goebel@RUS.Uni-Stuttgart.DE>
   for looking after this program as a RUS-CERT project and some comments.
 
 Florian Weimer <Florian.Weimer@RUS.Uni-Stuttgart.DE>
-  for a very nice code revision.
+  for a very nice code review.
 
 Torkil Zachariassen <torkil@heima.als.fo>
   for comments on the first public release.
@@ -48,3 +48,9 @@ Tobias Hunger <tobias@berlin-consortium.org>
 
 Diederick van Dijk <diedvdyk@jedi.van-dijk.net>
   for contributing to cisco PIX support.
+
+Andreas Pfaller <apf@trinary.de>
+  for contributing to netfilter support.
+
+Alberto Gonzalez Iniesta <agi@agi.as>
+  for maintaining the debian package.
