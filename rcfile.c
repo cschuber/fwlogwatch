@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: rcfile.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,21 +75,25 @@ void parse_rcfile(char *input)
     opt.verbose++;
     return;
   }
-  if (strncmp(command, "resolve", 7) == 0) {
+  if (strncmp(command, "resolve_hosts", 13) == 0) {
     opt.resolve = 1;
+    return;
+  }
+  if (strncmp(command, "resolve_services", 16) == 0) {
+    opt.sresolve = 1;
     return;
   }
   if (strncmp(command, "input", 5) == 0) {
     xstrncpy(opt.inputfile, get_one_parameter(command+6), FILESIZE);
     return;
   }
+
+  /* Evaluation options */
+
   if (strncmp(command, "parser", 6) == 0) {
     xstrncpy(opt.format_sel, get_one_parameter(command+7), SHORTLEN);
     return;
   }
-
-  /* Evaluation options */
-
   if (strncmp(command, "src_ip_off", 10) == 0) {
     opt.src_ip = 0;
     return;
@@ -146,27 +150,12 @@ void parse_rcfile(char *input)
     add_exclude_hp(get_one_parameter(command+16), 0);
     return;
   }
-
-  /* Log summary mode */
-
-  if (strncmp(command, "data_amount", 11) == 0) {
-    opt.datalen = 1;
-    return;
-  }
   if (strncmp(command, "sort_order", 10) == 0) {
     xstrncpy(opt.sort_order, get_one_parameter(command+11), MAXSORTSIZE);
     return;
   }
-  if (strncmp(command, "times", 5) == 0) {
-    opt.times = 1;
-    return;
-  }
-  if (strncmp(command, "duration", 8) == 0) {
-    opt.duration = 1;
-    return;
-  }
-  if (strncmp(command, "html", 4) == 0) {
-    opt.html = 1;
+  if (strncmp(command, "title", 5) == 0) {
+    xstrncpy(opt.title, get_parameter(command+6), TITLESIZE);
     return;
   }
   if (strncmp(command, "textcolor", 9) == 0) {
@@ -183,6 +172,29 @@ void parse_rcfile(char *input)
   }
   if (strncmp(command, "rowcolor2", 9) == 0) {
     xstrncpy(opt.rowcol2, get_one_parameter(command+10), COLORSIZE);
+    return;
+  }
+
+  /* Log summary mode */
+
+  if (strncmp(command, "data_amount", 11) == 0) {
+    opt.datalen = 1;
+    return;
+  }
+  if (strncmp(command, "start_times", 11) == 0) {
+    opt.stimes = 1;
+    return;
+  }
+  if (strncmp(command, "end_times", 9) == 0) {
+    opt.etimes = 1;
+    return;
+  }
+  if (strncmp(command, "duration", 8) == 0) {
+    opt.duration = 1;
+    return;
+  }
+  if (strncmp(command, "html", 4) == 0) {
+    opt.html = 1;
     return;
   }
   if (strncmp(command, "output", 6) == 0) {
@@ -259,12 +271,12 @@ void parse_rcfile(char *input)
     opt.response = opt.response | OPT_RESPOND;
     return;
   }
-  if (strncmp(command, "notify_script", 13) == 0) {
-    xstrncpy(opt.notify_script, get_one_parameter(command+14), FILESIZE);
+  if (strncmp(command, "notification_script", 19) == 0) {
+    xstrncpy(opt.notify_script, get_one_parameter(command+20), FILESIZE);
     return;
   }  
-  if (strncmp(command, "respond_script", 14) == 0) {
-    xstrncpy(opt.respond_script, get_one_parameter(command+15), FILESIZE);
+  if (strncmp(command, "response_script", 15) == 0) {
+    xstrncpy(opt.respond_script, get_one_parameter(command+16), FILESIZE);
     return;
   }  
   if (strncmp(command, "known_host", 10) == 0) {

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2002/02/14 21:48:38 bwess Exp $
+# $Id: Makefile,v 1.20 2002/02/14 21:55:19 bwess Exp $
 
 # Linux
 CC = gcc
@@ -18,8 +18,8 @@ LIBS = -lcrypt -lz #-lc_p
 
 # OpenBSD
 #CC = gcc
-#CFLAGS = -pipe -O2 -Wall
-#LIBS = -lz
+#CFLAGS = -pipe -O2 -Wall -I/usr/local/include
+#LIBS = -lz -L/usr/local/lib -lintl
 
 # FreeBSD
 #CC = gcc
@@ -82,8 +82,8 @@ install-config:
 install-i18n:
 	cd po; make
 	$(INSTALL_DATA) po/de.mo /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/pt_BR.mo /usr/share/locale/pt/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/zh.mo /usr/share/locale/zh/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/pt_BR.mo /usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/zh_CN.mo /usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
 
 uninstall:
 	@rm -f /usr/local/sbin/fwlogwatch \
@@ -91,8 +91,8 @@ uninstall:
 		/usr/local/sbin/fwlw_respond \
 		/usr/local/man/man8/fwlogwatch.8 \
 		/usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/pt/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/zh/LC_MESSAGES/fwlogwatch.mo \
+		/usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
+		/usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo \
 		/etc/fwlogwatch.config \
 		/etc/fwlogwatch.template
 

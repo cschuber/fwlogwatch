@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-18 17:52+0100\n"
+"POT-Creation-Date: 2002-01-20 19:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,170 +56,178 @@ msgid "         -d          differentiate destination ports\n"
 msgstr ""
 
 #: ../main.c:25
+msgid "         -e          show end times\n"
+msgstr ""
+
+#: ../main.c:26
 #, c-format
 msgid "         -f <file>   specify input file (defaults to %s)\n"
 msgstr ""
 
-#: ../main.c:26
+#: ../main.c:27
 msgid "         -h          this help\n"
 msgstr ""
 
-#: ../main.c:27
+#: ../main.c:28
 msgid "         -L <file>   show time of first and last log entry in file\n"
 msgstr ""
 
-#: ../main.c:28
+#: ../main.c:29
 msgid "         -l <time>   process recent events only (defaults to off)\n"
 msgstr ""
 
-#: ../main.c:29
-msgid "         -n          resolve host names\n"
-msgstr ""
-
 #: ../main.c:30
-msgid "         -P <format> use only parsers for specific formats\n"
+msgid "         -N          resolve service names\n"
 msgstr ""
 
 #: ../main.c:31
-msgid "         -p          differentiate protocols\n"
+msgid "         -n          resolve host names\n"
 msgstr ""
 
 #: ../main.c:32
-msgid "         -S          do not differentiate source IP addresses\n"
+msgid "         -P <format> use only parsers for specific formats\n"
 msgstr ""
 
 #: ../main.c:33
-msgid "         -s          differentiate source ports\n"
+msgid "         -p          differentiate protocols\n"
 msgstr ""
 
 #: ../main.c:34
-msgid "         -t          show start and end times\n"
+msgid "         -S          do not differentiate source IP addresses\n"
 msgstr ""
 
 #: ../main.c:35
-msgid "         -V          show version and copyright info\n"
+msgid "         -s          differentiate source ports\n"
 msgstr ""
 
 #: ../main.c:36
-msgid "         -v          verbose, specify twice for more info\n"
+msgid "         -t          show start times\n"
 msgstr ""
 
 #: ../main.c:37
-msgid "         -y          differentiate TCP options\n"
+msgid "         -V          show version and copyright info\n"
 msgstr ""
 
 #: ../main.c:38
+msgid "         -v          verbose, specify twice for more info\n"
+msgstr ""
+
+#: ../main.c:39
+msgid "         -y          differentiate TCP options\n"
+msgstr ""
+
+#: ../main.c:40
 msgid "         -z          show time interval\n"
 msgstr ""
 
-#: ../main.c:41
+#: ../main.c:43
 msgid "Log summary mode (default):\n"
 msgstr ""
 
-#: ../main.c:42
+#: ../main.c:44
 msgid ""
 "         -b          show amount of data (sum of total packet lengths)\n"
 msgstr ""
 
-#: ../main.c:43
+#: ../main.c:45
 msgid ""
 "         -m <count>  only show entries with at least so many incidents\n"
 msgstr ""
 
-#: ../main.c:44
+#: ../main.c:46
 msgid "         -o <file>   specify output file\n"
 msgstr ""
 
-#: ../main.c:45
+#: ../main.c:47
 msgid ""
 "         -O <order>  define the sort order (see the man page for details)\n"
 msgstr ""
 
-#: ../main.c:46
+#: ../main.c:48
 msgid "         -w          HTML output\n"
 msgstr ""
 
-#: ../main.c:47
+#: ../main.c:49
 msgid "         -W          activate whois lookups for source addresses\n"
 msgstr ""
 
-#: ../main.c:50
+#: ../main.c:52
 msgid "Interactive report mode:\n"
 msgstr ""
 
-#: ../main.c:51
+#: ../main.c:53
 msgid "         -i <count>  interactive mode with report threshold\n"
 msgstr ""
 
-#: ../main.c:52
+#: ../main.c:54
 msgid "         -F <email>  report sender address\n"
 msgstr ""
 
-#: ../main.c:53
+#: ../main.c:55
 #, c-format
 msgid "                     (defaults to '%s')\n"
 msgstr ""
 
-#: ../main.c:54
+#: ../main.c:56
 msgid ""
 "         -T <email>  address of CERT or abuse contact to send report to\n"
 msgstr ""
 
-#: ../main.c:55
+#: ../main.c:57
 msgid "         -C <email>  carbon copy recipients\n"
 msgstr ""
 
-#: ../main.c:56
+#: ../main.c:58
 msgid "         -I <file>   template file for report\n"
 msgstr ""
 
-#: ../main.c:57
+#: ../main.c:59
 #, c-format
 msgid "                     (defaults to %s)\n"
 msgstr ""
 
-#: ../main.c:60
+#: ../main.c:62
 msgid "Realtime response mode:\n"
 msgstr ""
 
-#: ../main.c:61
+#: ../main.c:63
 msgid ""
 "         -R          realtime response as daemon (default action: log only)\n"
 msgstr ""
 
-#: ../main.c:62
+#: ../main.c:64
 #, c-format
 msgid "         -a <count>  alert threshold (defaults to %d entries)\n"
 msgstr ""
 
-#: ../main.c:63
+#: ../main.c:65
 #, c-format
 msgid "         -l <time>   forget events this old (defaults to %d hours)\n"
 msgstr ""
 
-#: ../main.c:64
+#: ../main.c:66
 msgid ""
 "         -k <IP/net> add this IP address or net to the list of known hosts\n"
 msgstr ""
 
-#: ../main.c:65
+#: ../main.c:67
 msgid ""
 "         -A          invoke notification script if threshold is reached\n"
 msgstr ""
 
-#: ../main.c:66
+#: ../main.c:68
 msgid "         -B          invoke response action script (e.g. block host)\n"
 msgstr ""
 
-#: ../main.c:67
+#: ../main.c:69
 msgid "         -X          activate internal status information web server\n"
 msgstr ""
 
-#: ../main.c:93
+#: ../main.c:95
 msgid "You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 msgstr ""
 
-#: ../main.c:382
+#: ../main.c:397
 msgid "Exiting\n"
 msgstr ""
 
@@ -236,7 +244,7 @@ msgstr ""
 msgid "Processing\n"
 msgstr ""
 
-#: ../modes.c:98 ../modes.c:269 ../modes.c:602
+#: ../modes.c:98 ../modes.c:272 ../modes.c:605
 #, c-format
 msgid "Closing '%s'\n"
 msgstr ""
@@ -250,167 +258,167 @@ msgstr ""
 msgid "Opening output file '%s'\n"
 msgstr ""
 
-#: ../modes.c:154
+#: ../modes.c:157
 #, c-format
 msgid "Generated %s by "
 msgstr ""
 
-#: ../modes.c:164
+#: ../modes.c:167
 msgid "an unknown user.\n"
-msgstr ""
-
-#: ../modes.c:172
-#, c-format
-msgid "(and %d older than %d seconds) "
 msgstr ""
 
 #: ../modes.c:175
 #, c-format
-msgid "(and %d malformed) "
-msgstr ""
-
-#: ../modes.c:177
-#, c-format
-msgid "of %d entries in the file "
+msgid "(and %d older than %d seconds) "
 msgstr ""
 
 #: ../modes.c:178
 #, c-format
-msgid "\"%s\" are packet logs, "
+msgid "(and %d malformed) "
+msgstr ""
+
+#: ../modes.c:180
+#, c-format
+msgid "of %d entries in the file "
 msgstr ""
 
 #: ../modes.c:181
+#, c-format
+msgid "\"%s\" are packet logs, "
+msgstr ""
+
+#: ../modes.c:184
 msgid "one has unique characteristics.\n"
 msgstr ""
 
-#: ../modes.c:183
+#: ../modes.c:186
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr ""
 
-#: ../modes.c:191
+#: ../modes.c:194
 msgid "One entry was excluded by configuration.\n"
 msgstr ""
 
-#: ../modes.c:193
+#: ../modes.c:196
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr ""
 
-#: ../modes.c:201
+#: ../modes.c:204
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr ""
 
-#: ../modes.c:203 ../modes.c:597
+#: ../modes.c:206 ../modes.c:600
 msgid "No valid time entries found.\n"
 msgstr ""
 
-#: ../modes.c:210
+#: ../modes.c:213
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:217
+#: ../modes.c:220
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:224
+#: ../modes.c:227
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:231
+#: ../modes.c:234
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:238
+#: ../modes.c:241
 #, c-format
 msgid "Only entries with a count larger than %d are shown.\n"
 msgstr ""
 
-#: ../modes.c:247
+#: ../modes.c:250
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
 "\n"
 msgstr ""
 
-#: ../modes.c:285
+#: ../modes.c:288
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr ""
 
-#: ../modes.c:313
+#: ../modes.c:316
 msgid "SIGHUP caught, ignoring"
 msgstr ""
 
-#: ../modes.c:315
+#: ../modes.c:318
 msgid "SIGHUP caught, reopening log file"
 msgstr ""
 
-#: ../modes.c:391
+#: ../modes.c:394
 msgid "SIGTERM caught, cleaning up"
 msgstr ""
 
-#: ../modes.c:473
+#: ../modes.c:476
 #, c-format
 msgid "Starting (pid %d)"
 msgstr ""
 
-#: ../modes.c:505
+#: ../modes.c:508
 msgid "Alert threshold is one attempt"
 msgstr ""
 
-#: ../modes.c:507
+#: ../modes.c:510
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr ""
 
-#: ../modes.c:511
+#: ../modes.c:514
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr ""
 
-#: ../modes.c:514
+#: ../modes.c:517
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr ""
 
-#: ../modes.c:518
+#: ../modes.c:521
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr ""
 
-#: ../modes.c:519 ../net.c:292
+#: ../modes.c:522 ../net.c:302
 msgid ", notify"
 msgstr ""
 
-#: ../modes.c:520 ../net.c:293
+#: ../modes.c:523 ../net.c:303
 msgid ", respond"
 msgstr ""
 
-#: ../modes.c:547
+#: ../modes.c:550
 msgid "Reading standard input\n"
 msgstr ""
 
-#: ../modes.c:556
+#: ../modes.c:559
 #, c-format
 msgid "Reading '%s'\n"
 msgstr ""
 
-#: ../modes.c:590
+#: ../modes.c:593
 #, c-format
 msgid "# of lines : %d\n"
 msgstr ""
 
-#: ../modes.c:591
+#: ../modes.c:594
 #, c-format
 msgid "First entry: %s\n"
 msgstr ""
 
-#: ../modes.c:594
+#: ../modes.c:597
 #, c-format
 msgid "Last entry : %s\n"
 msgstr ""
@@ -452,34 +460,38 @@ msgstr ""
 msgid "<td>Source port</td>"
 msgstr ""
 
-#: ../net.c:171
+#: ../net.c:170 ../net.c:178
+msgid "<td>Service</td>"
+msgstr ""
+
+#: ../net.c:175
 msgid "<td>Destination port</td>"
 msgstr ""
 
-#: ../net.c:174
+#: ../net.c:182
 msgid "<td>Remaining time</td></tr>\n"
 msgstr ""
 
-#: ../net.c:205
+#: ../net.c:213
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
 msgstr ""
 
-#: ../net.c:214
+#: ../net.c:222
 #, c-format
 msgid "Connect from %s port %i"
 msgstr ""
 
-#: ../net.c:236
+#: ../net.c:244
 #, c-format
 msgid "Authorization failed (%s)"
 msgstr ""
 
-#: ../net.c:238
+#: ../net.c:246
 msgid "Authorization failed"
 msgstr ""
 
-#: ../net.c:247
+#: ../net.c:255
 msgid ""
 "<body>\n"
 "<h1>Authorization Required</h1>\n"
@@ -487,169 +499,163 @@ msgid ""
 "</html>\n"
 msgstr ""
 
-#: ../net.c:255
-msgid ""
-"<html>\n"
-"<head>\n"
-"<title>fwlogwatch status</title>\n"
-msgstr ""
-
-#: ../net.c:266
-msgid ""
-"<div align=\"center\">\n"
-"<h1>fwlogwatch status</h1>\n"
-msgstr ""
-
-#: ../net.c:267
+#: ../net.c:277
 msgid "<a href=\"/\">Reload</a><br>\n"
 msgstr ""
 
-#: ../net.c:269
+#: ../net.c:279
 #, c-format
 msgid "(automatic refresh every %d seconds)<br>\n"
 msgstr ""
 
-#: ../net.c:272
+#: ../net.c:282
 msgid ""
 "\n"
 "</div>\n"
 "<h2>General information</h2>\n"
 msgstr ""
 
-#: ../net.c:276
+#: ../net.c:286
 #, c-format
 msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
 msgstr ""
 
-#: ../net.c:281
+#: ../net.c:291
 #, c-format
 msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
 msgstr ""
 
-#: ../net.c:285
+#: ../net.c:295
 #, c-format
 msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
 msgstr ""
 
-#: ../net.c:288
+#: ../net.c:298
 #, c-format
 msgid ""
 "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
 "<tr><td>Discard timeout:</td><td>%d seconds</td></tr>\n"
 msgstr ""
 
-#: ../net.c:291
+#: ../net.c:301
 #, c-format
 msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
 msgstr ""
 
-#: ../net.c:298
+#: ../net.c:308
 msgid "<h2>Packet cache</h2>\n"
 msgstr ""
 
-#: ../net.c:358
+#: ../net.c:376
 msgid "<h2>Host status</h2>\n"
 msgstr ""
 
-#: ../net.c:375
+#: ../net.c:393
 #, c-format
 msgid "<td>-</td><td>%s/%d (known host/net)</td>"
 msgstr ""
 
-#: ../net.c:378 ../net.c:380 ../net.c:381 ../net.c:382
+#: ../net.c:396 ../net.c:398 ../net.c:399 ../net.c:401
 msgid "<td>any</td>"
 msgstr ""
 
-#: ../net.c:443
+#: ../net.c:471
 msgid "Connection closed"
 msgstr ""
 
-#: ../output.c:101 ../output.c:226
-msgid "to "
+#: ../output.c:199
+msgid " to "
 msgstr ""
 
-#: ../output.c:165
+#: ../output.c:261
 msgid " packet"
 msgstr ""
 
-#: ../output.c:167
+#: ../output.c:263
 msgid " packets"
 msgstr ""
 
-#: ../output.c:180
-msgid " bytes)"
-msgstr ""
-
-#: ../output.c:187
-msgid "from "
-msgstr ""
-
-#: ../output.c:215 ../output.c:239
-msgid "port "
-msgstr ""
-
-#: ../output.c:283
+#: ../output.c:267
 #, c-format
-msgid "<html><head><title>fwlogwatch output: %s</title>\n"
+msgid " (%d bytes)"
 msgstr ""
 
-#: ../output.c:290
-msgid "<h1>fwlogwatch output</h1>\n"
+#: ../output.c:271
+#, c-format
+msgid " from %s"
 msgstr ""
 
-#: ../output.c:300
-msgid "<td>start</td><td>end</td>"
+#: ../output.c:289 ../output.c:304
+#, c-format
+msgid " port %d"
 msgstr ""
 
-#: ../output.c:303
+#: ../output.c:296
+#, c-format
+msgid " to %s"
+msgstr ""
+
+#: ../output.c:354
+msgid "<td>start</td>"
+msgstr ""
+
+#: ../output.c:357
+msgid "<td>end</td>"
+msgstr ""
+
+#: ../output.c:360
 msgid "<td>interval</td>"
 msgstr ""
 
-#: ../output.c:306
+#: ../output.c:363
 msgid "<td>loghost</td>"
 msgstr ""
 
-#: ../output.c:309
+#: ../output.c:366
 msgid "<td>chain</td>"
 msgstr ""
 
-#: ../output.c:312
+#: ../output.c:369
 msgid "<td>target</td>"
 msgstr ""
 
-#: ../output.c:315
+#: ../output.c:372
 msgid "<td>interface</td>"
 msgstr ""
 
-#: ../output.c:318
+#: ../output.c:375
 msgid "<td>proto</td>"
 msgstr ""
 
-#: ../output.c:321
+#: ../output.c:378
 msgid "<td>bytes</td>"
 msgstr ""
 
-#: ../output.c:324
+#: ../output.c:381
 msgid "<td>source</td>"
 msgstr ""
 
-#: ../output.c:326 ../output.c:337
+#: ../output.c:383 ../output.c:397
 msgid "<td>hostname</td>"
 msgstr ""
 
-#: ../output.c:328
+#: ../output.c:385
 msgid "<td>whois information</td>"
 msgstr ""
 
-#: ../output.c:332 ../output.c:341
-msgid "<td>port</td><td>service</td>"
+#: ../output.c:389 ../output.c:401
+msgid "<td>port</td>"
 msgstr ""
 
-#: ../output.c:335
+#: ../output.c:391 ../output.c:403
+msgid "<td>service</td>"
+msgstr ""
+
+#: ../output.c:395
 msgid "<td>destination</td>"
 msgstr ""
 
-#: ../output.c:344
+#: ../output.c:407
 msgid "<td>opts</td>"
 msgstr ""
 
@@ -658,12 +664,12 @@ msgstr ""
 msgid "Unknown parser: '%c'.\n"
 msgstr ""
 
-#: ../rcfile.c:315
+#: ../rcfile.c:327
 #, c-format
 msgid "Unrecognized option in rcfile: %s"
 msgstr ""
 
-#: ../rcfile.c:333
+#: ../rcfile.c:345
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr ""
@@ -747,25 +753,30 @@ msgstr ""
 msgid "Incident report %s-%s"
 msgstr ""
 
-#: ../report.c:309
+#: ../report.c:299 ../report.c:314
+#, c-format
+msgid "%d (unknown)"
+msgstr ""
+
+#: ../report.c:325
 msgid "no SYNs"
 msgstr ""
 
-#: ../report.c:311
+#: ../report.c:327
 msgid "SYNs only"
 msgstr ""
 
-#: ../report.c:331
+#: ../report.c:347
 msgid ""
 "\n"
 "What do you want to change? [1-18/(o)k] "
 msgstr ""
 
-#: ../report.c:340
+#: ../report.c:356
 msgid "New value: "
 msgstr ""
 
-#: ../report.c:422
+#: ../report.c:438
 msgid ""
 "\n"
 "Should this report be sent? [(s)end/(m)odify/(q)uit] "
@@ -893,4 +904,12 @@ msgstr ""
 #: ../whois.c:238
 #, c-format
 msgid "lookup failed: %s\n"
+msgstr ""
+
+#: ../main.h:191
+msgid "fwlogwatch summary"
+msgstr ""
+
+#: ../main.h:215
+msgid "fwlogwatch status"
 msgstr ""

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: main.h,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.5.1"
-#define COPYRIGHT "2001-11-18 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.5.2"
+#define COPYRIGHT "2002-01-27 Boris Wesslowski, RUS-CERT"
 
 /* i18n */
 
@@ -30,6 +30,7 @@
 #define WHOISCMDLEN 32
 #define WHOISDESCLEN 64
 #define WHOISROUTELEN 20
+#define TITLESIZE 64
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 30
@@ -178,19 +179,17 @@ enum {
 #define RADB "whois.ra.net"
 #define WHOIS 43
 
-/* Log summary mode */
+/* HTML output */
 
 #define TEXTCOLOR "FFFFFF"
 #define BGCOLOR "000000"
 #define ROWCOLOR1 "555555"
 #define ROWCOLOR2 "333333"
 
-#define SORTORDER "cd"
+/* Log summary mode */
 
-enum {
-  NOSPACE,
-  SPACE
-};
+#define SUMMARY_TITLE _("fwlogwatch summary")
+#define SORTORDER "cd"
 
 /* Interactive report mode */
 
@@ -213,6 +212,7 @@ enum {
 #define FORGET 86400
 #define FWLW_NOTIFY "/usr/local/sbin/fwlw_notify"
 #define FWLW_RESPOND "/usr/local/sbin/fwlw_respond"
+#define STATUS_TITLE _("fwlogwatch status")
 #define LISTENIF "127.0.0.1"
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
@@ -341,6 +341,7 @@ struct options {
 
   unsigned char verbose;
   unsigned char resolve;
+  unsigned char sresolve;
   unsigned char whois_lookup;
   int whois_sock;
   char inputfile[FILESIZE];
@@ -360,7 +361,8 @@ struct options {
   unsigned char opts;
 
   unsigned char datalen;
-  unsigned char times;
+  unsigned char stimes;
+  unsigned char etimes;
   unsigned char duration;
 
   char sort_order[MAXSORTSIZE];
@@ -370,6 +372,8 @@ struct options {
   unsigned char html;
   unsigned char use_out;
   char outputfile[FILESIZE];
+
+  char title[TITLESIZE];
   char textcol[COLORSIZE];
   char bgcol[COLORSIZE];
   char rowcol1[COLORSIZE];

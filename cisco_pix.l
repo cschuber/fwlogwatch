@@ -1,4 +1,4 @@
-/* $Id: cisco_pix.l,v 1.5 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: cisco_pix.l,v 1.6 2002/02/14 21:55:19 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"

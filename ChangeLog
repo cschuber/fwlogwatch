@@ -1,4 +1,13 @@
-$Id: ChangeLog,v 1.17 2002/02/14 21:48:38 bwess Exp $
+$Id: ChangeLog,v 1.18 2002/02/14 21:55:19 bwess Exp $
+
+Version 0.5.2 2002-01-27
+- Added 'title' option: The title of the summary and the realtime
+  response status page can be customized in the configuration file
+- Added -e option: 'show end times', -t now only shows start times
+- Added -N option: 'resolve service names' is a new option and off by
+  default now
+- Added swedish translation
+- I18n adjustments, small fixes
 
 Version 0.5.1 2001-11-18
 - Various fixes: whois code, mode selection, endianness problems, realtime

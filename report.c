@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: report.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -252,10 +252,19 @@ void fill_report(struct conn_data *this, struct report_data *data)
 
   snprintf(data->count, SHORTLEN, "%d", this->count);
 
-  if(opt.times) {
+  if(opt.stimes) {
     strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->start_time));
     xstrncpy(data->t_start, stime, TIMESIZE);
 
+    now = time(NULL);
+    strftime(stime, SHORTLEN, "%Z", localtime(&now));
+    xstrncpy(data->timezone, stime, SHORTLEN);
+  } else {
+    data->t_start[0] = '\0';
+    data->timezone[0] = '\0';
+  }
+
+  if(opt.etimes) {
     strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
     xstrncpy(data->t_end, stime, TIMESIZE);
 
@@ -263,7 +272,6 @@ void fill_report(struct conn_data *this, struct report_data *data)
     strftime(stime, SHORTLEN, "%Z", localtime(&now));
     xstrncpy(data->timezone, stime, SHORTLEN);
   } else {
-    data->t_start[0] = '\0';
     data->t_end[0] = '\0';
     data->timezone[0] = '\0';
   }
@@ -283,9 +291,13 @@ void fill_report(struct conn_data *this, struct report_data *data)
     data->protocol[0] = '\0';
 
   if (opt.src_port) {
-    serv = resolve_service(this->sport, proto);
-    if (strncmp(serv, "-", 1) != 0) {
-      snprintf(data->sport, SHORTLEN, "%d (%s)", this->sport, serv);
+    if (opt.sresolve) {
+      serv = resolve_service(this->sport, proto);
+      if (strncmp(serv, "-", 1) != 0) {
+	snprintf(data->sport, SHORTLEN, "%d (%s)", this->sport, serv);
+      } else {
+	snprintf(data->sport, SHORTLEN, _("%d (unknown)"), this->sport);
+      }
     } else {
       snprintf(data->sport, SHORTLEN, "%d", this->sport);
     }
@@ -294,9 +306,13 @@ void fill_report(struct conn_data *this, struct report_data *data)
   }
 
   if (opt.dst_port) {
-    serv = resolve_service(this->dport, proto);
-    if (strncmp(serv, "-", 1) != 0) {
-      snprintf(data->dport, SHORTLEN, "%d (%s)", this->dport, serv);
+    if (opt.sresolve) {
+      serv = resolve_service(this->dport, proto);
+      if (strncmp(serv, "-", 1) != 0) {
+	snprintf(data->dport, SHORTLEN, "%d (%s)", this->dport, serv);
+      } else {
+	snprintf(data->dport, SHORTLEN, _("%d (unknown)"), this->dport);
+      }
     } else {
       snprintf(data->dport, SHORTLEN, "%d", this->dport);
     }

@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: modes.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,8 +146,11 @@ void mode_summary()
     }
   }
 
-  if (opt.html)
+  if (opt.html) {
     output_html_header();
+  } else {
+    printf("%s\n", opt.title);
+  }
 
   now = time(NULL);
   strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));

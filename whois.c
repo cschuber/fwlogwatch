@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.3 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: whois.c,v 1.4 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-$Id: README,v 1.18 2002/02/14 21:48:38 bwess Exp $
+$Id: README,v 1.19 2002/02/14 21:55:19 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -147,7 +147,7 @@ CONFIGURATION AND EXAMPLES
   IP addresses and service names and with connections separated by protocol,
   source and destination ports and TCP options you would use
 
-  fwlogwatch -v -v -s -d -t -z -y -n -p -w -l 1d -m 2 -o log.html -f messages
+  fwlogwatch -v -v -s -d -t -e -z -y -n -N -p -w -l 1d -m 2 -o log.html -f messages
 
 - If you want to use fwlogwatch as a CGI, e.g. to have a quick look at
   what happened in the last hour when you get a notification:

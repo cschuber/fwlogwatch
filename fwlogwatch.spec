@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.19 2002/02/14 21:48:38 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.20 2002/02/14 21:55:19 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.5.1
+%define version 0.5.2
 
 Name: %name
 Version: %version
@@ -40,8 +40,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/sbin
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man8
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/de/LC_MESSAGES
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale/pt/LC_MESSAGES
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/pt_BR/LC_MESSAGES
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh_CN/LC_MESSAGES
 make install INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 make install-i18n INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
@@ -50,12 +50,12 @@ make install-i18n INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
 /usr/sbin/fwlogwatch
 /usr/sbin/fwlw_notify
 /usr/sbin/fwlw_respond
-/etc/rc.d/init.d/fwlogwatch
 /usr/share/man/man8/fwlogwatch.8.gz
-/usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
-/usr/share/locale/pt/LC_MESSAGES/fwlogwatch.mo
-/usr/share/locale/zh/LC_MESSAGES/fwlogwatch.mo
 %config(noreplace) /etc/fwlogwatch.config
 %config(noreplace) /etc/fwlogwatch.template
+%config(noreplace) /etc/rc.d/init.d/fwlogwatch
+%lang(de) /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
+%lang(pt_BR) /usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+%lang(zh_CN) /usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
 %doc AUTHORS COPYING CREDITS ChangeLog README
 %doc contrib/fwlogsummary.cgi contrib/fwlogsummary_small.cgi

@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: main.c,v 1.20 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,16 +22,18 @@ void usage(char *me, unsigned char exitcode)
   printf(_("         -c <file>   specify config file (defaults to %s)\n"), RCFILE);
   printf(_("         -D          do not differentiate destination IP addresses\n"));
   printf(_("         -d          differentiate destination ports\n"));
+  printf(_("         -e          show end times\n"));
   printf(_("         -f <file>   specify input file (defaults to %s)\n"), INFILE);
   printf(_("         -h          this help\n"));
   printf(_("         -L <file>   show time of first and last log entry in file\n"));
   printf(_("         -l <time>   process recent events only (defaults to off)\n"));
+  printf(_("         -N          resolve service names\n"));
   printf(_("         -n          resolve host names\n"));
   printf(_("         -P <format> use only parsers for specific formats\n"));
   printf(_("         -p          differentiate protocols\n"));
   printf(_("         -S          do not differentiate source IP addresses\n"));
   printf(_("         -s          differentiate source ports\n"));
-  printf(_("         -t          show start and end times\n"));
+  printf(_("         -t          show start times\n"));
   printf(_("         -V          show version and copyright info\n"));
   printf(_("         -v          verbose, specify twice for more info\n"));
   printf(_("         -y          differentiate TCP options\n"));
@@ -74,7 +76,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000,2001 Boris Wesslowski, RUS-CERT");
+  puts("Copyright (C) 2000-2002 Boris Wesslowski, RUS-CERT");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -109,6 +111,7 @@ void init_options()
 
   opt.verbose = 0;
   opt.resolve = 0;
+  opt.sresolve = 0;
   opt.whois_lookup = 0;
   opt.whois_sock = -1;
   xstrncpy(opt.inputfile, INFILE, FILESIZE);
@@ -128,7 +131,8 @@ void init_options()
   opt.opts = 0;
 
   opt.datalen = 0;
-  opt.times = 0;
+  opt.stimes = 0;
+  opt.etimes = 0;
   opt.duration = 0;
 
   xstrncpy(opt.sort_order, SORTORDER, MAXSORTSIZE);
@@ -138,6 +142,7 @@ void init_options()
   opt.html = 0;
   opt.use_out = 0;
   opt.outputfile[0] = '\0';
+  opt.title[0] = '\0';
   xstrncpy(opt.textcol, TEXTCOLOR, COLORSIZE);
   xstrncpy(opt.bgcol, BGCOLOR, COLORSIZE);
   xstrncpy(opt.rowcol1, ROWCOLOR1, COLORSIZE);
@@ -220,7 +225,7 @@ int main(int argc, char **argv)
   xstrncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDf:F:hi:I:k:l:L:m:no:O:pP:RsStT:vVwWXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -246,6 +251,9 @@ int main(int argc, char **argv)
       break;
     case 'D':
       opt.dst_ip = 0;
+      break;
+    case 'e':
+      opt.etimes = 1;
       break;
     case 'f':
       xstrncpy(opt.inputfile, optarg, FILESIZE);
@@ -285,6 +293,9 @@ int main(int argc, char **argv)
     case 'n':
       opt.resolve = 1;
       break;
+    case 'N':
+      opt.sresolve = 1;
+      break;
     case 'o':
       xstrncpy(opt.outputfile, optarg, FILESIZE);
       opt.use_out = 1;
@@ -311,7 +322,7 @@ int main(int argc, char **argv)
       opt.src_ip = 0;
       break;
     case 't':
-      opt.times = 1;
+      opt.stimes = 1;
       break;
     case 'T':
       xstrncpy(opt.recipient, optarg, EMAILSIZE);
@@ -361,6 +372,8 @@ int main(int argc, char **argv)
 
   switch (opt.mode) {
   case LOG_SUMMARY:
+    if (opt.title[0] == '\0')
+      xstrncpy(opt.title, SUMMARY_TITLE, TITLESIZE);
   case INTERACTIVE_REPORT:
     mode_summary();
     break;
@@ -371,6 +384,8 @@ int main(int argc, char **argv)
       opt.threshold = ALERT;
     if (opt.recent == 0)
       opt.recent = FORGET;
+    if (opt.title[0] == '\0')
+      xstrncpy(opt.title, STATUS_TITLE, TITLESIZE);
     mode_rt_response();
     break;
   case SHOW_LOG_TIMES:

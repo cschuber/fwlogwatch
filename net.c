@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.17 2002/02/14 21:48:38 bwess Exp $ */
+/* $Id: net.c,v 1.18 2002/02/14 21:55:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -166,10 +166,18 @@ void table_header(int conn)
   if(opt.src_port) {
     snprintf(buf, BUFSIZE, _("<td>Source port</td>"));
     net_output(conn, buf);
+    if(opt.sresolve) {
+      snprintf(buf, BUFSIZE, _("<td>Service</td>"));
+      net_output(conn, buf);
+    }
   }
   if(opt.dst_port) {
     snprintf(buf, BUFSIZE, _("<td>Destination port</td>"));
     net_output(conn, buf);
+    if(opt.sresolve) {
+      snprintf(buf, BUFSIZE, _("<td>Service</td>"));
+      net_output(conn, buf);
+    }
   }
   snprintf(buf, BUFSIZE, _("<td>Remaining time</td></tr>\n"));
   net_output(conn, buf);
@@ -252,7 +260,8 @@ void handshake()
     net_output(conn, "Connection: close\r\n");
     net_output(conn, "Content-Type: text/html\r\n\r\n");
 
-    net_output(conn, _("<html>\n<head>\n<title>fwlogwatch status</title>\n"));
+    snprintf(buf, BUFSIZE, "<html>\n<head>\n<title>%s</title>\n", opt.title);
+    net_output(conn, buf);
     net_output(conn, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
     net_output(conn, "<meta http-equiv=\"expires\" content=\"0\">\n");
     if(opt.refresh > 0) {
@@ -263,7 +272,8 @@ void handshake()
     snprintf(buf, BUFSIZE, "<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
     net_output(conn, buf);
     net_output(conn, "<font face=\"Arial, Helvetica\">\n");
-    net_output(conn, _("<div align=\"center\">\n<h1>fwlogwatch status</h1>\n"));
+    snprintf(buf, BUFSIZE, "<div align=\"center\">\n<h1>%s</h1>\n", opt.title);
+    net_output(conn, buf);
     net_output(conn, _("<a href=\"/\">Reload</a><br>\n"));
     if(opt.refresh > 0) {
       snprintf(buf, BUFSIZE, _("(automatic refresh every %d seconds)<br>\n"), opt.refresh);
@@ -329,11 +339,19 @@ void handshake()
       if(opt.src_port) {
 	snprintf(buf, BUFSIZE, "<td>%d</td>", this->sport);
 	net_output(conn, buf);
+	if(opt.sresolve) {
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
+	  net_output(conn, buf);
+	}
       }
 
       if(opt.dst_port) {
 	snprintf(buf, BUFSIZE, "<td>%d</td>", this->dport);
 	net_output(conn, buf);
+	if(opt.sresolve) {
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
+	  net_output(conn, buf);
+	}
       }
 
       if (this->end_time != 0) {
@@ -379,7 +397,9 @@ void handshake()
 	if(opt.resolve) { net_output(conn, "<td>-</td>"); }
 	if(opt.proto) { net_output(conn, _("<td>any</td>")); }
 	if(opt.src_port) { net_output(conn, _("<td>any</td>")); }
+	if(opt.sresolve) { net_output(conn, "<td>-</td>"); }
 	if(opt.dst_port) { net_output(conn, _("<td>any</td>")); }
+	if(opt.sresolve) { net_output(conn, "<td>-</td>"); }
 	net_output(conn, "<td>-</td></tr>\n");
       } else {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
@@ -408,11 +428,19 @@ void handshake()
 	if(opt.src_port) {
 	  snprintf(buf, BUFSIZE, "<td>%d</td>", this_host->sport);
 	  net_output(conn, buf);
+	  if(opt.sresolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
+	    net_output(conn, buf);
+	  }
 	}
 
 	if(opt.dst_port) {
 	  snprintf(buf, BUFSIZE, "<td>%d</td>", this_host->dport);
 	  net_output(conn, buf);
+	  if(opt.sresolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
+	    net_output(conn, buf);
+	  }
 	}
 
 	snprintf(buf, BUFSIZE, "<td>%d</td></tr>\n", (int)(opt.recent - (now - this_host->time)));

@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.18 2002/02/14 21:48:38 bwess Exp $
-.TH FWLOGWATCH 8 "28 July 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.19 2002/02/14 21:55:19 bwess Exp $
+.TH FWLOGWATCH 8 "02 December 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -30,6 +30,9 @@ Do not differentiate destination IP addresses. Useful for finding scans in
 whole subnets.
 .IP \-d
 Differentiate destination ports.
+.IP \-e
+Show timestamp of last packet logged. End times are only available if
+there is more than one packet log entry with unique characteristics.
 .IP \-f\ \fIfile\fR
 Specify an input file (defaults to
 .B /var/log/messages
@@ -50,6 +53,8 @@ will show the time of the first and last entry overall.
 Process recent events only. See
 .B TIME FORMAT
 below for the time options.
+.IP \-N
+Enable service lookups. Port numbers will be resolved from /etc/services.
 .IP \-n
 Enable DNS lookups. Host names will be resolved (reverse and forward lookup
 with a warning if they don't match). This makes summary generation very
@@ -77,8 +82,7 @@ Do not differentiate source IP addresses.
 .IP \-s
 Differentiate source ports.
 .IP \-t
-Show start and end times of logged packets. End times are only available if
-there is more than one packet log entry with unique characteristics.
+Show timestamp of first packet logged.
 .IP \-V
 Show version and copyright information.
 .IP \-v
