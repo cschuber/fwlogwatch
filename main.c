@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: main.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,57 +23,55 @@ void usage(char *me, unsigned char exitcode)
   printf("%s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
   printf(_("Usage: %s [options]\n"), me);
   printf(_("General options:\n"));
-  printf(_("         -h          this help\n"));
-  printf(_("         -L <file>   show time of first and last log entry in file\n"));
-  printf(_("         -V          show version and copyright info\n"));
+  printf(_("  -h           this help\n"));
+  printf(_("  -L <file>    show time of first and last log entry in file\n"));
+  printf(_("  -V           show version and copyright info\n"));
   printf("\n");
 
   printf(_("Global options:\n"));
-  printf(_("         -c <file>   specify config file (defaults to %s)\n"), RCFILE);
-  printf(_("         -D          do not differentiate destination IP addresses\n"));
-  printf(_("         -d          differentiate destination ports\n"));
-  printf(_("         -f <file>   specify input file (defaults to %s)\n"), INFILE);
-  printf(_("         -m <count>  only show entries with at least so many incidents\n"));
-  printf(_("         -N          resolve service names\n"));
-  printf(_("         -n          resolve host names\n"));
-  printf(_("         -O <order>  define the sort order (see the man page for details)\n"));
-  printf(_("         -P <format> use only parsers for specific formats\n"));
-  printf(_("         -p          differentiate protocols\n"));
-  printf(_("         -s          differentiate source ports\n"));
-  printf(_("         -v          verbose, specify twice for more info\n"));
-  printf(_("         -y          differentiate TCP options\n"));
+  printf(_("  -c <file>    specify config file (defaults to %s)\n"), RCFILE);
+  printf(_("  -D           do not differentiate destination IP addresses\n"));
+  printf(_("  -d           differentiate destination ports\n"));
+  printf(_("  -f <file>    specify input file (defaults to %s)\n"), INFILE);
+  printf(_("  -m <count>   only show entries with at least so many incidents\n"));
+  printf(_("  -N           resolve service names\n"));
+  printf(_("  -n           resolve host names\n"));
+  printf(_("  -O <order>   define the sort order (see the man page for details)\n"));
+  printf(_("  -P <format>  use only parsers for specific formats\n"));
+  printf(_("  -p           differentiate protocols\n"));
+  printf(_("  -s           differentiate source ports\n"));
+  printf(_("  -v           verbose, specify twice for more info\n"));
+  printf(_("  -y           differentiate TCP options\n"));
   printf("\n");
 
   printf(_("Log summary mode (default):\n"));
-  printf(_("         -b          show amount of data (sum of total packet lengths)\n"));
-  printf(_("         -e          show end times\n"));
-  printf(_("         -l <time>   process recent events only (defaults to off)\n"));
-  printf(_("         -o <file>   specify output file\n"));
-  printf(_("         -S          do not differentiate source IP addresses\n"));
-  printf(_("         -t          show start times\n"));
-  printf(_("         -W          activate whois lookups for source addresses\n"));
-  printf(_("         -w          HTML output\n"));
-  printf(_("         -z          show time interval\n"));
+  printf(_("  -b           show amount of data (sum of total packet lengths)\n"));
+  printf(_("  -e           show end times\n"));
+  printf(_("  -l <time>    process recent events only (defaults to off)\n"));
+  printf(_("  -o <file>    specify output file\n"));
+  printf(_("  -S           do not differentiate source IP addresses\n"));
+  printf(_("  -t           show start times\n"));
+  printf(_("  -W           activate whois lookups for source addresses\n"));
+  printf(_("  -w           HTML output\n"));
+  printf(_("  -z           show time interval\n"));
   printf("\n");
 
   printf(_("Interactive report mode (summary mode extension):\n"));
-  printf(_("         -i <count>  interactive mode with report threshold\n"));
-  printf(_("         -F <email>  report sender address\n"));
-  printf(_("                     (defaults to '%s')\n"), opt.sender);
-  printf(_("         -T <email>  address of CERT or abuse contact to send report to\n"));
-  printf(_("         -C <email>  carbon copy recipients\n"));
-  printf(_("         -I <file>   template file for report\n"));
-  printf(_("                     (defaults to %s)\n"), TEMPLATE);
+  printf(_("  -i <count>   interactive mode with report threshold\n"));
+  printf(_("  -F <email>   report sender address (defaults to '%s')\n"), opt.sender);
+  printf(_("  -T <email>   address of CERT or abuse contact to send report to\n"));
+  printf(_("  -C <email>   carbon copy recipients\n"));
+  printf(_("  -I <file>    template file for report (defaults to %s)\n"), TEMPLATE);
   printf("\n");
 
   printf(_("Realtime response mode:\n"));
-  printf(_("         -R          realtime response as daemon (default action: log only)\n"));
-  printf(_("         -a <count>  alert threshold (defaults to %d entries)\n"), ALERT);
-  printf(_("         -l <time>   forget events this old (defaults to %d hours)\n"), FORGET/3600);
-  printf(_("         -k <IP/net> add this IP address or net to the list of known hosts\n"));
-  printf(_("         -A          invoke notification script if threshold is reached\n"));
-  printf(_("         -B          invoke response action script (e.g. block host)\n"));
-  printf(_("         -X          activate internal status information web server\n"));
+  printf(_("  -R           realtime response as daemon (default action: log only)\n"));
+  printf(_("  -a <count>   alert threshold (defaults to %d entries)\n"), ALERT);
+  printf(_("  -l <time>    forget events this old (defaults to %d hours)\n"), FORGET/3600);
+  printf(_("  -k <IP/net>  add this IP address or net to the list of known hosts\n"));
+  printf(_("  -A           invoke notification script if threshold is reached\n"));
+  printf(_("  -B           invoke response action script (e.g. block host)\n"));
+  printf(_("  -X           activate internal status information web server\n"));
   printf("\n");
 
   exit(exitcode);

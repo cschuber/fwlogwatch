@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlw_notify,v 1.7 2002/05/08 17:24:10 bwess Exp $
+# $Id: fwlw_notify,v 1.8 2002/05/15 22:24:44 bwess Exp $
 # fwlogwatch realtime notification script
 
 # You can invoke a custom action through this script when fwlogwatch

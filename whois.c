@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.7 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: whois.c,v 1.8 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -235,7 +235,7 @@ void whois_connect(const char *whois_server)
 
   he = gethostbyname(whois_server);
   if (he == NULL) {
-    printf(_("lookup failed: %s\n"), whois_server);
+    fprintf(stderr, _("lookup failed: %s\n"), whois_server);
     exit(EXIT_FAILURE);
   }
 

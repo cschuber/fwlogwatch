@@ -1,4 +1,4 @@
-/* $Id: cisco_ios.l,v 1.9 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: cisco_ios.l,v 1.10 2002/05/15 22:24:44 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"

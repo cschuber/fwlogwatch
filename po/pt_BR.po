@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
-"POT-Creation-Date: 2002-05-08 10:31+0200\n"
+"POT-Creation-Date: 2002-05-15 23:16+0200\n"
 "PO-Revision-Date: 2002-01-27 16:17+0100\n"
 "Last-Translator: Ivan F. Martinez <ivanfm@ecodigit.com.br>\n"
 "Language-Team: -\n"
@@ -44,16 +44,19 @@ msgid "General options:\n"
 msgstr "Opções globais:\n"
 
 #: ../main.c:26
-msgid "         -h          this help\n"
+#, fuzzy
+msgid "  -h           this help\n"
 msgstr "         -h          mostra texto de ajuda\n"
 
 #: ../main.c:27
-msgid "         -L <file>   show time of first and last log entry in file\n"
+#, fuzzy
+msgid "  -L <file>    show time of first and last log entry in file\n"
 msgstr ""
 "         -L <arq.>   mostra horario inicial e final do arquivo de log\n"
 
 #: ../main.c:28
-msgid "         -V          show version and copyright info\n"
+#, fuzzy
+msgid "  -V           show version and copyright info\n"
 msgstr "         -V          mostra informações sobre versão e copyright\n"
 
 #: ../main.c:31
@@ -61,64 +64,73 @@ msgid "Global options:\n"
 msgstr "Opções globais:\n"
 
 #: ../main.c:32
-#, c-format
-msgid "         -c <file>   specify config file (defaults to %s)\n"
+#, fuzzy, c-format
+msgid "  -c <file>    specify config file (defaults to %s)\n"
 msgstr ""
 "         -c <arq.>   especifica arquivo de configuração (padrão : %s)\n"
 
 #: ../main.c:33
-msgid "         -D          do not differentiate destination IP addresses\n"
+#, fuzzy
+msgid "  -D           do not differentiate destination IP addresses\n"
 msgstr "         -D          não diferencia endereços IP de destino\n"
 
 #: ../main.c:34
-msgid "         -d          differentiate destination ports\n"
+#, fuzzy
+msgid "  -d           differentiate destination ports\n"
 msgstr "         -d          diferencia portas de destino\n"
 
 #: ../main.c:35
-#, c-format
-msgid "         -f <file>   specify input file (defaults to %s)\n"
+#, fuzzy, c-format
+msgid "  -f <file>    specify input file (defaults to %s)\n"
 msgstr "         -f <arq.>   especifica arquivo de entrada  (padrão : %s)\n"
 
 #: ../main.c:36
-msgid ""
-"         -m <count>  only show entries with at least so many incidents\n"
+#, fuzzy
+msgid "  -m <count>   only show entries with at least so many incidents\n"
 msgstr ""
 "         -m <num>    mostra somente entradas com um minimo de ocorrencias\n"
 
 #: ../main.c:37
-msgid "         -N          resolve service names\n"
+#, fuzzy
+msgid "  -N           resolve service names\n"
 msgstr "         -N          resolve nome de servico\n"
 
 #: ../main.c:38
-msgid "         -n          resolve host names\n"
+#, fuzzy
+msgid "  -n           resolve host names\n"
 msgstr "         -n          resolve nome de hosts\n"
 
 #: ../main.c:39
-msgid ""
-"         -O <order>  define the sort order (see the man page for details)\n"
+#, fuzzy
+msgid "  -O <order>   define the sort order (see the man page for details)\n"
 msgstr ""
 "         -O <ordem>  define a ordem para ordenação (veja pagina man para "
 "detalhes)\n"
 
 #: ../main.c:40
-msgid "         -P <format> use only parsers for specific formats\n"
+#, fuzzy
+msgid "  -P <format>  use only parsers for specific formats\n"
 msgstr "         -P <formato> utiliza somente os formatos especificados\n"
 
 #: ../main.c:41
-msgid "         -p          differentiate protocols\n"
+#, fuzzy
+msgid "  -p           differentiate protocols\n"
 msgstr "         -p          diferenciar protocolos\n"
 
 #: ../main.c:42
-msgid "         -s          differentiate source ports\n"
+#, fuzzy
+msgid "  -s           differentiate source ports\n"
 msgstr "         -s          diferenciar portas de origem\n"
 
 #: ../main.c:43
-msgid "         -v          verbose, specify twice for more info\n"
+#, fuzzy
+msgid "  -v           verbose, specify twice for more info\n"
 msgstr ""
 "         -v          detalhes, especifique duas vezes para mais informações\n"
 
 #: ../main.c:44
-msgid "         -y          differentiate TCP options\n"
+#, fuzzy
+msgid "  -y           differentiate TCP options\n"
 msgstr "         -y          diferenciar opções de TCP\n"
 
 #: ../main.c:47
@@ -126,42 +138,50 @@ msgid "Log summary mode (default):\n"
 msgstr "Modo sumario de log (padrão):\n"
 
 #: ../main.c:48
-msgid ""
-"         -b          show amount of data (sum of total packet lengths)\n"
+#, fuzzy
+msgid "  -b           show amount of data (sum of total packet lengths)\n"
 msgstr ""
 "         -b          mostra total de dados (soma dos tamanhos dos pacotes)\n"
 
 #: ../main.c:49
-msgid "         -e          show end times\n"
+#, fuzzy
+msgid "  -e           show end times\n"
 msgstr "         -e          mostrar horario final\n"
 
 #: ../main.c:50
-msgid "         -l <time>   process recent events only (defaults to off)\n"
+#, fuzzy
+msgid "  -l <time>    process recent events only (defaults to off)\n"
 msgstr ""
 "         -l <tempo>  processa eventos recentes somente (padrão : desligado)\n"
 
 #: ../main.c:51
-msgid "         -o <file>   specify output file\n"
+#, fuzzy
+msgid "  -o <file>    specify output file\n"
 msgstr "         -o <arq.>   especifica arquivo de saida\n"
 
 #: ../main.c:52
-msgid "         -S          do not differentiate source IP addresses\n"
+#, fuzzy
+msgid "  -S           do not differentiate source IP addresses\n"
 msgstr "         -S          não diferencia endereços IP de origem\n"
 
 #: ../main.c:53
-msgid "         -t          show start times\n"
+#, fuzzy
+msgid "  -t           show start times\n"
 msgstr "         -t          mostrar horario inicial\n"
 
 #: ../main.c:54
-msgid "         -W          activate whois lookups for source addresses\n"
+#, fuzzy
+msgid "  -W           activate whois lookups for source addresses\n"
 msgstr "         -W          activa verificação whois para endereços origem\n"
 
 #: ../main.c:55
-msgid "         -w          HTML output\n"
+#, fuzzy
+msgid "  -w           HTML output\n"
 msgstr "         -w          saída em HTML\n"
 
 #: ../main.c:56
-msgid "         -z          show time interval\n"
+#, fuzzy
+msgid "  -z           show time interval\n"
 msgstr "         -z          mostra intervalo de tempo\n"
 
 #: ../main.c:59
@@ -170,111 +190,107 @@ msgid "Interactive report mode (summary mode extension):\n"
 msgstr "Modo de relatório interativo:\n"
 
 #: ../main.c:60
-msgid "         -i <count>  interactive mode with report threshold\n"
+#, fuzzy
+msgid "  -i <count>   interactive mode with report threshold\n"
 msgstr "         -i <num>    modo interativo com limite minimo para ativação\n"
 
 #: ../main.c:61
-msgid "         -F <email>  report sender address\n"
+#, fuzzy, c-format
+msgid "  -F <email>   report sender address (defaults to '%s')\n"
 msgstr "         -F <email>  email origem no envio do relatório\n"
 
 #: ../main.c:62
-#, c-format
-msgid "                     (defaults to '%s')\n"
-msgstr "                     (padrão : '%s')\n"
-
-#: ../main.c:63
-msgid ""
-"         -T <email>  address of CERT or abuse contact to send report to\n"
+#, fuzzy
+msgid "  -T <email>   address of CERT or abuse contact to send report to\n"
 msgstr ""
 "         -T <email>  endereço do CERT ou contato de abuso para envio do "
 "relatório\n"
 
-#: ../main.c:64
-msgid "         -C <email>  carbon copy recipients\n"
+#: ../main.c:63
+#, fuzzy
+msgid "  -C <email>   carbon copy recipients\n"
 msgstr "         -C <email>  destinatarios para cópia\n"
 
-#: ../main.c:65
-msgid "         -I <file>   template file for report\n"
+#: ../main.c:64
+#, fuzzy, c-format
+msgid "  -I <file>    template file for report (defaults to %s)\n"
 msgstr "         -I <arq.>   arquivo modelo para relatório\n"
 
-#: ../main.c:66
-#, c-format
-msgid "                     (defaults to %s)\n"
-msgstr "                     (padrão : %s)\n"
-
-#: ../main.c:69
+#: ../main.c:67
 msgid "Realtime response mode:\n"
 msgstr "Modo de resposta em tempo real:\n"
 
-#: ../main.c:70
-msgid ""
-"         -R          realtime response as daemon (default action: log only)\n"
+#: ../main.c:68
+#, fuzzy
+msgid "  -R           realtime response as daemon (default action: log only)\n"
 msgstr ""
 "         -R          modo de resposta em tempo real (ação padrão: somente "
 "registra)\n"
 
-#: ../main.c:71
-#, c-format
-msgid "         -a <count>  alert threshold (defaults to %d entries)\n"
+#: ../main.c:69
+#, fuzzy, c-format
+msgid "  -a <count>   alert threshold (defaults to %d entries)\n"
 msgstr "         -a <num>  limite de ativação (padrão : %d entradas)\n"
 
-#: ../main.c:72
-#, c-format
-msgid "         -l <time>   forget events this old (defaults to %d hours)\n"
+#: ../main.c:70
+#, fuzzy, c-format
+msgid "  -l <time>    forget events this old (defaults to %d hours)\n"
 msgstr ""
 "         -l <tempo>  esquece eventos após periodo (padrão : %d horas)\n"
 
-#: ../main.c:73
-msgid ""
-"         -k <IP/net> add this IP address or net to the list of known hosts\n"
+#: ../main.c:71
+#, fuzzy
+msgid "  -k <IP/net>  add this IP address or net to the list of known hosts\n"
 msgstr "         -k <IP/rede> adiciona IP ou rede à lista de conhecidos\n"
 
-#: ../main.c:74
-msgid ""
-"         -A          invoke notification script if threshold is reached\n"
+#: ../main.c:72
+#, fuzzy
+msgid "  -A           invoke notification script if threshold is reached\n"
 msgstr "         -A          executa scripta de avisao ao chegar no limite\n"
 
-#: ../main.c:75
-msgid "         -B          invoke response action script (e.g. block host)\n"
+#: ../main.c:73
+#, fuzzy
+msgid "  -B           invoke response action script (e.g. block host)\n"
 msgstr ""
 "         -B          executa script de resposta automatica (ex. bloqueia "
 "maquina)\n"
 
-#: ../main.c:76
-msgid "         -X          activate internal status information web server\n"
+#: ../main.c:74
+#, fuzzy
+msgid "  -X           activate internal status information web server\n"
 msgstr "         -X          activa servidor web interno de informações\n"
 
-#: ../main.c:102
+#: ../main.c:100
 msgid "Compile-time options of this version:"
 msgstr ""
 
-#: ../main.c:103
+#: ../main.c:101
 msgid "short names support "
 msgstr ""
 
-#: ../main.c:105 ../main.c:111 ../main.c:117
+#: ../main.c:103 ../main.c:109 ../main.c:115
 msgid "enabled"
 msgstr ""
 
-#: ../main.c:107 ../main.c:113 ../main.c:119
+#: ../main.c:105 ../main.c:111 ../main.c:117
 msgid "disabled"
 msgstr ""
 
-#: ../main.c:109
+#: ../main.c:107
 msgid "zlib support "
 msgstr ""
 
-#: ../main.c:115
+#: ../main.c:113
 msgid "gettext (i18n) support "
 msgstr ""
 
-#: ../main.c:122
+#: ../main.c:120
 #, fuzzy
 msgid "You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."
 msgstr ""
 "Você pode contactar o autor via <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 
-#: ../main.c:418
+#: ../main.c:416
 msgid "Exiting\n"
 msgstr "Terminando\n"
 
@@ -291,7 +307,7 @@ msgstr "Abrindo arquivo de entrada '%s'\n"
 msgid "Processing\n"
 msgstr "Processando\n"
 
-#: ../modes.c:119 ../modes.c:315 ../modes.c:712 ../rcfile.c:446
+#: ../modes.c:119 ../modes.c:314 ../modes.c:711 ../rcfile.c:446
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "Fechando '%s'\n"
@@ -305,92 +321,93 @@ msgstr "Ordenando dados\n"
 msgid "Opening output file '%s'\n"
 msgstr "Abrindo arquivo de saída '%s'\n"
 
-#: ../modes.c:178 ../report.c:210
-msgid "Sending...\n"
+#: ../modes.c:177 ../report.c:210
+#, fuzzy
+msgid "Sending\n"
 msgstr "Enviando...\n"
 
-#: ../modes.c:200
+#: ../modes.c:199
 #, c-format
 msgid "Generated %s by "
 msgstr "Gerado %s por "
 
-#: ../modes.c:210
+#: ../modes.c:209
 msgid "an unknown user.\n"
 msgstr "um usuario desconhecido.\n"
 
-#: ../modes.c:218
+#: ../modes.c:217
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(e %d anteriores à %d segundos) "
 
-#: ../modes.c:221
+#: ../modes.c:220
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(e %d mal formadas) "
 
-#: ../modes.c:223
+#: ../modes.c:222
 #, c-format
 msgid "of %d entries in the file "
 msgstr "de %d entradas no arquivo "
 
-#: ../modes.c:224
+#: ../modes.c:223
 #, c-format
 msgid "\"%s\" are packet logs, "
 msgstr "\"%s\" são registros de pacotes, "
 
-#: ../modes.c:227
+#: ../modes.c:226
 msgid "one has unique characteristics.\n"
 msgstr "um tem caracteristica unica.\n"
 
-#: ../modes.c:229
+#: ../modes.c:228
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d tem caracteristicas unicas.\n"
 
-#: ../modes.c:237
+#: ../modes.c:236
 msgid "One entry was excluded by configuration.\n"
 msgstr "Uma entrada foi excluida pela configuração.\n"
 
-#: ../modes.c:239
+#: ../modes.c:238
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d entradas foram excluidas pela configuração.\n"
 
-#: ../modes.c:247
+#: ../modes.c:246
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "Primeiro pacote registrado: %s, ultimo: %s.\n"
 
-#: ../modes.c:249 ../modes.c:707
+#: ../modes.c:248 ../modes.c:706
 msgid "No valid time entries found.\n"
 msgstr "Nenhum registro de horario valido encontrado.\n"
 
-#: ../modes.c:256
+#: ../modes.c:255
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "Todos registros são da mesma maquina: \"%s\".\n"
 
-#: ../modes.c:263
+#: ../modes.c:262
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "Todos registros são do mesmo chain: \"%s\".\n"
 
-#: ../modes.c:270
+#: ../modes.c:269
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "Todos registros tem o mesmo destino: \"%s\".\n"
 
-#: ../modes.c:277
+#: ../modes.c:276
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "Todos registros são da mesma interface: \"%s\".\n"
 
-#: ../modes.c:284
+#: ../modes.c:283
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "Somente registros com contagem maior que %d são mostrados.\n"
 
-#: ../modes.c:293
+#: ../modes.c:292
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
@@ -399,175 +416,175 @@ msgstr ""
 "Limite minimo do relatório: %d\n"
 "\n"
 
-#: ../modes.c:335
+#: ../modes.c:334
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr "Aviso: arquivo pid existe,outro fwlogwatch pode estar rodando.\n"
 
-#: ../modes.c:349
+#: ../modes.c:348
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:351
+#: ../modes.c:350
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:374
+#: ../modes.c:373
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:376
+#: ../modes.c:375
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:455
+#: ../modes.c:454
 msgid "SIGTERM caught, cleaning up"
 msgstr "SIGTERM recebido, fechando"
 
-#: ../modes.c:537
+#: ../modes.c:536
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "Iniciando (pid %d)"
 
-#: ../modes.c:598
+#: ../modes.c:597
 msgid "Alert threshold is one attempt"
 msgstr "Limite de alerta em uma tentativa"
 
-#: ../modes.c:600
+#: ../modes.c:599
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Limite de alerta : %d tentativas"
 
-#: ../modes.c:604
+#: ../modes.c:603
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "Eventos anteriores a %d segundo(s) são discartados"
 
-#: ../modes.c:607
+#: ../modes.c:606
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "Eventos anteriores a %d houra(s) são discartados"
 
-#: ../modes.c:611
+#: ../modes.c:610
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "Modo de resposta : registra%s%s"
 
-#: ../modes.c:612 ../net.c:314
+#: ../modes.c:611 ../net.c:304
 msgid ", notify"
 msgstr ", avisa"
 
-#: ../modes.c:613 ../net.c:315
+#: ../modes.c:612 ../net.c:305
 msgid ", respond"
 msgstr ", responde"
 
-#: ../modes.c:637
+#: ../modes.c:636
 msgid "Reading standard input\n"
 msgstr "Lendo entrada padrão(stdin)\n"
 
-#: ../modes.c:654
+#: ../modes.c:653
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "Lendo '%s'\n"
 
-#: ../modes.c:700
+#: ../modes.c:699
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "no. de linhas : %d\n"
 
-#: ../modes.c:701
+#: ../modes.c:700
 #, c-format
 msgid "First entry: %s\n"
 msgstr "Primeiro registro: %s\n"
 
-#: ../modes.c:704
+#: ../modes.c:703
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "Ultimo registro : %s\n"
 
-#: ../net.c:83
+#: ../net.c:84
 #, c-format
 msgid "Listening on %s port %i"
 msgstr "Esperando conexões em %s porta %i"
 
-#: ../net.c:114
+#: ../net.c:115
 msgid "decode_base64: input string incomplete"
 msgstr "decode_base64: string de entrada incompleta"
 
-#: ../net.c:121
+#: ../net.c:122
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
 msgstr "decode_base64: caracter ilegal '%c' na string de entrada"
 
-#: ../net.c:154
+#: ../net.c:160
 #, fuzzy, c-format
 msgid "<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"
 msgstr ""
 "<tr bgcolor=\"#%s\" align=\"center\"><td>Qtde.</td><td>Adic.</td><td>IP "
 "origem </td>"
 
-#: ../net.c:157 ../output.c:330
+#: ../net.c:162 ../output.c:330
 #, fuzzy
 msgid "<th>proto</th>"
 msgstr "<td>protocolo</td>"
 
-#: ../net.c:158 ../output.c:336
+#: ../net.c:163 ../output.c:336
 #, fuzzy
 msgid "<th>source</th>"
 msgstr "<td>origem</td>"
 
-#: ../net.c:160 ../net.c:169 ../output.c:338 ../output.c:352
+#: ../net.c:165 ../net.c:174 ../output.c:338 ../output.c:352
 #, fuzzy
 msgid "<th>hostname</th>"
 msgstr "<td>maquina</td>"
 
-#: ../net.c:162 ../net.c:172 ../output.c:344 ../output.c:356
+#: ../net.c:167 ../net.c:177 ../output.c:344 ../output.c:356
 #, fuzzy
 msgid "<th>port</th>"
 msgstr "<td>porta</td>"
 
-#: ../net.c:164 ../net.c:174 ../output.c:346 ../output.c:358
+#: ../net.c:169 ../net.c:179 ../output.c:346 ../output.c:358
 #, fuzzy
 msgid "<th>service</th>"
 msgstr "<td>serviço</td>"
 
-#: ../net.c:167 ../output.c:350
+#: ../net.c:172 ../output.c:350
 #, fuzzy
 msgid "<th>destination</th>"
 msgstr "<td>destino</td>"
 
-#: ../net.c:178 ../output.c:362
+#: ../net.c:183 ../output.c:362
 #, fuzzy
 msgid "<th>opts</th>"
 msgstr "<td>opções</td>"
 
-#: ../net.c:180
+#: ../net.c:185
 #, fuzzy
 msgid "<th>time remaining</th></tr>\n"
 msgstr "<td>Tempo restante</td></tr>\n"
 
-#: ../net.c:210
+#: ../net.c:215
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
 msgstr "Conexão recusada de endedeço não permitido : ip %s porta %i"
 
-#: ../net.c:219
+#: ../net.c:224
 #, c-format
 msgid "Connect from %s port %i"
 msgstr "Conexão de %s porta %i"
 
-#: ../net.c:241
+#: ../net.c:246
 #, c-format
 msgid "Authorization failed (%s)"
 msgstr "Falha na autorização (%s)"
 
-#: ../net.c:243
+#: ../net.c:248
 msgid "Authorization failed"
 msgstr "Falha na autorização"
 
-#: ../net.c:252
+#: ../net.c:256
 msgid ""
 "<body>\n"
 "<h1>Authorization Required</h1>\n"
@@ -579,16 +596,16 @@ msgstr ""
 "</body>\n"
 "</html>\n"
 
-#: ../net.c:288
+#: ../net.c:283
 msgid "<a href=\"/\">Reload</a><br>\n"
 msgstr "<a href=\"/\">Atualizar</a><br>\n"
 
-#: ../net.c:290
+#: ../net.c:285
 #, c-format
 msgid "(automatic refresh every %d seconds)<br>\n"
 msgstr "(atualização automatica a cada %d segundos)<br>\n"
 
-#: ../net.c:293
+#: ../net.c:287
 #, fuzzy
 msgid ""
 "</div>\n"
@@ -598,22 +615,22 @@ msgstr ""
 "</div>\n"
 "<h2>Informações Gerais</h2>\n"
 
-#: ../net.c:297
+#: ../net.c:291
 #, c-format
 msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Horario de inicialização:</td><td>%s</td></tr>\n"
 
-#: ../net.c:302
+#: ../net.c:295
 #, c-format
 msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Horario atual:</td><td>%s</td></tr>\n"
 
-#: ../net.c:306
+#: ../net.c:298
 #, c-format
 msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Tempo de execução:</td><td>%s</td></tr>\n"
 
-#: ../net.c:310
+#: ../net.c:301
 #, fuzzy, c-format
 msgid ""
 "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
@@ -622,36 +639,36 @@ msgstr ""
 "<tr><td>Limite de ativação:</td><td>%d entradas</td></tr>\n"
 "<tr><td>Tempo para descarte:</td><td>%d segundos</td></tr>\n"
 
-#: ../net.c:313
+#: ../net.c:303
 #, c-format
 msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
 msgstr "<tr><td>Modo de resposta:</td><td>registra%s%s</td></tr>\n"
 
-#: ../net.c:319
+#: ../net.c:308
 #, c-format
 msgid ""
 "<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in "
 "the packet cache.<td></tr>\n"
 msgstr ""
 
-#: ../net.c:325
+#: ../net.c:313
 msgid "<h2>Packet cache</h2>\n"
 msgstr "<h2>Cache de pacotes</h2>\n"
 
-#: ../net.c:407
+#: ../net.c:373
 msgid "<h2>Host status</h2>\n"
 msgstr "<h2>Situação da maquina</h2>\n"
 
-#: ../net.c:431 ../net.c:439 ../net.c:441 ../net.c:443
+#: ../net.c:396 ../net.c:403 ../net.c:405 ../net.c:407
 msgid "<td>any</td>"
 msgstr "<td>qualquer</td>"
 
-#: ../net.c:436
+#: ../net.c:401
 #, fuzzy, c-format
 msgid "<td>%s/%d (known host/net)</td>"
 msgstr "<td>-</td><td>%s/%d (maquina/rede conhecida)</td>"
 
-#: ../net.c:517
+#: ../net.c:462
 msgid "Connection closed"
 msgstr "Coneão fechada"
 
@@ -1010,6 +1027,12 @@ msgstr "Resumo do fwlogwatch"
 #: ../main.h:264
 msgid "fwlogwatch status"
 msgstr "Situação do fwlogwatch"
+
+#~ msgid "                     (defaults to '%s')\n"
+#~ msgstr "                     (padrão : '%s')\n"
+
+#~ msgid "                     (defaults to %s)\n"
+#~ msgstr "                     (padrão : %s)\n"
 
 #~ msgid "SIGHUP caught, ignoring"
 #~ msgstr "SIGHUP recebido, ignorando"

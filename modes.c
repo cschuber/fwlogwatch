@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: modes.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -165,7 +165,6 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, _("Opening output file '%s'\n"), opt.outputfile);
 
-    fflush(stdout);
     output = freopen(opt.outputfile, "w", stdout);
     if (output == NULL) {
       fprintf(stderr, "freopen %s: %s\n", opt.outputfile, strerror(errno));
@@ -175,9 +174,8 @@ void mode_summary()
     char buf[BUFSIZE];
 
     if(opt.verbose)
-      fprintf(stderr, _("Sending...\n"));
+      fprintf(stderr, _("Sending\n"));
 
-    fflush(stdout);
     snprintf(buf, BUFSIZE, "%s -t", P_SENDMAIL);
     output = popen(buf, "w");
     if(output == NULL) {
@@ -185,117 +183,118 @@ void mode_summary()
       exit(EXIT_FAILURE);
     }
 
-    stdout = output;
-    generate_email_header();
+    generate_email_header(output);
+  } else {
+    output = stdout;
   }
 
   if (opt.html) {
-    output_html_header();
+    output_html_header(output);
   } else {
-    printf("%s\n", opt.title);
+    fprintf(output, "%s\n", opt.title);
   }
 
   now = time(NULL);
   strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
-  printf(_("Generated %s by "), nows);
+  fprintf(output, _("Generated %s by "), nows);
 
   gen_user = getpwuid(getuid());
   if (gen_user != NULL) {
     if (gen_user->pw_gecos[0] != '\0') {
-      printf("%s.\n", gen_user->pw_gecos);
+      fprintf(output, "%s.\n", gen_user->pw_gecos);
     } else {
-      printf("%s.\n", gen_user->pw_name);
+      fprintf(output, "%s.\n", gen_user->pw_name);
     }
   } else {
-    printf(_("an unknown user.\n"));
+    fprintf(output, _("an unknown user.\n"));
   }
 
   if (opt.html)
-    printf("<br>\n");
+    fprintf(output, "<br>\n");
 
-  printf("%d ", hitnum);
+  fprintf(output, "%d ", hitnum);
   if (oldnum > 0) {
-    printf(_("(and %d older than %d seconds) "), oldnum, opt.recent);
+    fprintf(output, _("(and %d older than %d seconds) "), oldnum, opt.recent);
   }
   if (errnum > 0) {
-    printf(_("(and %d malformed) "), errnum);
+    fprintf(output, _("(and %d malformed) "), errnum);
   }
-  printf(_("of %d entries in the file "), linenum);
-  printf(_("\"%s\" are packet logs, "), opt.inputfile);
+  fprintf(output, _("of %d entries in the file "), linenum);
+  fprintf(output, _("\"%s\" are packet logs, "), opt.inputfile);
   retval = list_stats();
   if(retval == 1) {
-    printf(_("one has unique characteristics.\n"));
+    fprintf(output, _("one has unique characteristics.\n"));
   } else {
-    printf(_("%d have unique characteristics.\n"), retval);
+    fprintf(output, _("%d have unique characteristics.\n"), retval);
   }
 
   if (exnum != 0) {
     if (opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
     if(exnum == 1) {
-      printf(_("One entry was excluded by configuration.\n"));
+      fprintf(output, _("One entry was excluded by configuration.\n"));
     } else {
-      printf(_("%d entries were excluded by configuration.\n"), exnum);
+      fprintf(output, _("%d entries were excluded by configuration.\n"), exnum);
     }
   }
 
   if (opt.html)
-    printf("<br>\n");
+    fprintf(output, "<br>\n");
 
   if (first_entry[0] != '\0') {
-    printf(_("First packet log entry: %s, last: %s.\n"), first_entry, last_entry);
+    fprintf(output, _("First packet log entry: %s, last: %s.\n"), first_entry, last_entry);
   } else {
-    printf(_("No valid time entries found.\n"));
+    fprintf(output, _("No valid time entries found.\n"));
   }
 
   if(!opt.loghost) {
     if(opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
-    printf(_("All entries were logged by the same host: \"%s\".\n"), opt.hostname);
+    fprintf(output, _("All entries were logged by the same host: \"%s\".\n"), opt.hostname);
   }
 
   if(!opt.chains) {
     if(opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
-    printf(_("All entries are from the same chain: \"%s\".\n"), opt.chainlabel);
+    fprintf(output, _("All entries are from the same chain: \"%s\".\n"), opt.chainlabel);
   }
 
   if(!opt.branches) {
     if(opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
-    printf(_("All entries have the same target: \"%s\".\n"), opt.branchname);
+    fprintf(output, _("All entries have the same target: \"%s\".\n"), opt.branchname);
   }
 
   if(!opt.ifs) {
     if(opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
-    printf(_("All entries are from the same interface: \"%s\".\n"), opt.interface);
+    fprintf(output, _("All entries are from the same interface: \"%s\".\n"), opt.interface);
   }
 
   if(opt.least > 1) {
     if(opt.html)
-      printf("<br>\n");
+      fprintf(output, "<br>\n");
 
-    printf(_("Only entries with a count of at least %d are shown.\n"), opt.least);
+    fprintf(output, _("Only entries with a count of at least %d are shown.\n"), opt.least);
   }
 
   if (opt.html)
-    output_html_table();
+    output_html_table(output);
   else
-    printf("\n");
+    fprintf(output, "\n");
 
   if(opt.mode == INTERACTIVE_REPORT)
-    printf(_("Reporting threshold: %d\n\n"), opt.threshold);
+    fprintf(output, _("Reporting threshold: %d\n\n"), opt.threshold);
 
   if(opt.whois_lookup)
     whois_connect(RADB);
 
-  show_list();
+  show_list(output);
 
   if(opt.whois_lookup)
     whois_close();
@@ -304,7 +303,7 @@ void mode_summary()
     report();
 
   if (opt.html)
-    output_html_footer();
+    output_html_footer(output);
 
   free_conn_data();
   free_dns_cache();

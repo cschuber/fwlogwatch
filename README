@@ -1,4 +1,4 @@
-$Id: README,v 1.22 2002/05/08 17:24:09 bwess Exp $
+$Id: README,v 1.23 2002/05/15 22:24:44 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a

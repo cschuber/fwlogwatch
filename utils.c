@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: utils.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,11 +163,11 @@ void init_line()
 
 void mode_error()
 {
-  printf(_("fwlogwatch error: mode collision, please check that you didn't specify\n"
-	 "   several modes on the command line or a second mode is active in the\n"
-	 "   configuration file.\n"
-	 "   Please use a separate configuration file for each mode or comment out all\n"
-	 "   entries in the default configuration and use command line parameters.\n"));
+  fprintf(stderr, _("fwlogwatch error: mode collision, please check that you didn't specify\n"
+		    "   several modes on the command line or a second mode is active in the\n"
+		    "   configuration file.\n"
+		    "   Please use a separate configuration file for each mode or comment out all\n"
+		    "   entries in the default configuration and use command line parameters.\n"));
   exit(EXIT_FAILURE);
 }
 
@@ -269,7 +269,7 @@ void add_known_host(char *ip)
   host = xmalloc(sizeof(struct known_hosts));
   host->netmask.s_addr = parse_cidr(ip);
   if(convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
-    printf(_("(known host)\n"));
+    fprintf(stderr, _("(known host)\n"));
     free(host);
     exit(EXIT_FAILURE);
   }
@@ -303,7 +303,7 @@ void add_exclude_hpb(char *input, unsigned char mode)
   excluded_this->mode = mode;
   if(mode & PARSER_MODE_HOST) {
     if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
-      printf(_("(excluded host)\n"));
+      fprintf(stderr, _("(excluded host)\n"));
       free(excluded_this);
       exit(EXIT_FAILURE);
     }
@@ -319,7 +319,7 @@ void add_exclude_hpb(char *input, unsigned char mode)
   excluded_first = excluded_this;
 }
 
-void generate_email_header()
+void generate_email_header(FILE *fd)
 {
   time_t now;
   char stime[TIMESIZE];
@@ -327,16 +327,16 @@ void generate_email_header()
   now = time(NULL);
   strftime(stime, TIMESIZE, "%Y%m%d%H%M%S", localtime(&now));
 
-  printf("From: %s\n", opt.sender);
-  printf("To: %s\n", opt.recipient);
+  fprintf(fd, "From: %s\n", opt.sender);
+  fprintf(fd, "To: %s\n", opt.recipient);
   if(opt.cc[0] != '\0')
-    printf("Cc: %s\n", opt.cc);
-  printf("Subject: %s\n", opt.title);
-  printf("X-Generator: %s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
+    fprintf(fd, "Cc: %s\n", opt.cc);
+  fprintf(fd, "Subject: %s\n", opt.title);
+  fprintf(fd, "X-Generator: %s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
   if(opt.html) {
-    printf("Mime-Version: 1.0\n");
-    printf("Content-Type: text/html; charset=iso-8859-1\n");
-    printf("Content-Disposition: attachment; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
+    fprintf(fd, "Mime-Version: 1.0\n");
+    fprintf(fd, "Content-Type: text/html; charset=iso-8859-1\n");
+    fprintf(fd, "Content-Disposition: attachment; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
   }
-  printf("\n");
+  fprintf(fd, "\n");
 }

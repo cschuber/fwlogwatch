@@ -1,4 +1,4 @@
-/* $Id: net.h,v 1.21 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: net.h,v 1.22 2002/05/15 22:24:44 bwess Exp $ */
 
 #ifndef _NET_H
 #define _NET_H

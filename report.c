@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: report.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -207,7 +207,7 @@ void generate_with_template(struct report_data *data)
     perror("fclose");
   }
 
-  printf(_("Sending...\n"));
+  printf(_("Sending\n"));
 
   snprintf(buf, BUFSIZE, "%s %s | %s -t", P_CAT, file, P_SENDMAIL);
   run_command(buf);

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: rcfile.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -429,7 +429,7 @@ unsigned char read_rcfile(char *rcfile, unsigned char must_exist)
   name = strdup(rcfile);
 
   if(opt.verbose)
-    printf(_("Opening configuration file '%s'\n"), name);
+    fprintf(stderr, _("Opening configuration file '%s'\n"), name);
 
   fd = fopen(name, "r");
   if (fd == NULL) {
@@ -443,7 +443,7 @@ unsigned char read_rcfile(char *rcfile, unsigned char must_exist)
   }
 
   if(opt.verbose)
-    printf(_("Closing '%s'\n"), name);
+    fprintf(stderr, _("Closing '%s'\n"), name);
 
   xstrncpy(opt.rcfile, name, FILESIZE);
   free(name);

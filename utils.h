@@ -1,4 +1,4 @@
-/* $Id: utils.h,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: utils.h,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -18,6 +18,6 @@ unsigned char convert_ip(char *ip, struct in_addr *addr);
 unsigned long int parse_cidr(char *input);
 void add_known_host(char *ip);
 void add_exclude_hpb(char *input, unsigned char mode);
-void generate_email_header(void);
+void generate_email_header(FILE *fd);
 
 #endif

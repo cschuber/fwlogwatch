@@ -1,4 +1,4 @@
-/* $Id: parser.h,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
+/* $Id: parser.h,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
 
 #ifndef _PARSER_H
 #define _PARSER_H
