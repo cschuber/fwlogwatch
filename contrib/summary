@@ -1,0 +1,10 @@
+#!/bin/sh
+fwlogwatch -v -w -t -z -S -f $1 -o dst.html
+fwlogwatch -v -w -t -z -D -f $1 -o src.html
+fwlogwatch -v -w -t -z -f $1 -o src_dst.html
+fwlogwatch -v -w -t -z -f $1 -o src_dst.html
+fwlogwatch -v -w -t -z -s -f $1 -o src_dst_sp.html
+fwlogwatch -v -w -t -z -d -f $1 -o src_dst_dp.html
+fwlogwatch -v -w -t -z -s -d -f $1 -o src_dst_sp_dp.html
+fwlogwatch -v -w -t -z -s -d -y -f $1 -o src_dst_sp_dp_op.html
+fwlogwatch -v -w -t -z -s -d -y -n -f $1 -o all.html

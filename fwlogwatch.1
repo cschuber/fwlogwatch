@@ -1,0 +1,146 @@
+.\"
+.\" $Id: fwlogwatch.1,v 1.1 2002/02/14 19:43:03 bwess Exp $
+.\"
+.TH FWLOGWATCH 1 "21 October 2000" RUS-CERT
+.SH NAME
+fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
+.SH SYNOPSIS
+.B fwlogwatch
+.RI [ options ]
+.SH DESCRIPTION
+.B fwlogwatch
+produces ipchains log summary reports in text and HTML form,
+from the data found it can produce customizable incident reports from a
+template and send them to abuse contacts at offending sites or CERT
+coordination centers. Finally, it can also run as daemon and report
+anomalies or start countermeasures.
+.SH OPTIONS
+The global options for all modes (at least where they make sense) are:
+.IP \-c\ \fIconfig\fR
+Use the alternate configuration file
+.IR config .
+If you use the default configuration file
+.B /etc/fwlogwatch.config
+command line parameters override
+the options specified in the file. If you specify an alternate configuration
+file only options not specified in the file can be overridden by command line
+options.
+.IP \-D
+Do not differentiate destination IP addresses. Useful for finding scans in
+whole subnets.
+.IP \-d
+Differentiate destination ports.
+.IP \-f\ \fIfile\fR
+Specify an input file (defaults to
+.B /var/log/messages
+).
+.IP \-h
+Show the available options.
+.IP \-L
+Show time of the first and the last log entry in the input file. Use the -f
+option to specify other input file than the default.
+.IP \-l\ \fItime\fR
+Process recent events only.
+.IP \-n
+Enable DNS lookups. Host names will be resolved (reverse and forward lookup
+with a warning if they don't match). This makes summary generation very
+slow if a lot of different hosts appear in the log file.
+.IP \-p
+Differentiate protocols. This is activate automatically if you
+differentiate source and/or destination ports.
+.IP \-S
+Do not differentiate source IP addresses.
+.IP \-s
+Differentiate source ports.
+.IP \-t
+Show start and end times of connection attempts. End times are only
+available if the connection attempt entry consists of more than one packet.
+.IP \-V
+Show version and copyright information.
+.IP \-v
+Be verbose. You can specify it twice for more information.
+In very verbose mode while parsing the log file you will see "." for
+relevant packet filter log entries, "o" for packet filter log entries that
+are too old and "_" for entries that are not packet filter logs.
+.IP \-y
+Differentiate tcp options (syn/ack). All connections with a syn are listed
+separately, other tcp options are not available because ipchains can't log
+them.
+.IP \-z
+Show time interval between start and end time of connection attempts. This
+is only available if the connection attempt entry consists of more than one
+packet.
+.SH "LOG SUMMARY MODE"
+This are additional options that are only available in log summary mode:
+.IP \-o\ \fIfile\fR
+Specify output file.
+.IP \-w
+Produce output in HTML format.
+.SH "INTERACTIVE REPORT MODE"
+.IP \-i\ \fIcount\fR
+Enter interactive report mode.
+.I count
+is the minimum number of log entries you want to start reporting at. A
+summary of the corresponding entries will be shown and a report generated
+for each one. The more of the options above you use the more fields of the
+report will be filled in.
+.IP \-F\ \fIemail\fR
+This is the email address the mail containing the report will be sent from.
+.IP \-T\ \fIemail\fR
+This is the email address of the abuse contact or CERT the report will be
+sent to.
+.IP \-C\ \fIemail\fR
+These email recipients will get a carbon copy of the report (e.g. for your
+archives).
+.IP \-I\ \fIfile\fR
+Template file for report (defaults to
+.B /etc/fwlogwatch.template
+).
+.SH "REALTIME RESPONSE MODE"
+.IP \-R
+Enter realtime response mode. This means: detach, check if the firewall is
+configured correctly and run as daemon until the SIGTERM signal (kill) is
+received. All output can be followed in the system log.
+.IP \-a\ \fIcount\fR
+Alert threshold. Notify or start countermeasures if this limit is reached.
+Defaults to 5.
+.IP \-l\ \fItime\fR
+Forget events that happened this long ago (defaults to 1 day).
+.IP \-B
+Block host completely with new firewall rule. A new chain for
+.B fwlogwatch
+actions is inserted in the input chain and block rules added as needed.
+The chain and its content is removed if
+.B fwlogwatch
+is terminated normally.
+.IP \-W\ \fIhost\fR
+Send a winpopup alert message to the windows machine
+.IR host .
+.IP \-A\ \fIaction\fR
+This custom action is executed in a shell.
+.SH TIME FORMAT
+Time is specified as 'nx' where n is a natural number and x is one of the
+following: \'s' for seconds (default if you don't specify anything), \'m'
+for minutes, \'h' for hours, \'d' for days, \'w' for weeks, \'M' for months
+and \'y' for years.
+.SH FILES
+.IP \fB/etc/fwlogwatch.config\fR
+Default configuration file.
+.IP \fB/etc/fwlogwatch.template\fR
+Default template for incident reports.
+.IP \fB/var/log/messages\fR
+Default input log file.
+.SH SECURITY
+Since
+.B fwlogwatch
+is a security tool and needs superuser permissions for certain tasks
+special care was taken to make it secure. You can run it with user
+permissions for most functions or you can make it setgid for a
+group
+.B /var/log/messages
+is in if all you need is to be able to read this file. Only the realtime
+response mode needs superuser permissions to analyze (and in block mode
+also modify) the firewall.
+.SH AUTHOR
+Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>,
+RUS-CERT http://cert.uni-stuttgart.de
