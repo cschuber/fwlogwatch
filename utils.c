@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.27 2003/04/08 21:42:55 bwess Exp $ */
+/* $Id: utils.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <stdarg.h>
 #include "main.h"
 
 struct input_file *first_file = NULL;
@@ -385,4 +386,24 @@ void generate_email_header(FILE *fd)
     fprintf(fd, "Content-Disposition: attachment; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
   }
   fprintf(fd, "\n");
+}
+
+void fdprintf(int fd, char *format, ...)
+{
+  if(opt.status != FD_ERROR) {
+    char buf[BUFSIZE];
+    va_list argv;
+    ssize_t retval;
+
+    va_start(argv, format);
+    vsnprintf(buf, BUFSIZE, format, argv);
+    retval = write(fd, buf, strlen(buf));
+    va_end(argv);
+    if(retval == -1) {
+      syslog(LOG_NOTICE, "write: %s", strerror(errno));
+      opt.status = FD_ERROR;
+      return;
+    }
+    fflush(NULL);
+  }
 }

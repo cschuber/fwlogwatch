@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.27 2003/04/08 21:42:40 bwess Exp $ */
+/* $Id: main.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.9.2"
-#define COPYRIGHT "2003-04-08 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.9.3 2003/06/23"
+#define COPYRIGHT "Boris Wesslowski, RUS-CERT"
 
 /* Paths */
 
@@ -416,6 +416,7 @@ struct parser_options {
   struct parser_options *next;
 };
 
+#define PARSER_MODE_DEFAULT 0
 #define PARSER_MODE_NOT 1
 #define PARSER_MODE_HOST 2
 #define PARSER_MODE_PORT 4

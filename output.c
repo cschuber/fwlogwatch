@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.27 2003/04/08 21:42:42 bwess Exp $ */
+/* $Id: output.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -7,8 +7,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <time.h>
+#include <errno.h>
+#include <syslog.h>
 #include "output.h"
 #include "resolve.h"
+#include "utils.h"
 #include "whois.h"
 
 extern struct options opt;
@@ -62,14 +65,14 @@ void output_tcp_opts(struct conn_data *input, char *buf)
   }
 }
 
-void output_html(struct conn_data *input, FILE *fd)
+void output_html_entry(struct conn_data *input, FILE *fd)
 {
   char *proto, time[TIMESIZE], buf[HOSTLEN];
 
-  if (opt.html == 1) {
-    fprintf(fd, "<tr bgcolor=\"%s\" align=\"center\"><td>", opt.rowcol2);
+  if (opt.html == 2) {
+    fprintf(fd, "<tr class=\"r%d\" align=\"center\"><td>", opt.html);
   } else {
-    fprintf(fd, "<tr bgcolor=\"%s\" align=\"center\"><td>", opt.rowcol1);
+    fprintf(fd, "<tr class=\"r%d\" align=\"center\"><td>", opt.html);
   }
 
   fprintf(fd, "%d", input->count);
@@ -155,7 +158,7 @@ void output_html(struct conn_data *input, FILE *fd)
   fprintf(fd, "</td></tr>\n");
 }
 
-void output_plain(struct conn_data *input, FILE *fd)
+void output_text_entry(struct conn_data *input, FILE *fd)
 {
   char *proto, time[TIMESIZE], buf[HOSTLEN];
   unsigned char first = 1;
@@ -274,36 +277,11 @@ void output_plain(struct conn_data *input, FILE *fd)
   fprintf(fd, "\n");
 }
 
-void output_html_header(FILE *fd)
-{
-  char time[TIMESIZE];
-
-  fprintf(fd, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-  strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-  fprintf(fd, "<html>\n<head>\n<title>%s - %s</title>\n", opt.title, time);
-  fprintf(fd, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
-  fprintf(fd, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
-  fprintf(fd, "<meta http-equiv=\"expires\" content=\"0\">\n");
-  if (opt.stylesheet[0] != '\0') {
-    fprintf(fd, "<link rel=\"stylesheet\" href=\"%s\">\n", opt.stylesheet);
-  } else {
-    fprintf(fd, "<style type=\"text/css\">\n<!--\n");
-    fprintf(fd, "BODY {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-    fprintf(fd, "A:link, A:active, A:visited {color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-    fprintf(fd, "TH, TD {font-family: arial, helvetica, sans-serif; color: %s}\n", opt.textcol);
-    fprintf(fd, "SMALL {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-    fprintf(fd, "-->\n</style>\n");
-  }
-  fprintf(fd, "</head>\n<body>\n");
-  fprintf(fd, "<div align=\"center\">\n");
-  fprintf(fd, "<h1>%s</h1>\n", opt.title);
-}
-
 void output_html_table(FILE *fd)
 {
-  fprintf(fd, "<br><br>\n");
+  fprintf(fd, "</p>\n");
   fprintf(fd, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-  fprintf(fd, "<tr bgcolor=\"%s\" align=\"center\"><th>#</th>", opt.rowcol1);
+  fprintf(fd, "<tr align=\"center\"><th>#</th>");
 
   if(opt.stimes)
     fprintf(fd, _("<th>start</th>"));
@@ -364,11 +342,56 @@ void output_html_table(FILE *fd)
   fprintf(fd, "</tr>\n");
 }
 
-void output_html_footer(FILE *fd)
+void output_html_header(int fd) {
+  char time[TIMESIZE];
+
+  fdprintf(fd, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+  strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
+  fdprintf(fd, "<html>\n<head>\n<title>%s - %s</title>\n", opt.title, time);
+  fdprintf(fd, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
+  fdprintf(fd, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
+  fdprintf(fd, "<meta http-equiv=\"expires\" content=\"0\">\n");
+  if((opt.mode == REALTIME_RESPONSE) && (opt.refresh > 0)) {
+    fdprintf(fd, "<meta http-equiv=\"refresh\" content=\"%d\">\n", opt.refresh);
+  }
+  if (opt.stylesheet[0] != '\0') {
+    if ((opt.mode != REALTIME_RESPONSE) || (strncmp(opt.stylesheet, "http", 4) == 0)) {
+      fdprintf(fd, "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">\n", opt.stylesheet);
+    } else {
+      char buf[BUFSIZE];
+      FILE *cssfd;
+      int retval;
+
+      cssfd = fopen(opt.stylesheet, "r");
+      if (cssfd == NULL) {
+	syslog(LOG_NOTICE, "fopen %s: %s", opt.stylesheet, strerror(errno));
+      } else {
+	fdprintf(fd, "<style type=\"text/css\">\n<!--\n");
+	while (fgets(buf, BUFSIZE, cssfd)) fdprintf(fd, buf);
+	fdprintf(fd, "-->\n</style>\n");
+	retval = fclose(cssfd);
+	if (retval == EOF)
+	  syslog(LOG_NOTICE, "fclose %s: %s", opt.stylesheet, strerror(errno));
+      }
+    }
+  } else {
+    fdprintf(fd, "<style type=\"text/css\">\n<!--\n");
+    fdprintf(fd, "body {font-family: verdana, arial, helvetica, sans-serif; font-size: 11px; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+    fdprintf(fd, "th, td {font-family: verdana, arial, helvetica, sans-serif; font-size: 11px; font-weight: normal; color: %s}\n", opt.textcol);
+    fdprintf(fd, ".r1 {background: %s}\n", opt.rowcol1);
+    fdprintf(fd, ".r2 {background: %s}\n", opt.rowcol2);
+    fdprintf(fd, "a:link, a:active, a:visited {color: %s}\n", opt.textcol);
+    fdprintf(fd, "-->\n</style>\n");
+  }
+  fdprintf(fd, "</head>\n<body>\n<center>\n");
+  fdprintf(fd, "<h1>%s</h1>\n", opt.title);
+}
+
+void output_html_footer(int fd)
 {
-  fprintf(fd, "</table>\n</div><br>\n");
-  fprintf(fd, "<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
-  fprintf(fd, "</body>\n</html>\n");
+  fdprintf(fd, "</table>\n</center>\n");
+  fdprintf(fd, "<p><small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small></p>\n", PACKAGE, VERSION, COPYRIGHT);
+  fdprintf(fd, "</body>\n</html>\n");
 }
 
 void output_raw_data(struct conn_data *input)

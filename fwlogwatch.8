@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.26 2003/04/08 21:42:36 bwess Exp $
-.TH FWLOGWATCH 8 "22 March 2003" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.27 2003/06/23 15:26:53 bwess Exp $
+.TH FWLOGWATCH 8 "19 June 2003" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -42,6 +42,32 @@ Do not differentiate destination IP addresses. Useful for finding scans in
 whole subnets.
 .IP \-d
 Differentiate destination ports.
+.IP \-E\ \fIformat\fR
+Specific hosts, ports, chains and branches (targets) can be selected or
+excluded, selections an exclusions can be combined and added. The format is
+composed of one of the functions
+.I i
+include or
+.I e
+exclude, then one of the parameters
+.I h
+host,
+.I p
+port,
+.I c
+chain or
+.I b
+branch. In case of a host or port a third parameter for
+.I s
+source or
+.I d
+destination is needed. Finally, the object is directly appended, in case of
+a host this is an IP address, port is a number and chain and branch are
+strings. To show entries with destination port 25 you would use
+.B -Eipd25
+and to exclude entries which have localhost as source host or belong to the
+chain INPUT:
+.B -Eehs127.0.0.1 -EecINPUT
 .IP \-M\ \fInumber\fR
 If you only want to see a fixed maximum amount of entries (e.g. the "top 20")
 this option will trim the output for you.
@@ -285,9 +311,6 @@ configured to do so.
 The following features are only available in the configuration file and not
 on the command line, they are presented and explained in more detail in the
 sample configuration file.
-.IP Selection\ and\ exclusion
-Specific hosts, ports, chains and branches (targets) to be summarized can be
-selected or excluded.
 .IP HTML\ colors\ and\ stylesheet
 The colors of the HTML output and status page can be customized, an
 external cascading stylesheet can be referenced.

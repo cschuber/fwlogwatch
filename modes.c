@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.27 2003/04/08 21:42:40 bwess Exp $ */
+/* $Id: modes.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -204,7 +204,8 @@ void mode_summary()
   }
 
   if (opt.html) {
-    output_html_header(output);
+    output_html_header(fileno(output));
+    fprintf(output, "<p>\n");
   } else {
     fprintf(output, "%s\n", opt.title);
   }
@@ -329,8 +330,10 @@ void mode_summary()
   if(opt.mode == INTERACTIVE_REPORT)
     report();
 
-  if (opt.html)
-    output_html_footer(output);
+  if (opt.html) {
+    fflush(output);
+    output_html_footer(fileno(output));
+  }
 
   free_conn_data();
   free_dns_cache();
@@ -762,7 +765,7 @@ void mode_show_log_times()
     strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&last));
     printf(_("Last entry : %s\n"), stime);
     output_timediff(first, last, stime);
-    printf(_("Difference : %s\n"), stime);    
+    printf(_("Difference : %s\n"), stime);
   }
 
   free(opt.line);

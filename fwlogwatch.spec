@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.27 2003/04/08 21:42:37 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.28 2003/06/23 15:26:53 bwess Exp $
 
 Name: fwlogwatch
-Version: 0.9.2
+Version: 0.9.3
 Release: 1
 Group: Applications/Utilities
 Packager: Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>

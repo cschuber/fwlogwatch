@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.25 2003/04/08 21:42:41 bwess Exp $ */
+/* $Id: net.c,v 1.26 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,12 +8,12 @@
 #else
 #include <strings.h>
 #endif
-#include <stdarg.h>
 #include <errno.h>
 #include <syslog.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #ifndef __OpenBSD__
 #ifndef __FreeBSD__
@@ -178,30 +178,10 @@ void decode_base64(char *input)
   }
 }
 
-void fdprintf(int fd, char *format, ...)
-{
-  if(opt.status != FD_ERROR) {
-    char buf[BUFSIZE];
-    va_list argv;
-    ssize_t retval;
-
-    va_start(argv, format);
-    vsnprintf(buf, BUFSIZE, format, argv);
-    retval = write(fd, buf, strlen(buf));
-    va_end(argv);
-    if(retval == -1) {
-      syslog(LOG_NOTICE, "write: %s", strerror(errno));
-      opt.status = FD_ERROR;
-      return;
-    }
-    fflush(NULL);
-  }
-}
-
 void table_header(int conn, unsigned char mode)
 {
   fdprintf(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-  fdprintf(conn, _("<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"), opt.rowcol1);
+  fdprintf(conn, _("<tr align=\"center\"><th>count</th><th>added</th>"));
   if(opt.proto)
     fdprintf(conn, _("<th>proto</th>"));
   fdprintf(conn, _("<th>source</th>"));
@@ -293,7 +273,9 @@ void handshake()
 
   secure_read(conn, buf, BUFSIZE);
   while(!(strncmp(buf, "", BUFSIZE) == 0)) {
-    if(strncmp(buf, "Authorization: Basic ", 21) == 0) {
+    if((strlen(buf) == 22) && (strncmp(buf, "GET /?sort=", 11) == 0) && (strchr("ctpSsDdze", buf[11]) != NULL) && (strchr("ad", buf[12]) != NULL)) {
+      snprintf(opt.sort_order, MAXSORTSIZE, "%c%c", buf[11], buf[12]);
+    } else if(strncmp(buf, "Authorization: Basic ", 21) == 0) {
       xstrncpy(password, buf+21, PASSWORDSIZE);
       decode_base64(password);
       if (strncmp(opt.user, password, strlen(opt.user)) == 0) {
@@ -308,6 +290,8 @@ void handshake()
     }
     secure_read(conn, buf, BUFSIZE);
   }
+
+  signal(SIGPIPE, SIG_IGN);
 
   if (auth == 0) {
     if(opt.verbose == 2) {
@@ -328,31 +312,15 @@ void handshake()
     fdprintf(conn, "Connection: close\r\n");
     fdprintf(conn, "Content-Type: text/html\r\n\r\n");
 
-    fdprintf(conn, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-    fdprintf(conn, "<html>\n<head>\n<title>%s</title>\n", opt.title);
-    fdprintf(conn, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
-    fdprintf(conn, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
-    fdprintf(conn, "<meta http-equiv=\"expires\" content=\"0\">\n");
+    output_html_header(conn);
+
+    fdprintf(conn, _("<p><a href=\"/\">Reload</a>"));
     if(opt.refresh > 0) {
-      fdprintf(conn, "<meta http-equiv=\"refresh\" content=\"%d\">\n", opt.refresh);
-    }
-    if (opt.stylesheet[0] != '\0') {
-      fdprintf(conn, "<link rel=\"stylesheet\" href=\"%s\">\n", opt.stylesheet);
+      fdprintf(conn, _("<br>\n(automatic refresh every %d seconds)</p>\n"), opt.refresh);
     } else {
-      fdprintf(conn, "<style type=\"text/css\">\n<!--\n");
-      fdprintf(conn, "BODY {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-      fdprintf(conn, "A:link, A:active, A:visited {color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-      fdprintf(conn, "TH, TD {font-family: arial, helvetica, sans-serif; color: %s}\n", opt.textcol);
-      fdprintf(conn, "SMALL {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-      fdprintf(conn, "-->\n</style>\n");
+      fdprintf(conn, "</p>\n");
     }
-    fdprintf(conn, "</head>\n<body>\n");
-    fdprintf(conn, "<div align=\"center\">\n<h1>%s</h1>\n", opt.title);
-    fdprintf(conn, _("<a href=\"/\">Reload</a><br>\n"));
-    if(opt.refresh > 0) {
-      fdprintf(conn, _("(automatic refresh every %d seconds)<br>\n"), opt.refresh);
-    }
-    fdprintf(conn, _("</div>\n<h2>General information</h2>\n"));
+    fdprintf(conn, _("<h2>General information</h2>\n"));
 
     fdprintf(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
     strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
@@ -395,7 +363,7 @@ void handshake()
 	max++;
       if(this->count >= opt.least) {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this->start_time));
-	fdprintf(conn, "<tr bgcolor=\"%s\" align=\"center\"><td>%d</td><td>%s</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, nows);
+	fdprintf(conn, "<tr class=\"r%d\" align=\"center\"><td>%d</td><td>%s</td>", color, this->count, nows);
 	if(opt.proto) {
 	  fdprintf(conn, "<td>%s</td>", resolve_protocol(this->protocol));
 	}
@@ -440,7 +408,7 @@ void handshake()
       }
       this = this->next;
     }
-    fdprintf(conn, "</table>\n<br>\n");
+    fdprintf(conn, "</table>\n");
 
     color = 1;
     fdprintf(conn, _("<h2>Host status</h2>\n"));
@@ -449,7 +417,7 @@ void handshake()
 
     this_host = first_host;
     while(this_host != NULL) {
-      fdprintf(conn, "<tr bgcolor=\"%s\" align=\"center\"><td>%d</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->count);
+      fdprintf(conn, "<tr class=\"r%d\" align=\"center\"><td>%d</td>", color, this_host->count);
 
       if (this_host->time == 0) {
 	int mask;
@@ -520,11 +488,10 @@ void handshake()
 
       this_host = this_host->next;
     }
-    fdprintf(conn, "</table>\n<br><br>\n");
-
-    fdprintf(conn, "<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
-    fdprintf(conn, "</body>\n</html>\n");
+    output_html_footer(conn);
   }
+
+  signal(SIGPIPE, SIG_DFL);
 
   retval = close(conn);
   if (retval == -1) {

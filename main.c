@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.27 2003/04/08 21:42:39 bwess Exp $ */
+/* $Id: main.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +32,7 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -c <file>    specify config file (defaults to %s)\n"), RCFILE);
   printf(_("  -D           do not differentiate destination IP addresses\n"));
   printf(_("  -d           differentiate destination ports\n"));
+  printf(_("  -E <format>  select or exclude hosts, ports, chains and targets\n"));
   printf(_("  -m <count>   only show entries with at least so many incidents\n"));
   printf(_("  -M <number>  only show this amount of entries\n"));
   printf(_("  -N           resolve service names\n"));
@@ -230,7 +231,7 @@ void init_options()
 
 int main(int argc, char **argv)
 {
-  unsigned char alt_rcfile = 0;
+  unsigned char alt_rcfile = 0, parser_mode;
   int iopt;
 
   init_options();
@@ -242,7 +243,7 @@ int main(int argc, char **argv)
   textdomain(PACKAGE);
 #endif
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeF:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeE:F:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -271,6 +272,44 @@ int main(int argc, char **argv)
       break;
     case 'e':
       opt.etimes = 1;
+      break;
+    case 'E':
+      if(optarg[0] == 'i') {
+	parser_mode = PARSER_MODE_DEFAULT;
+      } else if(optarg[0] == 'e') {
+	parser_mode = PARSER_MODE_NOT;
+      } else {
+	fprintf(stderr, _("Illegal inclusion/exclusion pos. 1 (expected [ie]): %s\n"), optarg);
+	fprintf(stderr, _("Exiting\n"));
+	exit(EXIT_FAILURE);
+      }
+      if(optarg[1] == 'h') {
+	parser_mode = parser_mode | PARSER_MODE_HOST;
+      } else if(optarg[1] == 'p') {
+	parser_mode = parser_mode | PARSER_MODE_PORT;
+      } else if(optarg[1] == 'c') {
+	parser_mode = parser_mode | PARSER_MODE_CHAIN;
+        add_exclude_hpb(optarg+2, parser_mode);
+	break;
+      } else if(optarg[1] == 'b') {
+	parser_mode = parser_mode | PARSER_MODE_BRANCH;
+        add_exclude_hpb(optarg+2, parser_mode);
+	break;
+      } else {
+	fprintf(stderr, _("Illegal inclusion/exclusion pos. 2 (expected [hpcb]): %s\n"), optarg);
+	fprintf(stderr, _("Exiting\n"));
+	exit(EXIT_FAILURE);
+      }
+      if(optarg[2] == 'd') {
+	parser_mode = parser_mode | PARSER_MODE_DEFAULT;
+      } else if(optarg[2] == 's') {
+	parser_mode = parser_mode | PARSER_MODE_SRC;
+      } else {
+	fprintf(stderr, _("Illegal inclusion/exclusion pos. 3 (expected [sd]): %s\n"), optarg);
+	fprintf(stderr, _("Exiting\n"));
+	exit(EXIT_FAILURE);
+      }
+      add_exclude_hpb(optarg+3, parser_mode);
       break;
     case 'F':
       xstrncpy(opt.sender, optarg, EMAILSIZE);

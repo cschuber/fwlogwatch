@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.27 2003/04/08 21:42:35 bwess Exp $ */
+/* $Id: compare.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -349,14 +349,14 @@ void show_list(FILE *fd)
   while ((this != NULL) && (opt.max == 0 || max < opt.max || opt.mode == INTERACTIVE_REPORT)) {
     if(this->count >= opt.least && (opt.mode != INTERACTIVE_REPORT || this->count > opt.threshold)) {
       if (opt.html) {
-	output_html(this, fd);
+	output_html_entry(this, fd);
 	if (opt.html == 1) {
 	  opt.html = 2;
 	} else {
 	  opt.html = 1;
 	}
       } else {
-	output_plain(this, fd);
+	output_text_entry(this, fd);
       }
     }
     if (opt.max != 0)

@@ -1,4 +1,4 @@
-/* $Id: ipfilter.h,v 1.15 2003/04/08 21:42:37 bwess Exp $ */
+/* $Id: ipfilter.h,v 1.16 2003/06/23 15:26:53 bwess Exp $ */
 
 #ifndef _IPFILTER_H
 #define _IPFILTER_H

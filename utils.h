@@ -1,4 +1,4 @@
-/* $Id: utils.h,v 1.27 2003/04/08 21:43:01 bwess Exp $ */
+/* $Id: utils.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -21,5 +21,6 @@ void add_exclude_hpb(char *input, unsigned char mode);
 void add_input_file(char *name);
 void free_input_file(void);
 void generate_email_header(FILE *fd);
+void fdprintf(int fd, char *format, ...);
 
 #endif

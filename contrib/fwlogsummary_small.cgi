@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogsummary_small.cgi,v 1.12 2003/04/08 21:43:04 bwess Exp $
+# $Id: fwlogsummary_small.cgi,v 1.13 2003/06/23 15:26:53 bwess Exp $
 
 echo "Content-Type: text/html"
 echo

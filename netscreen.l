@@ -1,4 +1,4 @@
-/* $Id: netscreen.l,v 1.3 2003/04/08 21:42:42 bwess Exp $ */
+/* $Id: netscreen.l,v 1.4 2003/06/23 15:26:53 bwess Exp $ */
 
 %option prefix="ns"
 %option outfile="netscreen.c"
