@@ -1,4 +1,4 @@
-/* $Id: cisco.h,v 1.7 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: cisco.h,v 1.8 2002/02/14 21:09:41 bwess Exp $ */
 
 #ifndef _CISCO_H
 #define _CISCO_H

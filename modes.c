@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: modes.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +28,7 @@ void mode_summary()
   char buf[BUFSIZE], nows[TIMESIZE], log_begin[TIMESIZE], log_end[TIMESIZE];
   FILE *input, *output = NULL;
   unsigned char valid_times = 0;
-  int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0;
+  int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0, exnum = 0;
   time_t now;
   struct passwd *gen_user;
 
@@ -53,6 +53,7 @@ void mode_summary()
     if (hit == PARSE_OK) { ++hitnum; }
     if (hit == PARSE_WRONG_FORMAT) { ++errnum; }
     if (hit == PARSE_TOO_OLD) { ++oldnum; }
+    if (hit == PARSE_EXCLUDED) { ++hitnum; ++exnum; }
   }
 
   valid_times = get_times(input, log_begin, log_end);
@@ -99,7 +100,7 @@ void mode_summary()
 
   gen_user = getpwuid(getuid());
   if (gen_user != NULL) {
-    if (gen_user->pw_gecos != '\0') {
+    if (gen_user->pw_gecos[0] != '\0') {
       printf("%s.\n", gen_user->pw_gecos);
     } else {
       printf("%s.\n", gen_user->pw_name);
@@ -121,7 +122,14 @@ void mode_summary()
   printf("of %d entries in the file ", linenum);
   printf("\"%s\" are packet logs, ", opt.inputfile);
   retval = list_stats();
-  printf("%d %s unique connection characteristics.\n", retval, (retval==1)?"has":"have");
+  printf("%d %s unique characteristics.\n", retval, (retval==1)?"has":"have");
+
+  if (exnum != 0) {
+    if (opt.html)
+      printf("<br>\n");
+
+    printf("%d entr%s excluded by configuration.\n", exnum, (exnum==1)?"y was":"ies were");
+  }
 
   if (opt.html)
     printf("<br>\n");
@@ -185,6 +193,7 @@ void mode_summary()
 
   free_conn_data();
   free_dns_cache();
+  free_exclude_data();
 
   if (opt.use_out) {
     if (opt.verbose)
@@ -207,6 +216,22 @@ void terminate()
   log_exit();
 }
 
+void check_pidfile()
+{
+  struct stat *sbuf;
+
+  sbuf = xmalloc(sizeof(struct stat));
+  if (stat(PIDFILE, sbuf) != -1) {
+    fprintf(stderr, "Warning: pidfile exists, another fwlogwatch might be running.\n");
+  } else {
+    if ((errno != ENOENT) && (errno != EACCES)){
+      fprintf(stderr, "stat %s: %d, %s\n", PIDFILE, errno, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+  }
+  free(sbuf);
+}
+
 void mode_rt_response()
 {
   char buf[BUFSIZE];
@@ -218,6 +243,8 @@ void mode_rt_response()
   struct timeval tv;
 #ifndef RR_DEBUG
   pid_t pid;
+
+  check_pidfile();
 
   pid = fork();
   if (pid == -1) {
@@ -298,7 +325,8 @@ void mode_rt_response()
   if(opt.status)
     sock = prepare_socket();
 
-  look_for_log_rules();
+  if((opt.format & PARSER_IPCHAINS) != 0)
+    look_for_log_rules();
 
   syslog(LOG_NOTICE, "Alert threshold is %d attempt%s", opt.threshold, (opt.threshold == 1)?"":"s");
 

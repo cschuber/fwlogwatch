@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: compare.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -137,7 +137,7 @@ struct conn_data *split(struct conn_data *list1)
   }
 }
 
-struct conn_data *mergesort(struct conn_data *list1)
+struct conn_data *fwlw_mergesort(struct conn_data *list1)
 {
   struct conn_data *list2;
 
@@ -145,7 +145,7 @@ struct conn_data *mergesort(struct conn_data *list1)
   else if (list1->next == NULL) return list1;
   else {
     list2 = split(list1);
-    return merge(mergesort(list1), mergesort(list2));
+    return merge(fwlw_mergesort(list1), fwlw_mergesort(list2));
   }
 }
 
@@ -153,7 +153,7 @@ void sort_data()
 {
   unsigned char i = 0, error;
 
-  while (opt.sort_order[i] != '\0') {
+  while ((i < MAXSORTSIZE) && (opt.sort_order[i] != '\0')) {
     error = 0;
     switch (opt.sort_order[i]) {
     case 'c':
@@ -207,7 +207,7 @@ void sort_data()
 
     i++;
     if (error == 0) {
-      first = mergesort(first);
+      first = fwlw_mergesort(first);
       if (opt.verbose == 2)
 	fprintf(stderr, ".");
     }

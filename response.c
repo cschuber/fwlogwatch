@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: response.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,10 +50,10 @@ void look_for_log_rules()
   }
 
   if (found > 0) {
-    syslog(LOG_NOTICE, "%u logging firewall rule%s defined", found, (found == 1)?"":"s");
+    syslog(LOG_NOTICE, "%u logging ipchains firewall rule%s defined", found, (found == 1)?"":"s");
   } else {
-    syslog(LOG_NOTICE, "No logging firewall rules defined, exiting");
-    exit(EXIT_FAILURE);
+    syslog(LOG_NOTICE, "No logging ipchains firewall rules defined, format was requested");
+    log_exit();
   }
 }
 
@@ -177,7 +177,7 @@ void remove_old()
       diff = now - this->start_time;
     if (diff >= opt.recent) {
       if(opt.verbose == 2)
-	syslog(LOG_NOTICE, "Deleting connection cache entry (%s)", inet_ntoa(this->shost));
+	syslog(LOG_NOTICE, "Deleting packet cache entry (%s)", inet_ntoa(this->shost));
       if (is_first == 1) {
 	prev = this->next;
 	free(this);
@@ -250,7 +250,7 @@ void look_for_alert()
       }
       if(opt.response & OPT_NOTIFY_EMAIL) {
 	snprintf(buf, BUFSIZE,
-		 "%s | %s -s 'fwlogwatch alert: %d connection attempt%s from %s' %s",
+		 "%s | %s -s 'fwlogwatch alert: %d packet%s from %s' %s",
 		 P_ECHO, P_MAIL,
 		 this->count, (this->count == 1)?"":"s",
 		 inet_ntoa(this->shost), opt.recipient);
@@ -258,9 +258,10 @@ void look_for_alert()
       }
       if(opt.response & OPT_NOTIFY_SMB) {
 	snprintf(buf, BUFSIZE,
-		 "%s 'fwlogwatch alert: %d connection attempts from %s' | %s -M %s",
+		 "%s 'fwlogwatch alert: %d packet%s from %s' | %s -M %s",
 		 P_ECHO,
-		 this->count, inet_ntoa(this->shost),
+		 this->count, (this->count == 1)?"":"s",
+		 inet_ntoa(this->shost),
 		 P_SMBCLIENT, opt.smb_host);
 	run_command(buf);
       }

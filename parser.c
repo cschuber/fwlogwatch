@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: parser.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,34 +10,110 @@
 #include "parser.h"
 #include "compare.h"
 #include "utils.h"
-#include "ipchains.h"
-#include "netfilter.h"
 #include "cisco.h"
+#include "ipchains.h"
+#include "ipfilter.h"
+#include "netfilter.h"
 
+struct parser_options *excluded_first;
 extern struct options opt;
 
 unsigned char parse_line(char *input, int linenum)
 {
   unsigned char retval;
 
-  if (strstr(input, " kernel: Packet log: ")) {
+  if ((opt.format & PARSER_IPCHAINS) && (strstr(input, " kernel: Packet log: "))) {
+    /* For ipchains log format see (in kernel 2.2 source) */
+    /* /usr/src/linux/net/ipv4/ip_fw.c */
     retval = flex_ipchains(input, linenum);
-    /* For ipchains log format see */
-    /* /usr/src/linux-2.2.18/net/ipv4/ip_fw.c */
-  } else if (strstr(input, "IN=")) {
+  } else if ((opt.format & PARSER_NETFILTER) && (strstr(input, "IN="))) {
+    /* For netfilter log format see (in kernel 2.4 source) */
+    /* /usr/src/linux/net/ipv4/netfilter/ipt_LOG.c */
     retval = flex_netfilter(input, linenum);
-    /* For iptables/netfilter log format see */
-    /* /usr/src/linux-2.4.0-test12/net/ipv4/netfilter/ipt_LOG.c */
-  } else if (strstr(input, "%SEC-6-IPACCESSLOG")) {
-    /* For cisco log format see cisco online documentation */
+  } else if ((opt.format & PARSER_CISCO) && (strstr(input, "%SEC-6-IPACCESSLOG"))) {
+    /* For cisco log format see CCO */
     retval = flex_cisco(input, linenum);
+  } else if ((opt.format & PARSER_IPFILTER) && (strstr(input, " ipmon"))) {
+    /* For ipfilter log format see the source */
+    /* http://coombs.anu.edu.au/~avalon/ */
+    retval = flex_ipfilter(input, linenum);
   } else {
+    retval = PARSE_NO_HIT;
+  }
+
+  if (retval == PARSE_NO_HIT) {
     if (opt.verbose == 2)
       fprintf(stderr, "_");
     return PARSE_NO_HIT;
   }
 
   if (retval == PARSE_OK) {
+    {
+      struct parser_options *excluded_this;
+      unsigned char match = P_MATCH_NONE;
+
+      excluded_this = excluded_first;
+      //while((excluded_this != NULL) && (match != P_MATCH_EXC)) {
+      while(excluded_this != NULL) {
+	if((excluded_this->mode & PARSER_MODE_HOST) != 0) {
+	  /* host */
+	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
+	    /* source */
+	    if(opt.line->shost.s_addr == excluded_this->value) {
+	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+		match = P_MATCH_EXC;
+	      } else {
+		match = P_MATCH_INC;
+	      }
+	    }
+	  } else {
+	    /* destination */
+	    if(opt.line->dhost.s_addr == excluded_this->value) {
+	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+		match = P_MATCH_EXC;
+	      } else {
+		match = P_MATCH_INC;
+	      }
+	    }
+	  }
+	} else {
+	  /* port */
+	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
+	    /* source */
+	    if(opt.line->sport == excluded_this->value) {
+	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+		match = P_MATCH_EXC;
+	      } else {
+		match = P_MATCH_INC;
+	      }
+	    }
+	  } else {
+	    /* destination */
+	    if(opt.line->dport == excluded_this->value) {
+	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+		match = P_MATCH_EXC;
+	      } else {
+		match = P_MATCH_INC;
+	      }
+	    }
+	  }
+	}
+
+	if(((excluded_this->mode & PARSER_MODE_NOT) == 0) &&
+	   (match == P_MATCH_NONE)) {
+	  match = P_MATCH_EXC;
+	}
+
+	excluded_this = excluded_this->next;
+      }
+
+      if(match == P_MATCH_EXC) {
+	if (opt.verbose == 2)
+	  fprintf(stderr, "e");
+	return PARSE_EXCLUDED;
+      }
+    }
+
     if(opt.recent != 0) {
       if((opt.now - opt.line->time) > opt.recent) {
 	if(opt.verbose == 2) {
@@ -133,4 +209,35 @@ int parse_time(char *input)
 
   free(string);
   return seconds;
+}
+
+void select_parsers()
+{
+  unsigned char i = 0;
+
+  if (opt.format_sel[0] == '\0') {
+    return;
+  } else {
+    opt.format = 0;
+    while ((i < SHORTLEN) && (opt.format_sel[i] != '\0')) {
+      switch (opt.format_sel[i]) {
+      case 'i':
+	opt.format = opt.format | PARSER_IPCHAINS;
+	break;
+      case 'n':
+	opt.format = opt.format | PARSER_NETFILTER;
+	break;
+      case 'c':
+	opt.format = opt.format | PARSER_CISCO;  
+	break;
+      case 'f':
+	opt.format = opt.format | PARSER_IPFILTER;  
+	break;
+      default:
+	fprintf(stderr, "Unknown parser: '%c'.\n", opt.format_sel[i]);
+	exit(EXIT_FAILURE);
+      }
+      i++;
+    }
+  }
 }

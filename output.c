@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: output.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -158,7 +158,7 @@ void output_resolved(struct conn_data *input)
   }
 
   if (!opt.html)
-    printf(" connect%s", (input->count == 1) ? "" : "s");
+    printf(" packet%s", (input->count == 1) ? "" : "s");
 
   if (opt.src_ip) {
     separate(SPACE);

@@ -1,4 +1,4 @@
-/* $Id: cisco.yy,v 1.7 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: cisco.yy,v 1.8 2002/02/14 21:09:41 bwess Exp $ */
 
 %option prefix="cisco"
 %option outfile="cisco.c"
@@ -29,13 +29,14 @@ PORT	{DIGIT}{1,5}
 CISCO	"%SEC-6-IPACCESSLOG"("P"|"DP"|"RP"|"NP"|"S")":"
 LIST	[a-zA-Z0-9._-]*
 TARGET	"denied"|"permitted"
-PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|{NUMBER}
+PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|"pim"|{NUMBER}
 
 %%
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	cisco_parse_date(ciscotext, C_OPT_HOST);
 {NUMBER}":"	/* ignore */
 {NUMBER}"w"{DIGIT}"d:"	/* ignore */
+{DIGIT}"d"{DIGIT}{2}"h:"	/* ignore */
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}"."{DIGIT}{3}":"	cisco_parse_date(ciscotext, C_OPT_MSEC);
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}":"	cisco_parse_date(ciscotext, C_OPT_NONE);
 {CISCO}		/* ignore */
@@ -56,7 +57,7 @@ PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|{NUMBER}
 
 void cisco_parse_date(char *input, unsigned char mode)
 {
-  int day, hour, minute, second, msec;
+  int retval, day, hour, minute, second, msec;
   char smonth[3];
 #ifdef IRIX
     char tmp[SHOSTLEN];
@@ -66,12 +67,13 @@ void cisco_parse_date(char *input, unsigned char mode)
 #endif
 
   if (mode == C_OPT_HOST) {
-    sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
+    retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
 	   smonth, &day, &hour, &minute, &second,
 #ifndef IRIX
 	   opt.line->hostname);
 #else
 	   tmp);
+    if(retval != 6) return;
     if(tmp[2] == ':')
       strncpy(opt.line->hostname, tmp+3, SHOSTLEN);
 #endif
@@ -81,11 +83,13 @@ void cisco_parse_date(char *input, unsigned char mode)
       *remove_dot = '\0';
 #endif
   } else if (mode == C_OPT_MSEC) {
-    sscanf(input, "%3s %2d %2d:%2d:%2d.%3d:",
-	   smonth, &day, &hour, &minute, &second, &msec);
+    retval = sscanf(input, "%3s %2d %2d:%2d:%2d.%3d:",
+		    smonth, &day, &hour, &minute, &second, &msec);
+    if(retval != 6) return;
   } else if (mode == C_OPT_NONE) {
-    sscanf(input, "%3s %2d %2d:%2d:%2d:",
-	   smonth, &day, &hour, &minute, &second);
+    retval = sscanf(input, "%3s %2d %2d:%2d:%2d:",
+		    smonth, &day, &hour, &minute, &second);
+    if(retval != 5) return;
   } else {
     return;
   }
@@ -99,19 +103,22 @@ void cisco_parse_src(char *input, unsigned char mode)
 {
   char proto[5], ip[IPLEN];
   int shost1, shost2, shost3, shost4;
+  int retval;
 
   if (mode == C_OPT_PORT) {
-    sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d(%5d)",
-	   opt.line->chainlabel,
-	   opt.line->branchname,
-	   proto,
-	   &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
+    retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d(%5d)",
+		    opt.line->chainlabel,
+		    opt.line->branchname,
+		    proto,
+		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
+    if(retval != 8) return;
   } else if (mode == C_OPT_NONE) {
-    sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d",
-	   opt.line->chainlabel,
-	   opt.line->branchname,
-	   proto,
-	   &shost1, &shost2, &shost3, &shost4);
+    retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d",
+		    opt.line->chainlabel,
+		    opt.line->branchname,
+		    proto,
+		    &shost1, &shost2, &shost3, &shost4);
+    if(retval != 7) return;
   } else if (mode == C_OPT_MISSING) {
     return;
   }
@@ -128,6 +135,7 @@ void cisco_parse_src(char *input, unsigned char mode)
   if(strncmp(proto, "gre", 3) == 0) opt.line->protocol = 47; /* RFC1701/1702 */
   if(strncmp(proto, "ospf", 4) == 0) opt.line->protocol = 89;
   if(strncmp(proto, "ipinip", 6) == 0) opt.line->protocol = 4;
+  if(strncmp(proto, "pim", 3) == 0) opt.line->protocol = 103;
   if(isdigit((int)proto[0])) opt.line->protocol = atoi(proto);
 
   if (opt.line->protocol != 0)
@@ -138,17 +146,21 @@ void cisco_parse_dst(char *input, unsigned char mode)
 {
   char ip[IPLEN];
   int dhost1, dhost2, dhost3, dhost4;
+  int retval;
 
   if (mode == C_OPT_PORT) {
-    sscanf(input, "-> %3d.%3d.%3d.%3d(%5d),",
-	   &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+    retval = sscanf(input, "-> %3d.%3d.%3d.%3d(%5d),",
+		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+    if(retval != 5) return;
   } else if (mode == C_OPT_TYPE) {
-    sscanf(input, "-> %3d.%3d.%3d.%3d (%2d/%2d),",
-	   &dhost1, &dhost2, &dhost3, &dhost4,
-	   &opt.line->sport, &opt.line->dport);
+    retval = sscanf(input, "-> %3d.%3d.%3d.%3d (%2d/%2d),",
+		    &dhost1, &dhost2, &dhost3, &dhost4,
+		    &opt.line->sport, &opt.line->dport);
+    if(retval != 6) return;
   } else if (mode == C_OPT_NONE) {
-    sscanf(input, "-> %3d.%3d.%3d.%3d,",
-	   &dhost1, &dhost2, &dhost3, &dhost4);
+    retval = sscanf(input, "-> %3d.%3d.%3d.%3d,",
+		    &dhost1, &dhost2, &dhost3, &dhost4);
+    if(retval != 4) return;
   } else {
     return;
   }

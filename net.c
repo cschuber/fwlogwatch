@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.10 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: net.c,v 1.11 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,9 +6,13 @@
 #include <string.h>
 #include <errno.h>
 #include <syslog.h>
-#include <crypt.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+
+#ifndef __OpenBSD__
+#include <crypt.h>
+#endif
+
 #include "utils.h"
 #include "main.h"
 #include "output.h"
@@ -240,7 +244,7 @@ void handshake(int fd)
 
     net_output(conn, "</table>\n");
 
-    net_output(conn, "<h2>Connection cache</h2>\n");
+    net_output(conn, "<h2>Packet cache</h2>\n");
     net_output(conn, "<table border=\"0\">\n");
     snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>count</td><td>IP address</td><td>remaining time</td></tr>\n", opt.rowcol1);
     net_output(conn, buf);

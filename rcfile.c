@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: rcfile.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,6 +83,10 @@ void parse_rcfile(char *input)
     strncpy(opt.inputfile, get_one_parameter(command+6), FILESIZE);
     return;
   }
+  if (strncmp(command, "parser", 6) == 0) {
+    strncpy(opt.format_sel, get_one_parameter(command+7), SHORTLEN);
+    return;
+  }
 
   /* Evaluation options */
 
@@ -108,6 +112,38 @@ void parse_rcfile(char *input)
   }
   if (strncmp(command, "tcp_opts", 8) == 0) {
     opt.opts = 1;
+    return;
+  }
+  if (strncmp(command, "exclude_src_host", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC|PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "exclude_src_port", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_SRC|PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "exclude_dst_host", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "exclude_dst_port", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_NOT);
+    return;
+  }
+  if (strncmp(command, "include_src_host", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_HOST|PARSER_MODE_SRC);
+    return;
+  }
+  if (strncmp(command, "include_src_port", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_SRC);
+    return;
+  }
+  if (strncmp(command, "include_dst_host", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), PARSER_MODE_HOST);
+    return;
+  }
+  if (strncmp(command, "include_dst_port", 16) == 0) {
+    add_exclude_host_port(get_one_parameter(command+16), 0);
     return;
   }
 

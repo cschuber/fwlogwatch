@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: main.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,13 +26,14 @@ void usage(char *me, unsigned char exitcode)
   printf("         -L          show time of first and last log entry in file\n");
   printf("         -l <time>   process recent events only (defaults to off)\n");
   printf("         -n          resolve host names\n");
+  printf("         -P <format> use only parsers for specific formats\n");
   printf("         -p          differentiate protocols\n");
   printf("         -S          do not differentiate source IP addresses\n");
   printf("         -s          differentiate source ports\n");
   printf("         -t          show start and end times\n");
   printf("         -V          show version and copyright info\n");
   printf("         -v          verbose, specify twice for more info\n");
-  printf("         -y          differentiate TCP options (SYN/ACK)\n");
+  printf("         -y          differentiate TCP options\n");
   printf("         -z          show time interval\n");
   printf("\n");
 
@@ -108,6 +109,8 @@ void init_options()
   strncpy(opt.inputfile, INFILE, FILESIZE);
 
   opt.line = NULL;
+  opt.format_sel[0] = '\0';
+  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO|PARSER_IPFILTER;
   opt.parser = 0;
 
   opt.src_ip = 1;
@@ -198,7 +201,7 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:M:no:O:pRsStT:vVwW:Xyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:A:Bc:C:dDf:F:hi:I:k:l:Lm:M:no:O:pP:RsStT:vVwW:Xyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -274,6 +277,9 @@ int main(int argc, char **argv)
     case 'p':
       opt.proto = 1;
       break;
+    case 'P':
+      strncpy(opt.format_sel, optarg, SHORTLEN);
+      break;
     case 'R':
       if (opt.mode != LOG_SUMMARY) {
 	mode_error();
@@ -322,6 +328,8 @@ int main(int argc, char **argv)
   if(alt_rcfile)
     read_rcfile(rcfile);
 
+  select_parsers();
+
   /* Consistency checks */
   if ((opt.src_port == 1) || (opt.dst_port == 1))
     opt.proto = 1;
@@ -337,6 +345,11 @@ int main(int argc, char **argv)
     mode_summary();
     break;
   case REALTIME_RESPONSE:
+    if (((opt.format & PARSER_IPCHAINS) == 0)
+	&& ((opt.response & OPT_BLOCK) != 0)) {
+      fprintf(stderr, "Error: the block response is only available for ipchains\n");
+      return EXIT_FAILURE;
+    }
     if (opt.src_ip == 0)
       opt.src_ip = 1;
     if (opt.threshold == 0)

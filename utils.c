@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: utils.c,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +15,7 @@ extern struct options opt;
 extern struct conn_data *first;
 extern struct dns_cache *dns_first;
 extern struct known_hosts *first_host;
+extern struct parser_options *excluded_first;
 
 void *xmalloc(int size)
 {
@@ -104,6 +105,19 @@ void free_hosts()
     free(first_host);
   }
   first_host = NULL;
+}
+
+void free_exclude_data()
+{
+  struct parser_options *excluded_this;
+
+  excluded_this = excluded_first;
+  while (excluded_this != NULL) {
+    excluded_first = excluded_this;
+    excluded_this = excluded_this->next;
+    free(excluded_first);
+  }
+  excluded_first = NULL;
 }
 
 void init_line()
@@ -228,4 +242,25 @@ void add_host_ip_net(char *input, time_t time)
   host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
   host->next = first_host;
   first_host = host;
+}
+
+void add_exclude_host_port(char *input, unsigned char mode)
+{
+  struct parser_options *excluded_this;
+  struct in_addr ip;
+
+  excluded_this = xmalloc(sizeof(struct parser_options));
+  excluded_this->mode = mode;
+  if(mode & PARSER_MODE_HOST) {
+    if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
+      printf("(excluded host)\n");
+      free(excluded_this);
+      exit(EXIT_FAILURE);
+    }
+    excluded_this->value = ip.s_addr;
+  } else {
+    excluded_this->value = atoi(input);
+  }
+  excluded_this->next = excluded_first;
+  excluded_first = excluded_this;
 }

@@ -1,4 +1,4 @@
-/* $Id: netfilter.yy,v 1.8 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: netfilter.yy,v 1.9 2002/02/14 21:09:41 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -88,8 +88,6 @@ void nf_parse_start(char *input)
     if (retval == 6) {
       strncpy(opt.line->chainlabel, "-", SHORTLEN);
     } else {
-      if(opt.verbose)
-	fprintf(stderr, "netfilter format mismatch: %d args, ignoring.\n", retval);
       return;
     }
   }

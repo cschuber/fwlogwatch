@@ -1,4 +1,4 @@
-/* $Id: ipchains.yy,v 1.5 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: ipchains.yy,v 1.6 2002/02/14 21:09:41 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -55,12 +55,13 @@ IPCHAINS	" kernel: Packet log: "
 
 void ipchains_parse_date(char *input)
 {
-  int day, hour, minute, second;
+  int retval, day, hour, minute, second;
   char smonth[3];
 
-  sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-	 smonth, &day, &hour, &minute, &second,
-	 opt.line->hostname);
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
+		  smonth, &day, &hour, &minute, &second,
+		  opt.line->hostname);
+  if(retval != 6) return;
 
   build_time(smonth, day, hour, minute, second);
 
@@ -69,24 +70,28 @@ void ipchains_parse_date(char *input)
 
 void ipchains_parse_data(char *input)
 {
-  sscanf(input, "%10s %10s %10s PROTO=%3d",
-	 opt.line->chainlabel,
-	 opt.line->branchname,
-	 opt.line->interface,
-	 &opt.line->protocol);
+  int retval;
+
+  retval = sscanf(input, "%10s %10s %10s PROTO=%3d",
+		  opt.line->chainlabel,
+		  opt.line->branchname,
+		  opt.line->interface,
+		  &opt.line->protocol);
+  if(retval != 4) return;
 
   opt.parser=opt.parser|IPCHAINS_DATA;
 }
  
 void ipchains_parse_rdata(char *input)
 {
-  int port;
+  int retval, port;
 
-  sscanf(input, "%10s REDIRECT %5d %10s PROTO=%3d",
-	 opt.line->chainlabel,
-	 &port,
-	 opt.line->interface,
-	 &opt.line->protocol);
+  retval = sscanf(input, "%10s REDIRECT %5d %10s PROTO=%3d",
+		  opt.line->chainlabel,
+		  &port,
+		  opt.line->interface,
+		  &opt.line->protocol);
+  if(retval != 4) return;
 
   snprintf(opt.line->branchname, SHORTLEN, "RD %d", port);
 
@@ -97,11 +102,13 @@ void ipchains_parse_ips(char *input)
 {
   int shost1, shost2, shost3, shost4;
   int dhost1, dhost2, dhost3, dhost4;
+  int retval;
   char ip[IPLEN];
 
-  sscanf(input, "%3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d",
-	 &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
-	 &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+  retval = sscanf(input, "%3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d",
+		  &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
+		  &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+  if(retval != 10) return;
 
   snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
   if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.12 2002/02/14 21:06:11 bwess Exp $ */
+/* $Id: main.h,v 1.13 2002/02/14 21:09:41 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.1.3"
-#define COPYRIGHT "2001-01-22 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.2"
+#define COPYRIGHT "2001-02-10 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -41,12 +41,18 @@ enum {
 
 /* Parser */
 
+#define PARSER_IPCHAINS 1
+#define PARSER_NETFILTER 2
+#define PARSER_CISCO 4
+#define PARSER_IPFILTER 8
+
 enum {
   PARSE_OK,
   PARSE_ERROR,
   PARSE_NO_HIT,
   PARSE_WRONG_FORMAT,
-  PARSE_TOO_OLD
+  PARSE_TOO_OLD,
+  PARSE_EXCLUDED
 };
 
 enum {
@@ -95,6 +101,20 @@ enum {
   C_OPT_PORT,
   C_OPT_MISSING,
   C_OPT_TYPE
+};
+
+/* ipfilter support */
+
+#define IPF_DATE 1
+#define IPF_DATA 2
+#define IPF_PROTO 4
+#define IPF_IPS 8
+#define IPF_NO_HIT 128
+
+enum {
+  IPF_OPT_NONE,
+  IPF_OPT_COUNT,
+  IPF_OPT_PORTS
 };
 
 /* Sorting */
@@ -162,11 +182,11 @@ enum {
 
 #define KNOWN_HOST 0
 
-#define OPT_LOG 0x01
-#define OPT_BLOCK 0x02
-#define OPT_NOTIFY_EMAIL 0x04
-#define OPT_NOTIFY_SMB 0x08
-#define OPT_CUSTOM_ACTION 0x10
+#define OPT_LOG 1
+#define OPT_BLOCK 2
+#define OPT_NOTIFY_EMAIL 4
+#define OPT_NOTIFY_SMB 8
+#define OPT_CUSTOM_ACTION 16
 
 enum {
   ADD_CHAIN,
@@ -244,6 +264,22 @@ struct known_hosts {
   struct known_hosts *next;
 };
 
+struct parser_options {
+  unsigned char mode;
+  unsigned long int value;
+  struct parser_options *next;
+};
+
+#define PARSER_MODE_NOT 1
+#define PARSER_MODE_HOST 2 /* host or port */
+#define PARSER_MODE_SRC 4 /* source or destination */
+
+enum {
+  P_MATCH_NONE,
+  P_MATCH_EXC,
+  P_MATCH_INC
+};
+
 struct options {
   unsigned char mode;
 
@@ -252,6 +288,8 @@ struct options {
   char inputfile[FILESIZE];
 
   struct log_line *line;
+  char format_sel[SHORTLEN];
+  unsigned char format;
   unsigned char parser;
 
   unsigned char src_ip;

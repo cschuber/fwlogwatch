@@ -1,9 +1,9 @@
-$Id: README,v 1.11 2002/02/14 21:06:11 bwess Exp $
+$Id: README,v 1.12 2002/02/14 21:09:41 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
-linux ipchains, netfilter/iptables and cisco log files. It also features
-incident report and realtime response capabilities.
+linux ipchains, netfilter/iptables, ipfilter and cisco log files. It also
+features incident report and realtime response capabilities.
 
 It is available from the RUS-CERT website
 http://cert.uni-stuttgart.de/projects/fwlogwatch/
@@ -21,10 +21,11 @@ FEATURES
     and interfaces).
   - Can separate recent from old entries and detects timewarps in log files.
   - Plain text and HTML output with sort options.
+  - Ports and hosts can be selected or excluded as needed.
   - Integrated resolver for protocols, services and host names.
   - Own DNS cache for faster lookups.
-  - Detects and processes ipchains, netfilter/iptables and cisco log
-    entries, in separate files or even combined.
+  - Detects and processes ipchains, netfilter/iptables, ipfilter and cisco
+    log entries, even combined or only with the selected parsers.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -49,12 +50,14 @@ The commented configuration file supports and explains all options and will
 get you started quickly.
 
 
-NETFILTER AND CISCO SUPPORT
-fwlogwatch also features iptables/netfilter and cisco log file support, it
-can even parse combined log files. Some restrictions apply because not all
-fields exist or make sense in all log file types. Realtime response mode
-only works for ipchains. It is assumed that if you use netfilter or a cisco
-product you know how to get them to produce usable log entries through syslog.
+NETFILTER, IPFILTER AND CISCO SUPPORT
+fwlogwatch also features iptables/netfilter, ipfilter and cisco log file
+support, it can even combine or separate the formats if you activate or
+deactivate the corresponding parsers. Some restrictions apply because not all
+fields exist or make sense in all log file types. The block response in
+realtime response mode only works for ipchains and you will need to
+deactivate the ipchains parser if you want to use realtime response mode on
+a system without ipchains.
 
 
 INSTALLATION

@@ -1,7 +1,5 @@
-.\"
-.\" $Id: fwlogwatch.8,v 1.11 2002/02/14 21:06:11 bwess Exp $
-.\"
-.TH FWLOGWATCH 8 "20 January 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.12 2002/02/14 21:09:41 bwess Exp $
+.TH FWLOGWATCH 8 "10 February 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -9,9 +7,9 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .RI [ options ]
 .SH DESCRIPTION
 .B fwlogwatch
-produces ipchains, netfilter/iptables and cisco log summary reports in text
-and HTML form and has a lot of options to find and display relevant
-patterns in connection attempts. With the data found it can produce
+produces ipchains, netfilter/iptables, ipfilter and cisco log summary
+reports in text and HTML form and has a lot of options to find and display
+relevant patterns in packet logs. With the data found it can produce
 customizable incident reports from a template and send them to abuse
 contacts at offending sites or CERT coordination centers. Finally, it can
 also run as daemon and report anomalies or start countermeasures.
@@ -50,6 +48,18 @@ below for the time options.
 Enable DNS lookups. Host names will be resolved (reverse and forward lookup
 with a warning if they don't match). This makes summary generation very
 slow if a lot of different hosts appear in the log file.
+.IP \-P\ \fIformat\fR
+Only use certain parsers, where the log
+.I format
+can be one or a combination of:
+.I i
+ipchains,
+.I n
+netfilter,
+.I c
+cisco and
+.I f
+ipfilter.
 .IP \-p
 Differentiate protocols. This is activated automatically if you
 differentiate source and/or destination ports.
@@ -58,8 +68,8 @@ Do not differentiate source IP addresses.
 .IP \-s
 Differentiate source ports.
 .IP \-t
-Show start and end times of connection attempts. End times are only
-available if the connection attempt entry consists of more than one packet.
+Show start and end times of logged packets. End times are only available if
+there is more than one packet log entry with unique characteristics.
 .IP \-V
 Show version and copyright information.
 .IP \-v
@@ -68,13 +78,13 @@ In very verbose mode while parsing the log file you will see "." for
 relevant packet filter log entries, "o" for packet filter log entries that
 are too old and "_" for entries that are not packet filter logs.
 .IP \-y
-Differentiate TCP options (SYN/ACK). All connections with a SYN are listed
-separately, other TCP flags are not available because ipchains and cisco
-don't log them (netfilter does, cisco doesn't even log SYNs).
+Differentiate TCP options. All packets with a SYN are listed separately,
+other TCP flags are shown in full format if they are available (ipchains
+does not log them, netfilter and ipfilter do, cisco doesn't even log SYNs).
 .IP \-z
-Show time interval between start and end time of connection attempts. This
-is only available if the connection attempt entry consists of more than one
-packet.
+Show time interval between start and end time of packet log entries. This
+is only available if there is more than one packet log entry with unique
+characteristics.
 .SH "LOG SUMMARY MODE"
 This are additional options that are only available in log summary mode:
 .IP \-m\ \fIcount\fR
@@ -229,11 +239,16 @@ The colors of the HTML output page can be customized.
 .IP status\ server\ options
 The host that can access the web interface, the port it listens to and the
 user and password can be changed.
-.SH NETFILTER AND CISCO SUPPORT
-fwlogwatch also features iptables/netfilter and cisco log file support, it can
-even parse combined log files. Some restrictions apply because not all fields
-exist or make sense in all log file types. Realtime response mode only works
-for ipchains.
+.IP host\ and\ port\ selection\ and\ exclusion
+Hosts and ports to be summarized can be selected or excluded.
+.SH "NETFILTER, IPFILTER AND CISCO SUPPORT"
+fwlogwatch also features iptables/netfilter, ipfilter and cisco log file
+support, it can even combine or separate the formats if you activate or
+deactivate the corresponding parsers. Some restrictions apply because not all
+fields exist or make sense in all log file types. The block response in
+realtime response mode only works for ipchains and you will need to
+deactivate the ipchains parser if you want to use realtime response mode on
+a system without ipchains.
 .SH SECURITY
 Since
 .B fwlogwatch
