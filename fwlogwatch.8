@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.20 2002/02/24 14:27:30 bwess Exp $
-.TH FWLOGWATCH 8 "02 December 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.21 2002/03/29 11:25:51 bwess Exp $
+.TH FWLOGWATCH 8 "16 March 2002" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -7,40 +7,16 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .RI [ options ]
 .SH DESCRIPTION
 .B fwlogwatch
-produces ipchains, netfilter/iptables, cisco IOS, cisco PIX and ipfilter
-log summary reports in text and HTML form and has a lot of options to find
-and display relevant patterns in packet logs. With the data found it can
-produce customizable incident reports from a template and send them to
-abuse contacts at offending sites or CERT coordination centers. Finally, it
-can also run as daemon and report anomalies or start countermeasures.
+produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
+ipfilter, Cisco IOS, Cisco PIX and Windows XP firewall log summary reports
+in plain text and HTML form and has a lot of options to analyze and display
+relevant patterns. It can produce customizable incident reports and send
+them to abuse contacts at offending sites or CERTs. Finally, it can also
+run as daemon (with web interface) doing realtime log monitoring and
+reporting anomalies or starting attack countermeasures.
 
-.SH OPTIONS
-The global options for all modes (at least where they make sense) are:
-.IP \-c\ \fIconfig\fR
-Use the alternate configuration file
-.IR config .
-If you use the default configuration file
-.B /etc/fwlogwatch.config
-command line parameters override
-the options specified in the file. If you specify an alternate configuration
-file only options not specified in the file can be overridden by command line
-options.
-.IP \-D
-Do not differentiate destination IP addresses. Useful for finding scans in
-whole subnets.
-.IP \-d
-Differentiate destination ports.
-.IP \-e
-Show timestamp of last packet logged. End times are only available if
-there is more than one packet log entry with unique characteristics.
-.IP \-f\ \fIfile\fR
-Specify an input file (defaults to
-.B /var/log/messages
-). Relevant entries are automatically detected so combined log files (e.g.
-from a log host) are no problem. Compressed files are supported (except in
-realtime response mode). The '-' sign may be used for reading from standard
-input (stdin). In realtime response mode the file needs to be specified with
-full path since the daemon is rooted in /.
+.SH "GENERAL OPTIONS"
+These options are independent from the main modes of operation.
 .IP \-h
 Show the available options.
 .IP \-L\ \fIfile\fR
@@ -49,71 +25,44 @@ Show time of the first and the last log entry in the input
 which can be a compressed or plain log file. Summary mode will show the
 time of the first and last packet log entry, this log times mode
 will show the time of the first and last entry overall.
-.IP \-l\ \fItime\fR
-Process recent events only. See
-.B TIME FORMAT
-below for the time options.
+.IP \-V
+Show version and copyright information.
+.SH "GLOBAL OPTIONS"
+The global options for all modes are:
+.IP \-c\ \fIconfig\fR
+Use the alternate configuration file
+.IR config
+instead of the default configuration file
+.B /etc/fwlogwatch.config
+(which does not need to exist). Only options not specified in the files can
+be overridden by command line options.
+.IP \-D
+Do not differentiate destination IP addresses. Useful for finding scans in
+whole subnets.
+.IP \-d
+Differentiate destination ports.
+.IP \-f\ \fIfile\fR
+Specify an input file (defaults to
+.B /var/log/messages
+). Relevant entries are automatically detected so combined log files (e.g.
+from a log host) are no problem. Compressed files are supported (except in
+realtime response mode). The '-' sign may be used for reading from standard
+input (stdin). In realtime response mode the file needs to be specified with
+full path since the daemon is rooted in /.
+.IP \-m\ \fIcount\fR
+When analyzing large amounts of data you usually aren't interested in entries
+that have a small count. You can hide entries below a certain threshold with
+this option.
 .IP \-N
-Enable service lookups. Port numbers will be resolved from /etc/services.
+Enable service lookups. Port numbers will be looked up in /etc/services.
 .IP \-n
 Enable DNS lookups. Host names will be resolved (reverse and forward lookup
 with a warning if they don't match). This makes summary generation very
 slow if a lot of different hosts appear in the log file. Resolved host names
 are cached.
-.IP \-P\ \fIformat\fR
-Only use certain parsers, where the log
-.I format
-can be one or a combination of:
-.I i
-ipchains,
-.I n
-netfilter,
-.I c
-cisco IOS,
-.I p
-cisco PIX and
-.I f
-ipfilter.
-.IP \-p
-Differentiate protocols. This is activated automatically if you
-differentiate source and/or destination ports.
-.IP \-S
-Do not differentiate source IP addresses.
-.IP \-s
-Differentiate source ports.
-.IP \-t
-Show timestamp of first packet logged.
-.IP \-V
-Show version and copyright information.
-.IP \-v
-Be verbose. You can specify it twice for more information.
-In very verbose mode while parsing the log file you will see "." for
-relevant packet filter log entries, "r" for 'last message repeated' entries
-concerning packet filter logs, "o" for packet filter log entries that are
-too old and "_" for entries that are not packet filter logs.
-.IP \-y
-Differentiate TCP options. All packets with a SYN are listed separately,
-other TCP flags are shown in full format if they are available (ipchains
-does not log them, netfilter and ipfilter do, cisco IOS doesn't even log SYNs).
-.IP \-z
-Show time interval between start and end time of packet log entries. This
-is only available if there is more than one packet log entry with unique
-characteristics.
-.SH "LOG SUMMARY MODE"
-This are additional options that are only available in log summary mode:
-.IP \-b
-Show the amount of data in bytes this entry represents, this is the sum of
-total packet lengths of packets matching this rule (obviously only available
-for log formats that contain this information).
-.IP \-m\ \fIcount\fR
-When analyzing large log files you usually aren't interested in entries that
-have a small count. You can hide entries below a certain threshold with
-this option.
-.IP \-o\ \fIfile\fR
-Specify an output file.
 .IP \-O\ \fIorder\fR
-This is the sort order of the summary. Since entries often are
-equal in certain fields you can sort by several fields one after another
+This is the sort order of the summary and packet cache. Since entries often
+are equal in certain fields you can sort by several fields one after another
 (the sort algorithm is stable, so equal entries will remain sorted in the
 order they were sorted before). The sort string can be composed of up to 11
 fields of the form
@@ -150,19 +99,81 @@ ascending and
 .I d
 descending.
 Sorting is done in the order specified, so the last option is the primary
-criteria. The default is
+criteria. The default in summary mode is
 .I tacd
 (start with the highest count, if two counts match list the one earlier in
 time first) of which
 .I ta
 is built in, so if you specify an empty sort string or everything else is
-equal entries will be sorted ascending by time.
-.IP \-w
-Produce output in HTML format.
+equal entries will be sorted ascending by time. The realtime response mode
+default is
+.I cd
+(
+.I ta
+is not built in).
+.IP \-P\ \fIformat\fR
+Only use certain parsers, where the log
+.I format
+can be one or a combination of:
+.I i
+ipchains,
+.I n
+netfilter,
+.I f
+ipfilter,
+.I c
+Cisco IOS,
+.I p
+Cisco PIX and
+.I w
+Windows XP. The default is to use all parsers except the one for Windows XP
+logs.
+.IP \-p
+Differentiate protocols. This is activated automatically if you
+differentiate source and/or destination ports.
+.IP \-s
+Differentiate source ports.
+.IP \-v
+Be verbose. You can specify it twice for more information.
+In very verbose mode while parsing the log file you will see "." for
+relevant packet filter log entries, "r" for 'last message repeated' entries
+concerning packet filter logs, "o" for packet filter log entries that are
+too old and "_" for entries that are not packet filter logs.
+.IP \-y
+Differentiate TCP options. All packets with a SYN are listed separately,
+other TCP flags are shown in full format if they are available (ipchains
+does not log them, netfilter and ipfilter do, Cisco IOS doesn't even log SYNs).
+.SH "LOG SUMMARY MODE"
+This are additional options that are only available in log summary mode:
+.IP \-b
+Show the amount of data in bytes this entry represents, this is the sum of
+total packet lengths of packets matching this rule (obviously only available
+for log formats that contain this information).
+.IP \-e
+Show timestamp of last packet logged. End times are only available if
+there is more than one packet log entry with unique characteristics.
+.IP \-l\ \fItime\fR
+Process recent events only. See
+.B TIME FORMAT
+below for the time options.
+.IP \-o\ \fIfile\fR
+Specify an output file.
+.IP \-S
+Do not differentiate source IP addresses.
+.IP \-t
+Show timestamp of first packet logged.
 .IP \-W
 Look up information about the source addresses in the whois database. This
 is slow, please don't stress the registry with too many queries.
+.IP \-w
+Produce output in HTML format.
+.IP \-z
+Show time interval between start and end time of packet log entries. This
+is only available if there is more than one packet log entry with unique
+characteristics.
 .SH "INTERACTIVE REPORT MODE"
+The interactive report mode is a summary mode extension with the
+following additional options:
 .IP \-i\ \fIcount\fR
 Enter interactive report mode.
 .I count
@@ -184,10 +195,11 @@ Template file for report (defaults to
 ).
 .SH "REALTIME RESPONSE MODE"
 .IP \-R
-Enter realtime response mode. This means: detach, check if the firewall is
-configured correctly and run as daemon until the TERM signal (kill) is
-received. The HUP signal forces a reload of the input file (useful e.g. for
-log rotation). All output can be followed in the system log.
+Enter realtime response mode. This means: detach and run as daemon until
+the TERM signal (kill) is received. The HUP signal forces a reload of the
+configuration file, the USR1 signal forces fwlogwatch to reopen and read the
+input file from the beginning (useful e.g. for log rotation). All output
+can be followed in the system log.
 .IP \-a\ \fIcount\fR
 Alert threshold. Notify or start countermeasures if this limit is reached.
 Defaults to 5.
@@ -204,14 +216,14 @@ The notification script is invoked when the threshold is reached. A few
 examples of possible notifications are included in fwlw_notify, you can add
 your own ones as you see fit.
 .IP \-B
-The response script is invoked when the threshold is reached. This will
-usually block the attacking host completely with a new firewall rule.
-A new chain for
+The response script is invoked when the threshold is reached. Using the
+example script fwlw_respond this will block the attacking host with a new
+firewall rule. A new chain for
 .B fwlogwatch
 actions is inserted in the input chain and block rules added as needed.
 The chain and its content is removed if
 .B fwlogwatch
-is terminated normally. The default scripts contain actions for ipchains
+is terminated normally. The example scripts contain actions for ipchains
 and netfilter, you can modify them or add others as you like.
 .IP \-X
 Activate the internal web server to monitor the current status of the program.
@@ -219,7 +231,7 @@ Use the configuration file to change it's options. The default user name is
 .B admin
 and the default password is
 .B fwlogwat
-since DES can only encrypt 8 characters. By default it listens on port
+(since DES can only encrypt 8 characters). By default it listens on port
 888 and only allows connections from localhost.
 .SH "TIME FORMAT"
 Time is specified as
@@ -231,7 +243,7 @@ is a natural number and
 is one of the
 following:
 .I s
-for seconds (default if you don't specify anything),
+for seconds (this is the default),
 .I m
 for minutes,
 .I h
@@ -252,39 +264,39 @@ Default template for incident reports.
 .IP \fB/var/log/messages\fR
 Default input log file.
 .IP \fB/var/run/fwlogwatch.pid\fR
-PID file generated by the daemon in realtime response mode.
+Default PID file generated by the daemon in realtime response mode if
+configured to do so.
 .SH "FEATURES ONLY IN CONFIGURATION FILE"
 The following features are only available in the configuration file and not
-on the command line, they are presented and explained in the sample
-configuration file.
-.IP HTML\ colors
-The colors of the HTML output page can be customized.
-.IP realtime\ response\ options
-The host that can access the web interface, the port it listens on, the
-user and password and the pid file handling can be changed.
-.IP host\ and\ port\ selection\ and\ exclusion
-Hosts and ports to be summarized can be selected or excluded.
-.SH "NETFILTER, IPFILTER AND CISCO SUPPORT"
-fwlogwatch also features iptables/netfilter, ipfilter and cisco IOS/PIX log
-file support, it can even combine or separate the formats if you activate
-or deactivate the corresponding parsers. Some restrictions apply because
-not all fields exist or make sense in all log file types. Realtime response
-has predefined actions for ipchains and netfilter, you can add whatever you
-want done to the fwlw_respond script. You will need to deactivate the
-ipchains parser if you want to use realtime response mode on a system
-without ipchains.
+on the command line, they are presented and explained in more detail in the
+sample configuration file.
+.IP Selection\ and\ exclusion
+Specific hosts, ports, chains and branches (targets) to be summarized can be
+selected or excluded.
+.IP HTML\ colors\ and\ stylesheet
+The colors of the HTML output and status page can be customized, an
+external cascading stylesheet can be referenced.
+.IP Realtime\ response\ options
+Verification of ipchains rules, PID file handling, the user
+.B fwlogwatch
+should run as, the location of the notification and response scripts, which
+interfaces the web interface listens on, which host can connect, the port
+used, the refresh interval of the status page and the admin name and password
+can be configured.
 .SH SECURITY
 Since
 .B fwlogwatch
-is a security tool and needs superuser permissions for certain tasks
-special care was taken to make it secure. You can run it with user
-permissions for most functions or you can make it setgid for a
-group
+is a security tool special care was taken to make it secure. You can and
+should run it with user permissions for most functions, you can make it
+setgid for a group
 .B /var/log/messages
 is in if all you need is to be able to read this file. Only the realtime
-response mode with activated ipchains parser needs superuser permissions
-to analyze the firewall rules. You might also need them for the response
-script and for binding the default status port.
+response mode with activated ipchains rule analysis needs superuser
+permissions but you might also need them to write the PID file, for actions
+in the response script and for binding the default status port. However, you
+can configure fwlogwatch to drop root privileges as soon as possible after
+allocating these resources (the notification and response scripts will still
+be executed with user privileges and log rotation might not work).
 .SH AUTHOR
-Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>,
+Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>,
 RUS-CERT http://cert.uni-stuttgart.de

@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: output.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -22,7 +22,7 @@ void output_timediff(time_t start, time_t end, char *td)
 
   diff = end - start;
   if (diff <= 0) {
-    snprintf(td, 1, "-");
+    snprintf(td, 2, "-");
     return;
   }
 
@@ -44,23 +44,39 @@ void output_timediff(time_t start, time_t end, char *td)
   strncat(td, tmp, 3);
 }
 
+void output_tcp_opts(struct conn_data *input, char *buf)
+{
+  if ((input->flags & (TCP_ACK|TCP_FIN|TCP_RST|TCP_PSH|TCP_URG)) != 0) {
+    if (input->flags & TCP_SYN) { strcpy(buf, "s"); } else { strcpy (buf, "-"); }
+    if (input->flags & TCP_ACK) { strcat(buf, "a"); } else { strcat (buf, "-"); }
+    if (input->flags & TCP_FIN) { strcat(buf, "f"); } else { strcat (buf, "-"); }
+    if (input->flags & TCP_RST) { strcat(buf, "r"); } else { strcat (buf, "-"); }
+    if (input->flags & TCP_PSH) { strcat(buf, "p"); } else { strcat (buf, "-"); }
+    if (input->flags & TCP_URG) { strcat(buf, "u"); } else { strcat (buf, "-"); }
+  } else {
+    if (input->flags & TCP_SYN) {
+      strcpy(buf, "SYN");
+    } else {
+      strcpy(buf, "-");
+    }
+  }
+}
+
 void output_html(struct conn_data *input)
 {
   char *proto, time[TIMESIZE], buf[HOSTLEN];
-  struct whois_entry *we;
 
   if (opt.html == 1) {
-    printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", opt.rowcol2);
+    printf("<tr bgcolor=\"%s\" align=\"center\"><td>", opt.rowcol2);
   } else {
-    printf("<tr bgcolor=\"#%s\" align=\"center\"><td>", opt.rowcol1);
+    printf("<tr bgcolor=\"%s\" align=\"center\"><td>", opt.rowcol1);
   }
 
   printf("%d", input->count);
 
   if(opt.stimes) {
-    printf("</td><td>");
     strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->start_time));
-    printf("%s", time);
+    printf("</td><td>%s", time);
   }
 
   if(opt.etimes) {
@@ -74,109 +90,66 @@ void output_html(struct conn_data *input)
   }
 
   if(opt.duration) {
-    printf("</td><td>");
     output_timediff(input->start_time, input->end_time, time);
-    printf("%s", time);
+    printf("</td><td>%s", time);
   }
 
-  if(opt.loghost) {
-    printf("</td><td>");
-    printf("%s", input->hostname);
-  }
+  if(opt.loghost)
+    printf("</td><td>%s", input->hostname);
 
-  if(opt.chains) {
-    printf("</td><td>");
-    printf("%s", input->chainlabel);
-  }
+  if(opt.chains)
+    printf("</td><td>%s", input->chainlabel);
 
-  if(opt.branches) {
-    printf("</td><td>");
-    printf("%s", input->branchname);
-  }
+  if(opt.branches)
+    printf("</td><td>%s", input->branchname);
 
-  if(opt.ifs) {
-    printf("</td><td>");
-    printf("%s", input->interface);
-  }
+  if(opt.ifs)
+    printf("</td><td>%s", input->interface);
 
   proto = resolve_protocol(input->protocol);
-  if(opt.proto) {
-    printf("</td><td>");
-    printf("%s", proto);
-  }
+  if(opt.proto)
+    printf("</td><td>%s", proto);
 
-  if (opt.datalen) {
-    printf("</td><td>");
-    printf("%d", input->datalen);
-  }
+  if (opt.datalen)
+    printf("</td><td>%d", input->datalen);
 
   if (opt.src_ip) {
-    printf("</td><td>");
-    printf("%s", inet_ntoa(input->shost));
-
-    if(opt.resolve) {
-      printf("</td><td>");
-      printf("%s", resolve_hostname(input->shost));
-    }
-
+    printf("</td><td>%s", inet_ntoa(input->shost));
+    if(opt.resolve)
+      printf("</td><td>%s", resolve_hostname(input->shost));
     if(opt.whois_lookup) {
-      printf("</td><td>");
+      struct whois_entry *we;
       we = whois(input->shost);
       if (we != NULL) {
 	snprintf(buf, HOSTLEN, "%s %s AS%d %s", we->ip_route, we->ip_descr, we->as_number, we->as_descr);
       } else {
 	snprintf(buf, HOSTLEN, "-");
       }
-      printf("%s", buf);
+      printf("</td><td>%s", buf);
     }
   }
 
   if (opt.src_port) {
-    printf("</td><td>");
-    printf("%d", input->sport);
-
-    if (opt.sresolve) {
-      printf("</td><td>");
-      printf("%s", resolve_service(input->sport, proto));
-    }
+    printf("</td><td>%d", input->sport);
+    if (opt.sresolve)
+      printf("</td><td>%s", resolve_service(input->sport, proto));
   }
 
   if (opt.dst_ip) {
-    printf("</td><td>");
-    printf("%s", inet_ntoa(input->dhost));
-
-    if(opt.resolve) {
-      printf("</td><td>");
-      printf("%s", resolve_hostname(input->dhost));
-    }
+    printf("</td><td>%s", inet_ntoa(input->dhost));
+    if(opt.resolve)
+      printf("</td><td>%s", resolve_hostname(input->dhost));
   }
 
   if (opt.dst_port) {
-    printf("</td><td>");
-    printf("%d", input->dport);
-
-    if (opt.sresolve) {
-      printf("</td><td>");
-      printf("%s", resolve_service(input->dport, proto));
-    }
+    printf("</td><td>%d", input->dport);
+    if (opt.sresolve)
+      printf("</td><td>%s", resolve_service(input->dport, proto));
   }
 
   if(opt.opts) {
-    printf("</td><td>");
-    if ((input->flags & (TCP_ACK|TCP_FIN|TCP_RST|TCP_PSH|TCP_URG)) != 0) {
-      if (input->flags & TCP_SYN) { printf("s"); } else { printf ("-"); }
-      if (input->flags & TCP_ACK) { printf("a"); } else { printf ("-"); }
-      if (input->flags & TCP_FIN) { printf("f"); } else { printf ("-"); }
-      if (input->flags & TCP_RST) { printf("r"); } else { printf ("-"); }
-      if (input->flags & TCP_PSH) { printf("p"); } else { printf ("-"); }
-      if (input->flags & TCP_URG) { printf("u"); } else { printf ("-"); }
-    } else {
-      if (input->flags & TCP_SYN) {
-	printf("SYN");
-      } else {
-	printf("-");
-      }
-    }
+    output_tcp_opts(input, buf);
+    printf("</td><td>%s", buf);
   }
 
   printf("</td></tr>\n");
@@ -185,7 +158,6 @@ void output_html(struct conn_data *input)
 void output_plain(struct conn_data *input)
 {
   char *proto, time[TIMESIZE], buf[HOSTLEN];
-  struct whois_entry *we;
   unsigned char first = 1;
 
   if(opt.stimes) {
@@ -210,11 +182,7 @@ void output_plain(struct conn_data *input)
     if(!first)
       printf(" ");
     output_timediff(input->start_time, input->end_time, time);
-    if(strlen(time) > 0) {
-      printf("%s", time);
-    } else {
-      printf("-");
-    }
+    printf("%s", time);
     first = 0;
   }
 
@@ -251,9 +219,8 @@ void output_plain(struct conn_data *input)
   printf("%d", input->count);
 
   proto = resolve_protocol(input->protocol);
-  if(opt.proto) {
+  if(opt.proto)
     printf(" %s", proto);
-  }
 
   if(input->count == 1) {
     printf(_(" packet"));
@@ -261,18 +228,15 @@ void output_plain(struct conn_data *input)
     printf(_(" packets"));
   }
 
-  if (opt.datalen) {
+  if (opt.datalen)
     printf(_(" (%d bytes)"), input->datalen);
-  }
 
   if (opt.src_ip) {
     printf(_(" from %s"), inet_ntoa(input->shost));
-
-    if(opt.resolve) {
+    if(opt.resolve)
       printf(" (%s)", resolve_hostname(input->shost));
-    }
-
     if(opt.whois_lookup) {
+      struct whois_entry *we;
       we = whois(input->shost);
       if (we != NULL) {
 	snprintf(buf, HOSTLEN, "%s %s AS%d %s", we->ip_route, we->ip_descr, we->as_number, we->as_descr);
@@ -285,14 +249,12 @@ void output_plain(struct conn_data *input)
 
   if (opt.src_port) {
     printf(_(" port %d"), input->sport);
-
     if (opt.sresolve)
       printf(" (%s)", resolve_service(input->sport, proto));
   }
 
   if (opt.dst_ip) {
     printf(_(" to %s"), inet_ntoa(input->dhost));
-
     if(opt.resolve) {
       printf(" (%s)", resolve_hostname(input->dhost));
     }
@@ -300,28 +262,13 @@ void output_plain(struct conn_data *input)
 
   if (opt.dst_port) {
     printf(_(" port %d"), input->dport);
-
     if (opt.sresolve)
       printf(" (%s)", resolve_service(input->dport, proto));
   }
 
   if(opt.opts) {
-    if ((input->flags & (TCP_ACK|TCP_FIN|TCP_RST|TCP_PSH|TCP_URG)) != 0) {
-      printf(" ");
-
-      if (input->flags & TCP_SYN) { printf("s"); } else { printf ("-"); }
-      if (input->flags & TCP_ACK) { printf("a"); } else { printf ("-"); }
-      if (input->flags & TCP_FIN) { printf("f"); } else { printf ("-"); }
-      if (input->flags & TCP_RST) { printf("r"); } else { printf ("-"); }
-      if (input->flags & TCP_PSH) { printf("p"); } else { printf ("-"); }
-      if (input->flags & TCP_URG) { printf("u"); } else { printf ("-"); }
-    } else {
-      if (input->flags & TCP_SYN) {
-	printf(" SYN");
-      } else {
-	printf(" -");
-      }
-    }
+      output_tcp_opts(input, buf);
+      printf(" %s", buf);
   }
 
   printf("\n");
@@ -331,13 +278,23 @@ void output_html_header()
 {
   char time[TIMESIZE];
 
+  printf("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
   strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-  printf("<html><head><title>%s - %s</title>\n", opt.title, time);
+  printf("<html>\n<head>\n<title>%s - %s</title>\n", opt.title, time);
+  printf("<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
   printf("<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
   printf("<meta http-equiv=\"expires\" content=\"0\">\n");
-  printf("</head>\n");
-  printf("<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
-  printf("<font face=\"Arial, Helvetica\">");
+  if (opt.stylesheet[0] != '\0') {
+    printf("<link rel=\"stylesheet\" href=\"%s\">\n", opt.stylesheet);
+  } else {
+    printf("<style type=\"text/css\">\n<!--\n");
+    printf("BODY {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+    printf("A:link, A:active, A:visited {color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+    printf("TH, TD {font-family: arial, helvetica, sans-serif; color: %s}\n", opt.textcol);
+    printf("SMALL {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+    printf("-->\n</style>\n");
+  }
+  printf("</head>\n<body>\n");
   printf("<div align=\"center\">\n");
   printf("<h1>%s</h1>\n", opt.title);
 }
@@ -345,73 +302,73 @@ void output_html_header()
 void output_html_table()
 {
   printf("<br><br>\n");
-  printf("<table border=\"0\">\n");
-  printf("<tr bgcolor=\"#%s\" align=\"center\"><td>#</td>", opt.rowcol1);
+  printf("<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
+  printf("<tr bgcolor=\"%s\" align=\"center\"><th>#</th>", opt.rowcol1);
 
   if(opt.stimes)
-    printf(_("<td>start</td>"));
+    printf(_("<th>start</th>"));
 
   if(opt.etimes)
-    printf(_("<td>end</td>"));
+    printf(_("<th>end</th>"));
 
   if(opt.duration)
-    printf(_("<td>interval</td>"));
+    printf(_("<th>interval</th>"));
 
   if(opt.loghost)
-    printf(_("<td>loghost</td>"));
+    printf(_("<th>loghost</th>"));
 
   if(opt.chains)
-    printf(_("<td>chain</td>"));
+    printf(_("<th>chain</th>"));
 
   if(opt.branches)
-    printf(_("<td>target</td>"));
+    printf(_("<th>target</th>"));
 
   if(opt.ifs)
-    printf(_("<td>interface</td>"));
+    printf(_("<th>interface</th>"));
 
   if(opt.proto)
-    printf(_("<td>proto</td>"));
+    printf(_("<th>proto</th>"));
 
   if(opt.datalen)
-    printf(_("<td>bytes</td>"));
+    printf(_("<th>bytes</th>"));
 
   if(opt.src_ip) {
-    printf(_("<td>source</td>"));
+    printf(_("<th>source</th>"));
     if(opt.resolve)
-      printf(_("<td>hostname</td>"));
+      printf(_("<th>hostname</th>"));
     if(opt.whois_lookup)
-      printf(_("<td>whois information</td>"));
+      printf(_("<th>whois information</th>"));
   }
 
   if (opt.src_port) {
-    printf(_("<td>port</td>"));
+    printf(_("<th>port</th>"));
     if (opt.sresolve)
-      printf(_("<td>service</td>"));
+      printf(_("<th>service</th>"));
   }
 
   if(opt.dst_ip) {
-    printf(_("<td>destination</td>"));
+    printf(_("<th>destination</th>"));
     if(opt.resolve)
-      printf(_("<td>hostname</td>"));
+      printf(_("<th>hostname</th>"));
   }
 
   if (opt.dst_port) {
-    printf(_("<td>port</td>"));
+    printf(_("<th>port</th>"));
     if (opt.sresolve)
-      printf(_("<td>service</td>"));
+      printf(_("<th>service</th>"));
   }
 
   if (opt.opts)
-    printf(_("<td>opts</td>"));
+    printf(_("<th>opts</th>"));
 
   printf("</tr>\n");
 }
 
 void output_html_footer()
 {
-  printf("</table></div><br>\n");
+  printf("</table>\n</div><br>\n");
   printf("<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
-  printf("</font></body></html>\n");
+  printf("</body>\n</html>\n");
 }
 
 void output_raw_data(struct conn_data *input)

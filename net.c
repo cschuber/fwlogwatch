@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.19 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: net.c,v 1.20 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +21,7 @@
 #include "output.h"
 #include "response.h"
 #include "resolve.h"
+#include "compare.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -58,6 +59,7 @@ void prepare_socket()
   }
 
   ina.s_addr = inet_addr(opt.listenif);
+  bzero(&sa, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_port = htons(opt.listenport);
   sa.sin_addr = ina;
@@ -108,7 +110,7 @@ void decode_base64(char *input)
 	  syslog(LOG_NOTICE, _("decode_base64: input string incomplete"));
 	  return;
 	}
-	strncpy(input, buf, strlen(input));
+	xstrncpy(input, buf, strlen(input));
 	return;
       }
       if (dtable[c] & 0x80) {
@@ -129,7 +131,7 @@ void decode_base64(char *input)
     }
     *pnt = '\0';
     if (i < 3) {
-      strncpy(input, buf, strlen(input));
+      xstrncpy(input, buf, strlen(input));
       return;
     }
   }
@@ -140,47 +142,38 @@ void net_output(int fd, char *buf)
   write(fd, buf, strlen(buf));
 }
 
-void table_header(int conn)
+void table_header(int conn, unsigned char mode)
 {
   char buf[BUFSIZE];
 
   net_output(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-  snprintf(buf, BUFSIZE, _("<tr bgcolor=\"#%s\" align=\"center\"><td>Count</td><td>Added</td><td>Source IP address</td>"), opt.rowcol1);
+  snprintf(buf, BUFSIZE, _("<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"), opt.rowcol1);
   net_output(conn, buf);
-  if(opt.resolve) {
-    snprintf(buf, BUFSIZE, _("<td>Hostname</td>"));
-    net_output(conn, buf);
+  if(opt.proto)
+    net_output(conn, _("<th>proto</th>"));
+  net_output(conn, _("<th>source</th>"));
+  if(opt.resolve)
+    net_output(conn, _("<th>hostname</th>"));
+  if(opt.src_port) {
+    net_output(conn, _("<th>port</th>"));
+    if(opt.sresolve)
+      net_output(conn, _("<th>service</th>"));
   }
   if(opt.dst_ip) {
-    snprintf(buf, BUFSIZE, _("<td>Destination IP address</td>"));
-    net_output(conn, buf);
-    if(opt.resolve) {
-      snprintf(buf, BUFSIZE, _("<td>Hostname</td>"));
-      net_output(conn, buf);
-    }
-  }
-  if(opt.proto) {
-    snprintf(buf, BUFSIZE, _("<td>Protocol</td>"));
-    net_output(conn, buf);
-  }
-  if(opt.src_port) {
-    snprintf(buf, BUFSIZE, _("<td>Source port</td>"));
-    net_output(conn, buf);
-    if(opt.sresolve) {
-      snprintf(buf, BUFSIZE, _("<td>Service</td>"));
-      net_output(conn, buf);
-    }
+    net_output(conn, _("<th>destination</th>"));
+    if(opt.resolve)
+      net_output(conn, _("<th>hostname</th>"));
   }
   if(opt.dst_port) {
-    snprintf(buf, BUFSIZE, _("<td>Destination port</td>"));
-    net_output(conn, buf);
-    if(opt.sresolve) {
-      snprintf(buf, BUFSIZE, _("<td>Service</td>"));
-      net_output(conn, buf);
-    }
+    net_output(conn, _("<th>port</th>"));
+    if(opt.sresolve)
+      net_output(conn, _("<th>service</th>"));
   }
-  snprintf(buf, BUFSIZE, _("<td>Remaining time</td></tr>\n"));
-  net_output(conn, buf);
+  if(mode == TCP_OPTS) {
+    if (opt.opts)
+      net_output(conn, _("<th>opts</th>"));
+  }
+  net_output(conn, _("<th>time remaining</th></tr>\n"));
 }
 
 void handshake()
@@ -260,18 +253,32 @@ void handshake()
     net_output(conn, "Connection: close\r\n");
     net_output(conn, "Content-Type: text/html\r\n\r\n");
 
+    net_output(conn, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     snprintf(buf, BUFSIZE, "<html>\n<head>\n<title>%s</title>\n", opt.title);
     net_output(conn, buf);
+    net_output(conn, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
     net_output(conn, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
     net_output(conn, "<meta http-equiv=\"expires\" content=\"0\">\n");
     if(opt.refresh > 0) {
       snprintf(buf, BUFSIZE, "<meta http-equiv=\"refresh\" content=\"%d\">\n", opt.refresh);
       net_output(conn, buf);
     }
-    net_output(conn, "</head>\n");
-    snprintf(buf, BUFSIZE, "<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
-    net_output(conn, buf);
-    net_output(conn, "<font face=\"Arial, Helvetica\">\n");
+    if (opt.stylesheet[0] != '\0') {
+      snprintf(buf, BUFSIZE, "<link rel=\"stylesheet\" href=\"%s\">\n", opt.stylesheet);
+      net_output(conn, buf);
+    } else {
+      net_output(conn, "<style type=\"text/css\">\n<!--\n");
+      snprintf(buf, BUFSIZE, "BODY {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+      net_output(conn, buf);
+      snprintf(buf, BUFSIZE, "A:link, A:active, A:visited {color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+      net_output(conn, buf);
+      snprintf(buf, BUFSIZE, "TH, TD {font-family: arial, helvetica, sans-serif; color: %s}\n", opt.textcol);
+      net_output(conn, buf);
+      snprintf(buf, BUFSIZE, "SMALL {font-family: arial, helvetica, sans-serif; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+      net_output(conn, buf);
+      net_output(conn, "-->\n</style>\n");
+    }
+    net_output(conn, "</head>\n<body>\n");
     snprintf(buf, BUFSIZE, "<div align=\"center\">\n<h1>%s</h1>\n", opt.title);
     net_output(conn, buf);
     net_output(conn, _("<a href=\"/\">Reload</a><br>\n"));
@@ -279,7 +286,7 @@ void handshake()
       snprintf(buf, BUFSIZE, _("(automatic refresh every %d seconds)<br>\n"), opt.refresh);
       net_output(conn, buf);
     }
-    net_output(conn, _("\n</div>\n<h2>General information</h2>\n"));
+    net_output(conn, _("</div>\n<h2>General information</h2>\n"));
 
     net_output(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
     strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
@@ -295,7 +302,8 @@ void handshake()
     snprintf(buf, BUFSIZE, _("<tr><td>Running time:</td><td>%s</td></tr>\n"), nows);
     net_output(conn, buf);
 
-    snprintf(buf, BUFSIZE, _("<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n<tr><td>Discard timeout:</td><td>%d seconds</td></tr>\n"), opt.threshold, opt.recent);
+    output_timediff(0, opt.recent, nows);
+    snprintf(buf, BUFSIZE, _("<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n<tr><td>Discard timeout:</td><td>%s</td></tr>\n"), opt.threshold, nows);
     net_output(conn, buf);
 
     snprintf(buf, BUFSIZE, _("<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"),
@@ -303,71 +311,90 @@ void handshake()
 	     (opt.response & OPT_RESPOND)?_(", respond"):"");
     net_output(conn, buf);
 
+    if(opt.least > 1) {
+      snprintf(buf, BUFSIZE, _("<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in the packet cache.<td></tr>\n"), opt.least);
+      net_output(conn, buf);
+    }
+
     net_output(conn, "</table>\n");
 
     net_output(conn, _("<h2>Packet cache</h2>\n"));
 
-    table_header(conn);
+    table_header(conn, TCP_OPTS);
+
+    sort_data();
 
     this = first;
     while(this != NULL) {
       time_t remaining;
 
-      strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this->start_time));
-      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td><td>%s</td><td>%s</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, nows, inet_ntoa(this->shost));
-      net_output(conn, buf);
-
-      if(opt.resolve) {
-	snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_hostname(this->shost));
+      if(this->count >= opt.least) {
+	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this->start_time));
+	snprintf(buf, BUFSIZE, "<tr bgcolor=\"%s\" align=\"center\"><td>%d</td><td>%s</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, nows);
 	net_output(conn, buf);
-      }
 
-      if(opt.dst_ip) {
-	snprintf(buf, BUFSIZE, "<td>%s</td>", inet_ntoa(this->dhost));
+	if(opt.proto) {
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_protocol(this->protocol));
+	  net_output(conn, buf);
+	}
+
+	snprintf(buf, BUFSIZE, "<td>%s</td>", inet_ntoa(this->shost));
 	net_output(conn, buf);
+
 	if(opt.resolve) {
-	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_hostname(this->dhost));
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_hostname(this->shost));
 	  net_output(conn, buf);
 	}
-      }
 
-      if(opt.proto) {
-	snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_protocol(this->protocol));
-	net_output(conn, buf);
-      }
-
-      if(opt.src_port) {
-	snprintf(buf, BUFSIZE, "<td>%d</td>", this->sport);
-	net_output(conn, buf);
-	if(opt.sresolve) {
-	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
+	if(opt.src_port) {
+	  snprintf(buf, BUFSIZE, "<td>%d</td>", this->sport);
 	  net_output(conn, buf);
+	  if(opt.sresolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
+	    net_output(conn, buf);
+	  }
+	}
+
+	if(opt.dst_ip) {
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", inet_ntoa(this->dhost));
+	  net_output(conn, buf);
+	  if(opt.resolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_hostname(this->dhost));
+	    net_output(conn, buf);
+	  }
+	}
+
+	if(opt.dst_port) {
+	  snprintf(buf, BUFSIZE, "<td>%d</td>", this->dport);
+	  net_output(conn, buf);
+	  if(opt.sresolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
+	    net_output(conn, buf);
+	  }
+	}
+
+	if(opt.opts) {
+	  net_output(conn, "<td>");
+	  output_tcp_opts(this, buf);
+	  net_output(conn, buf);
+	  net_output(conn, "</td>");
+	}
+
+	if (this->end_time != 0) {
+	  remaining = opt.recent - (now - this->end_time);
+	} else {
+	  remaining = opt.recent - (now - this->start_time);
+	}
+	output_timediff(0, remaining, nows);
+	snprintf(buf, BUFSIZE, "<td>%s</td></tr>\n", nows);
+	net_output(conn, buf);
+
+	if (color == 1) {
+	  color = 2;
+	} else {
+	  color = 1;
 	}
       }
-
-      if(opt.dst_port) {
-	snprintf(buf, BUFSIZE, "<td>%d</td>", this->dport);
-	net_output(conn, buf);
-	if(opt.sresolve) {
-	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
-	  net_output(conn, buf);
-	}
-      }
-
-      if (this->end_time != 0) {
-	remaining = opt.recent - (now - this->end_time);
-      } else {
-	remaining = opt.recent - (now - this->start_time);
-      }
-      snprintf(buf, BUFSIZE, "<td>%d</td></tr>\n", (int)remaining);
-      net_output(conn, buf);
-
-      if (color == 1) {
-	color = 2;
-      } else {
-	color = 1;
-      }
-
       this = this->next;
     }
     net_output(conn, "</table>\n<br>\n");
@@ -375,11 +402,11 @@ void handshake()
     color = 1;
     net_output(conn, _("<h2>Host status</h2>\n"));
 
-    table_header(conn);
+    table_header(conn, NO_TCP_OPTS);
 
     this_host = first_host;
     while(this_host != NULL) {
-      snprintf(buf, BUFSIZE, "<tr bgcolor=\"#%s\" align=\"center\"><td>%d</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->count);
+      snprintf(buf, BUFSIZE, "<tr bgcolor=\"%s\" align=\"center\"><td>%d</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this_host->count);
       net_output(conn, buf);
 
       if (this_host->time == 0) {
@@ -390,25 +417,43 @@ void handshake()
 	  mask++;
 	  res /= 2;
 	}
-	snprintf(buf, BUFSIZE, _("<td>-</td><td>%s/%d (known host/net)</td>"), inet_ntoa(this_host->shost), mask);
+	net_output(conn, "<td>-</td>");
+	if(opt.proto) { net_output(conn, _("<td>any</td>")); }
+	snprintf(buf, BUFSIZE, _("<td>%s/%d (known host/net)</td>"), inet_ntoa(this_host->shost), mask);
 	net_output(conn, buf);
 	if(opt.resolve) { net_output(conn, "<td>-</td>"); }
-	if(opt.dst_ip) { net_output(conn, _("<td>any</td>")); }
-	if(opt.resolve) { net_output(conn, "<td>-</td>"); }
-	if(opt.proto) { net_output(conn, _("<td>any</td>")); }
-	if(opt.src_port) { net_output(conn, _("<td>any</td>")); }
-	if(opt.sresolve) { net_output(conn, "<td>-</td>"); }
-	if(opt.dst_port) { net_output(conn, _("<td>any</td>")); }
-	if(opt.sresolve) { net_output(conn, "<td>-</td>"); }
+	if(opt.src_port) { net_output(conn, _("<td>any</td>"));
+	if(opt.sresolve) { net_output(conn, "<td>-</td>"); } }
+	if(opt.dst_ip) { net_output(conn, _("<td>any</td>"));
+	if(opt.resolve) { net_output(conn, "<td>-</td>"); } }
+	if(opt.dst_port) { net_output(conn, _("<td>any</td>"));
+	if(opt.sresolve) { net_output(conn, "<td>-</td>"); } }
 	net_output(conn, "<td>-</td></tr>\n");
       } else {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
-	snprintf(buf, BUFSIZE, "<td>%s</td><td>%s</td>", nows, inet_ntoa(this_host->shost));
+	snprintf(buf, BUFSIZE, "<td>%s</td>", nows);
+	net_output(conn, buf);
+
+	if(opt.proto) {
+	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_protocol(this_host->protocol));
+	  net_output(conn, buf);
+	}
+
+	snprintf(buf, BUFSIZE, "<td>%s</td>", inet_ntoa(this_host->shost));
 	net_output(conn, buf);
 
 	if(opt.resolve) {
 	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_hostname(this_host->shost));
 	  net_output(conn, buf);
+	}
+
+	if(opt.src_port) {
+	  snprintf(buf, BUFSIZE, "<td>%d</td>", this_host->sport);
+	  net_output(conn, buf);
+	  if(opt.sresolve) {
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this_host->sport, resolve_protocol(this_host->protocol)));
+	    net_output(conn, buf);
+	  }
 	}
 
 	if(opt.dst_ip) {
@@ -420,30 +465,17 @@ void handshake()
 	  }
 	}
 
-	if(opt.proto) {
-	  snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_protocol(this_host->protocol));
-	  net_output(conn, buf);
-	}
-
-	if(opt.src_port) {
-	  snprintf(buf, BUFSIZE, "<td>%d</td>", this_host->sport);
-	  net_output(conn, buf);
-	  if(opt.sresolve) {
-	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
-	    net_output(conn, buf);
-	  }
-	}
-
 	if(opt.dst_port) {
 	  snprintf(buf, BUFSIZE, "<td>%d</td>", this_host->dport);
 	  net_output(conn, buf);
 	  if(opt.sresolve) {
-	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
+	    snprintf(buf, BUFSIZE, "<td>%s</td>", resolve_service(this_host->dport, resolve_protocol(this_host->protocol)));
 	    net_output(conn, buf);
 	  }
 	}
 
-	snprintf(buf, BUFSIZE, "<td>%d</td></tr>\n", (int)(opt.recent - (now - this_host->time)));
+	output_timediff(0, opt.recent - (now - this_host->time), nows);
+	snprintf(buf, BUFSIZE, "<td>%s</td></tr>\n", nows);
 	net_output(conn, buf);
       }
 
@@ -459,7 +491,7 @@ void handshake()
 
     snprintf(buf, BUFSIZE, "<small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small>\n", PACKAGE, VERSION, COPYRIGHT);
     net_output(conn, buf);
-    net_output(conn, "</font>\n</body>\n</html>\n");
+    net_output(conn, "</body>\n</html>\n");
   }
 
   retval = close(conn);

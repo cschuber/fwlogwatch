@@ -1,4 +1,4 @@
-/* $Id: output.h,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: output.h,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #ifndef _OUTPUT_H
 #define _OUTPUT_H
@@ -6,6 +6,7 @@
 #include "main.h"
 
 void output_timediff(time_t start, time_t end, char *td);
+void output_tcp_opts(struct conn_data *input, char *buf);
 void output_html(struct conn_data *input);
 void output_plain(struct conn_data *input);
 void output_html_header(void);

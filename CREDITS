@@ -1,13 +1,13 @@
-$Id: CREDITS,v 1.20 2002/02/24 14:27:30 bwess Exp $
+$Id: CREDITS,v 1.21 2002/03/29 11:25:51 bwess Exp $
 
 This program was written by
-Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
+Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
 
 Thanks go to the following persons:
-Oliver Goebel <Goebel@RUS.Uni-Stuttgart.DE>
+Oliver Goebel <Goebel@CERT.Uni-Stuttgart.DE>
   for looking after this program as a RUS-CERT project and some comments.
 
-Florian Weimer <Florian.Weimer@RUS.Uni-Stuttgart.DE>
+Florian Weimer <Weimer@CERT.Uni-Stuttgart.DE>
   for a very nice code review.
 
 Torkil Zachariassen <torkil@heima.als.fo>
@@ -20,7 +20,7 @@ Diego M. Vadell <dvadell@uyr.com.ar>
   for reporting an ipchains log format difference in old kernels.
 
 Didier Contis <didier@ece.gatech.edu>
-  for information and examples of the cisco log file formats.
+  for information and examples of the Cisco log file formats.
 
 Werner Fleck <w.fleck@PopNet.de> / <fwlogwatch@flexoft.net>
   for reporting ipchains parser omissions and building a first debian package.
@@ -29,7 +29,7 @@ Michael Reichardt <Michael.Reichardt@guug.de>
   for reporting various problems.
 
 Pekka Savola <pekkas@netcore.fi>
-  for further examples of cisco log formats.
+  for further examples of Cisco log formats.
 
 Martin Hein <martin@hein.dk>
   for contributing to ipfilter support.
@@ -47,7 +47,7 @@ Tobias Hunger <tobias@berlin-consortium.org>
   for contributing to the improved response mode.
 
 Diederick van Dijk <diedvdyk@jedi.van-dijk.net>
-  for contributing to cisco PIX support.
+  for contributing to Cisco PIX support.
 
 Andreas Pfaller <apf@trinary.de>
   for contributing to netfilter support and doing some debugging.
@@ -60,3 +60,25 @@ Sherwood Herben <sherwood@easystreet.com>
 
 Robert Malmgren <rom@rot13.romab.com> and Dan Larsson <dl@tyfon.net>
   for contributing to FreeBSD support.
+
+Ivan F. Martinez <ivanfm@ecodigit.com.br>
+  for various suggestions and the Portuguese translation.
+
+Oden Eriksson <oden.eriksson@kvikkjokk.net>
+  for the Swedish translation.
+
+Xiaojun Yang <Xiaojun.Yang@RUS.Uni-Stuttgart.DE>
+  for the simplified Chinese translation and doing a guided implementation
+  of the windows xp parser.
+
+Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>
+  for the traditional Chinese translation.
+
+Hugo van der Kooij <hvdkooij@vanderkooij.org>
+  for various suggestions.
+
+Peter Bray
+  for comments on the Makefile and the ipfilter parser.
+
+Kimura Fuyuki <fuyuki@mj.0038.net>
+  for FreeBSD portability fixes.

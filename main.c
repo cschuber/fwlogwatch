@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: main.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,38 +18,41 @@ void usage(char *me, unsigned char exitcode)
 {
   printf("%s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
   printf(_("Usage: %s [options]\n"), me);
+  printf(_("General options:\n"));
+  printf(_("         -h          this help\n"));
+  printf(_("         -L <file>   show time of first and last log entry in file\n"));
+  printf(_("         -V          show version and copyright info\n"));
+  printf("\n");
+
   printf(_("Global options:\n"));
   printf(_("         -c <file>   specify config file (defaults to %s)\n"), RCFILE);
   printf(_("         -D          do not differentiate destination IP addresses\n"));
   printf(_("         -d          differentiate destination ports\n"));
-  printf(_("         -e          show end times\n"));
   printf(_("         -f <file>   specify input file (defaults to %s)\n"), INFILE);
-  printf(_("         -h          this help\n"));
-  printf(_("         -L <file>   show time of first and last log entry in file\n"));
-  printf(_("         -l <time>   process recent events only (defaults to off)\n"));
+  printf(_("         -m <count>  only show entries with at least so many incidents\n"));
   printf(_("         -N          resolve service names\n"));
   printf(_("         -n          resolve host names\n"));
+  printf(_("         -O <order>  define the sort order (see the man page for details)\n"));
   printf(_("         -P <format> use only parsers for specific formats\n"));
   printf(_("         -p          differentiate protocols\n"));
-  printf(_("         -S          do not differentiate source IP addresses\n"));
   printf(_("         -s          differentiate source ports\n"));
-  printf(_("         -t          show start times\n"));
-  printf(_("         -V          show version and copyright info\n"));
   printf(_("         -v          verbose, specify twice for more info\n"));
   printf(_("         -y          differentiate TCP options\n"));
-  printf(_("         -z          show time interval\n"));
   printf("\n");
 
   printf(_("Log summary mode (default):\n"));
   printf(_("         -b          show amount of data (sum of total packet lengths)\n"));
-  printf(_("         -m <count>  only show entries with at least so many incidents\n"));
+  printf(_("         -e          show end times\n"));
+  printf(_("         -l <time>   process recent events only (defaults to off)\n"));
   printf(_("         -o <file>   specify output file\n"));
-  printf(_("         -O <order>  define the sort order (see the man page for details)\n"));
-  printf(_("         -w          HTML output\n"));
+  printf(_("         -S          do not differentiate source IP addresses\n"));
+  printf(_("         -t          show start times\n"));
   printf(_("         -W          activate whois lookups for source addresses\n"));
+  printf(_("         -w          HTML output\n"));
+  printf(_("         -z          show time interval\n"));
   printf("\n");
 
-  printf(_("Interactive report mode:\n"));
+  printf(_("Interactive report mode (summary mode extension):\n"));
   printf(_("         -i <count>  interactive mode with report threshold\n"));
   printf(_("         -F <email>  report sender address\n"));
   printf(_("                     (defaults to '%s')\n"), opt.sender);
@@ -92,7 +95,7 @@ void info()
   puts("along with this program; if not, write to the Free Software");
   puts("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA");
   puts("");
-  puts(_("You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."));
+  puts(_("You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."));
 
   exit(EXIT_SUCCESS);
 }
@@ -115,6 +118,7 @@ void init_options()
   opt.whois_lookup = 0;
   opt.whois_sock = -1;
   xstrncpy(opt.inputfile, INFILE, FILESIZE);
+  xstrncpy(opt.rcfile, RCFILE, FILESIZE);
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
@@ -143,6 +147,7 @@ void init_options()
   opt.use_out = 0;
   opt.outputfile[0] = '\0';
   opt.title[0] = '\0';
+  opt.stylesheet[0] = '\0';
   xstrncpy(opt.textcol, TEXTCOLOR, COLORSIZE);
   xstrncpy(opt.bgcol, BGCOLOR, COLORSIZE);
   xstrncpy(opt.rowcol1, ROWCOLOR1, COLORSIZE);
@@ -212,7 +217,6 @@ void init_options()
 
 int main(int argc, char **argv)
 {
-  char rcfile[FILESIZE];
   unsigned char alt_rcfile = 0;
   int iopt;
 
@@ -222,9 +226,6 @@ int main(int argc, char **argv)
   setlocale(LC_TIME,"");
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
-
-  xstrncpy(rcfile, RCFILE, FILESIZE);
-  read_rcfile(rcfile);
 
   while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
@@ -241,7 +242,7 @@ int main(int argc, char **argv)
       opt.response = opt.response | OPT_RESPOND;
       break;
     case 'c':
-      xstrncpy(rcfile, optarg, FILESIZE);
+      xstrncpy(opt.rcfile, optarg, FILESIZE);
       alt_rcfile = 1;
       break;
     case 'C':
@@ -354,8 +355,11 @@ int main(int argc, char **argv)
     }
   }
 
-  if(alt_rcfile)
-    read_rcfile(rcfile);
+  if(!alt_rcfile) {
+    read_rcfile(opt.rcfile, MAY_NOT_EXIST);
+  } else {
+    read_rcfile(opt.rcfile, MUST_EXIST);
+  }
 
   if(!strncmp(opt.inputfile, "-", FILESIZE))
     opt.std_in = 1;

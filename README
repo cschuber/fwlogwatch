@@ -1,21 +1,25 @@
-$Id: README,v 1.20 2002/02/24 14:27:30 bwess Exp $
+$Id: README,v 1.21 2002/03/29 11:25:51 bwess Exp $
 
-fwlogwatch is a security tool written in C by Boris Wesslowski for the
-RUS-CERT. It is a packet filter/firewall log analyzer with support for
-linux ipchains, netfilter/iptables, cisco IOS, cisco PIX and ipfilter log
-files. It also features incident report and realtime response capabilities.
+fwlogwatch is a security tool written in C by Boris Wesslowski for
+RUS-CERT. It is a packet filter/firewall log analyzer with support for a
+lot of log formats and analysis options. It also features incident report
+and realtime response capabilities, a web interface and internationalization.
 
 It is available from the RUS-CERT website
 http://cert.uni-stuttgart.de/projects/fwlogwatch/
 and from
 http://www.kyb.uni-stuttgart.de/boris/software.shtml
 
+The inter-release changes in the source can be reviewed with
+cvsweb at SourceForge: http://sourceforge.net/projects/fwlogwatch/
+
 
 FEATURES
 - General Features:
   - Can detect and process log entries in the following formats:
     Linux ipchains, Linux netfilter/iptables,
-    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS and Cisco PIX.
+    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX and
+    Windows XP firewall.
   - Entries can be parsed in combined log files, the parsers to be used
     can be selected.
   - Gzip-compressed logs are supported.
@@ -24,9 +28,10 @@ FEATURES
   - Integrated resolver for protocols, services and host names.
   - Can do lookups in the whois database.
   - Own DNS and whois information cache for faster lookups.
-  - Ports and hosts can be selected or excluded as needed.
-  - Support for internationalization (available in english, german,
-    portuguese and chinese).
+  - Hosts, ports, chains and branches (targets) can be selected or
+    excluded as needed.
+  - Support for internationalization (available in English, German,
+    Portuguese, simplified and traditional Chinese and Swedish).
 
 - Log summary mode:
   - A lot of options to find and display relevant patterns in connection
@@ -35,52 +40,47 @@ FEATURES
     omitted and the host mentioned in the header of the summary if the
     log is from a single host, the same happens with the chains, targets
     and interfaces).
-  - Plain text and HTML output with sort options.
+  - Plain text and HTML (with CSS) output with many sort options.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
     report that can be sent to abuse contacts of attacking sites or
-    computer emergency response and coordination centers (CERT/CC).
+    computer emergency response teams (CERTs).
   - Supports templates and incident number generation.
   - All fields can be adjusted as needed interactively.
 
 - Realtime response mode:
   - The program detaches and stays in the background as a daemon.
-  - The ipchains parser can detect if the necessary ipchains rules with
-    logging turned on exist.
+  - Detection of the necessary ipchains rules with logging turned on can be
+    configured.
   - Response can be a notification (in form of a log file entry, an email,
     a remote winpopup message or whatever you can put into a shell script),
     or a customizable firewall modification.
   - The included response script adds a new chain for fwlogwatch to
-    ipchains or netfilter setups and attackers are completely blocked with
+    ipchains or netfilter setups and attackers are blocked with
     new firewall rules.
   - Supports trusted hosts (anti-spoofing).
   - The current status of the program can be followed through a web
     interface.
 
-The commented configuration file supports and explains all options and
-will get you started quickly.
+The commented configuration file supports and explains all options and will
+get you started quickly. Please read the man page for details on the
+command line options.
 
 
-IPCHAINS, NETFILTER/IPTABLES, IPFILTER AND IOS/PIX SUPPORT
-  fwlogwatch features ipchains, iptables/netfilter, ipfilter and IOS/PIX
-  log file support, it can even read the combined logs on a log host. You
-  can separate the formats if you activate or deactivate the corresponding
-  parsers. Some restrictions apply because not all fields exist or make
-  sense in all log file types. The included script for realtime response
-  mode supports ipchains and netfilter. The check if correct ipchains rules
-  exist can be activated in the configuration file. Cisco PIX support is
-  restricted to versions before 6 of PIX OS and only focuses on denied
-  packets and ignores all other kinds of PIX log entries.
+PARSER NOTES
+  Cisco PIX support focuses on denied packets and ignores all other kinds
+  of PIX log entries. PIX OS version 6 is not supported yet.
+  The ipfilter parser does not support logs with resolved service names
+  and tcp/udp entries without ports.
 
 
 INSTALLATION
 - General
-  Before compiling you may want to have a look at main.h if you want to
-  change some default values. The default configuration assumes Linux, to
-  compile on Solaris, OpenBSD, FreeBSD or IRIX look for the corresponding
-  lines at the top of the Makefile. You might want to enable short names to
-  save memory if you only parse ipchains logs.
+  The Makefile assumes you use Linux, to compile on Solaris, OpenBSD,
+  FreeBSD or IRIX look for the corresponding lines at the top of the
+  Makefile. You may want to have a look at main.h if you want to change
+  some default values.
 
   You will need the zlib compression library (version 1.0.9 or newer) and
   it's header files to compile fwlogwatch.
@@ -139,15 +139,17 @@ BASICS (with examples for ipchains)
 
 CONFIGURATION AND EXAMPLES
 - You should make a configuration file for each function you want, look at
-  the included sample file, it should be easy to adapt it to your needs.
+  the included sample file, it should be easy to adapt to your needs.
 
-- If you want a HTML summary 'log.html' of all packet filter entries at most
-  one day old representing at least two connection attempts logged to the
-  file 'messages' with output including timestamps, time intervals, resolved
-  IP addresses and service names and with connections separated by protocol,
-  source and destination ports and TCP options you would use
+- Example (the options are in the order they are mentioned in the text):
+  If you want very verbose generation of a HTML summary in the file
+  'log.html' of all packet filter entries at most one day old representing
+  at least two connection attempts logged to the file 'messages' with
+  output including start and end timestamps, time intervals, resolved IP
+  addresses and service names and with connections separated by protocol,
+  source and destination ports and TCP options you would use the command
 
-  fwlogwatch -v -v -s -d -t -e -z -y -n -N -p -w -l 1d -m 2 -o log.html -f messages
+  fwlogwatch -v -v -w -o log.html -l 1d -m 2 -f messages -t -e -z -n -N -p -s -d -y
 
 - If you want to use fwlogwatch as a CGI, e.g. to have a quick look at
   what happened in the last hour when you get a notification:
@@ -161,8 +163,8 @@ CONFIGURATION AND EXAMPLES
   /var/www/html/fwlogwatch as default. Look at the index.html file to
   select the level of detail you want.
 
-- An sample init file (for redhat linux systems) for starting fwlogwatch in
-  realtime response mode at system start is also included.
+- An sample init file (for Red Hat Linux systems) for starting fwlogwatch
+  in realtime response mode at system start is also included.
 
 - You might want to replace your /etc/services file by the one supplied
   with nmap (http://www.insecure.org/nmap/), a lot more services will be
@@ -173,5 +175,7 @@ CONFIGURATION AND EXAMPLES
 
 FEEDBACK
   If you find a bug or have an idea for a new feature please send an email
-  to Boris.Wesslowski@RUS.Uni-Stuttgart.DE
-
+  to Wesslowski@CERT.Uni-Stuttgart.DE
+  If you want to report a parser problem please specify which log format you
+  are trying to parse, the version of the log generator and fwlogwatch you
+  are using and provide a sample incuding log lines for which parsing fails.

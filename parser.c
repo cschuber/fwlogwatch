@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: parser.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,23 +67,25 @@ unsigned char parse_line(char *input, int linenum)
     return PARSE_NO_HIT;
   }
 
-  if(opt.recent != 0) {
-    if((opt.now - opt.line->time) > opt.recent) {
-      if(opt.verbose == 2) {
-	fprintf(stderr, "o");
+  if(opt.mode != REALTIME_RESPONSE) {
+    if(opt.recent != 0) {
+      if((opt.now - opt.line->time) > opt.recent) {
+	if(opt.verbose == 2) {
+	  fprintf(stderr, "o");
+	}
+	return PARSE_TOO_OLD;
       }
-      return PARSE_TOO_OLD;
     }
   }
 
   if (retval == PARSE_OK) {
     {
       struct parser_options *excluded_this;
-      unsigned char match = P_MATCH_NONE;
+      unsigned char match = P_MATCH_NONE, include_rules_exist = 0;
 
       excluded_this = excluded_first;
       while(excluded_this != NULL) {
-	if((excluded_this->mode & PARSER_MODE_HOST) != 0) {
+	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_HOST) != 0) {
 	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
 	    if(opt.line->shost.s_addr == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
@@ -102,7 +104,7 @@ unsigned char parse_line(char *input, int linenum)
 	    }
 	  }
 	}
-	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_PORT) != 0) {
+	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_PORT) != 0) {
 	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
 	    if((unsigned long int)opt.line->sport == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
@@ -121,7 +123,7 @@ unsigned char parse_line(char *input, int linenum)
 	    }
 	  }
 	}
-	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
+	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
 	  if(strncmp(opt.line->chainlabel, excluded_this->svalue, SHORTLEN) == 0) {
 	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
@@ -130,7 +132,7 @@ unsigned char parse_line(char *input, int linenum)
 	    }
 	  }
 	}
-	if((match == P_MATCH_NONE) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
+	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
 	  if(strncmp(opt.line->branchname, excluded_this->svalue, SHORTLEN) == 0) {
 	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
@@ -140,13 +142,14 @@ unsigned char parse_line(char *input, int linenum)
 	  }
 	}
 
-	if(((excluded_this->mode & PARSER_MODE_NOT) == 0) &&
-	   (match == P_MATCH_NONE)) {
-	  match = P_MATCH_EXC;
-	}
+	if((include_rules_exist == 0) && (excluded_this->mode & PARSER_MODE_NOT) == 0)
+	  include_rules_exist++;
 
 	excluded_this = excluded_this->next;
       }
+
+      if((match == P_MATCH_NONE) && (include_rules_exist))
+	match = P_MATCH_EXC;
 
       if(match == P_MATCH_EXC) {
 	if (opt.verbose == 2)

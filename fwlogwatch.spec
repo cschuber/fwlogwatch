@@ -1,13 +1,13 @@
-# $Id: fwlogwatch.spec,v 1.21 2002/02/24 14:27:30 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.22 2002/03/29 11:25:52 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.6
+%define version 0.7
 
 Name: %name
 Version: %version
 Release: 1
 Group: Applications/Utilities
-Packager: Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
+Packager: Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
 Vendor: RUS-CERT
 URL: http://cert.uni-stuttgart.de/projects/fwlogwatch/
 License: GPL
@@ -17,13 +17,14 @@ Patch: %name-%version-paths.patch
 BuildRoot: /var/tmp/%name-buildroot
 
 %description
-fwlogwatch produces ipchains, netfilter/iptables, ipfilter, Cisco IOS and
-Cisco PIX log summary reports in text and HTML form and has a lot of
-options to find and display relevant patterns in connection attempts. With
-the data found it can also generate customizable incident reports from a
-template and send them to abuse contacts at offending sites or CERT
-coordination centers. Finally, it can also run as daemon and report
-anomalies or start countermeasures.
+fwlogwatch produces Linux ipchains, Linux netfilter/iptables,
+Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX and Windows XP
+firewall log summary reports in plain text and HTML form and has a lot of
+options to analyze and display relevant patterns. It can produce
+customizable incident reports and send them to abuse contacts at offending
+sites or CERTs. Finally, it can also run as daemon (with web interface)
+doing realtime log monitoring and reporting anomalies or starting attack
+countermeasures.
 
 %prep
 
@@ -44,9 +45,10 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/locale/pt_BR/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/sv/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh_CN/LC_MESSAGES
 mkdir -p $RPM_BUILD_ROOT/usr/share/locale/zh_TW/LC_MESSAGES
-make install INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
-make install-config INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
-make install-i18n INSTALL_DIR=$RPM_BUILD_ROOT/usr CONF_DIR=$RPM_BUILD_ROOT/etc
+make install INSTALL_DIR=$RPM_BUILD_ROOT/usr
+make install-config CONF_DIR=$RPM_BUILD_ROOT/etc
+make install-i18n LOCALE_DIR=$RPM_BUILD_ROOT/usr
+make install-rhinit CONF_DIR=$RPM_BUILD_ROOT/etc
 
 %files
 /usr/sbin/fwlogwatch

@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: utils.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -165,7 +165,7 @@ void mode_error()
 {
   printf(_("fwlogwatch error: mode collision, please check that you didn't specify\n"
 	 "   several modes on the command line or a second mode is active in the\n"
-	 "   default or specified configuration file.\n"
+	 "   configuration file.\n"
 	 "   Please use a separate configuration file for each mode or comment out all\n"
 	 "   entries in the default configuration and use command line parameters.\n"));
   exit(EXIT_FAILURE);
@@ -255,18 +255,28 @@ uint32_t parse_cidr(char *input)
 
 void add_known_host(char *ip)
 {
-  struct known_hosts *host;
+  struct known_hosts *host, *test_host;
 
   host = xmalloc(sizeof(struct known_hosts));
-  host->time = 0;
-  host->count = 0;
   host->netmask.s_addr = parse_cidr(ip);
   if(convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
     printf(_("(known host)\n"));
     free(host);
     exit(EXIT_FAILURE);
   }
+
+  test_host = first_host;
+  while (test_host != NULL) {
+    if (test_host->shost.s_addr == (host->shost.s_addr & test_host->netmask.s_addr)) {
+      free(host);
+      return;
+    }
+    test_host = test_host->next;
+  }
+
   host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
+  host->time = 0;
+  host->count = 0;
   host->protocol = 0;
   host->dhost.s_addr = 0;
   host->sport = 0;

@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogsummary.cgi,v 1.20 2002/02/24 14:27:31 bwess Exp $
+# $Id: fwlogsummary.cgi,v 1.21 2002/03/29 11:25:52 bwess Exp $
 
 # This script generates 8 fwlogwatch html summaries in a directory visible
 # to your web server.

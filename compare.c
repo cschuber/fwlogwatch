@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: compare.c,v 1.22 2002/03/29 11:25:51 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -235,6 +235,7 @@ void sort_data()
 	error = 1;
       }
     } else {
+      fprintf(stderr, _("Error in sort string, direction expected, ignoring.\n"));
       error = 1;
     }
 
@@ -345,7 +346,7 @@ void show_list()
 
   this = first;
   while (this != NULL) {
-    if(this->count > opt.least && this->count > opt.threshold) {
+    if(this->count >= opt.least && (opt.mode != INTERACTIVE_REPORT || this->count > opt.threshold)) {
       if (opt.html) {
 	output_html(this);
 	if (opt.html == 1) {

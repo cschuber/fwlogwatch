@@ -1,4 +1,4 @@
-/* $Id: win_xp.c,v 1.1 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: win_xp.c,v 1.2 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,10 +67,9 @@ unsigned char win_xp(char *input, int linenum)
   else if(strncmp(sinputs, "UDP", 3) == 0) opt.line->protocol = 17;
   else if(strncmp(sinputs, "ICMP", 4) == 0) opt.line->protocol = 1;
   else {
-    if(opt.verbose){
+    if(opt.verbose)
       fprintf(stderr, "win_xp parse error wenn reading proto in line %d, ignoring.\n", linenum);
-      return PARSE_WRONG_FORMAT;
-    }
+    return PARSE_WRONG_FORMAT;
   }
 
   /* Read src ip */
@@ -82,10 +81,9 @@ unsigned char win_xp(char *input, int linenum)
   if (*sinputs != '-'){
     if(convert_ip(sinputs, &opt.line->shost) == IN_ADDR_ERROR) return PARSE_NO_HIT;
   } else {
-    if(opt.verbose){
+    if(opt.verbose)
       fprintf(stderr, "win_xp parse error wenn reading shost in line %d, ignoring.\n", linenum);
-      return PARSE_WRONG_FORMAT;
-    }
+    return PARSE_WRONG_FORMAT;
   }
 
   /* Read dst ip */
@@ -111,10 +109,9 @@ unsigned char win_xp(char *input, int linenum)
   if (isdigit((int)*sinputs)){
     opt.line->sport=atoi(sinputs);
   } else if (*sinputs == '-' && (opt.line->protocol == 6 || opt.line->protocol == 17)) {
-    if(opt.verbose){
+    if(opt.verbose)
       fprintf(stderr, "win_xp parse error wenn reading sport in line %d, ignoring.\n", linenum);
-      return PARSE_WRONG_FORMAT;
-    }
+    return PARSE_WRONG_FORMAT;
   }
 
   /* Read dst port */
@@ -126,10 +123,9 @@ unsigned char win_xp(char *input, int linenum)
   if (isdigit((int)*sinputs)){
     opt.line->dport=atoi(sinputs);
   } else if (*sinputs == '-' && (opt.line->protocol == 6 || opt.line->protocol == 17)) {
-    if(opt.verbose){
+    if(opt.verbose)
       fprintf(stderr, "win_xp parse error wenn reading dport in line %d, ignoring.\n", linenum);
-      return PARSE_WRONG_FORMAT;
-    }
+    return PARSE_WRONG_FORMAT;
   }
 
   /* Read size */
@@ -150,17 +146,29 @@ unsigned char win_xp(char *input, int linenum)
   sinpute = strchr(sinputs, ' ');
   if (sinpute != NULL)
     *sinpute = '\0';
-  if (*sinputs == '-') {
-    opt.line->flags = 0;
-  } else {
-    if (*sinputs == 'S') {
+  while (*sinputs != '\0') {
+    switch (*sinputs) {
+    case '-':
+      opt.line->flags = 0;
+      break;
+    case 'S':
       opt.line->flags = opt.line->flags | TCP_SYN;
-    } else {
-      if(opt.verbose){
+      break;
+    case 'A':
+      opt.line->flags = opt.line->flags | TCP_ACK;
+      break;
+    case 'F':
+      opt.line->flags = opt.line->flags | TCP_FIN;
+      break;
+    case 'P':
+      opt.line->flags = opt.line->flags | TCP_PSH;
+      break;
+    default:
+      if(opt.verbose)
 	fprintf(stderr, "win_xp parse error in line %d, ignoring.\n", linenum);
-	return PARSE_WRONG_FORMAT;
-      }
+      return PARSE_WRONG_FORMAT;
     }
+    sinputs++;
   }
 
   /* Read tcpsyn tcpack and tcpwin, not used */

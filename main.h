@@ -1,17 +1,23 @@
-/* $Id: main.h,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: main.h,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.6"
-#define COPYRIGHT "2002-02-24 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.7"
+#define COPYRIGHT "2002-03-27 Boris Wesslowski, RUS-CERT"
+
+/* Paths */
+
+#define INSTALL_DIR "/usr/local"
+#define CONF_DIR "/etc"
+#define LOCALE_DIR "/usr"
 
 /* i18n */
 
 #include <libintl.h>
 #define _(String) gettext(String)
-#define LOCALEDIR "/usr/share/locale"
+#define LOCALEDIR LOCALE_DIR "/share/locale"
 
 /* Data sizes */
 
@@ -23,7 +29,7 @@
 #define IPLEN 16
 #define EMAILSIZE 80
 #define REPORTLEN 52
-#define COLORSIZE 7
+#define COLORSIZE 8
 #define MAXSORTSIZE 24
 #define USERSIZE 16
 #define PASSWORDSIZE 76
@@ -31,6 +37,7 @@
 #define WHOISDESCLEN 64
 #define WHOISROUTELEN 20
 #define TITLESIZE 64
+#define CSSSIZE 64
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 30
@@ -41,7 +48,22 @@
 /* Files */
 
 #define INFILE "/var/log/messages"
-#define RCFILE "/etc/fwlogwatch.config"
+#define RCFILE CONF_DIR "/fwlogwatch.config"
+
+enum {
+  MAY_NOT_EXIST,
+  MUST_EXIST
+};
+
+enum {
+  NO,
+  YES
+};
+
+enum {
+  IGNORE_HASH,
+  COMMENT_HASH
+};
 
 /* Modes */
 
@@ -145,14 +167,19 @@ enum {
 #define IPF_DATE 1
 #define IPF_DATA 2
 #define IPF_PROTO 4
-#define IPF_IPS 8
+#define IPF_SRC_IP 8
+#define IPF_DST_IP 16
+#define IPF_SRC_PORT 32
+#define IPF_DST_PORT 64
 #define IPF_NO_HIT 128
 
-enum {
-  IPF_OPT_NONE,
-  IPF_OPT_COUNT,
-  IPF_OPT_PORTS
-};
+#define IPF_OPT_NONE 1
+#define IPF_OPT_COUNT 2
+#define IPF_OPT_SRC 4
+#define IPF_OPT_DST 8
+#define IPF_OPT_RES 16
+#define IPF_OPT_PORT 32
+#define IPF_OPT_RPORT 64
 
 /* Sorting */
 
@@ -182,10 +209,10 @@ enum {
 
 /* HTML output */
 
-#define TEXTCOLOR "FFFFFF"
-#define BGCOLOR "000000"
-#define ROWCOLOR1 "555555"
-#define ROWCOLOR2 "333333"
+#define TEXTCOLOR "white"
+#define BGCOLOR "black"
+#define ROWCOLOR1 "#555555"
+#define ROWCOLOR2 "#333333"
 
 /* Log summary mode */
 
@@ -195,7 +222,7 @@ enum {
 /* Interactive report mode */
 
 #define CERT "[Insert address of abuse contact or CERT here]"
-#define TEMPLATE "/etc/fwlogwatch.template"
+#define TEMPLATE CONF_DIR "/fwlogwatch.template"
 #define FILENAME "fwlogwatchXXXXXX"
 #define INSERTREPORT "# insert report here"
 #define P_CAT "/bin/cat"
@@ -211,8 +238,8 @@ enum {
 
 #define ALERT 5
 #define FORGET 86400
-#define FWLW_NOTIFY "/usr/local/sbin/fwlw_notify"
-#define FWLW_RESPOND "/usr/local/sbin/fwlw_respond"
+#define FWLW_NOTIFY INSTALL_DIR "/sbin/fwlw_notify"
+#define FWLW_RESPOND INSTALL_DIR "/sbin/fwlw_respond"
 #define STATUS_TITLE _("fwlogwatch status")
 #define LISTENIF "127.0.0.1"
 #define LISTENPORT 888
@@ -231,6 +258,11 @@ enum {
 enum {
   FW_START,
   FW_STOP
+};
+
+enum {
+  NO_TCP_OPTS,
+  TCP_OPTS
 };
 
 /* Data structures */
@@ -350,6 +382,7 @@ struct options {
   unsigned char whois_lookup;
   int whois_sock;
   char inputfile[FILESIZE];
+  char rcfile[FILESIZE];
 
   struct log_line *line;
   char format_sel[SHORTLEN];
@@ -379,6 +412,7 @@ struct options {
   char outputfile[FILESIZE];
 
   char title[TITLESIZE];
+  char stylesheet[CSSSIZE];
   char textcol[COLORSIZE];
   char bgcol[COLORSIZE];
   char rowcol1[COLORSIZE];

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.21 2002/02/24 14:27:30 bwess Exp $
+# $Id: Makefile,v 1.22 2002/03/29 11:25:51 bwess Exp $
 
 # Linux
 CC = gcc
@@ -28,7 +28,7 @@ LIBS = -lcrypt -lz #-lc_p
 
 # You might want to add -DSHORT_NAMES to CFLAGS if you only intend to
 # analyze log formats with short list/chain/branch/interface names like
-# ipchains. You can also add -DLOGDOTS if your cisco log host logs FQDNs
+# ipchains. You can also add -DLOGDOTS if your Cisco log host logs FQDNs
 # and you only want the hostnames in the output.
 
 
@@ -39,6 +39,9 @@ INSTALL = install
 INSTALL_PROGRAM = $(INSTALL) -s -m 0755
 INSTALL_SCRIPT = $(INSTALL) -m 0755
 INSTALL_DATA = $(INSTALL) -m 0644
+INSTALL_DIR = /usr/local
+CONF_DIR = /etc
+LOCALE_DIR = /usr
 
 OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o \
        main.o modes.o net.o netfilter.o output.o parser.o \
@@ -71,35 +74,38 @@ fwlogwatch:	$(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 install:	all
-	$(INSTALL_PROGRAM) fwlogwatch /usr/local/sbin/fwlogwatch
-	$(INSTALL_SCRIPT) contrib/fwlw_notify /usr/local/sbin/fwlw_notify
-	$(INSTALL_SCRIPT) contrib/fwlw_respond /usr/local/sbin/fwlw_respond
-	$(INSTALL_DATA) fwlogwatch.8 /usr/local/man/man8/fwlogwatch.8
+	$(INSTALL_PROGRAM) fwlogwatch $(INSTALL_DIR)/sbin/fwlogwatch
+	$(INSTALL_SCRIPT) contrib/fwlw_notify $(INSTALL_DIR)/sbin/fwlw_notify
+	$(INSTALL_SCRIPT) contrib/fwlw_respond $(INSTALL_DIR)/sbin/fwlw_respond
+	$(INSTALL_DATA) fwlogwatch.8 $(INSTALL_DIR)/share/man/man8/fwlogwatch.8
 
 install-config:
-	$(INSTALL_DATA) fwlogwatch.config /etc/fwlogwatch.config
-	$(INSTALL_DATA) fwlogwatch.template /etc/fwlogwatch.template
+	$(INSTALL_DATA) fwlogwatch.config $(CONF_DIR)/fwlogwatch.config
+	$(INSTALL_DATA) fwlogwatch.template $(CONF_DIR)/fwlogwatch.template
 
 install-i18n:
 	cd po; make
-	$(INSTALL_DATA) po/de.mo /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/pt_BR.mo /usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/sv.mo /usr/share/locale/sv/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/zh_CN.mo /usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
-	$(INSTALL_DATA) po/zh_TW.mo /usr/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/de.mo $(LOCALE_DIR)/share/locale/de/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/pt_BR.mo $(LOCALE_DIR)/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/sv.mo $(LOCALE_DIR)/share/locale/sv/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/zh_CN.mo $(LOCALE_DIR)/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/zh_TW.mo $(LOCALE_DIR)/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo
+
+install-rhinit:
+	$(INSTALL_SCRIPT) contrib/fwlogwatch.init.redhat $(CONF_DIR)/rc.d/init.d/fwlogwatch
 
 uninstall:
-	@rm -f /usr/local/sbin/fwlogwatch \
-		/usr/local/sbin/fwlw_notify \
-		/usr/local/sbin/fwlw_respond \
-		/usr/local/man/man8/fwlogwatch.8 \
-		/usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/sv/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo \
-		/usr/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo \
-		/etc/fwlogwatch.config \
-		/etc/fwlogwatch.template
+	@rm -f $(INSTALL_DIR)/sbin/fwlogwatch \
+		$(INSTALL_DIR)/sbin/fwlw_notify \
+		$(INSTALL_DIR)/sbin/fwlw_respond \
+		$(INSTALL_DIR)/man/man8/fwlogwatch.8 \
+		$(LOCALE_DIR)/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
+		$(LOCALE_DIR)/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
+		$(LOCALE_DIR)/share/locale/sv/LC_MESSAGES/fwlogwatch.mo \
+		$(LOCALE_DIR)/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo \
+		$(LOCALE_DIR)/share/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo \
+		$(CONF_DIR)/fwlogwatch.config \
+		$(CONF_DIR)/fwlogwatch.template
 
 clean:
 	rm -f *.o *~ *.bak fwlogwatch

@@ -1,4 +1,18 @@
-$Id: ChangeLog,v 1.19 2002/02/24 14:27:30 bwess Exp $
+$Id: ChangeLog,v 1.20 2002/03/29 11:25:51 bwess Exp $
+
+Version 0.7 2002-03-27
+- Several realtime response improvements
+- Added support for configuration changes while running
+- Added support for include files in configuration files
+- Status page can be sorted and supports the at_least option
+- SIGUSR1 reopens the log file, SIGHUP rereads the configuration file
+- Documentation was updated
+- HTML output now mostly uses inline CSS for colors and fonts
+- Added support for external stylesheets and basic HTML color names
+- The default configuration file is not parsed anymore if an alternative
+  configuration file is specified
+- Rewrote parts of the ipfilter parser to support resolved Addresses in logs
+- Various small fixes
 
 Version 0.6 2002-02-24
 - Added chain and branch selection/exclusion options
@@ -93,14 +107,14 @@ Version 0.1 2001-01-07
 
 Version 0.0.28 2000-12-26
 - Rewrote ipchains parser (converted to flex)
-- Added support for cisco uptime log format
+- Added support for Cisco uptime log format
 
 Version 0.0.27 2000-12-08
 - Solaris portability patches
 - Added at_least option
 
 Version 0.0.26 2000-11-11
-- Added basic cisco support
+- Added basic Cisco support
 - Various small fixes
 
 Version 0.0.25 2000-11-06

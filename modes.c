@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: modes.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "net.h"
 #include "whois.h"
+#include "rcfile.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -234,11 +235,11 @@ void mode_summary()
     printf(_("All entries are from the same interface: \"%s\".\n"), opt.interface);
   }
 
-  if(opt.least > 0) {
+  if(opt.least > 1) {
     if(opt.html)
       printf("<br>\n");
 
-    printf(_("Only entries with a count larger than %d are shown.\n"), opt.least);
+    printf(_("Only entries with a count of at least %d are shown.\n"), opt.least);
   }
 
   if (opt.html)
@@ -295,6 +296,17 @@ void check_pidfile()
   free(sbuf);
 }
 
+void mode_rt_response_reread_conf()
+{
+  free_exclude_data();
+  if(read_rcfile(opt.rcfile, MAY_NOT_EXIST) == EXIT_SUCCESS) {
+    syslog(LOG_NOTICE, _("SIGHUP caught, reread configuration file %s"), opt.rcfile);
+  } else {
+    syslog(LOG_NOTICE, _("SIGHUP caught, unable to reread configuration file %s"), opt.rcfile);
+  }
+  signal(SIGHUP, mode_rt_response_reread_conf);
+}
+
 void mode_rt_response_open()
 {
   if(opt.std_in) {
@@ -308,21 +320,21 @@ void mode_rt_response_open()
   }
 }
 
-void mode_rt_response_restart()
+void mode_rt_response_reopen_log()
 {
   int retval;
 
   if(opt.std_in) {
-    syslog(LOG_NOTICE, _("SIGHUP caught, ignoring"));
+    syslog(LOG_NOTICE, _("SIGUSR1 caught, reading input from stdin, no need to reopen log file"));
   } else {
-    syslog(LOG_NOTICE, _("SIGHUP caught, reopening log file"));
+    syslog(LOG_NOTICE, _("SIGUSR1 caught, reopening log file %s"), opt.inputfile);
 
     retval = fclose(opt.inputfd);
     if(retval == EOF)
       syslog(LOG_NOTICE, "fclose %s: %s", opt.inputfile, strerror(errno));
 
     mode_rt_response_open();
-    signal(SIGHUP, mode_rt_response_restart);
+    signal(SIGUSR1, mode_rt_response_reopen_log);
   }
 }
 
@@ -380,6 +392,7 @@ void mode_rt_response_core()
       }
       if(size != info.st_size) {
 	size = info.st_size;
+	clearerr(opt.inputfd);
 	while (fgets(buf, BUFSIZE, opt.inputfd)) {
 	  opt.line = xmalloc(sizeof(struct log_line));
 	  parse_line(buf, 0);
@@ -561,7 +574,8 @@ void mode_rt_response()
     }
   }
 
-  signal(SIGHUP, mode_rt_response_restart);
+  signal(SIGHUP, mode_rt_response_reread_conf);
+  signal(SIGUSR1, mode_rt_response_reopen_log);
   mode_rt_response_core();
 }
 

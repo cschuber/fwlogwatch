@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.21 2002/02/24 14:27:30 bwess Exp $ */
+/* $Id: response.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -212,22 +212,23 @@ void remove_old()
   }
 }
 
-unsigned char is_known(struct conn_data *host)
+struct known_hosts * is_known(struct conn_data *host)
 {
   struct known_hosts *this_host;
 
   this_host = first_host;
   while (this_host != NULL) {
     if (this_host->shost.s_addr != (host->shost.s_addr & this_host->netmask.s_addr)) {goto no_match;}
+    if (this_host->time == 0) return this_host;
     if ((opt.dst_ip) && (this_host->dhost.s_addr != host->dhost.s_addr)) {goto no_match;}
     if ((opt.dst_port) && (this_host->dport != host->dport)) {goto no_match;}
     if ((opt.src_port) && (this_host->sport != host->sport)) {goto no_match;}
     if ((opt.proto) && (this_host->protocol != host->protocol)) {goto no_match;}
-    return 1;
+    break;
   no_match:
     this_host = this_host->next;
   }
-  return 0;
+  return this_host;
 }
 
 void look_for_alert()
@@ -238,7 +239,8 @@ void look_for_alert()
   while (this != NULL) {
     if (this->count >= opt.threshold) {
       struct known_hosts *this_host;
-      if (!is_known(this)) {
+      this_host = is_known(this);
+      if (this_host == NULL) {
 	this_host = xmalloc(sizeof(struct known_hosts));
 	this_host->time = time(NULL);
 	this_host->count = this->count;
@@ -250,26 +252,16 @@ void look_for_alert()
 	this_host->dport = this->dport;
 	this_host->next = first_host;
 	first_host = this_host;
+	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this->count, inet_ntoa(this->shost));
 	if(opt.response & OPT_NOTIFY)
 	  react(EX_NOTIFY, this_host);
 	if(opt.response & OPT_RESPOND)
 	  react(EX_RESPOND_ADD, this_host);
       } else {
-	this_host = first_host;
-	while (this_host != NULL) {
-	  if (this_host->shost.s_addr != this->shost.s_addr) {goto no_match;}
-	  if ((opt.dst_ip) && (this_host->dhost.s_addr != this->dhost.s_addr)) {goto no_match;}
-	  if ((opt.dst_port) && (this_host->dport != this->dport)) {goto no_match;}
-	  if ((opt.src_port) && (this_host->sport != this->sport)) {goto no_match;}
-	  if ((opt.proto) && (this_host->protocol != this->protocol)) {goto no_match;}
+	this_host->count = this_host->count + this->count;
+	if (this_host->time != 0)
 	  this_host->time = this->end_time;
-	  this_host->count = this_host->count + this->count;
-	  break;
-	no_match:
-	  this_host = this_host->next;
-	}
       }
-      syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this->count, inet_ntoa(this->shost));
       this->end_time = 1;
     }
     this = this->next;
