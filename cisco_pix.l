@@ -1,4 +1,4 @@
-/* $Id: cisco_pix.l,v 1.8 2002/03/29 11:25:51 bwess Exp $ */
+/* $Id: cisco_pix.l,v 1.9 2002/05/08 17:24:09 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
@@ -23,7 +23,7 @@ void cisco_pix_parse_count(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9._-]*
-LOGHOST	[0-9.a-zA-Z_:-]*
+LOGHOST	[0-9.a-zA-Z()_:-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
@@ -95,44 +95,28 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
   int retval;
 
   if (mode == CP_OPT_ITCP) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, " %30s TCP connection %30s from %3d.%3d.%3d.%3d/%5d",
-#else
-    retval = sscanf(input, " %10s TCP connection %10s from %3d.%3d.%3d.%3d/%5d",
-#endif
+    retval = sscanf(input, " %" SSHORTLEN "s TCP connection %" SSHORTLEN "s from %3d.%3d.%3d.%3d/%5d",
 		    opt.line->branchname,
 		    opt.line->chainlabel,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     opt.line->protocol = 6;
     if(retval != 7) return;
   } else if (mode == CP_OPT_TCP) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, " %30s TCP (no connection) from %3d.%3d.%3d.%3d/%5d",
-#else
-    retval = sscanf(input, " %10s TCP (no connection) from %3d.%3d.%3d.%3d/%5d",
-#endif
+    retval = sscanf(input, " %" SSHORTLEN "s TCP (no connection) from %3d.%3d.%3d.%3d/%5d",
 		    opt.line->chainlabel,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     xstrncpy(opt.line->branchname, "-", SHORTLEN);
     opt.line->protocol = 6;
     if(retval != 6) return;
   } else if (mode == CP_OPT_UDP) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, " %30s %30s UDP from %3d.%3d.%3d.%3d/%5d",
-#else
-    retval = sscanf(input, " %10s %10s UDP from %3d.%3d.%3d.%3d/%5d",
-#endif
+    retval = sscanf(input, " %" SSHORTLEN "s %" SSHORTLEN "s UDP from %3d.%3d.%3d.%3d/%5d",
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     opt.line->protocol = 17;
     if(retval != 7) return;
   } else if (mode == CP_OPT_ICMP) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, "%3d.%3d.%3d.%3d %30s to ping",
-#else
-    retval = sscanf(input, "%3d.%3d.%3d.%3d %10s to ping",
-#endif
+    retval = sscanf(input, "%3d.%3d.%3d.%3d %" SSHORTLEN "s to ping",
 		    &shost1, &shost2, &shost3, &shost4,
 		    opt.line->chainlabel);
     xstrncpy(opt.line->branchname, "-", SHORTLEN);

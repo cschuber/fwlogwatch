@@ -1,7 +1,7 @@
-$Id: README,v 1.21 2002/03/29 11:25:51 bwess Exp $
+$Id: README,v 1.22 2002/05/08 17:24:09 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for
-RUS-CERT. It is a packet filter/firewall log analyzer with support for a
+RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
 lot of log formats and analysis options. It also features incident report
 and realtime response capabilities, a web interface and internationalization.
 
@@ -18,8 +18,8 @@ FEATURES
 - General Features:
   - Can detect and process log entries in the following formats:
     Linux ipchains, Linux netfilter/iptables,
-    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX and
-    Windows XP firewall.
+    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX,
+    Windows XP firewall and the snort IDS.
   - Entries can be parsed in combined log files, the parsers to be used
     can be selected.
   - Gzip-compressed logs are supported.
@@ -41,6 +41,7 @@ FEATURES
     log is from a single host, the same happens with the chains, targets
     and interfaces).
   - Plain text and HTML (with CSS) output with many sort options.
+  - Can send reports by email.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -73,24 +74,27 @@ PARSER NOTES
   of PIX log entries. PIX OS version 6 is not supported yet.
   The ipfilter parser does not support logs with resolved service names
   and tcp/udp entries without ports.
+  The snort parser does not analyze portscan entries yet.
 
 
 INSTALLATION
 - General
   The Makefile assumes you use Linux, to compile on Solaris, OpenBSD,
   FreeBSD or IRIX look for the corresponding lines at the top of the
-  Makefile. You may want to have a look at main.h if you want to change
+  Makefile. fwlogwatch may also be compiled and run on Windows with help
+  of cygwin. You may want to have a look at main.h if you want to change
   some default values.
 
-  You will need the zlib compression library (version 1.0.9 or newer) and
-  it's header files to compile fwlogwatch.
+  A simple 'make' should be enough to obtain a working binary.
+  If your make (like the one on OpenBSD) thinks flex can only produce files
+  called lex.yy.c type make several times, after all parsers are generated
+  linking will work.
 
-  A simple 'make' should be enough to obtain a working binary. If you use
-  the realtime response mode you will need to install fwlogwatch with
-  superuser permissions for certain configurations. If all you need is read
-  access to the system's standard log file (e.g. /var/log/messages) you can
-  use group permissions. You can also bind a nonprivileged port for the
-  status server. 'make install' will install the binary (in
+  If you use the realtime response mode you will need to install fwlogwatch
+  with superuser permissions for certain configurations. If all you need is
+  read access to the system's standard log file (e.g. /var/log/messages)
+  you can use group permissions. You can also bind a nonprivileged port for
+  the status server. 'make install' will install the binary (in
   /usr/local/sbin) and the man page, 'make install-config' will also
   install a sample configuration file and template in /etc.
 
@@ -98,15 +102,22 @@ INSTALLATION
   fwlogwatch to create it's temporary files (only needed in report mode)
   in /tmp.
 
+- zlib/gettext
+  If you define HAVE_ZLIB and HAVE_GETTEXT fwlogwatch will be compiled with
+  zlib and gettext support. The output of fwlogwatch -V will contain an
+  overview of the compiler options used.
+
+  You will need the zlib compression library version 1.0.9 or newer and
+  it's header files to be able to use zlib support.
+
+  To enable the internationalization support you will need to have the
+  gettext package (sometimes with it's surroundings libtool, GNU m4,
+  autoconf and automake) installed.
+
 - Linux
   For ipchains you will need at least kernel 2.2.10 (which you should have
   updated for security reasons anyway), kernel versions before 2.2.10 don't
   log enough.
-
-- FreeBSD/OpenBSD
-  Because of the internationalization support you will need to have the
-  gettext package (sometimes with it's surroundings libtool, GNU m4,
-  autoconf and automake) installed to compile fwlogwatch.
 
 
 BASICS (with examples for ipchains)
@@ -176,6 +187,7 @@ CONFIGURATION AND EXAMPLES
 FEEDBACK
   If you find a bug or have an idea for a new feature please send an email
   to Wesslowski@CERT.Uni-Stuttgart.DE
+
   If you want to report a parser problem please specify which log format you
   are trying to parse, the version of the log generator and fwlogwatch you
   are using and provide a sample incuding log lines for which parsing fails.

@@ -1,10 +1,14 @@
-/* $Id: main.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: main.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+
+#ifdef HAVE_GETTEXT
 #include <locale.h>
+#endif
+
 #include "main.h"
 #include "rcfile.h"
 #include "parser.h"
@@ -95,6 +99,26 @@ void info()
   puts("along with this program; if not, write to the Free Software");
   puts("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA");
   puts("");
+  puts(_("Compile-time options of this version:"));
+  printf(_("short names support "));
+#ifdef SHORT_NAMES
+  puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
+  printf(_("zlib support "));
+#ifdef HAVE_ZLIB
+  puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
+  printf(_("gettext (i18n) support "));
+#ifdef HAVE_GETTEXT
+  puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
+  puts("");
   puts(_("You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."));
 
   exit(EXIT_SUCCESS);
@@ -103,9 +127,6 @@ void info()
 void init_options()
 {
   char *user, host[SHOSTLEN];
-#ifndef SOLARIS
-  char domain[SHOSTLEN];
-#endif
   int retval;
 
   opt.mode = LOG_SUMMARY;
@@ -171,7 +192,7 @@ void init_options()
   opt.threshold = 0;
   opt.least = 0;
   opt.sender[0] = '\0';
-  xstrncpy(opt.recipient, CERT, EMAILSIZE);
+  opt.recipient[0] = '\0';
   opt.cc[0] = '\0';
   xstrncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
@@ -199,20 +220,7 @@ void init_options()
     perror("gethostname");
     return;
   }
-#ifndef SOLARIS
-  retval = getdomainname(domain, SHOSTLEN);
-  if (retval == -1) {
-    perror("getdomainname");
-    return;
-  }
-  if (strlen(domain) > 0) {
-    snprintf(opt.sender, EMAILSIZE, "%s@%s.%s", user, host, domain);
-  } else {
-#endif
-    snprintf(opt.sender, EMAILSIZE, "%s@%s", user, host);
-#ifndef SOLARIS
-  }
-#endif
+  snprintf(opt.sender, EMAILSIZE, "%s@%s", user, host);
 }
 
 int main(int argc, char **argv)
@@ -222,10 +230,12 @@ int main(int argc, char **argv)
 
   init_options();
 
+#ifdef HAVE_GETTEXT
   setlocale(LC_MESSAGES,"");
   setlocale(LC_TIME,"");
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
+#endif
 
   while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
@@ -379,7 +389,13 @@ int main(int argc, char **argv)
   case LOG_SUMMARY:
     if (opt.title[0] == '\0')
       xstrncpy(opt.title, SUMMARY_TITLE, TITLESIZE);
+    mode_summary();
+    break;
   case INTERACTIVE_REPORT:
+    if (opt.title[0] == '\0')
+      xstrncpy(opt.title, SUMMARY_TITLE, TITLESIZE);
+    if (opt.recipient[0] == '\0')
+      xstrncpy(opt.recipient, CERT, EMAILSIZE);
     mode_summary();
     break;
   case REALTIME_RESPONSE:

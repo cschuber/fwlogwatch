@@ -1,30 +1,30 @@
-# $Id: Makefile,v 1.22 2002/03/29 11:25:51 bwess Exp $
+# $Id: Makefile,v 1.23 2002/05/08 17:24:09 bwess Exp $
 
 # Linux
 CC = gcc
-CFLAGS = -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
+CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = #-g #-static -p
 LIBS = -lcrypt -lz #-lc_p
 
 # Solaris
-#LIBS = -lnsl -lsocket -lz -lcrypt
+#LIBS = -lnsl -lsocket -lcrypt -lz
 #
 #CC = gcc
-#CFLAGS = -DSOLARIS -pipe -O2 -Wall #-pedantic #-g
+#CFLAGS = -DSOLARIS -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic #-g
 #LDFLAGS = #-g
 #
 #CC = cc
-#CFLAGS = -DSOLARIS -v -fast -xCC
+#CFLAGS = -DSOLARIS -DHAVE_ZLIB -DHAVE_GETTEXT -v -fast -xCC
 
 # OpenBSD
 #CC = gcc
-#CFLAGS = -pipe -O2 -Wall -I/usr/local/include
-#LIBS = -lz -L/usr/local/lib -lintl
+#CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall -I/usr/local/include
+#LIBS = -L/usr/local/lib -lz -lintl
 
 # FreeBSD
 #CC = gcc
-#CFLAGS = -pipe -O2 -Wall -I/usr/local/include
-#LIBS = -L/usr/local/lib -lintl -lcrypt -lz
+#CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall -I/usr/local/include
+#LIBS = -L/usr/local/lib -lcrypt -lz -lintl
 
 # You might want to add -DSHORT_NAMES to CFLAGS if you only intend to
 # analyze log formats with short list/chain/branch/interface names like
@@ -45,7 +45,8 @@ LOCALE_DIR = /usr
 
 OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o \
        main.o modes.o net.o netfilter.o output.o parser.o \
-       rcfile.o report.o resolve.o response.o utils.o whois.o win_xp.o
+       rcfile.o report.o resolve.o response.o snort.o utils.o \
+       whois.o win_xp.o
 
 all:	fwlogwatch
 
@@ -66,6 +67,7 @@ rcfile.o:	main.h parser.h rcfile.h
 report.o:	main.h output.h resolve.h response.h
 resolve.o:	main.h resolve.h
 response.o:	main.h output.h response.h
+snort.o:	main.h utils.h
 utils.o:	main.h
 whois.o:	main.h utils.h
 win_xp.o:	main.h utils.h
@@ -98,7 +100,7 @@ uninstall:
 	@rm -f $(INSTALL_DIR)/sbin/fwlogwatch \
 		$(INSTALL_DIR)/sbin/fwlw_notify \
 		$(INSTALL_DIR)/sbin/fwlw_respond \
-		$(INSTALL_DIR)/man/man8/fwlogwatch.8 \
+		$(INSTALL_DIR)/share/man/man8/fwlogwatch.8 \
 		$(LOCALE_DIR)/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
 		$(LOCALE_DIR)/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
 		$(LOCALE_DIR)/share/locale/sv/LC_MESSAGES/fwlogwatch.mo \

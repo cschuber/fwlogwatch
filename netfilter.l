@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.9 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: netfilter.l,v 1.10 2002/05/08 17:24:09 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -23,8 +23,8 @@ void nf_parse_proto(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
-PREFIX	[ -~]+
-LOGHOST	[0-9.a-zA-Z_-]*
+PREFIX	[ -~¡-ÿ]+
+LOGHOST	[0-9.a-zA-Z()_:-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
@@ -67,6 +67,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 "RST"			opt.line->flags = opt.line->flags | TCP_RST;
 "SYN"			opt.line->flags = opt.line->flags | TCP_SYN;
 "FIN"			opt.line->flags = opt.line->flags | TCP_FIN;
+"ECE"			/* ignore */
+"CWR"			/* ignore */
 "URGP="{NUMBER}		/* ignore */
 "OPT ("[0-9A-F]*")"	/* ignore */
 "SPI="{HEXNUM}		/* ignore */
@@ -85,11 +87,7 @@ void nf_parse_start(char *input)
   char smonth[3];
 
   retval = sscanf(input,
-#ifndef SHORT_NAMES
 		  "%3s %2d %2d:%2d:%2d %32s",
-#else
-		  "%3s %2d %2d:%2d:%2d %32s",
-#endif
 		  smonth, &day, &hour, &minute, &second,
 		  opt.line->hostname);
   if (retval != 6) {

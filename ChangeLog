@@ -1,4 +1,14 @@
-$Id: ChangeLog,v 1.20 2002/03/29 11:25:51 bwess Exp $
+$Id: ChangeLog,v 1.21 2002/05/08 17:24:09 bwess Exp $
+
+Version 0.8 2002-05-08
+- Added Snort support
+- Added support for sending summaries by email (-T option)
+- Made zlib and gettext support compile time options (-V shows options used)
+- Changes in the parsers and CIDR code.
+- Various small fixes
+
+Version 0.7.1 2002-04-04
+was not officially released
 
 Version 0.7 2002-03-27
 - Several realtime response improvements
@@ -11,7 +21,8 @@ Version 0.7 2002-03-27
 - Added support for external stylesheets and basic HTML color names
 - The default configuration file is not parsed anymore if an alternative
   configuration file is specified
-- Rewrote parts of the ipfilter parser to support resolved Addresses in logs
+- Rewrote parts of the ipfilter parser to support resolved IP addresses
+  in logs
 - Various small fixes
 
 Version 0.6 2002-02-24

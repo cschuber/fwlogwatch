@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: main.h,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.7"
-#define COPYRIGHT "2002-03-27 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.8"
+#define COPYRIGHT "2002-05-08 Boris Wesslowski, RUS-CERT"
 
 /* Paths */
 
@@ -15,9 +15,13 @@
 
 /* i18n */
 
+#ifdef HAVE_GETTEXT
 #include <libintl.h>
 #define _(String) gettext(String)
 #define LOCALEDIR LOCALE_DIR "/share/locale"
+#else
+#define _(String) String
+#endif
 
 /* Data sizes */
 
@@ -40,9 +44,11 @@
 #define CSSSIZE 64
 
 #ifndef SHORT_NAMES
-#define SHORTLEN 30
+#define SHORTLEN 128
+#define SSHORTLEN "128"
 #else
 #define SHORTLEN 10
+#define SSHORTLEN "10"
 #endif
 
 /* Files */
@@ -82,6 +88,7 @@ enum {
 #define PARSER_IPFILTER 8
 #define PARSER_CISCO_PIX 16
 #define PARSER_WIN_XP 32
+#define PARSER_SNORT 64
 
 enum {
   PARSE_OK,
@@ -180,6 +187,20 @@ enum {
 #define IPF_OPT_RES 16
 #define IPF_OPT_PORT 32
 #define IPF_OPT_RPORT 64
+
+/* snort support */
+
+#define SNORT_DATE 1
+#define SNORT_CHAIN 2
+#define SNORT_BRANCH 4
+#define SNORT_PROTO 8
+#define SNORT_SRC 16
+#define SNORT_DST 32
+#define SNORT_NO_HIT 64
+
+#define SNORT_OPT_SRC 1
+#define SNORT_OPT_DST 2
+#define SNORT_OPT_PORT 4
 
 /* Sorting */
 

@@ -1,4 +1,4 @@
-/* $Id: cisco_ios.l,v 1.8 2002/03/29 11:25:51 bwess Exp $ */
+/* $Id: cisco_ios.l,v 1.9 2002/05/08 17:24:09 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -23,13 +23,13 @@ void cisco_ios_parse_if(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9._-]*
-LOGHOST	[0-9.a-zA-Z_:-]*
+LOGHOST	[0-9.a-zA-Z()_:-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
 CISCO	"%SEC-6-IPACCESSLOG"("P"|"DP"|"RP"|"NP"|"S")":"
-LIST	[a-zA-Z0-9._-]*
+LIST	[a-zA-Z0-9._>-]*
 TARGET	"denied"|"permitted"
 PROTO	"tcp"|"udp"|"icmp"|"igmp"|"gre"|"ospf"|"ipinip"|"pim"|{NUMBER}
 
@@ -109,22 +109,14 @@ void cisco_ios_parse_src(char *input, unsigned char mode)
   int retval;
 
   if (mode == CI_OPT_PORT) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, "list %30s %30s %5s %3d.%3d.%3d.%3d(%5d)",
-#else
-    retval = sscanf(input, "list %10s %10s %5s %3d.%3d.%3d.%3d(%5d)",
-#endif
+    retval = sscanf(input, "list %" SSHORTLEN "s %" SSHORTLEN "s %5s %3d.%3d.%3d.%3d(%5d)",
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if(retval != 8) return;
   } else if (mode == CI_OPT_NONE) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, "list %30s %30s %8s %3d.%3d.%3d.%3d",
-#else
-    retval = sscanf(input, "list %10s %10s %8s %3d.%3d.%3d.%3d",
-#endif
+    retval = sscanf(input, "list %" SSHORTLEN "s %" SSHORTLEN "s %8s %3d.%3d.%3d.%3d",
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,

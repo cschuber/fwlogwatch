@@ -1,4 +1,4 @@
-/* $Id: whois.h,v 1.6 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: whois.h,v 1.7 2002/05/08 17:24:09 bwess Exp $ */
 
 #ifndef _WHOIS_H
 #define _WHOIS_H

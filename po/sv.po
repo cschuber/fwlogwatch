@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
-"POT-Creation-Date: 2002-03-26 23:12+0100\n"
+"POT-Creation-Date: 2002-05-08 10:31+0200\n"
 "PO-Revision-Date: 2001-12-06 00:34+0200\n"
 "Last-Translator: Robert Malmgren <rom@romab.com>\n"
 "Language-Team: -\n"
@@ -39,352 +39,380 @@ msgstr ""
 msgid "Timewarp in log file (%s"
 msgstr "Tidsomställning i loggfil (%s"
 
-#: ../main.c:20
+#: ../main.c:24
 #, c-format
 msgid "Usage: %s [options]\n"
 msgstr "Användningsexempel: %s [kommandoradsparametrar]\n"
 
-#: ../main.c:21
+#: ../main.c:25
 #, fuzzy
 msgid "General options:\n"
 msgstr "Globala parametrar:\n"
 
-#: ../main.c:22
+#: ../main.c:26
 msgid "         -h          this help\n"
 msgstr "         -h          Denna hjälptext\n"
 
-#: ../main.c:23
+#: ../main.c:27
 msgid "         -L <file>   show time of first and last log entry in file\n"
 msgstr ""
 "         -L <datei>  Visa tidsstämplar för första och sista logposten i "
 "filen\n"
 
-#: ../main.c:24
+#: ../main.c:28
 msgid "         -V          show version and copyright info\n"
 msgstr "         -V          Visa versions- och upphovsrättsinformation\n"
 
-#: ../main.c:27
+#: ../main.c:31
 msgid "Global options:\n"
 msgstr "Globala parametrar:\n"
 
-#: ../main.c:28
+#: ../main.c:32
 #, c-format
 msgid "         -c <file>   specify config file (defaults to %s)\n"
 msgstr ""
 "         -c <filnamn>  Speficiera konfigurationsfil (Standardförval: %s)\n"
 
-#: ../main.c:29
+#: ../main.c:33
 msgid "         -D          do not differentiate destination IP addresses\n"
 msgstr "         -D          Differentiera ej mottangande IP adresser\n"
 
-#: ../main.c:30
+#: ../main.c:34
 msgid "         -d          differentiate destination ports\n"
 msgstr "         -d          Differentiera ej på mottagande portnummer\n"
 
-#: ../main.c:31
+#: ../main.c:35
 #, c-format
 msgid "         -f <file>   specify input file (defaults to %s)\n"
 msgstr "         -f <filnamn>  Specificera indatafil (Standardförval: %s)\n"
 
-#: ../main.c:32
+#: ../main.c:36
 msgid ""
 "         -m <count>  only show entries with at least so many incidents\n"
 msgstr ""
 "         -m <antal> Visa enbart poster med åtminstone ANTAL incidenter\n"
 
-#: ../main.c:33
+#: ../main.c:37
 #, fuzzy
 msgid "         -N          resolve service names\n"
 msgstr "         -n          Utför DNS-namnuppslagning\n"
 
-#: ../main.c:34
+#: ../main.c:38
 msgid "         -n          resolve host names\n"
 msgstr "         -n          Utför DNS-namnuppslagning\n"
 
-#: ../main.c:35
+#: ../main.c:39
 msgid ""
 "         -O <order>  define the sort order (see the man page for details)\n"
 msgstr ""
 "         -O <ordning> Definiera sorteringsordning (Se manualblad för mer "
 "beskrivning)\n"
 
-#: ../main.c:36
+#: ../main.c:40
 msgid "         -P <format> use only parsers for specific formats\n"
 msgstr "         -P <format> använd enbart parser för specifika format\n"
 
-#: ../main.c:37
+#: ../main.c:41
 msgid "         -p          differentiate protocols\n"
 msgstr "         -p          Differentiera protokoll\n"
 
-#: ../main.c:38
+#: ../main.c:42
 msgid "         -s          differentiate source ports\n"
 msgstr "         -s          Differentiera på avsändarportar\n"
 
-#: ../main.c:39
+#: ../main.c:43
 msgid "         -v          verbose, specify twice for more info\n"
 msgstr ""
 "         -v          Ge utökad mängd information. Ge optionen dubbelt för "
 "ännu högre grad av utdata (-vv)\n"
 
-#: ../main.c:40
+#: ../main.c:44
 msgid "         -y          differentiate TCP options\n"
 msgstr "         -y          Differentiera på TCP-Optioner\n"
 
-#: ../main.c:43
+#: ../main.c:47
 msgid "Log summary mode (default):\n"
 msgstr "Logganalysmod (standard):\n"
 
-#: ../main.c:44
+#: ../main.c:48
 msgid ""
 "         -b          show amount of data (sum of total packet lengths)\n"
 msgstr ""
 "         -b          Visa mängden data (Summering av totala paketstorlekar)\n"
 
-#: ../main.c:45
+#: ../main.c:49
 #, fuzzy
 msgid "         -e          show end times\n"
 msgstr "         -t          Visa start- och stopptider\n"
 
-#: ../main.c:46
+#: ../main.c:50
 msgid "         -l <time>   process recent events only (defaults to off)\n"
 msgstr ""
 "         -l <zeit>   Bearbeta enbart nytillkomna händelser (Standardval: "
 "avaktiverad)\n"
 
-#: ../main.c:47
+#: ../main.c:51
 msgid "         -o <file>   specify output file\n"
 msgstr "         -o <fil>  Specificera utdatafil\n"
 
-#: ../main.c:48
+#: ../main.c:52
 msgid "         -S          do not differentiate source IP addresses\n"
 msgstr "         -S          Differentiera inte på avsändaradresser\n"
 
-#: ../main.c:49
+#: ../main.c:53
 #, fuzzy
 msgid "         -t          show start times\n"
 msgstr "         -t          Visa start- och stopptider\n"
 
-#: ../main.c:50
+#: ../main.c:54
 msgid "         -W          activate whois lookups for source addresses\n"
 msgstr "         -W          Utför en \"whois\"-fråga för avsändaradresser\n"
 
-#: ../main.c:51
+#: ../main.c:55
 msgid "         -w          HTML output\n"
 msgstr "         -w          utdata som HTML\n"
 
-#: ../main.c:52
+#: ../main.c:56
 msgid "         -z          show time interval\n"
 msgstr "         -z          Visa tidsintervall\n"
 
-#: ../main.c:55
+#: ../main.c:59
 #, fuzzy
 msgid "Interactive report mode (summary mode extension):\n"
 msgstr "Interaktiv avrapporteringsmod:\n"
 
-#: ../main.c:56
+#: ../main.c:60
 msgid "         -i <count>  interactive mode with report threshold\n"
 msgstr "         -i <antal> Interaktivt mod med tröskelvärde för rapport\n"
 
-#: ../main.c:57
+#: ../main.c:61
 msgid "         -F <email>  report sender address\n"
 msgstr "         -F <email>  Avsändaradressen för rapporten\n"
 
-#: ../main.c:58
+#: ../main.c:62
 #, c-format
 msgid "                     (defaults to '%s')\n"
 msgstr "                     (Standardmässigt förval: '%s')\n"
 
-#: ../main.c:59
+#: ../main.c:63
 msgid ""
 "         -T <email>  address of CERT or abuse contact to send report to\n"
 msgstr ""
 "         -T <email>  E-postadress till CERT eller \"abuse\"-kontakt att "
 "sända rapport till\n"
 
-#: ../main.c:60
+#: ../main.c:64
 msgid "         -C <email>  carbon copy recipients\n"
 msgstr "         -C <email>  Kännedomskopia av rapporten\n"
 
-#: ../main.c:61
+#: ../main.c:65
 msgid "         -I <file>   template file for report\n"
 msgstr "         -I <fil>  Mall för rapport\n"
 
-#: ../main.c:62
+#: ../main.c:66
 #, c-format
 msgid "                     (defaults to %s)\n"
 msgstr "                     (Standardmässigt förval: %s)\n"
 
-#: ../main.c:65
+#: ../main.c:69
 msgid "Realtime response mode:\n"
 msgstr "Echtzeitantwortmodus:\n"
 
-#: ../main.c:66
+#: ../main.c:70
 msgid ""
 "         -R          realtime response as daemon (default action: log only)\n"
 msgstr ""
 "         -R          Realtidsåtgärder som bakgrundsprocess (daemon) "
 "(Standardmässigt förval: enbart loggning)\n"
 
-#: ../main.c:67
+#: ../main.c:71
 #, c-format
 msgid "         -a <count>  alert threshold (defaults to %d entries)\n"
 msgstr ""
 "         -a <antal> Tröskelvärde för larm (Standardmässigt förval: %d "
 "poster)\n"
 
-#: ../main.c:68
+#: ../main.c:72
 #, c-format
 msgid "         -l <time>   forget events this old (defaults to %d hours)\n"
 msgstr ""
 "         -l <tid>   Glöm händelser älder än (Standardmässigt förval: %d "
 "timmar)\n"
 
-#: ../main.c:69
+#: ../main.c:73
 msgid ""
 "         -k <IP/net> add this IP address or net to the list of known hosts\n"
 msgstr ""
 "         -k <IP/Nät> Lägg till denna IP-adress eller detta nät till listan "
 "över \"kända\" system\n"
 
-#: ../main.c:70
+#: ../main.c:74
 msgid ""
 "         -A          invoke notification script if threshold is reached\n"
 msgstr ""
 "         -A          Anropa notifieringsskript om tröskelvärdet nås "
 "Schwelle\n"
 
-#: ../main.c:71
+#: ../main.c:75
 msgid "         -B          invoke response action script (e.g. block host)\n"
 msgstr ""
 "         -B          Anropa åtgärdsskriptet (exempelvis för att spärra "
 "adressen)\n"
 
-#: ../main.c:72
+#: ../main.c:76
 msgid "         -X          activate internal status information web server\n"
 msgstr ""
 "         -X          Aktivera den interna statusinformationsfunktionen i "
 "webbservern\n"
 
-#: ../main.c:98
+#: ../main.c:102
+msgid "Compile-time options of this version:"
+msgstr ""
+
+#: ../main.c:103
+msgid "short names support "
+msgstr ""
+
+#: ../main.c:105 ../main.c:111 ../main.c:117
+msgid "enabled"
+msgstr ""
+
+#: ../main.c:107 ../main.c:113 ../main.c:119
+msgid "disabled"
+msgstr ""
+
+#: ../main.c:109
+msgid "zlib support "
+msgstr ""
+
+#: ../main.c:115
+msgid "gettext (i18n) support "
+msgstr ""
+
+#: ../main.c:122
 #, fuzzy
 msgid "You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."
 msgstr ""
 "Upphovsmannen till programmet kan nås på adressen <Boris.Wesslowski@RUS.Uni-"
 "Stuttgart.DE>"
 
-#: ../main.c:402
+#: ../main.c:418
 msgid "Exiting\n"
 msgstr "Programmet avslutas\n"
 
-#: ../modes.c:40
+#: ../modes.c:44
 msgid "Using stdin as input\n"
 msgstr "Använder normal indatakanal (stdin) för datainläsning\n"
 
-#: ../modes.c:45
+#: ../modes.c:49
 #, c-format
 msgid "Opening input file '%s'\n"
 msgstr "Öppnar indatafil '%s'\n"
 
-#: ../modes.c:55
+#: ../modes.c:67
 msgid "Processing\n"
 msgstr "Bearbetar\n"
 
-#: ../modes.c:99 ../modes.c:273 ../modes.c:648 ../rcfile.c:446
+#: ../modes.c:119 ../modes.c:315 ../modes.c:712 ../rcfile.c:446
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "Stänger filen '%s'\n"
 
-#: ../modes.c:115
+#: ../modes.c:141
 msgid "Sorting data\n"
 msgstr "Sorterar data\n"
 
-#: ../modes.c:140
+#: ../modes.c:166
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr "Öppnar utdatafil '%s'\n"
 
-#: ../modes.c:158
+#: ../modes.c:178 ../report.c:210
+msgid "Sending...\n"
+msgstr "Sänder....\n"
+
+#: ../modes.c:200
 #, c-format
 msgid "Generated %s by "
 msgstr "Skapad %s av "
 
-#: ../modes.c:168
+#: ../modes.c:210
 msgid "an unknown user.\n"
 msgstr "en okänd användare.\n"
 
-#: ../modes.c:176
+#: ../modes.c:218
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(och %d äldre än %d sekunder) "
 
-#: ../modes.c:179
+#: ../modes.c:221
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(och %d felformatterad) "
 
-#: ../modes.c:181
+#: ../modes.c:223
 #, c-format
 msgid "of %d entries in the file "
 msgstr "av %d poster i filen "
 
-#: ../modes.c:182
+#: ../modes.c:224
 #, c-format
 msgid "\"%s\" are packet logs, "
 msgstr "\"%s\" är paketloggar, "
 
-#: ../modes.c:185
+#: ../modes.c:227
 msgid "one has unique characteristics.\n"
 msgstr "en har unika egenskaper.\n"
 
-#: ../modes.c:187
+#: ../modes.c:229
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d har unika egenskaper.\n"
 
-#: ../modes.c:195
+#: ../modes.c:237
 msgid "One entry was excluded by configuration.\n"
 msgstr "En post utelämnades via konfigurationsinställningar.\n"
 
-#: ../modes.c:197
+#: ../modes.c:239
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d poster utelämnades pgr av konfigurationsinställningar.\n"
 
-#: ../modes.c:205
+#: ../modes.c:247
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "Den första posten i loggen: %s, den senaste: %s.\n"
 
-#: ../modes.c:207 ../modes.c:643
+#: ../modes.c:249 ../modes.c:707
 msgid "No valid time entries found.\n"
 msgstr "Inga giltiga tidsposter funna.\n"
 
-#: ../modes.c:214
+#: ../modes.c:256
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "Alla poster var loggade av samma system: \"%s\".\n"
 
-#: ../modes.c:221
+#: ../modes.c:263
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "Alla poster kom från samma kedja: \"%s\".\n"
 
-#: ../modes.c:228
+#: ../modes.c:270
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "Alla poster har samma måladress: \"%s\".\n"
 
-#: ../modes.c:235
+#: ../modes.c:277
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "Alla poster kommer från samma nätverksinterface: \"%s\".\n"
 
-#: ../modes.c:242
+#: ../modes.c:284
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "Bara poster med räknare större än %d visas.\n"
 
-#: ../modes.c:251
+#: ../modes.c:293
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
@@ -393,176 +421,176 @@ msgstr ""
 "Rapporttröskelvärde: %d\n"
 "\n"
 
-#: ../modes.c:289
+#: ../modes.c:335
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr ""
 "Varning: En pid-fil existerar redan. En till fwlogwatch kanske exekverar?\n"
 
-#: ../modes.c:303
+#: ../modes.c:349
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "signalen SIGHUP fångad, loggfilen öppnas åter"
 
-#: ../modes.c:305
+#: ../modes.c:351
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "signalen SIGHUP fångad, loggfilen öppnas åter"
 
-#: ../modes.c:328
+#: ../modes.c:374
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:330
+#: ../modes.c:376
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "signalen SIGHUP fångad, loggfilen öppnas åter"
 
-#: ../modes.c:409
+#: ../modes.c:455
 msgid "SIGTERM caught, cleaning up"
 msgstr "signalen SIGTERM fångad, städar temporärdata"
 
-#: ../modes.c:491
+#: ../modes.c:537
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "Startar (pid %d)"
 
-#: ../modes.c:552
+#: ../modes.c:598
 msgid "Alert threshold is one attempt"
 msgstr "Tröskelvärde för <alert> är ett försök"
 
-#: ../modes.c:554
+#: ../modes.c:600
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Tröskelvärde för <alert> är %d försök"
 
-#: ../modes.c:558
+#: ../modes.c:604
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "Poster äldre än %d sekund(er) sållas bort"
 
-#: ../modes.c:561
+#: ../modes.c:607
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "Poster äldre än %d timme/timmar sållas bort"
 
-#: ../modes.c:565
+#: ../modes.c:611
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "Svarsmod: loggen%s%s"
 
-#: ../modes.c:566 ../net.c:310
+#: ../modes.c:612 ../net.c:314
 msgid ", notify"
 msgstr ", notifiera <notify>"
 
-#: ../modes.c:567 ../net.c:311
+#: ../modes.c:613 ../net.c:315
 msgid ", respond"
 msgstr ", återgälda <respond>"
 
-#: ../modes.c:593
+#: ../modes.c:637
 msgid "Reading standard input\n"
 msgstr "Läser data från standardinmatningskällan stdin\n"
 
-#: ../modes.c:602
+#: ../modes.c:654
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "Läser data'%s'\n"
 
-#: ../modes.c:636
+#: ../modes.c:700
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "Antal rader: %d\n"
 
-#: ../modes.c:637
+#: ../modes.c:701
 #, c-format
 msgid "First entry: %s\n"
 msgstr "Första posten: %s\n"
 
-#: ../modes.c:640
+#: ../modes.c:704
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "Sista posten: %s\n"
 
-#: ../net.c:79
+#: ../net.c:83
 #, c-format
 msgid "Listening on %s port %i"
 msgstr "Lyssnar på adress %s, port %i"
 
-#: ../net.c:110
+#: ../net.c:114
 msgid "decode_base64: input string incomplete"
 msgstr "decode_base64: okomplett indatasträng"
 
-#: ../net.c:117
+#: ../net.c:121
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
 msgstr "decode_base64: Otillåtet tecken '%c' i indatasträngen"
 
-#: ../net.c:150
+#: ../net.c:154
 #, fuzzy, c-format
 msgid "<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"
 msgstr ""
 "<tr bgcolor=\"#%s\" align=\"center\"><td>Antal</td><td>Adderade</td><td>IP-"
 "adress på avsändare</td>"
 
-#: ../net.c:153 ../output.c:330
+#: ../net.c:157 ../output.c:330
 #, fuzzy
 msgid "<th>proto</th>"
 msgstr "<td>Protokoll</td>"
 
-#: ../net.c:154 ../output.c:336
+#: ../net.c:158 ../output.c:336
 #, fuzzy
 msgid "<th>source</th>"
 msgstr "<td>avsändare</td>"
 
-#: ../net.c:156 ../net.c:165 ../output.c:338 ../output.c:352
+#: ../net.c:160 ../net.c:169 ../output.c:338 ../output.c:352
 #, fuzzy
 msgid "<th>hostname</th>"
 msgstr "<td>datornamn</td>"
 
-#: ../net.c:158 ../net.c:168 ../output.c:344 ../output.c:356
+#: ../net.c:162 ../net.c:172 ../output.c:344 ../output.c:356
 #, fuzzy
 msgid "<th>port</th>"
 msgstr "<td>Protokoll</td>"
 
-#: ../net.c:160 ../net.c:170 ../output.c:346 ../output.c:358
+#: ../net.c:164 ../net.c:174 ../output.c:346 ../output.c:358
 #, fuzzy
 msgid "<th>service</th>"
 msgstr "<td>avsändare</td>"
 
-#: ../net.c:163 ../output.c:350
+#: ../net.c:167 ../output.c:350
 #, fuzzy
 msgid "<th>destination</th>"
 msgstr "<td>mottagare</td>"
 
-#: ../net.c:174 ../output.c:362
+#: ../net.c:178 ../output.c:362
 #, fuzzy
 msgid "<th>opts</th>"
 msgstr "<td>optioner</td>"
 
-#: ../net.c:176
+#: ../net.c:180
 #, fuzzy
 msgid "<th>time remaining</th></tr>\n"
 msgstr "<td>Återstående tid</td></tr>\n"
 
-#: ../net.c:206
+#: ../net.c:210
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
 msgstr "Avvisad uppkoppling ifrån otillåten IP-adress %s, port %i"
 
-#: ../net.c:215
+#: ../net.c:219
 #, c-format
 msgid "Connect from %s port %i"
 msgstr "Uppkoppling från %s port %i"
 
-#: ../net.c:237
+#: ../net.c:241
 #, c-format
 msgid "Authorization failed (%s)"
 msgstr "Misslyckad auktorisation (%s)"
 
-#: ../net.c:239
+#: ../net.c:243
 msgid "Authorization failed"
 msgstr "Misslyckad auktorisation"
 
-#: ../net.c:248
+#: ../net.c:252
 msgid ""
 "<body>\n"
 "<h1>Authorization Required</h1>\n"
@@ -574,16 +602,16 @@ msgstr ""
 "</body>\n"
 "</html>\n"
 
-#: ../net.c:284
+#: ../net.c:288
 msgid "<a href=\"/\">Reload</a><br>\n"
 msgstr "<a href=\"/\">Ladda om</a><br>\n"
 
-#: ../net.c:286
+#: ../net.c:290
 #, c-format
 msgid "(automatic refresh every %d seconds)<br>\n"
 msgstr "(Automatisk återladdning var %d sekund)<br>\n"
 
-#: ../net.c:289
+#: ../net.c:293
 #, fuzzy
 msgid ""
 "</div>\n"
@@ -593,22 +621,22 @@ msgstr ""
 "</div>\n"
 "<h2>Allmän information</h2>\n"
 
-#: ../net.c:293
+#: ../net.c:297
 #, c-format
 msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Startid för Daemonprocessen:</td><td>%s</td></tr>\n"
 
-#: ../net.c:298
+#: ../net.c:302
 #, c-format
 msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Aktuell tid:</td><td>%s</td></tr>\n"
 
-#: ../net.c:302
+#: ../net.c:306
 #, c-format
 msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Tid för Exekvering:</td><td>%s</td></tr>\n"
 
-#: ../net.c:306
+#: ../net.c:310
 #, fuzzy, c-format
 msgid ""
 "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
@@ -618,36 +646,36 @@ msgstr ""
 "<tr><td>Tidsmässigt tröskelvärde för att släppa:</td><td>%d sekunder</td></"
 "tr>\n"
 
-#: ../net.c:309
+#: ../net.c:313
 #, c-format
 msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
 msgstr "<tr><td>Svarsmod:</td><td>logg%s%s</td></tr>\n"
 
-#: ../net.c:315
+#: ../net.c:319
 #, c-format
 msgid ""
 "<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in "
 "the packet cache.<td></tr>\n"
 msgstr ""
 
-#: ../net.c:321
+#: ../net.c:325
 msgid "<h2>Packet cache</h2>\n"
 msgstr "<h2>Paketcache</h2>\n"
 
-#: ../net.c:403
+#: ../net.c:407
 msgid "<h2>Host status</h2>\n"
 msgstr "<h2>Status för serverdatorn</h2>\n"
 
-#: ../net.c:421 ../net.c:425 ../net.c:427 ../net.c:429
+#: ../net.c:431 ../net.c:439 ../net.c:441 ../net.c:443
 msgid "<td>any</td>"
 msgstr "<td>någon</td>"
 
-#: ../net.c:422
+#: ../net.c:436
 #, fuzzy, c-format
 msgid "<td>%s/%d (known host/net)</td>"
 msgstr "<td>-</td><td>%s/%d (kända adresser/nät)</td>"
 
-#: ../net.c:503
+#: ../net.c:517
 msgid "Connection closed"
 msgstr "Förbindelsen nedstängd"
 
@@ -729,7 +757,7 @@ msgstr "<td>Bytes</td>"
 msgid "<th>whois information</th>"
 msgstr "<td>whois-information</td>"
 
-#: ../parser.c:240
+#: ../parser.c:246
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr "Okänd parser: '%c'.\n"
@@ -828,10 +856,6 @@ msgstr "TCP-optioner:              %s\n"
 #, c-format
 msgid "Tracking number:           %s\n"
 msgstr "Spårnummer:         %s\n"
-
-#: ../report.c:210
-msgid "Sending...\n"
-msgstr "Sänder....\n"
 
 #: ../report.c:231
 #, c-format
@@ -976,16 +1000,16 @@ msgstr ""
 msgid "IP address error: %s\n"
 msgstr "IP-adressfel: %s\n"
 
-#: ../utils.c:244
+#: ../utils.c:254
 #, c-format
 msgid "Error in CIDR format: %s\n"
 msgstr "Fel i CIDR-Format: %s\n"
 
-#: ../utils.c:263
+#: ../utils.c:272
 msgid "(known host)\n"
 msgstr "(känd datorn)\n"
 
-#: ../utils.c:297
+#: ../utils.c:306
 msgid "(excluded host)\n"
 msgstr "(Exkluderad datorn)\n"
 
@@ -1004,11 +1028,11 @@ msgstr "Undersöker whois-Information för %s\n"
 msgid "lookup failed: %s\n"
 msgstr "Sökning misslyckades: %s\n"
 
-#: ../main.h:219
+#: ../main.h:240
 msgid "fwlogwatch summary"
 msgstr ""
 
-#: ../main.h:243
+#: ../main.h:264
 msgid "fwlogwatch status"
 msgstr ""
 

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: rcfile.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ int get_num_parameter(char *string, char *rcfile, int linenum)
 
   pnt = string;
   while (*pnt != '\n' && *pnt != ' ' && *pnt != '#' && *pnt != '\t' && *pnt != '\0') {
-    if(!isdigit(*pnt))
+    if(!isdigit((int)*pnt))
       fprintf(stderr, _("Error in configuration file '%s' line %d: not a number\n"), rcfile, linenum);
     ++pnt;
   }

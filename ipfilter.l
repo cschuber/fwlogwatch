@@ -1,4 +1,4 @@
-/* $Id: ipfilter.l,v 1.9 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.10 2002/05/08 17:24:09 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -25,7 +25,7 @@ void ipf_parse_flags(char *input);
 
 MONTH		"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING		[a-zA-Z0-9.,_-]*
-LOGHOST		[0-9.a-zA-Z_-]*
+LOGHOST		[0-9.a-zA-Z()_:-]*
 DIGIT		[0-9]
 NUMBER		{DIGIT}+
 HEXDIGIT	[0-9a-f]
@@ -45,17 +45,17 @@ TARGET		[SpPbBnL]
 {STRING}[ ]"@"{NUMBER}":"{NUMBER}[ ]{TARGET}					ipf_parse_data(ipftext, IPF_OPT_NONE);
 {NUMBER}"x"[ ]+{STRING}[ ]"@"{NUMBER}":"{NUMBER}[ ]{TARGET}			ipf_parse_data(ipftext, IPF_OPT_COUNT);
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}						ipf_parse_ips(ipftext, IPF_OPT_SRC);
-" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}					ipf_parse_ips(ipftext+5, IPF_OPT_DST);
+" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}					ipf_parse_ips(ipftext+4, IPF_OPT_DST);
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{PORT}					ipf_parse_ips(ipftext, IPF_OPT_SRC|IPF_OPT_PORT);
-" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{PORT}				ipf_parse_ips(ipftext+5, IPF_OPT_DST|IPF_OPT_PORT);
+" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{PORT}				ipf_parse_ips(ipftext+4, IPF_OPT_DST|IPF_OPT_PORT);
 {STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"]"				ipf_parse_ips(ipftext, IPF_OPT_SRC|IPF_OPT_RES);
-" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"]"			ipf_parse_ips(ipftext+5, IPF_OPT_DST|IPF_OPT_RES);
+" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"]"			ipf_parse_ips(ipftext+4, IPF_OPT_DST|IPF_OPT_RES);
 {STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{PORT}			ipf_parse_ips(ipftext, IPF_OPT_SRC|IPF_OPT_RES|IPF_OPT_PORT);
-" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{PORT}		ipf_parse_ips(ipftext+5, IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_PORT);
+" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{PORT}		ipf_parse_ips(ipftext+4, IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_PORT);
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{STRING}				ipf_parse_ips(ipftext, IPF_OPT_SRC|IPF_OPT_RPORT);
-" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{STRING}				ipf_parse_ips(ipftext+5, IPF_OPT_DST|IPF_OPT_RPORT);
+" -> "{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}","{STRING}				ipf_parse_ips(ipftext+4, IPF_OPT_DST|IPF_OPT_RPORT);
 {STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{STRING}			ipf_parse_ips(ipftext, IPF_OPT_SRC|IPF_OPT_RES|IPF_OPT_RPORT);
-" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{STRING}		ipf_parse_ips(ipftext+5, IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_RPORT);
+" -> "{STRING}"["{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}"],"{STRING}		ipf_parse_ips(ipftext+4, IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_RPORT);
 "PR "{PROTO}									ipf_parse_proto(ipftext+3);
 "len "{NUMBER}[ ][(]?{NUMBER}[)]?						opt.line->datalen = atoi(ipftext+4);
 "frag "{NUMBER}"@"{NUMBER}							/* ignore */
@@ -107,22 +107,14 @@ void ipf_parse_data(char *input, unsigned char mode)
   int retval;
 
   if (mode == IPF_OPT_COUNT) {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, "%dx %30s @%30s %30s",
-#else
-    retval = sscanf(input, "%dx %10s @%10s %10s",
-#endif
+    retval = sscanf(input, "%dx %" SSHORTLEN "s @%" SSHORTLEN "s %" SSHORTLEN "s",
 		    &opt.line->count,
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);
     if (retval != 4) return;
   } else {
-#ifndef SHORT_NAMES
-    retval = sscanf(input, "%30s @%30s %30s",
-#else
-    retval = sscanf(input, "%10s @%10s %10s",
-#endif
+    retval = sscanf(input, "%" SSHORTLEN "s @%" SSHORTLEN "s %" SSHORTLEN "s",
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);

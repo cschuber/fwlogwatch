@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: response.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -260,7 +260,7 @@ void look_for_alert()
       } else {
 	this_host->count = this_host->count + this->count;
 	if (this_host->time != 0)
-	  this_host->time = this->end_time;
+	  this_host->time = time(NULL);
       }
       this->end_time = 1;
     }

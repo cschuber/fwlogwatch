@@ -1,4 +1,4 @@
-.\" $Id: fwlogwatch.8,v 1.21 2002/03/29 11:25:51 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.22 2002/05/08 17:24:09 bwess Exp $
 .TH FWLOGWATCH 8 "16 March 2002" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
@@ -8,12 +8,12 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .SH DESCRIPTION
 .B fwlogwatch
 produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
-ipfilter, Cisco IOS, Cisco PIX and Windows XP firewall log summary reports
-in plain text and HTML form and has a lot of options to analyze and display
-relevant patterns. It can produce customizable incident reports and send
-them to abuse contacts at offending sites or CERTs. Finally, it can also
-run as daemon (with web interface) doing realtime log monitoring and
-reporting anomalies or starting attack countermeasures.
+ipfilter, Cisco IOS, Cisco PIX, Windows XP firewall and snort IDS log
+summary reports in plain text and HTML form and has a lot of options to
+analyze and display relevant patterns. It can produce customizable incident
+reports and send them to abuse contacts at offending sites or CERTs.
+Finally, it can also run as daemon (with web interface) doing realtime log
+monitoring and reporting anomalies or starting attack countermeasures.
 
 .SH "GENERAL OPTIONS"
 These options are independent from the main modes of operation.
@@ -26,7 +26,8 @@ which can be a compressed or plain log file. Summary mode will show the
 time of the first and last packet log entry, this log times mode
 will show the time of the first and last entry overall.
 .IP \-V
-Show version and copyright information.
+Show version and copyright information and the options used to compile
+fwlogwatch.
 .SH "GLOBAL OPTIONS"
 The global options for all modes are:
 .IP \-c\ \fIconfig\fR
@@ -124,10 +125,12 @@ ipfilter,
 .I c
 Cisco IOS,
 .I p
-Cisco PIX and
+Cisco PIX,
 .I w
-Windows XP. The default is to use all parsers except the one for Windows XP
-logs.
+Windows XP and
+.I s
+snort. The default is to use all parsers except the ones for Windows XP
+and snort logs.
 .IP \-p
 Differentiate protocols. This is activated automatically if you
 differentiate source and/or destination ports.
@@ -185,7 +188,8 @@ report will be filled in.
 This is the address the email containing the report will be sent from.
 .IP \-T\ \fIemail\fR
 This is the email address of the abuse contact or CERT the report will be
-sent to.
+sent to. When used in log summary mode the summary will be sent to this
+address.
 .IP \-C\ \fIemail\fR
 These email recipients will get a carbon copy of the report (e.g. for your
 archives).

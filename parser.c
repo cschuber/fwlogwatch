@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: parser.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +16,7 @@
 #include "ipfilter.h"
 #include "netfilter.h"
 #include "win_xp.h"
+#include "snort.h"
 
 struct parser_options *excluded_first;
 extern struct options opt;
@@ -57,6 +58,8 @@ unsigned char parse_line(char *input, int linenum)
     retval = flex_cisco_pix(input, linenum);
   } else if (opt.format & PARSER_WIN_XP){
     retval = win_xp(input, linenum);
+  } else if ((opt.format & PARSER_SNORT) && (strstr(input, " snort: "))) {
+    retval = flex_snort(input, linenum);
   } else {
     retval = PARSE_NO_HIT;
   }
@@ -235,6 +238,9 @@ void select_parsers()
 	break;
       case 'w':
 	opt.format = opt.format | PARSER_WIN_XP;
+	break;
+      case 's':
+	opt.format = opt.format | PARSER_SNORT;
 	break;
       default:
 	fprintf(stderr, _("Unknown parser: '%c'.\n"), opt.format_sel[i]);

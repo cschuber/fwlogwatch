@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: modes.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +12,11 @@
 #include <fcntl.h>
 #include <syslog.h>
 #include <signal.h>
+
+#ifdef HAVE_ZLIB
 #include <zlib.h>
+#endif
+
 #include "main.h"
 #include "parser.h"
 #include "output.h"
@@ -44,9 +48,17 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, _("Opening input file '%s'\n"), opt.inputfile);
 
+#ifdef HAVE_ZLIB
     opt.inputfd = gzopen(opt.inputfile, "rb");
+#else
+    opt.inputfd = fopen(opt.inputfile, "r");
+#endif
     if (opt.inputfd == NULL) {
+#ifdef HAVE_ZLIB
       fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
+#else
+      fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
+#endif
       exit(EXIT_FAILURE);
     }
   }
@@ -56,11 +68,15 @@ void mode_summary()
 
   opt.line = xmalloc(sizeof(struct log_line));
 
+#ifdef HAVE_ZLIB
   if (opt.std_in) {
+#endif
     retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
   } else {
     retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
   }
+#endif
 
   while (retval) {
     ++linenum;
@@ -84,11 +100,15 @@ void mode_summary()
       break;
     }
 
+#ifdef HAVE_ZLIB
     if (opt.std_in) {
+#endif
       retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
     } else {
       retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
     }
+#endif
   }
 
   if (opt.verbose == 2)
@@ -98,6 +118,11 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
 
+#ifndef HAVE_ZLIB
+    retval = fclose(opt.inputfd);
+    if (retval == EOF) {
+      perror("fclose");
+#else
     retval = gzclose(opt.inputfd);
     if (retval != 0) {
       if (retval != Z_ERRNO) {
@@ -105,6 +130,7 @@ void mode_summary()
       } else {
 	perror("gzclose");
       }
+#endif
       exit(EXIT_FAILURE);
     }
   }
@@ -145,6 +171,22 @@ void mode_summary()
       fprintf(stderr, "freopen %s: %s\n", opt.outputfile, strerror(errno));
       exit(EXIT_FAILURE);
     }
+  } else if ((opt.mode != INTERACTIVE_REPORT) && (opt.recipient[0] != '\0')) {
+    char buf[BUFSIZE];
+
+    if(opt.verbose)
+      fprintf(stderr, _("Sending...\n"));
+
+    fflush(stdout);
+    snprintf(buf, BUFSIZE, "%s -t", P_SENDMAIL);
+    output = popen(buf, "w");
+    if(output == NULL) {
+      perror("popen");
+      exit(EXIT_FAILURE);
+    }
+
+    stdout = output;
+    generate_email_header();
   }
 
   if (opt.html) {
@@ -275,7 +317,11 @@ void mode_summary()
     retval = fclose(output);
     if (retval == EOF) {
       perror("fclose");
-      exit(EXIT_FAILURE);
+    }
+  } else if ((opt.mode != INTERACTIVE_REPORT) && (opt.recipient[0] != '\0')) {
+    retval = pclose(output);
+    if (retval == -1) {
+      perror("pclose");
     }
   }
 }
@@ -583,18 +629,24 @@ void mode_show_log_times()
 {
   char first_entry[TIMESIZE], last_entry[TIMESIZE], buf[BUFSIZE], month[3];
   int retval = 0, retval2, day, hour, minute, second, linenum = 0;
-  FILE *input;
 
   if (opt.std_in) {
     opt.inputfd = stdin;
-    input = 0;
 
     if (opt.verbose)
       fprintf(stderr, _("Reading standard input\n"));
   } else {
-    input = gzopen(opt.inputfile, "rb");
-    if (input == NULL) {
+#ifdef HAVE_ZLIB
+    opt.inputfd = gzopen(opt.inputfile, "rb");
+#else
+    opt.inputfd = fopen(opt.inputfile, "r");
+#endif
+    if (opt.inputfd == NULL) {
+#ifdef HAVE_ZLIB
       fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
+#else
+      fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
+#endif
       exit(EXIT_FAILURE);
     }
 
@@ -602,21 +654,29 @@ void mode_show_log_times()
       fprintf(stderr, _("Reading '%s'\n"), opt.inputfile);
   }
 
+#ifdef HAVE_ZLIB
   if (opt.std_in) {
+#endif
     retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
   } else {
-    retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+    retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
   }
+#endif
 
   while ((retval != 5) && (retval2)) {
     retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
     linenum++;
 
+#ifdef HAVE_ZLIB
     if (opt.std_in) {
+#endif
       retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
     } else {
-      retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+      retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
     }
+#endif
   }
 
   if(retval == 5) {
@@ -626,11 +686,15 @@ void mode_show_log_times()
     while (retval2) {
       retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
       linenum++;
+#ifdef HAVE_ZLIB
       if (opt.std_in) {
+#endif
 	retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
       } else {
-	retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+	retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
       }
+#endif
     }
 
     printf(_("# of lines : %d\n"), linenum);
@@ -647,13 +711,19 @@ void mode_show_log_times()
     if (opt.verbose)
       fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
 
-    retval = gzclose(input);
+#ifndef HAVE_ZLIB
+    retval = fclose(opt.inputfd);
+    if (retval == EOF) {
+      perror("fclose");
+#else
+    retval = gzclose(opt.inputfd);
     if (retval != 0) {
       if (retval != Z_ERRNO) {
-	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
+	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
       } else {
 	perror("gzclose");
       }
+#endif
       exit(EXIT_FAILURE);
     }
   }

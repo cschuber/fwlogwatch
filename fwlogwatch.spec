@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.22 2002/03/29 11:25:52 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.23 2002/05/08 17:24:09 bwess Exp $
 
 %define name fwlogwatch
-%define version 0.7
+%define version 0.8
 
 Name: %name
 Version: %version
@@ -18,9 +18,9 @@ BuildRoot: /var/tmp/%name-buildroot
 
 %description
 fwlogwatch produces Linux ipchains, Linux netfilter/iptables,
-Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX and Windows XP
-firewall log summary reports in plain text and HTML form and has a lot of
-options to analyze and display relevant patterns. It can produce
+Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX, Windows XP firewall
+and snort IDS log summary reports in plain text and HTML form and has a lot
+of options to analyze and display relevant patterns. It can produce
 customizable incident reports and send them to abuse contacts at offending
 sites or CERTs. Finally, it can also run as daemon (with web interface)
 doing realtime log monitoring and reporting anomalies or starting attack

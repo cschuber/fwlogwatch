@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.6 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: whois.c,v 1.7 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -186,7 +186,7 @@ struct whois_entry * whois(struct in_addr ip)
   char adds[WHOISROUTELEN];
   struct in_addr net, addr;
   struct whois_entry *we;
-  uint32_t tmp_ip;
+  unsigned long int tmp_ip;
 
   if(opt.whois_sock == -1)
     return NULL;

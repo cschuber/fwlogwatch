@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5.2\n"
-"POT-Creation-Date: 2002-03-26 23:12+0100\n"
+"POT-Creation-Date: 2002-05-08 10:31+0200\n"
 "PO-Revision-Date: 2001-11-11 00:20+0100\n"
 "Last-Translator: Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>\n"
 "Language-Team: -\n"
@@ -33,323 +33,351 @@ msgstr "排序錯誤: '%c', 需要范圍,忽略\n"
 msgid "Timewarp in log file (%s"
 msgstr "log文件中的時間(%s"
 
-#: ../main.c:20
+#: ../main.c:24
 #, c-format
 msgid "Usage: %s [options]\n"
 msgstr "使用方法: %s [選項] \n"
 
-#: ../main.c:21
+#: ../main.c:25
 #, fuzzy
 msgid "General options:\n"
 msgstr "全局選項: \n"
 
-#: ../main.c:22
+#: ../main.c:26
 msgid "         -h          this help\n"
 msgstr "        -h          \t幫助文件\n"
 
-#: ../main.c:23
+#: ../main.c:27
 msgid "         -L <file>   show time of first and last log entry in file\n"
 msgstr "        -L <文件>   \t顯示文件中第一次與最後一次登陸紀錄的時間\n"
 
-#: ../main.c:24
+#: ../main.c:28
 msgid "         -V          show version and copyright info\n"
 msgstr "        -V          \t顯示版本與版權信息\n"
 
-#: ../main.c:27
+#: ../main.c:31
 msgid "Global options:\n"
 msgstr "全局選項: \n"
 
-#: ../main.c:28
+#: ../main.c:32
 #, c-format
 msgid "         -c <file>   specify config file (defaults to %s)\n"
 msgstr "        -c <文件>\t指定配置文件 (缺省 %s) \n"
 
-#: ../main.c:29
+#: ../main.c:33
 msgid "         -D          do not differentiate destination IP addresses\n"
 msgstr "        -D          \t不區分目標IP地址\n"
 
-#: ../main.c:30
+#: ../main.c:34
 msgid "         -d          differentiate destination ports\n"
 msgstr "        -d          \t區分目標端口\n"
 
-#: ../main.c:31
+#: ../main.c:35
 #, c-format
 msgid "         -f <file>   specify input file (defaults to %s)\n"
 msgstr "        -f <文件>   \t指定輸入文件  (缺省 %s) \n"
 
-#: ../main.c:32
+#: ../main.c:36
 msgid ""
 "         -m <count>  only show entries with at least so many incidents\n"
 msgstr "\t-m <數量> \t只顯示至少有這麼多數量的記錄\n"
 
-#: ../main.c:33
+#: ../main.c:37
 #, fuzzy
 msgid "         -N          resolve service names\n"
 msgstr "        -n          \t解析域名\n"
 
-#: ../main.c:34
+#: ../main.c:38
 msgid "         -n          resolve host names\n"
 msgstr "        -n          \t解析域名\n"
 
-#: ../main.c:35
+#: ../main.c:39
 msgid ""
 "         -O <order>  define the sort order (see the man page for details)\n"
 msgstr "\t-O <排序方法> \t對輸出進行排序 (具體參見相應文檔\n"
 
-#: ../main.c:36
+#: ../main.c:40
 msgid "         -P <format> use only parsers for specific formats\n"
 msgstr "        -P <格式>  \n"
 
-#: ../main.c:37
+#: ../main.c:41
 msgid "         -p          differentiate protocols\n"
 msgstr "        -p          \t區分傳輸協議\n"
 
-#: ../main.c:38
+#: ../main.c:42
 msgid "         -s          differentiate source ports\n"
 msgstr "        -s          \t區分源端口\n"
 
-#: ../main.c:39
+#: ../main.c:43
 msgid "         -v          verbose, specify twice for more info\n"
 msgstr "        -v          \t處理時顯示信息,使用 -vv 得到更多信息\n"
 
-#: ../main.c:40
+#: ../main.c:44
 msgid "         -y          differentiate TCP options\n"
 msgstr "        -y          \t區分TCP選項\n"
 
-#: ../main.c:43
+#: ../main.c:47
 msgid "Log summary mode (default):\n"
 msgstr ""
 
-#: ../main.c:44
+#: ../main.c:48
 msgid ""
 "         -b          show amount of data (sum of total packet lengths)\n"
 msgstr "        -b\t\t顯示數據量 (所有數據包長度的總和)\n"
 
-#: ../main.c:45
+#: ../main.c:49
 #, fuzzy
 msgid "         -e          show end times\n"
 msgstr "        -t          \t顯示開始與結束時間\n"
 
-#: ../main.c:46
+#: ../main.c:50
 msgid "         -l <time>   process recent events only (defaults to off)\n"
 msgstr "        -l <時間>   \t只處理當前事件 (缺省為關閉)\n"
 
-#: ../main.c:47
+#: ../main.c:51
 msgid "         -o <file>   specify output file\n"
 msgstr "        -o <文件>   \t指定輸出文件\n"
 
-#: ../main.c:48
+#: ../main.c:52
 msgid "         -S          do not differentiate source IP addresses\n"
 msgstr "        -S          \t不區分源IP地址\n"
 
-#: ../main.c:49
+#: ../main.c:53
 #, fuzzy
 msgid "         -t          show start times\n"
 msgstr "        -t          \t顯示開始與結束時間\n"
 
-#: ../main.c:50
+#: ../main.c:54
 msgid "         -W          activate whois lookups for source addresses\n"
 msgstr "        -W          \t啟動對源IP地址的whois查詢\n"
 
-#: ../main.c:51
+#: ../main.c:55
 msgid "         -w          HTML output\n"
 msgstr "        -w          \t以HTML格式輸出\n"
 
-#: ../main.c:52
+#: ../main.c:56
 msgid "         -z          show time interval\n"
 msgstr "        -z          \t顯示時間間隔\n"
 
-#: ../main.c:55
+#: ../main.c:59
 #, fuzzy
 msgid "Interactive report mode (summary mode extension):\n"
 msgstr "交互式報告模式:\n"
 
-#: ../main.c:56
+#: ../main.c:60
 msgid "         -i <count>  interactive mode with report threshold\n"
 msgstr "        -i <數量> \t報告流交互模式\n"
 
-#: ../main.c:57
+#: ../main.c:61
 msgid "         -F <email>  report sender address\n"
 msgstr "        -F <email>  \t發信人地址\n"
 
-#: ../main.c:58
+#: ../main.c:62
 #, c-format
 msgid "                     (defaults to '%s')\n"
 msgstr "                   \t(缺省為 '%s')\n"
 
-#: ../main.c:59
+#: ../main.c:63
 msgid ""
 "         -T <email>  address of CERT or abuse contact to send report to\n"
 msgstr "\t-T <email> \t收信人地址 (CERT或聯系人)\n"
 
-#: ../main.c:60
+#: ../main.c:64
 msgid "         -C <email>  carbon copy recipients\n"
 msgstr "        -C <email>  \t轉發地址\n"
 
-#: ../main.c:61
+#: ../main.c:65
 msgid "         -I <file>   template file for report\n"
 msgstr "        -I <文件>   \t報告模板文件\n"
 
-#: ../main.c:62
+#: ../main.c:66
 #, c-format
 msgid "                     (defaults to %s)\n"
 msgstr "\t\t    \t(缺省為 %s)\n"
 
-#: ../main.c:65
+#: ../main.c:69
 msgid "Realtime response mode:\n"
 msgstr "實時回應模式:\n"
 
-#: ../main.c:66
+#: ../main.c:70
 msgid ""
 "         -R          realtime response as daemon (default action: log only)\n"
 msgstr "\t-R \t\t實時回應作為傳輸代理程序 (缺省: 只有運行記錄)\n"
 
-#: ../main.c:67
+#: ../main.c:71
 #, c-format
 msgid "         -a <count>  alert threshold (defaults to %d entries)\n"
 msgstr "\t-a <數量>   \t警告流 (缺省 %d 記錄)\n"
 
-#: ../main.c:68
+#: ../main.c:72
 #, c-format
 msgid "         -l <time>   forget events this old (defaults to %d hours)\n"
 msgstr "\t-l <時間>   \t忽略此時間前舊事件 (缺省: %d小時)\n"
 
-#: ../main.c:69
+#: ../main.c:73
 msgid ""
 "         -k <IP/net> add this IP address or net to the list of known hosts\n"
 msgstr "\t-k <IP/網絡> \t將此IP地址加入到已知主機列表中\n"
 
-#: ../main.c:70
+#: ../main.c:74
 msgid ""
 "         -A          invoke notification script if threshold is reached\n"
 msgstr "\t-A\t\t如果有流進入啟動通知文本\n"
 
-#: ../main.c:71
+#: ../main.c:75
 msgid "         -B          invoke response action script (e.g. block host)\n"
 msgstr "\t-B\t    \t啟動回應文本 (比如 切斷主機與外部聯系)\n"
 
-#: ../main.c:72
+#: ../main.c:76
 msgid "         -X          activate internal status information web server\n"
 msgstr "\t-X          \t啟動內部狀態信息web服務器\n"
 
-#: ../main.c:98
+#: ../main.c:102
+msgid "Compile-time options of this version:"
+msgstr ""
+
+#: ../main.c:103
+msgid "short names support "
+msgstr ""
+
+#: ../main.c:105 ../main.c:111 ../main.c:117
+msgid "enabled"
+msgstr ""
+
+#: ../main.c:107 ../main.c:113 ../main.c:119
+msgid "disabled"
+msgstr ""
+
+#: ../main.c:109
+msgid "zlib support "
+msgstr ""
+
+#: ../main.c:115
+msgid "gettext (i18n) support "
+msgstr ""
+
+#: ../main.c:122
 #, fuzzy
 msgid "You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."
 msgstr "請使用以下地址與作者聯系實際<Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 
-#: ../main.c:402
+#: ../main.c:418
 msgid "Exiting\n"
 msgstr "退出\n"
 
-#: ../modes.c:40
+#: ../modes.c:44
 msgid "Using stdin as input\n"
 msgstr "使用標準輸入\n"
 
-#: ../modes.c:45
+#: ../modes.c:49
 #, c-format
 msgid "Opening input file '%s'\n"
 msgstr "打開輸入文件 '%s'\n"
 
-#: ../modes.c:55
+#: ../modes.c:67
 msgid "Processing\n"
 msgstr "處理\n"
 
-#: ../modes.c:99 ../modes.c:273 ../modes.c:648 ../rcfile.c:446
+#: ../modes.c:119 ../modes.c:315 ../modes.c:712 ../rcfile.c:446
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "關閉 '&s'\n"
 
-#: ../modes.c:115
+#: ../modes.c:141
 msgid "Sorting data\n"
 msgstr "數據排序\n"
 
-#: ../modes.c:140
+#: ../modes.c:166
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr "打開輸出文件 '%s'\n"
 
-#: ../modes.c:158
+#: ../modes.c:178 ../report.c:210
+msgid "Sending...\n"
+msgstr "發送...\n"
+
+#: ../modes.c:200
 #, c-format
 msgid "Generated %s by "
 msgstr "生成 %s 由"
 
-#: ../modes.c:168
+#: ../modes.c:210
 msgid "an unknown user.\n"
 msgstr "不明使用者\n"
 
-#: ../modes.c:176
+#: ../modes.c:218
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(並且 &d 比 %d 老) "
 
-#: ../modes.c:179
+#: ../modes.c:221
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(並且 %d 有錯誤)"
 
-#: ../modes.c:181
+#: ../modes.c:223
 #, c-format
 msgid "of %d entries in the file "
 msgstr ""
 
-#: ../modes.c:182
+#: ../modes.c:224
 #, c-format
 msgid "\"%s\" are packet logs, "
 msgstr "\"%s\" 是數據包記錄"
 
-#: ../modes.c:185
+#: ../modes.c:227
 msgid "one has unique characteristics.\n"
 msgstr "一個有特殊形式\n"
 
-#: ../modes.c:187
+#: ../modes.c:229
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d有特殊形式\n"
 
-#: ../modes.c:195
+#: ../modes.c:237
 msgid "One entry was excluded by configuration.\n"
 msgstr "一條記錄在配置時被刪除\n"
 
-#: ../modes.c:197
+#: ../modes.c:239
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d記錄在配置時被刪除\n"
 
-#: ../modes.c:205
+#: ../modes.c:247
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "第一條數據包登陸記錄: %s, 最後一條: %s.\n"
 
-#: ../modes.c:207 ../modes.c:643
+#: ../modes.c:249 ../modes.c:707
 msgid "No valid time entries found.\n"
 msgstr "沒找到有效時間記錄\n"
 
-#: ../modes.c:214
+#: ../modes.c:256
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "所有的記錄都是從同一個主機登陸的: \"%s\".\n"
 
-#: ../modes.c:221
+#: ../modes.c:263
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "所有的記錄都來自同一個鏈: \"%s\".\n"
 
-#: ../modes.c:228
+#: ../modes.c:270
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "所有的記錄都有同樣的目標:  \"%s\".\n"
 
-#: ../modes.c:235
+#: ../modes.c:277
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "所有的記錄都來自同一個界面: \"%s\".\n"
 
-#: ../modes.c:242
+#: ../modes.c:284
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "只顯示大于%d的記錄.\n"
 
-#: ../modes.c:251
+#: ../modes.c:293
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
@@ -358,175 +386,175 @@ msgstr ""
 "報告流: %d\n"
 "\n"
 
-#: ../modes.c:289
+#: ../modes.c:335
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr "警告: 存在pid文件,可能另一個fwlogwatch在運行.\n"
 
-#: ../modes.c:303
+#: ../modes.c:349
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:305
+#: ../modes.c:351
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:328
+#: ../modes.c:374
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:330
+#: ../modes.c:376
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:409
+#: ../modes.c:455
 msgid "SIGTERM caught, cleaning up"
 msgstr "捕捉到SIGTERM, 清除內存"
 
-#: ../modes.c:491
+#: ../modes.c:537
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "開始 (pid %d)"
 
-#: ../modes.c:552
+#: ../modes.c:598
 msgid "Alert threshold is one attempt"
 msgstr "警告threshold是一次嘗試"
 
-#: ../modes.c:554
+#: ../modes.c:600
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "警告threshold是%d次嘗試"
 
-#: ../modes.c:558
+#: ../modes.c:604
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "在%d秒之前的事件將不受理"
 
-#: ../modes.c:561
+#: ../modes.c:607
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "在%d小時之前的事件將不受理"
 
-#: ../modes.c:565
+#: ../modes.c:611
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "回應模式: log%s%s"
 
-#: ../modes.c:566 ../net.c:310
+#: ../modes.c:612 ../net.c:314
 msgid ", notify"
 msgstr "通知"
 
-#: ../modes.c:567 ../net.c:311
+#: ../modes.c:613 ../net.c:315
 msgid ", respond"
 msgstr ". 回答"
 
-#: ../modes.c:593
+#: ../modes.c:637
 msgid "Reading standard input\n"
 msgstr "讀取標準輸入\n"
 
-#: ../modes.c:602
+#: ../modes.c:654
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "讀 '%s'\n"
 
-#: ../modes.c:636
+#: ../modes.c:700
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "行數 : %d\n"
 
-#: ../modes.c:637
+#: ../modes.c:701
 #, c-format
 msgid "First entry: %s\n"
 msgstr "第一條記錄:  %s\n"
 
-#: ../modes.c:640
+#: ../modes.c:704
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "最後一條記錄 : %s\n"
 
-#: ../net.c:79
+#: ../net.c:83
 #, c-format
 msgid "Listening on %s port %i"
 msgstr "列出在 &s 上的端口 %i"
 
-#: ../net.c:110
+#: ../net.c:114
 msgid "decode_base64: input string incomplete"
 msgstr "decode_base64: 輸入字符串不完整"
 
-#: ../net.c:117
+#: ../net.c:121
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
 msgstr "decode_base64: 在輸入字符串有非法字符  '%c'"
 
-#: ../net.c:150
+#: ../net.c:154
 #, fuzzy, c-format
 msgid "<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"
 msgstr ""
 "<tr bgcolor=\"#%s\" align=\"center\"><td>數量</td><td>加入</td><td>源IP地址</"
 "td>"
 
-#: ../net.c:153 ../output.c:330
+#: ../net.c:157 ../output.c:330
 #, fuzzy
 msgid "<th>proto</th>"
 msgstr "<td>傳輸協議</td>"
 
-#: ../net.c:154 ../output.c:336
+#: ../net.c:158 ../output.c:336
 #, fuzzy
 msgid "<th>source</th>"
 msgstr "<td>源</td>"
 
-#: ../net.c:156 ../net.c:165 ../output.c:338 ../output.c:352
+#: ../net.c:160 ../net.c:169 ../output.c:338 ../output.c:352
 #, fuzzy
 msgid "<th>hostname</th>"
 msgstr "<td>主機名</td>"
 
-#: ../net.c:158 ../net.c:168 ../output.c:344 ../output.c:356
+#: ../net.c:162 ../net.c:172 ../output.c:344 ../output.c:356
 #, fuzzy
 msgid "<th>port</th>"
 msgstr "<td>傳輸協議</td>"
 
-#: ../net.c:160 ../net.c:170 ../output.c:346 ../output.c:358
+#: ../net.c:164 ../net.c:174 ../output.c:346 ../output.c:358
 #, fuzzy
 msgid "<th>service</th>"
 msgstr "<td>源</td>"
 
-#: ../net.c:163 ../output.c:350
+#: ../net.c:167 ../output.c:350
 #, fuzzy
 msgid "<th>destination</th>"
 msgstr "<td>目標</td>"
 
-#: ../net.c:174 ../output.c:362
+#: ../net.c:178 ../output.c:362
 #, fuzzy
 msgid "<th>opts</th>"
 msgstr "<td>選項</td>"
 
-#: ../net.c:176
+#: ../net.c:180
 #, fuzzy
 msgid "<th>time remaining</th></tr>\n"
 msgstr "<td>剩余時間</td></tr>\n"
 
-#: ../net.c:206
+#: ../net.c:210
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
 msgstr "拒絕來自 %s 端口 %i 的訪問"
 
-#: ../net.c:215
+#: ../net.c:219
 #, c-format
 msgid "Connect from %s port %i"
 msgstr "來自 %s 端口  %i 的訪問"
 
-#: ../net.c:237
+#: ../net.c:241
 #, c-format
 msgid "Authorization failed (%s)"
 msgstr "檢驗錯誤 (%s)"
 
-#: ../net.c:239
+#: ../net.c:243
 msgid "Authorization failed"
 msgstr "檢驗錯誤"
 
-#: ../net.c:248
+#: ../net.c:252
 msgid ""
 "<body>\n"
 "<h1>Authorization Required</h1>\n"
@@ -538,16 +566,16 @@ msgstr ""
 "</body>\n"
 "</html>\n"
 
-#: ../net.c:284
+#: ../net.c:288
 msgid "<a href=\"/\">Reload</a><br>\n"
 msgstr "<a href=\"/\">刷新</a><br>\n"
 
-#: ../net.c:286
+#: ../net.c:290
 #, c-format
 msgid "(automatic refresh every %d seconds)<br>\n"
 msgstr "(每%d秒鐘後自動刷新)<br>\n"
 
-#: ../net.c:289
+#: ../net.c:293
 #, fuzzy
 msgid ""
 "</div>\n"
@@ -557,22 +585,22 @@ msgstr ""
 "</div>\n"
 "<h2>基本信息</h2>\n"
 
-#: ../net.c:293
+#: ../net.c:297
 #, c-format
 msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Daemon啟動時間:</td><td>%s</td></tr>\n"
 
-#: ../net.c:298
+#: ../net.c:302
 #, c-format
 msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>當前時間:</td><td>%s</td></tr>\n"
 
-#: ../net.c:302
+#: ../net.c:306
 #, c-format
 msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>運行時間:</td><td>%s</td></tr>\n"
 
-#: ../net.c:306
+#: ../net.c:310
 #, fuzzy, c-format
 msgid ""
 "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
@@ -581,36 +609,36 @@ msgstr ""
 "<tr><td>警告threshold:</td><td>%d entries</td></tr>\n"
 "<tr><td>超時:</td><td>%d 秒</td></tr>\n"
 
-#: ../net.c:309
+#: ../net.c:313
 #, c-format
 msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
 msgstr "<tr><td>回應模式:</td><td>log%s%s</td></tr>\n"
 
-#: ../net.c:315
+#: ../net.c:319
 #, c-format
 msgid ""
 "<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in "
 "the packet cache.<td></tr>\n"
 msgstr ""
 
-#: ../net.c:321
+#: ../net.c:325
 msgid "<h2>Packet cache</h2>\n"
 msgstr "<h2> 數據緩存</h2>\n"
 
-#: ../net.c:403
+#: ../net.c:407
 msgid "<h2>Host status</h2>\n"
 msgstr "<h2>主機狀態</h2>\n"
 
-#: ../net.c:421 ../net.c:425 ../net.c:427 ../net.c:429
+#: ../net.c:431 ../net.c:439 ../net.c:441 ../net.c:443
 msgid "<td>any</td>"
 msgstr "<td>任何</td>"
 
-#: ../net.c:422
+#: ../net.c:436
 #, fuzzy, c-format
 msgid "<td>%s/%d (known host/net)</td>"
 msgstr "<td>-</td><td>%s/%d (已知主機/網絡)</td>"
 
-#: ../net.c:503
+#: ../net.c:517
 msgid "Connection closed"
 msgstr "關閉聯接"
 
@@ -692,7 +720,7 @@ msgstr "<td>字節</td>"
 msgid "<th>whois information</th>"
 msgstr "<td>whois信息</td>"
 
-#: ../parser.c:240
+#: ../parser.c:246
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr "不知parser: '%c'.\n"
@@ -791,10 +819,6 @@ msgstr "TCP選項:               %s\n"
 #, c-format
 msgid "Tracking number:           %s\n"
 msgstr "Tracking數:           %s\n"
-
-#: ../report.c:210
-msgid "Sending...\n"
-msgstr "發送...\n"
 
 #: ../report.c:231
 #, c-format
@@ -936,16 +960,16 @@ msgstr ""
 msgid "IP address error: %s\n"
 msgstr "IP地址錯誤:  %s\n"
 
-#: ../utils.c:244
+#: ../utils.c:254
 #, c-format
 msgid "Error in CIDR format: %s\n"
 msgstr "CIDR格式有錯誤: %s\n"
 
-#: ../utils.c:263
+#: ../utils.c:272
 msgid "(known host)\n"
 msgstr "(不明主機)\n"
 
-#: ../utils.c:297
+#: ../utils.c:306
 msgid "(excluded host)\n"
 msgstr "(被排除的主機)\n"
 
@@ -964,11 +988,11 @@ msgstr "為 %s 尋找whois信息\n"
 msgid "lookup failed: %s\n"
 msgstr "搜索失敗: %s\n"
 
-#: ../main.h:219
+#: ../main.h:240
 msgid "fwlogwatch summary"
 msgstr ""
 
-#: ../main.h:243
+#: ../main.h:264
 msgid "fwlogwatch status"
 msgstr ""
 

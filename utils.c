@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.22 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: utils.c,v 1.23 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -231,26 +231,35 @@ unsigned char convert_ip(char *ip, struct in_addr *addr)
   return IN_ADDR_OK;
 }
 
-uint32_t parse_cidr(char *input)
+unsigned long int parse_cidr(char *input)
 {
-  int mask = 32;
-  char *pnt, n;
-  uint32_t res = 1;
+  char *pnt;
+  int n;
+  unsigned long int netmask[33] = {
+    0x0,
+    0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
+    0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
+    0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
+    0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
+    0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
+    0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
+    0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
+    0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
+  };
 
   pnt = strstr(input, "/");
   if (pnt != NULL) {
-    mask = atoi(pnt+1);
-    if ((mask < 0) || (mask > 32)) {
+    n = atoi(pnt+1);
+    if ((n < 0) || (n > 32)) {
       fprintf(stderr, _("Error in CIDR format: %s\n"), input);
       exit(EXIT_FAILURE);
     }
     *pnt = '\0';
+  } else {
+    n = 32;
   }
 
-  for(n=0;n<mask;n++)
-    res *= 2;
-
-  return --res;
+  return ntohl(netmask[n]);
 }
 
 void add_known_host(char *ip)
@@ -308,4 +317,26 @@ void add_exclude_hpb(char *input, unsigned char mode)
   }
   excluded_this->next = excluded_first;
   excluded_first = excluded_this;
+}
+
+void generate_email_header()
+{
+  time_t now;
+  char stime[TIMESIZE];
+
+  now = time(NULL);
+  strftime(stime, TIMESIZE, "%Y%m%d%H%M%S", localtime(&now));
+
+  printf("From: %s\n", opt.sender);
+  printf("To: %s\n", opt.recipient);
+  if(opt.cc[0] != '\0')
+    printf("Cc: %s\n", opt.cc);
+  printf("Subject: %s\n", opt.title);
+  printf("X-Generator: %s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
+  if(opt.html) {
+    printf("Mime-Version: 1.0\n");
+    printf("Content-Type: text/html; charset=iso-8859-1\n");
+    printf("Content-Disposition: attachment; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
+  }
+  printf("\n");
 }

@@ -1,9 +1,13 @@
-/* $Id: net.c,v 1.20 2002/03/29 11:25:52 bwess Exp $ */
+/* $Id: net.c,v 1.21 2002/05/08 17:24:09 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#ifndef SOLARIS
 #include <string.h>
+#else
+#include <strings.h>
+#endif
 #include <errno.h>
 #include <syslog.h>
 #include <sys/socket.h>
@@ -410,15 +414,25 @@ void handshake()
       net_output(conn, buf);
 
       if (this_host->time == 0) {
-	int mask = 0;
-	uint32_t res;
-	res = this_host->netmask.s_addr;
-	while(res >= 1) {
-	  mask++;
-	  res /= 2;
-	}
+	int mask;
+	unsigned long int netmask[33] = {
+	  0x0,
+	  0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
+	  0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
+	  0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
+	  0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
+	  0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
+	  0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
+	  0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
+	  0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
+	};
+
 	net_output(conn, "<td>-</td>");
 	if(opt.proto) { net_output(conn, _("<td>any</td>")); }
+	for(mask=0;mask<32;mask++) {
+	  if (ntohl(netmask[mask]) == this_host->netmask.s_addr)
+	    break;
+	}
 	snprintf(buf, BUFSIZE, _("<td>%s/%d (known host/net)</td>"), inet_ntoa(this_host->shost), mask);
 	net_output(conn, buf);
 	if(opt.resolve) { net_output(conn, "<td>-</td>"); }
