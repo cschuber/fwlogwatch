@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: compare.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,10 +22,10 @@ void add_entry()
   data->count = opt.line->count;
   data->start_time = opt.line->time;
   data->end_time = 0;
-  strncpy(data->hostname, opt.line->hostname, SHOSTLEN);
-  strncpy(data->chainlabel, opt.line->chainlabel, SHORTLEN);
-  strncpy(data->branchname, opt.line->branchname, SHORTLEN);
-  strncpy(data->interface, opt.line->interface, SHORTLEN);
+  xstrncpy(data->hostname, opt.line->hostname, SHOSTLEN);
+  xstrncpy(data->chainlabel, opt.line->chainlabel, SHORTLEN);
+  xstrncpy(data->branchname, opt.line->branchname, SHORTLEN);
+  xstrncpy(data->interface, opt.line->interface, SHORTLEN);
   data->protocol = opt.line->protocol;
   data->datalen = opt.line->datalen;
   data->shost = opt.line->shost;
@@ -258,7 +258,7 @@ void build_list()
 	opt.loghost = 1;
       }
     } else {
-      strncpy(opt.hostname, opt.line->hostname, SHOSTLEN);
+      xstrncpy(opt.hostname, opt.line->hostname, SHOSTLEN);
     }
   }
 
@@ -268,7 +268,7 @@ void build_list()
 	opt.chains = 1;
       }
     } else {
-      strncpy(opt.chainlabel, opt.line->chainlabel, SHORTLEN);
+      xstrncpy(opt.chainlabel, opt.line->chainlabel, SHORTLEN);
     }
   }
 
@@ -278,7 +278,7 @@ void build_list()
 	opt.branches = 1;
       }
     } else {
-      strncpy(opt.branchname, opt.line->branchname, SHORTLEN);
+      xstrncpy(opt.branchname, opt.line->branchname, SHORTLEN);
     }
   }
 
@@ -288,7 +288,7 @@ void build_list()
 	opt.ifs = 1;
       }
     } else {
-      strncpy(opt.interface, opt.line->interface, SHORTLEN);
+      xstrncpy(opt.interface, opt.line->interface, SHORTLEN);
     }
   }
 

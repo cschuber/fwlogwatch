@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.5 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: netfilter.l,v 1.6 2002/02/14 21:48:38 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -111,8 +111,8 @@ void nf_parse_prefix(char *input, unsigned char mode)
 	if (input[i+1] == 'N') {
 	  if (input[i+2] == '=') {
 	    input[i] = '\0';
-	    strncpy(opt.line->chainlabel, input, SHORTLEN);
-	    strncpy(opt.line->interface, input+i+3, SHORTLEN);
+	    xstrncpy(opt.line->chainlabel, input, SHORTLEN);
+	    xstrncpy(opt.line->interface, input+i+3, SHORTLEN);
 	    break;
 	  }
 	}
@@ -120,8 +120,8 @@ void nf_parse_prefix(char *input, unsigned char mode)
       i++;
     }
   } else {
-    strncpy(opt.line->chainlabel, "-", SHORTLEN);
-    strncpy(opt.line->interface, input, SHORTLEN);
+    xstrncpy(opt.line->chainlabel, "-", SHORTLEN);
+    xstrncpy(opt.line->interface, input, SHORTLEN);
   }
 
   opt.parser=opt.parser|NF_IN;
@@ -161,7 +161,7 @@ unsigned char flex_netfilter(char *input, int linenum)
   nf_scan_string(input);
   nflex();
 
-  strncpy(opt.line->branchname, "-", SHORTLEN);
+  xstrncpy(opt.line->branchname, "-", SHORTLEN);
   opt.line->count = 1;
 
   if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {

@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: modes.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +21,7 @@
 #include "response.h"
 #include "utils.h"
 #include "net.h"
+#include "whois.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -245,7 +246,13 @@ void mode_summary()
   if(opt.mode == INTERACTIVE_REPORT)
     printf(_("Reporting threshold: %d\n\n"), opt.threshold);
 
+  if(opt.whois_lookup)
+    whois_connect(RADB);
+
   show_list();
+
+  if(opt.whois_lookup)
+    whois_close();
 
   if(opt.mode == INTERACTIVE_REPORT)
     report();
@@ -514,7 +521,7 @@ void mode_rt_response()
 
   mode_rt_response_open();
 
-  if(!stdin) {
+  if(!opt.std_in) {
     retval = fseek(opt.inputfd, 0, SEEK_END);
     if (retval == -1) {
       syslog(LOG_NOTICE, "fseek %s: %s", opt.inputfile, strerror(errno));

@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.16 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: net.c,v 1.17 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -216,7 +216,7 @@ void handshake()
   secure_read(conn, buf, BUFSIZE);
   while(!(strncmp(buf, "", BUFSIZE) == 0)) {
     if(strncmp(buf, "Authorization: Basic ", 21) == 0) {
-      strncpy(password, buf+21, PASSWORDSIZE);
+      xstrncpy(password, buf+21, PASSWORDSIZE);
       decode_base64(password);
       if (strncmp(opt.user, password, strlen(opt.user)) == 0) {
 	salt[0] = opt.password[0];
@@ -366,8 +366,12 @@ void handshake()
 
       if (this_host->time == 0) {
 	int mask = 0;
-	while((0 != (this_host->netmask.s_addr >> mask)) && (mask < 32))
+	uint32_t res;
+	res = this_host->netmask.s_addr;
+	while(res >= 1) {
 	  mask++;
+	  res /= 2;
+	}
 	snprintf(buf, BUFSIZE, _("<td>-</td><td>%s/%d (known host/net)</td>"), inet_ntoa(this_host->shost), mask);
 	net_output(conn, buf);
 	if(opt.resolve) { net_output(conn, "<td>-</td>"); }

@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: report.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -221,32 +221,32 @@ void fill_report(struct conn_data *this, struct report_data *data)
   time_t now;
   char stime[TIMESIZE], *proto, *serv;
 
-  strncpy(data->sender, opt.sender, EMAILSIZE);
+  xstrncpy(data->sender, opt.sender, EMAILSIZE);
 
-  strncpy(data->recipient, opt.recipient, EMAILSIZE);
+  xstrncpy(data->recipient, opt.recipient, EMAILSIZE);
 
-  strncpy(data->cc, opt.cc, EMAILSIZE);
+  xstrncpy(data->cc, opt.cc, EMAILSIZE);
 
   strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
   snprintf(data->subject, EMAILSIZE, _("Incident report %s-%s"), stime, inet_ntoa(this->shost));
 
   if(opt.src_ip)
-    strncpy(data->shost, inet_ntoa(this->shost), IPLEN);
+    xstrncpy(data->shost, inet_ntoa(this->shost), IPLEN);
   else
     data->shost[0] = '\0';
 
   if(opt.src_ip && opt.resolve)
-    strncpy(data->shostname, resolve_hostname(this->shost), REPORTLEN);
+    xstrncpy(data->shostname, resolve_hostname(this->shost), REPORTLEN);
   else
     data->shostname[0] = '\0';
 
   if(opt.dst_ip)
-    strncpy(data->dhost, inet_ntoa(this->dhost), IPLEN);
+    xstrncpy(data->dhost, inet_ntoa(this->dhost), IPLEN);
   else
     data->dhost[0] = '\0';
 
   if(opt.dst_ip && opt.resolve)
-    strncpy(data->dhostname, resolve_hostname(this->dhost), REPORTLEN);
+    xstrncpy(data->dhostname, resolve_hostname(this->dhost), REPORTLEN);
   else
     data->dhostname[0] = '\0';
 
@@ -254,14 +254,14 @@ void fill_report(struct conn_data *this, struct report_data *data)
 
   if(opt.times) {
     strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->start_time));
-    strncpy(data->t_start, stime, TIMESIZE);
+    xstrncpy(data->t_start, stime, TIMESIZE);
 
     strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
-    strncpy(data->t_end, stime, TIMESIZE);
+    xstrncpy(data->t_end, stime, TIMESIZE);
 
     now = time(NULL);
     strftime(stime, SHORTLEN, "%Z", localtime(&now));
-    strncpy(data->timezone, stime, SHORTLEN);
+    xstrncpy(data->timezone, stime, SHORTLEN);
   } else {
     data->t_start[0] = '\0';
     data->t_end[0] = '\0';
@@ -278,7 +278,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
   proto = resolve_protocol(this->protocol);
 
   if(opt.proto)
-    strncpy(data->protocol, proto, SHORTLEN);
+    xstrncpy(data->protocol, proto, SHORTLEN);
   else
     data->protocol[0] = '\0';
 
@@ -306,9 +306,9 @@ void fill_report(struct conn_data *this, struct report_data *data)
 
   if (opt.opts) {
     if (this->flags & TCP_SYN) {
-      strncpy(data->syn, _("no SYNs"), SHORTLEN);
+      xstrncpy(data->syn, _("no SYNs"), SHORTLEN);
     } else {
-      strncpy(data->syn, _("SYNs only"), SHORTLEN);
+      xstrncpy(data->syn, _("SYNs only"), SHORTLEN);
     }
   } else {
     data->syn[0] = '\0';
@@ -344,58 +344,58 @@ void modify_report(struct report_data *data)
     *pnt = '\0';
     switch(num) {
     case 1:
-      strncpy(data->sender, buf, EMAILSIZE);
+      xstrncpy(data->sender, buf, EMAILSIZE);
       break;
     case 2:
-      strncpy(data->recipient, buf, EMAILSIZE);
+      xstrncpy(data->recipient, buf, EMAILSIZE);
       break;
     case 3:
-      strncpy(data->cc, buf, EMAILSIZE);
+      xstrncpy(data->cc, buf, EMAILSIZE);
       break;
     case 4:
-      strncpy(data->subject, buf, EMAILSIZE);
+      xstrncpy(data->subject, buf, EMAILSIZE);
       break;
     case 5:
-      strncpy(data->shost, buf, REPORTLEN);
+      xstrncpy(data->shost, buf, REPORTLEN);
       break;
     case 6:
-      strncpy(data->shostname, buf, REPORTLEN);
+      xstrncpy(data->shostname, buf, REPORTLEN);
       break;
     case 7:
-      strncpy(data->dhost, buf, REPORTLEN);
+      xstrncpy(data->dhost, buf, REPORTLEN);
       break;
     case 8:
-      strncpy(data->dhostname, buf, REPORTLEN);
+      xstrncpy(data->dhostname, buf, REPORTLEN);
       break;
     case 9:
-      strncpy(data->count, buf, REPORTLEN);
+      xstrncpy(data->count, buf, REPORTLEN);
       break;
     case 10:
-      strncpy(data->t_start, buf, REPORTLEN);
+      xstrncpy(data->t_start, buf, REPORTLEN);
       break;
     case 11:
-      strncpy(data->t_end, buf, REPORTLEN);
+      xstrncpy(data->t_end, buf, REPORTLEN);
       break;
     case 12:
-      strncpy(data->timezone, buf, REPORTLEN);
+      xstrncpy(data->timezone, buf, REPORTLEN);
       break;
     case 13:
-      strncpy(data->duration, buf, REPORTLEN);
+      xstrncpy(data->duration, buf, REPORTLEN);
       break;
     case 14:
-      strncpy(data->protocol, buf, REPORTLEN);
+      xstrncpy(data->protocol, buf, REPORTLEN);
       break;
     case 15:
-      strncpy(data->sport, buf, REPORTLEN);
+      xstrncpy(data->sport, buf, REPORTLEN);
       break;
     case 16:
-      strncpy(data->dport, buf, REPORTLEN);
+      xstrncpy(data->dport, buf, REPORTLEN);
       break;
     case 17:
-      strncpy(data->syn, buf, REPORTLEN);
+      xstrncpy(data->syn, buf, REPORTLEN);
       break;
     case 18:
-      strncpy(data->tracking, buf, REPORTLEN);
+      xstrncpy(data->tracking, buf, REPORTLEN);
       break;
     }
   }

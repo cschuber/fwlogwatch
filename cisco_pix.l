@@ -1,4 +1,4 @@
-/* $Id: cisco_pix.l,v 1.4 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: cisco_pix.l,v 1.5 2002/02/14 21:48:38 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
@@ -75,7 +75,7 @@ void cisco_pix_parse_date(char *input)
 	   tmp);
   if(retval != 6) return;
   if(tmp[2] == ':')
-    strncpy(opt.line->hostname, tmp+3, SHOSTLEN);
+    xstrncpy(opt.line->hostname, tmp+3, SHOSTLEN);
 #endif
 #ifdef LOGDOTS
   remove_dot = strstr(opt.line->hostname, ".");
@@ -113,7 +113,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
 #endif
 		    opt.line->chainlabel,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
-    strncpy(opt.line->branchname, "-", SHORTLEN);
+    xstrncpy(opt.line->branchname, "-", SHORTLEN);
     opt.line->protocol = 6;
     if(retval != 6) return;
   } else if (mode == CP_OPT_UDP) {
@@ -135,7 +135,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
 #endif
 		    &shost1, &shost2, &shost3, &shost4,
 		    opt.line->chainlabel);
-    strncpy(opt.line->branchname, "-", SHORTLEN);
+    xstrncpy(opt.line->branchname, "-", SHORTLEN);
     opt.line->protocol = 1;
     if(retval != 5) return;
   }
@@ -177,7 +177,7 @@ unsigned char flex_cisco_pix(char *input, int linenum)
   cisco_pix_scan_string(input);
   cisco_pixlex();
 
-  strncpy(opt.line->interface, "-", SHORTLEN);
+  xstrncpy(opt.line->interface, "-", SHORTLEN);
   opt.line->count = 1;
 
   if (opt.parser == (CISCO_PIX_DATE|CISCO_PIX_SRC|CISCO_PIX_DST)) {

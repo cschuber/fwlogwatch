@@ -1,4 +1,4 @@
-/* $Id: cisco_ios.l,v 1.4 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: cisco_ios.l,v 1.5 2002/02/14 21:48:38 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -78,7 +78,7 @@ void cisco_ios_parse_date(char *input, unsigned char mode)
 	   tmp);
     if(retval != 6) return;
     if(tmp[2] == ':')
-      strncpy(opt.line->hostname, tmp+3, SHOSTLEN);
+      xstrncpy(opt.line->hostname, tmp+3, SHOSTLEN);
 #endif
 #ifdef LOGDOTS
     remove_dot = strstr(opt.line->hostname, ".");
@@ -185,9 +185,9 @@ void cisco_ios_parse_dst(char *input, unsigned char mode)
 void cisco_ios_parse_if(char *input)
 {
 #ifndef SHORT_NAMES
-  strncpy(opt.line->interface, input, SHORTLEN);
+  xstrncpy(opt.line->interface, input, SHORTLEN);
 #else
-  strncpy(opt.line->interface, "-", SHORTLEN);
+  xstrncpy(opt.line->interface, "-", SHORTLEN);
 #endif
 }
 

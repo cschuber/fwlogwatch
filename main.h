@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: main.h,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.5"
-#define COPYRIGHT "2001-10-11 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.5.1"
+#define COPYRIGHT "2001-11-18 Boris Wesslowski, RUS-CERT"
 
 /* i18n */
 
@@ -27,7 +27,9 @@
 #define MAXSORTSIZE 24
 #define USERSIZE 16
 #define PASSWORDSIZE 76
-#define CMDLEN 32
+#define WHOISCMDLEN 32
+#define WHOISDESCLEN 64
+#define WHOISROUTELEN 20
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 30
@@ -276,10 +278,10 @@ struct dns_cache {
 };
 
 struct whois_entry {
-  char ip_route[SHOSTLEN];
+  char ip_route[WHOISROUTELEN];
   int as_number;
-  char ip_descr[SHOSTLEN];
-  char as_descr[SHOSTLEN];
+  char ip_descr[WHOISDESCLEN];
+  char as_descr[WHOISDESCLEN];
   struct whois_entry *next;
 };
 
@@ -340,6 +342,7 @@ struct options {
   unsigned char verbose;
   unsigned char resolve;
   unsigned char whois_lookup;
+  int whois_sock;
   char inputfile[FILESIZE];
 
   struct log_line *line;

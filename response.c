@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: response.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,9 +108,9 @@ void react(unsigned char mode, struct known_hosts *this_host)
   char buf[BUFSIZE], buf2[BUFSIZE];
 
   if(mode == EX_NOTIFY) {
-    strncpy(buf, opt.notify_script, BUFSIZE);
+    xstrncpy(buf, opt.notify_script, BUFSIZE);
   } else {
-    strncpy(buf, opt.respond_script, BUFSIZE);
+    xstrncpy(buf, opt.respond_script, BUFSIZE);
     if(mode == EX_RESPOND_ADD) {
       strncat(buf, " add", BUFSIZE);
     } else {
@@ -212,15 +212,19 @@ void remove_old()
   }
 }
 
-unsigned char is_known(struct in_addr shost)
+unsigned char is_known(struct conn_data *host)
 {
   struct known_hosts *this_host;
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (this_host->shost.s_addr == (shost.s_addr & this_host->netmask.s_addr)) {
-      return 1;
-    }
+    if (this_host->shost.s_addr != (host->shost.s_addr & this_host->netmask.s_addr)) {goto no_match;}
+    if ((opt.dst_ip) && (this_host->dhost.s_addr != host->dhost.s_addr)) {goto no_match;}
+    if ((opt.dst_port) && (this_host->dport != host->dport)) {goto no_match;}
+    if ((opt.src_port) && (this_host->sport != host->sport)) {goto no_match;}
+    if ((opt.proto) && (this_host->protocol != host->protocol)) {goto no_match;}
+    return 1;
+  no_match:
     this_host = this_host->next;
   }
   return 0;
@@ -234,7 +238,7 @@ void look_for_alert()
   while (this != NULL) {
     if (this->count >= opt.threshold) {
       struct known_hosts *this_host;
-      if (!is_known(this->shost)) {
+      if (!is_known(this)) {
 	this_host = xmalloc(sizeof(struct known_hosts));
 	this_host->time = time(NULL);
 	this_host->count = this->count;

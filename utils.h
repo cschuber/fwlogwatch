@@ -1,8 +1,9 @@
-/* $Id: utils.h,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: utils.h,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
 
+char *xstrncpy(char *dest, const char *src, size_t n);
 void *xmalloc(int size);
 void log_exit(unsigned char returncode);
 void run_command(char *buf);

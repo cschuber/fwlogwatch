@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: rcfile.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,11 +80,11 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "input", 5) == 0) {
-    strncpy(opt.inputfile, get_one_parameter(command+6), FILESIZE);
+    xstrncpy(opt.inputfile, get_one_parameter(command+6), FILESIZE);
     return;
   }
   if (strncmp(command, "parser", 6) == 0) {
-    strncpy(opt.format_sel, get_one_parameter(command+7), SHORTLEN);
+    xstrncpy(opt.format_sel, get_one_parameter(command+7), SHORTLEN);
     return;
   }
 
@@ -154,7 +154,7 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "sort_order", 10) == 0) {
-    strncpy(opt.sort_order, get_one_parameter(command+11), MAXSORTSIZE);
+    xstrncpy(opt.sort_order, get_one_parameter(command+11), MAXSORTSIZE);
     return;
   }
   if (strncmp(command, "times", 5) == 0) {
@@ -170,24 +170,24 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "textcolor", 9) == 0) {
-    strncpy(opt.textcol, get_one_parameter(command+10), COLORSIZE);
+    xstrncpy(opt.textcol, get_one_parameter(command+10), COLORSIZE);
     return;
   }
   if (strncmp(command, "bgcolor", 7) == 0) {
-    strncpy(opt.bgcol, get_one_parameter(command+8), COLORSIZE);
+    xstrncpy(opt.bgcol, get_one_parameter(command+8), COLORSIZE);
     return;
   }
   if (strncmp(command, "rowcolor1", 9) == 0) {
-    strncpy(opt.rowcol1, get_one_parameter(command+10), COLORSIZE);
+    xstrncpy(opt.rowcol1, get_one_parameter(command+10), COLORSIZE);
     return;
   }
   if (strncmp(command, "rowcolor2", 9) == 0) {
-    strncpy(opt.rowcol2, get_one_parameter(command+10), COLORSIZE);
+    xstrncpy(opt.rowcol2, get_one_parameter(command+10), COLORSIZE);
     return;
   }
   if (strncmp(command, "output", 6) == 0) {
     opt.use_out = 1;
-    strncpy(opt.outputfile, get_one_parameter(command+7), FILESIZE);
+    xstrncpy(opt.outputfile, get_one_parameter(command+7), FILESIZE);
     return;
   }
   if (strncmp(command, "recent", 6) == 0) {
@@ -206,7 +206,7 @@ void parse_rcfile(char *input)
   /* Interactive report mode */
 
   if (strncmp(command, "interactive", 11) == 0) {
-    if (opt.mode != LOG_SUMMARY) {
+    if ((opt.mode != LOG_SUMMARY) && (opt.mode != INTERACTIVE_REPORT)) {
       mode_error();
     }
     opt.mode = INTERACTIVE_REPORT;
@@ -214,26 +214,26 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "sender", 6) == 0) {
-    strncpy(opt.sender, get_parameter(command+7), EMAILSIZE);
+    xstrncpy(opt.sender, get_parameter(command+7), EMAILSIZE);
     return;
   }
   if (strncmp(command, "recipient", 9) == 0) {
-    strncpy(opt.recipient, get_parameter(command+10), EMAILSIZE);
+    xstrncpy(opt.recipient, get_parameter(command+10), EMAILSIZE);
     return;
   }
   if (strncmp(command, "cc", 2) == 0) {
-    strncpy(opt.cc, get_parameter(command+3), EMAILSIZE);
+    xstrncpy(opt.cc, get_parameter(command+3), EMAILSIZE);
     return;
   }
   if (strncmp(command, "template", 8) == 0) {
-    strncpy(opt.templatefile, get_one_parameter(command+9), FILESIZE);
+    xstrncpy(opt.templatefile, get_one_parameter(command+9), FILESIZE);
     return;
   }
 
   /* Realtime response mode */
 
   if (strncmp(command, "realtime_response", 17) == 0) {
-    if (opt.mode != LOG_SUMMARY) {
+    if ((opt.mode != LOG_SUMMARY) && (opt.mode != REALTIME_RESPONSE)) {
       mode_error();
     }
     opt.mode = REALTIME_RESPONSE;
@@ -244,7 +244,7 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "pidfile", 7) == 0) {
-    strncpy(opt.pidfile, get_one_parameter(command+8), FILESIZE);
+    xstrncpy(opt.pidfile, get_one_parameter(command+8), FILESIZE);
     return;
   }  
   if (strncmp(command, "alert_threshold", 15) == 0) {
@@ -260,11 +260,11 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "notify_script", 13) == 0) {
-    strncpy(opt.notify_script, get_one_parameter(command+14), FILESIZE);
+    xstrncpy(opt.notify_script, get_one_parameter(command+14), FILESIZE);
     return;
   }  
   if (strncmp(command, "respond_script", 14) == 0) {
-    strncpy(opt.respond_script, get_one_parameter(command+15), FILESIZE);
+    xstrncpy(opt.respond_script, get_one_parameter(command+15), FILESIZE);
     return;
   }  
   if (strncmp(command, "known_host", 10) == 0) {
@@ -276,7 +276,7 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "bind_to", 7) == 0) {
-    strncpy(opt.listenif, get_one_parameter(command+8), IPLEN);
+    xstrncpy(opt.listenif, get_one_parameter(command+8), IPLEN);
     return;
   }
   if (strncmp(command, "listen_port", 11) == 0) {
@@ -284,15 +284,15 @@ void parse_rcfile(char *input)
     return;
   }
   if (strncmp(command, "listen_to", 9) == 0) {
-    strncpy(opt.listento, get_one_parameter(command+10), IPLEN);
+    xstrncpy(opt.listento, get_one_parameter(command+10), IPLEN);
     return;
   }
   if (strncmp(command, "status_user", 11) == 0) {
-    strncpy(opt.user, get_one_parameter(command+12), USERSIZE);
+    xstrncpy(opt.user, get_one_parameter(command+12), USERSIZE);
     return;
   }
   if (strncmp(command, "status_password", 15) == 0) {
-    strncpy(opt.password, get_one_parameter(command+16), PASSWORDSIZE);
+    xstrncpy(opt.password, get_one_parameter(command+16), PASSWORDSIZE);
     return;
   }
   if (strncmp(command, "refresh", 7) == 0) {
@@ -303,11 +303,11 @@ void parse_rcfile(char *input)
   /* Show log times mode */
 
   if (strncmp(command, "show_log_times", 14) == 0) {
-    if (opt.mode != LOG_SUMMARY) {
+    if ((opt.mode != LOG_SUMMARY) && (opt.mode != SHOW_LOG_TIMES)) {
       mode_error();
     }
     opt.mode = SHOW_LOG_TIMES;
-    strncpy(opt.inputfile, get_one_parameter(command+15), FILESIZE);
+    xstrncpy(opt.inputfile, get_one_parameter(command+15), FILESIZE);
     return;
   }
 

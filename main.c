@@ -1,9 +1,10 @@
-/* $Id: main.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
+/* $Id: main.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <locale.h>
 #include "main.h"
 #include "rcfile.h"
 #include "parser.h"
@@ -109,7 +110,8 @@ void init_options()
   opt.verbose = 0;
   opt.resolve = 0;
   opt.whois_lookup = 0;
-  strncpy(opt.inputfile, INFILE, FILESIZE);
+  opt.whois_sock = -1;
+  xstrncpy(opt.inputfile, INFILE, FILESIZE);
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
@@ -129,17 +131,17 @@ void init_options()
   opt.times = 0;
   opt.duration = 0;
 
-  strncpy(opt.sort_order, SORTORDER, MAXSORTSIZE);
+  xstrncpy(opt.sort_order, SORTORDER, MAXSORTSIZE);
   opt.sortfield = 0;
   opt.sortmode = 0;
 
   opt.html = 0;
   opt.use_out = 0;
   opt.outputfile[0] = '\0';
-  strncpy(opt.textcol, TEXTCOLOR, COLORSIZE);
-  strncpy(opt.bgcol, BGCOLOR, COLORSIZE);
-  strncpy(opt.rowcol1, ROWCOLOR1, COLORSIZE);
-  strncpy(opt.rowcol2, ROWCOLOR2, COLORSIZE);
+  xstrncpy(opt.textcol, TEXTCOLOR, COLORSIZE);
+  xstrncpy(opt.bgcol, BGCOLOR, COLORSIZE);
+  xstrncpy(opt.rowcol1, ROWCOLOR1, COLORSIZE);
+  xstrncpy(opt.rowcol2, ROWCOLOR2, COLORSIZE);
 
   opt.loghost = 0;
   opt.hostname[0] = '\0';
@@ -159,22 +161,22 @@ void init_options()
   opt.threshold = 0;
   opt.least = 0;
   opt.sender[0] = '\0';
-  strncpy(opt.recipient, CERT, EMAILSIZE);
+  xstrncpy(opt.recipient, CERT, EMAILSIZE);
   opt.cc[0] = '\0';
-  strncpy(opt.templatefile, TEMPLATE, FILESIZE);
+  xstrncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
   opt.response = OPT_LOG;
   opt.ipchains_check = 0;
   opt.pidfile[0] = '\0';
-  strncpy(opt.notify_script, FWLW_NOTIFY, FILESIZE);
-  strncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
+  xstrncpy(opt.notify_script, FWLW_NOTIFY, FILESIZE);
+  xstrncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
   opt.status = 0;
   opt.sock = 0;
-  strncpy(opt.listenif, LISTENIF, IPLEN);
+  xstrncpy(opt.listenif, LISTENIF, IPLEN);
   opt.listenport = LISTENPORT;
   opt.listento[0] = '\0';
-  strncpy(opt.user, DEFAULT_USER, USERSIZE);
-  strncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
+  xstrncpy(opt.user, DEFAULT_USER, USERSIZE);
+  xstrncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
   opt.refresh = 0;
 
   user = getenv("USER");
@@ -215,7 +217,7 @@ int main(int argc, char **argv)
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
 
-  strncpy(rcfile, RCFILE, FILESIZE);
+  xstrncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
   while ((iopt = getopt(argc, argv, "a:AbBc:C:dDf:F:hi:I:k:l:L:m:no:O:pP:RsStT:vVwWXyz")) != EOF) {
@@ -233,11 +235,11 @@ int main(int argc, char **argv)
       opt.response = opt.response | OPT_RESPOND;
       break;
     case 'c':
-      strncpy(rcfile, optarg, FILESIZE);
+      xstrncpy(rcfile, optarg, FILESIZE);
       alt_rcfile = 1;
       break;
     case 'C':
-      strncpy(opt.cc, optarg, EMAILSIZE);
+      xstrncpy(opt.cc, optarg, EMAILSIZE);
       break;
     case 'd':
       opt.dst_port = 1;
@@ -246,23 +248,23 @@ int main(int argc, char **argv)
       opt.dst_ip = 0;
       break;
     case 'f':
-      strncpy(opt.inputfile, optarg, FILESIZE);
+      xstrncpy(opt.inputfile, optarg, FILESIZE);
       break;
     case 'F':
-      strncpy(opt.sender, optarg, EMAILSIZE);
+      xstrncpy(opt.sender, optarg, EMAILSIZE);
       break;
     case 'h':
       usage(argv[0], EXIT_SUCCESS);
       break;
     case 'i':
-      if (opt.mode != LOG_SUMMARY) {
+      if ((opt.mode != LOG_SUMMARY) && (opt.mode != INTERACTIVE_REPORT)) {
 	mode_error();
       }
       opt.mode = INTERACTIVE_REPORT;
       opt.threshold = atoi(optarg);
       break;
     case 'I':
-      strncpy(opt.templatefile, optarg, FILESIZE);
+      xstrncpy(opt.templatefile, optarg, FILESIZE);
       break;
     case 'k':
       add_known_host(optarg);
@@ -271,11 +273,11 @@ int main(int argc, char **argv)
       opt.recent = parse_time(optarg);
       break;
     case 'L':
-      if (opt.mode != LOG_SUMMARY) {
+      if ((opt.mode != LOG_SUMMARY) && (opt.mode != SHOW_LOG_TIMES)) {
 	mode_error();
       }
       opt.mode = SHOW_LOG_TIMES;
-      strncpy(opt.inputfile, optarg, FILESIZE);
+      xstrncpy(opt.inputfile, optarg, FILESIZE);
       break;
     case 'm':
       opt.least = atoi(optarg);
@@ -284,20 +286,20 @@ int main(int argc, char **argv)
       opt.resolve = 1;
       break;
     case 'o':
-      strncpy(opt.outputfile, optarg, FILESIZE);
+      xstrncpy(opt.outputfile, optarg, FILESIZE);
       opt.use_out = 1;
       break;
     case 'O':
-      strncpy(opt.sort_order, optarg, MAXSORTSIZE);
+      xstrncpy(opt.sort_order, optarg, MAXSORTSIZE);
       break;
     case 'p':
       opt.proto = 1;
       break;
     case 'P':
-      strncpy(opt.format_sel, optarg, SHORTLEN);
+      xstrncpy(opt.format_sel, optarg, SHORTLEN);
       break;
     case 'R':
-      if (opt.mode != LOG_SUMMARY) {
+      if ((opt.mode != LOG_SUMMARY) && (opt.mode != REALTIME_RESPONSE)) {
 	mode_error();
       }
       opt.mode = REALTIME_RESPONSE;
@@ -312,7 +314,7 @@ int main(int argc, char **argv)
       opt.times = 1;
       break;
     case 'T':
-      strncpy(opt.recipient, optarg, EMAILSIZE);
+      xstrncpy(opt.recipient, optarg, EMAILSIZE);
       break;
     case 'v':
       opt.verbose++;

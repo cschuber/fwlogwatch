@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: utils.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,27 @@ extern struct conn_data *first;
 extern struct dns_cache *dns_first;
 extern struct known_hosts *first_host;
 extern struct parser_options *excluded_first;
+
+
+/*
+ * xstrncpy() - similar to strncpy(3) but always terminates string
+ * with '\0' (if n > 0 and dest != NULL),  doesn't do padding.
+ */
+char *xstrncpy(char *dest, const char *src, size_t n)
+{
+  char *r = dest;
+
+  if((n <= 0) || (dest == NULL)) {
+    return dest;
+  }
+  if(src != NULL) {
+    while ((--n != 0) && (*src != '\0')) {
+      *dest++ = *src++;
+    }
+  }
+  *dest = '\0';
+  return r;
+}
 
 void *xmalloc(int size)
 {
@@ -210,10 +231,11 @@ unsigned char convert_ip(char *ip, struct in_addr *addr)
   return IN_ADDR_OK;
 }
 
-unsigned long int parse_cidr(char *input)
+uint32_t parse_cidr(char *input)
 {
   int mask = 32;
-  char *pnt;
+  char *pnt, n;
+  uint32_t res = 1;
 
   pnt = strstr(input, "/");
   if (pnt != NULL) {
@@ -224,11 +246,11 @@ unsigned long int parse_cidr(char *input)
     }
     *pnt = '\0';
   }
-  if (mask == 0) {
-    return 0;
-  } else {
-    return (0xFFFFFFFF >> (32-mask));
-  }
+
+  for(n=0;n<mask;n++)
+    res *= 2;
+
+  return --res;
 }
 
 void add_known_host(char *ip)

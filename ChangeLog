@@ -1,4 +1,10 @@
-$Id: ChangeLog,v 1.16 2002/02/14 21:36:53 bwess Exp $
+$Id: ChangeLog,v 1.17 2002/02/14 21:48:38 bwess Exp $
+
+Version 0.5.1 2001-11-18
+- Various fixes: whois code, mode selection, endianness problems, realtime
+  response with destination/port distinction, forward chain blocking for
+  iptables, international encoding, portability
+- Added chinese and portuguese translations
 
 Version 0.5 2001-10-11
 - Added internationalization support with german as first language

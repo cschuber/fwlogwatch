@@ -1,4 +1,4 @@
-$Id: README,v 1.17 2002/02/14 21:36:53 bwess Exp $
+$Id: README,v 1.18 2002/02/14 21:48:38 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -12,6 +12,22 @@ http://www.kyb.uni-stuttgart.de/boris/software.shtml
 
 
 FEATURES
+- General Features:
+  - Can detect and process log entries in the following formats:
+    Linux ipchains, Linux netfilter/iptables,
+    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS and Cisco PIX.
+  - Entries can be parsed in combined log files, the parsers to be used
+    can be selected.
+  - Gzip-compressed logs are supported.
+  - Can separate recent from old entries and detects timewarps in log files.
+  - Can recognize 'last message repeated' entries concerning the firewall.
+  - Integrated resolver for protocols, services and host names.
+  - Can do lookups in the whois database.
+  - Own DNS and whois information cache for faster lookups.
+  - Ports and hosts can be selected or excluded as needed.
+  - Support for internationalization (available in english, german,
+    portuguese and chinese).
+
 - Log summary mode:
   - A lot of options to find and display relevant patterns in connection
     attempts.
@@ -19,16 +35,7 @@ FEATURES
     omitted and the host mentioned in the header of the summary if the
     log is from a single host, the same happens with the chains, targets
     and interfaces).
-  - Can separate recent from old entries and detects timewarps in log files.
-  - Can recognize 'last message repeated' entries concerning the firewall.
   - Plain text and HTML output with sort options.
-  - Ports and hosts can be selected or excluded as needed.
-  - Integrated resolver for protocols, services and host names.
-  - Can do lookups in the whois database.
-  - Own DNS and whois information cache for faster lookups.
-  - Detects and processes ipchains, netfilter/iptables, cisco IOS/PIX and
-    ipfilter log entries, even combined or only with the selected parsers.
-  - Can analyze compressed log files.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -39,14 +46,15 @@ FEATURES
 
 - Realtime response mode:
   - The program detaches and stays in the background as a daemon.
-  - If the ipchains parser is activated it detects if the necessary ipchains
-    rules with logging turned on exist.
+  - The ipchains parser can detect if the necessary ipchains rules with
+    logging turned on exist.
   - Response can be a notification (in form of a log file entry, an email,
     a remote winpopup message or whatever you can put into a shell script),
     or a customizable firewall modification.
   - The included response script adds a new chain for fwlogwatch to
     ipchains or netfilter setups and attackers are completely blocked with
-    new firewall rules. Supports trusted hosts (anti-spoofing).
+    new firewall rules.
+  - Supports trusted hosts (anti-spoofing).
   - The current status of the program can be followed through a web
     interface.
 
@@ -54,27 +62,25 @@ The commented configuration file supports and explains all options and
 will get you started quickly.
 
 
-IPCHAINS, NETFILTER/IPTABLES, CISCO IOS/PIX AND IPFILTER SUPPORT
-  fwlogwatch features ipchains, iptables/netfilter, cisco IOS/PIX and
-  ipfilter log file support, it can even read the combined logs on a log
-  host. You can separate the formats if you activate or deactivate the
-  corresponding parsers. Some restrictions apply because not all fields
-  exist or make sense in all log file types. The included script for
-  realtime response mode supports ipchains and netfilter, you will need to
-  deactivate the ipchains parser if you want to use realtime response mode
-  on a system without ipchains. Cisco PIX support at the moment only
-  focuses on denied packets and ignores all other kinds of PIX log entries.
+IPCHAINS, NETFILTER/IPTABLES, IPFILTER AND IOS/PIX SUPPORT
+  fwlogwatch features ipchains, iptables/netfilter, ipfilter and IOS/PIX
+  log file support, it can even read the combined logs on a log host. You
+  can separate the formats if you activate or deactivate the corresponding
+  parsers. Some restrictions apply because not all fields exist or make
+  sense in all log file types. The included script for realtime response
+  mode supports ipchains and netfilter. The check if correct ipchains rules
+  exist can be activated in the configuration file. Cisco PIX support is
+  restricted to versions before 6 of PIX OS and only focuses on denied
+  packets and ignores all other kinds of PIX log entries.
 
 
 INSTALLATION
-  For ipchains you will need at least kernel 2.2.10 (which you should have
-  updated for security reasons anyway), kernel versions before 2.2.10 don't
-  log enough.
-
+- General
   Before compiling you may want to have a look at main.h if you want to
-  change some default values. To compile on Solaris or OpenBSD look for the
-  corresponding lines at the top of the Makefile. You might want to enable
-  short names to save memory if you only parse ipchains logs.
+  change some default values. The default configuration assumes Linux, to
+  compile on Solaris, OpenBSD, FreeBSD or IRIX look for the corresponding
+  lines at the top of the Makefile. You might want to enable short names to
+  save memory if you only parse ipchains logs.
 
   You will need the zlib compression library (version 1.0.9 or newer) and
   it's header files to compile fwlogwatch.
@@ -92,17 +98,27 @@ INSTALLATION
   fwlogwatch to create it's temporary files (only needed in report mode)
   in /tmp.
 
+- Linux
+  For ipchains you will need at least kernel 2.2.10 (which you should have
+  updated for security reasons anyway), kernel versions before 2.2.10 don't
+  log enough.
 
-BASICS (for ipchains)
-- Create an ipchains packet filter with allow rules for all connections you
-  need, as tight as possible.
+- FreeBSD/OpenBSD
+  Because of the internationalization support you will need to have the
+  gettext package (sometimes with it's surroundings libtool, GNU m4,
+  autoconf and automake) installed to compile fwlogwatch.
+
+
+BASICS (with examples for ipchains)
+- Create a packet filter with ACCEPT rules for all connections you need, as
+  tight as possible.
 
 - Your default policies should be DENY:
 
     ipchains -P input DENY
     ipchains -P forward DENY
 
-  although they won't be needed since all prohibited traffic
+  although with ipchains they won't be needed since all prohibited traffic
   will be intercepted by the following logging rules:
 
     ipchains -A input -l -j DENY
@@ -158,3 +174,4 @@ CONFIGURATION AND EXAMPLES
 FEEDBACK
   If you find a bug or have an idea for a new feature please send an email
   to Boris.Wesslowski@RUS.Uni-Stuttgart.DE
+

@@ -1,4 +1,4 @@
-/* $Id: resolve.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
+/* $Id: resolve.c,v 1.19 2002/02/14 21:48:38 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,7 +98,7 @@ char * resolve_hostname(struct in_addr ip)
     forward = gethostbyname(reverse->h_name);
     if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
       if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
-	strncpy(dns->fqdn, reverse->h_name, HOSTLEN);
+	xstrncpy(dns->fqdn, reverse->h_name, HOSTLEN);
       } else {
 	snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
       }
@@ -106,7 +106,7 @@ char * resolve_hostname(struct in_addr ip)
       snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup failed]"), reverse->h_name);
     }
   } else {
-    strncpy(dns->fqdn, "-", HOSTLEN);
+    xstrncpy(dns->fqdn, "-", HOSTLEN);
   }
 
   dns->next = dns_first;
