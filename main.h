@@ -1,11 +1,17 @@
-/* $Id: main.h,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: main.h,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.4"
-#define COPYRIGHT "2001-08-19 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.5"
+#define COPYRIGHT "2001-10-11 Boris Wesslowski, RUS-CERT"
+
+/* i18n */
+
+#include <libintl.h>
+#define _(String) gettext(String)
+#define LOCALEDIR "/usr/share/locale"
 
 /* Data sizes */
 
@@ -21,7 +27,7 @@
 #define MAXSORTSIZE 24
 #define USERSIZE 16
 #define PASSWORDSIZE 76
-#define CMDLEN 16
+#define CMDLEN 32
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 30
@@ -329,6 +335,7 @@ enum {
 struct options {
   unsigned char mode;
   FILE *inputfd;
+  unsigned char std_in;
 
   unsigned char verbose;
   unsigned char resolve;
@@ -388,7 +395,10 @@ struct options {
   char templatefile[FILESIZE];
 
   unsigned char response;
+  unsigned char ipchains_check;
   char pidfile[FILESIZE];
+  char notify_script[FILESIZE];
+  char respond_script[FILESIZE];
   unsigned char status;
   int sock;
   char listenif[IPLEN];
@@ -396,6 +406,7 @@ struct options {
   char listento[IPLEN];
   char user[USERSIZE];
   char password[PASSWORDSIZE];
+  int refresh;
 };
 
 #endif

@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: main.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,54 +16,54 @@ extern char *optarg;
 void usage(char *me, unsigned char exitcode)
 {
   printf("%s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
-  printf("Usage: %s [options]\n", me);
-  printf("Global options:\n");
-  printf("         -c <file>   specify config file (defaults to %s)\n", RCFILE);
-  printf("         -D          do not differentiate destination IP addresses\n");
-  printf("         -d          differentiate destination ports\n");
-  printf("         -f <file>   specify input file (defaults to %s)\n", INFILE);
-  printf("         -h          this help\n");
-  printf("         -L <file>   show time of first and last log entry in file\n");
-  printf("         -l <time>   process recent events only (defaults to off)\n");
-  printf("         -n          resolve host names\n");
-  printf("         -P <format> use only parsers for specific formats\n");
-  printf("         -p          differentiate protocols\n");
-  printf("         -S          do not differentiate source IP addresses\n");
-  printf("         -s          differentiate source ports\n");
-  printf("         -t          show start and end times\n");
-  printf("         -V          show version and copyright info\n");
-  printf("         -v          verbose, specify twice for more info\n");
-  printf("         -y          differentiate TCP options\n");
-  printf("         -z          show time interval\n");
+  printf(_("Usage: %s [options]\n"), me);
+  printf(_("Global options:\n"));
+  printf(_("         -c <file>   specify config file (defaults to %s)\n"), RCFILE);
+  printf(_("         -D          do not differentiate destination IP addresses\n"));
+  printf(_("         -d          differentiate destination ports\n"));
+  printf(_("         -f <file>   specify input file (defaults to %s)\n"), INFILE);
+  printf(_("         -h          this help\n"));
+  printf(_("         -L <file>   show time of first and last log entry in file\n"));
+  printf(_("         -l <time>   process recent events only (defaults to off)\n"));
+  printf(_("         -n          resolve host names\n"));
+  printf(_("         -P <format> use only parsers for specific formats\n"));
+  printf(_("         -p          differentiate protocols\n"));
+  printf(_("         -S          do not differentiate source IP addresses\n"));
+  printf(_("         -s          differentiate source ports\n"));
+  printf(_("         -t          show start and end times\n"));
+  printf(_("         -V          show version and copyright info\n"));
+  printf(_("         -v          verbose, specify twice for more info\n"));
+  printf(_("         -y          differentiate TCP options\n"));
+  printf(_("         -z          show time interval\n"));
   printf("\n");
 
-  printf("Log summary mode (default):\n");
-  printf("         -b          show amount of data (sum of total packet lengths)\n");
-  printf("         -m <count>  only show entries with at least so many incidents\n");
-  printf("         -o <file>   specify output file\n");
-  printf("         -O <order>  define the sort order (see the man page for details)\n");
-  printf("         -w          HTML output\n");
-  printf("         -W          activate whois lookups for source addresses\n");
+  printf(_("Log summary mode (default):\n"));
+  printf(_("         -b          show amount of data (sum of total packet lengths)\n"));
+  printf(_("         -m <count>  only show entries with at least so many incidents\n"));
+  printf(_("         -o <file>   specify output file\n"));
+  printf(_("         -O <order>  define the sort order (see the man page for details)\n"));
+  printf(_("         -w          HTML output\n"));
+  printf(_("         -W          activate whois lookups for source addresses\n"));
   printf("\n");
 
-  printf("Interactive report mode:\n");
-  printf("         -i <count>  interactive mode with report threshold\n");
-  printf("         -F <email>  report sender address\n");
-  printf("                     (defaults to '%s')\n", opt.sender);
-  printf("         -T <email>  address of CERT or abuse contact to send report to\n");
-  printf("         -C <email>  carbon copy recipients\n");
-  printf("         -I <file>   template file for report\n");
-  printf("                     (defaults to %s)\n", TEMPLATE);
+  printf(_("Interactive report mode:\n"));
+  printf(_("         -i <count>  interactive mode with report threshold\n"));
+  printf(_("         -F <email>  report sender address\n"));
+  printf(_("                     (defaults to '%s')\n"), opt.sender);
+  printf(_("         -T <email>  address of CERT or abuse contact to send report to\n"));
+  printf(_("         -C <email>  carbon copy recipients\n"));
+  printf(_("         -I <file>   template file for report\n"));
+  printf(_("                     (defaults to %s)\n"), TEMPLATE);
   printf("\n");
 
-  printf("Realtime response mode:\n");
-  printf("         -R          realtime response as daemon (default action: log only)\n");
-  printf("         -a <count>  alert threshold (defaults to %d entries)\n", ALERT);
-  printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
-  printf("         -k <IP/net> add this IP address or net to the list of known hosts\n");
-  printf("         -A          invoke notification script if threshold is reached\n");
-  printf("         -B          invoke response action script (e.g. block host)\n");
-  printf("         -X          activate internal status information web server\n");
+  printf(_("Realtime response mode:\n"));
+  printf(_("         -R          realtime response as daemon (default action: log only)\n"));
+  printf(_("         -a <count>  alert threshold (defaults to %d entries)\n"), ALERT);
+  printf(_("         -l <time>   forget events this old (defaults to %d hours)\n"), FORGET/3600);
+  printf(_("         -k <IP/net> add this IP address or net to the list of known hosts\n"));
+  printf(_("         -A          invoke notification script if threshold is reached\n"));
+  printf(_("         -B          invoke response action script (e.g. block host)\n"));
+  printf(_("         -X          activate internal status information web server\n"));
   printf("\n");
 
   exit(exitcode);
@@ -89,7 +89,7 @@ void info()
   puts("along with this program; if not, write to the Free Software");
   puts("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA");
   puts("");
-  puts("You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>.");
+  puts(_("You can contact the author at <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."));
 
   exit(EXIT_SUCCESS);
 }
@@ -104,6 +104,7 @@ void init_options()
 
   opt.mode = LOG_SUMMARY;
   opt.inputfd = NULL;
+  opt.std_in = 0;
 
   opt.verbose = 0;
   opt.resolve = 0;
@@ -163,7 +164,10 @@ void init_options()
   strncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
   opt.response = OPT_LOG;
+  opt.ipchains_check = 0;
   opt.pidfile[0] = '\0';
+  strncpy(opt.notify_script, FWLW_NOTIFY, FILESIZE);
+  strncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
   opt.status = 0;
   opt.sock = 0;
   strncpy(opt.listenif, LISTENIF, IPLEN);
@@ -171,6 +175,7 @@ void init_options()
   opt.listento[0] = '\0';
   strncpy(opt.user, DEFAULT_USER, USERSIZE);
   strncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
+  opt.refresh = 0;
 
   user = getenv("USER");
   if (user == NULL) {
@@ -204,6 +209,11 @@ int main(int argc, char **argv)
   int iopt;
 
   init_options();
+
+  setlocale(LC_MESSAGES,"");
+  setlocale(LC_TIME,"");
+  bindtextdomain(PACKAGE, LOCALEDIR);
+  textdomain(PACKAGE);
 
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
@@ -333,6 +343,9 @@ int main(int argc, char **argv)
   if(alt_rcfile)
     read_rcfile(rcfile);
 
+  if(!strncmp(opt.inputfile, "-", FILESIZE))
+    opt.std_in = 1;
+
   select_parsers();
 
   /* Consistency checks */
@@ -364,7 +377,7 @@ int main(int argc, char **argv)
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Exiting\n");
+    fprintf(stderr, _("Exiting\n"));
 
   return EXIT_SUCCESS;
 }

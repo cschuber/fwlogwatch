@@ -1,8 +1,9 @@
-/* $Id: compare.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: compare.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "compare.h"
@@ -120,7 +121,7 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
     }
     break;
   default:
-    fprintf(stderr, "conn_sort_up: wrong mode\n");
+    fprintf(stderr, _("conn_sort_up: wrong mode\n"));
   }
 
   return cond;
@@ -216,7 +217,7 @@ void sort_data()
       opt.sortfield = SORT_DESTPORT;
       break;
     default:
-      fprintf(stderr, "Error in sort string: '%c', order expected, ignoring.\n", opt.sort_order[i]);
+      fprintf(stderr, _("Error in sort string: '%c', order expected, ignoring.\n"), opt.sort_order[i]);
       error = 1;
     }
 
@@ -230,7 +231,7 @@ void sort_data()
 	opt.sortmode = ORDER_DESCENDING;
 	break;
       default:
-	fprintf(stderr, "Error in sort string: '%c', direction expected, ignoring.\n", opt.sort_order[i]);
+	fprintf(stderr, _("Error in sort string: '%c', direction expected, ignoring.\n"), opt.sort_order[i]);
 	error = 1;
       }
     } else {
@@ -310,7 +311,7 @@ void build_list()
     } else {
       if(opt.verbose) {
 	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
-	fprintf(stderr, "Timewarp in log file (%s", stime);
+	fprintf(stderr, _("Timewarp in log file (%s"), stime);
 	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&opt.line->time));
 	fprintf(stderr, " < %s).\n", stime);
       }

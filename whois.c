@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.1 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: whois.c,v 1.2 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +85,7 @@ char *whois_get_from_as(int sock, int asn)
 {
   char cmdstr[CMDLEN], *data;
 
-  sprintf(cmdstr, "!man,AS%d\n", asn);
+  snprintf(cmdstr, CMDLEN, "!man,AS%d\n", asn);
   write(sock, cmdstr, strlen(cmdstr));
   data = whois_read_data(sock);
 
@@ -126,7 +126,7 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 
   he = gethostbyname(RADB);
   if (he == NULL) {
-    printf("lookup failed: %s\n", RADB);
+    printf(_("lookup failed: %s\n"), RADB);
     exit(EXIT_FAILURE);
   }
 
@@ -147,7 +147,7 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
   }
 
   write(sock, "!!\n", 3);
-  sprintf(cmdstr, "!r%s/32,l\n", inet_ntoa(ip));
+  snprintf(cmdstr, CMDLEN, "!r%s/32,l\n", inet_ntoa(ip));
   write(sock, cmdstr, strlen(cmdstr));
   data = whois_read_data(sock);
 
@@ -223,14 +223,14 @@ struct whois_entry * whois(struct in_addr ip)
     convert_ip(adds, &addr);
     if (addr.s_addr == net.s_addr) {
       if(opt.verbose)
-        fprintf(stderr, "Looking up whois info for %s from cache\n", inet_ntoa(ip));
+        fprintf(stderr, _("Looking up whois info for %s from cache\n"), inet_ntoa(ip));
       return (we);
     }
     we = we->next;
   }
  
   if(opt.verbose)
-    fprintf(stderr, "Looking up whois info for %s\n", inet_ntoa(ip));
+    fprintf(stderr, _("Looking up whois info for %s\n"), inet_ntoa(ip));
  
   we = xmalloc(sizeof(struct whois_entry));
   whois_from_ip(ip, we);

@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: parser.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -215,7 +215,7 @@ void select_parsers()
 	opt.format = opt.format | PARSER_IPFILTER;
 	break;
       default:
-	fprintf(stderr, "Unknown parser: '%c'.\n", opt.format_sel[i]);
+	fprintf(stderr, _("Unknown parser: '%c'.\n"), opt.format_sel[i]);
 	exit(EXIT_FAILURE);
       }
       i++;

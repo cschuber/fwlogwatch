@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: response.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,9 +54,13 @@ void check_for_ipchains()
   }
 
   if (found > 0) {
-    syslog(LOG_NOTICE, "%u logging ipchains firewall rule%s defined", found, (found == 1)?"":"s");
+    if(found == 1) {
+      syslog(LOG_NOTICE, _("One logging ipchains firewall rule defined"));
+    } else {
+      syslog(LOG_NOTICE, _("%u logging ipchains firewall rules defined"), found);
+    }
   } else {
-    syslog(LOG_NOTICE, "No logging ipchains firewall rules defined, format was requested");
+    syslog(LOG_NOTICE, _("No logging ipchains firewall rules defined, format was requested"));
     log_exit(EXIT_FAILURE);
   }
 }
@@ -77,7 +81,7 @@ void check_script_perms(char *name)
 
   if((getuid() == 0) || (geteuid() == 0)) {
     if ((buf->st_mode & (S_IWGRP|S_IWOTH)) != 0) {
-      syslog(LOG_NOTICE, "%s is group/world writable", FWLW_NOTIFY);
+      syslog(LOG_NOTICE, _("%s is group/world writable"), name);
       free(buf);
       log_exit(EXIT_FAILURE);
     }
@@ -91,10 +95,10 @@ void modify_firewall(unsigned char action)
   char buf[BUFSIZE];
 
   if (action == FW_START) {
-    snprintf(buf, BUFSIZE, "%s start", FWLW_RESPOND);
+    snprintf(buf, BUFSIZE, "%s start", opt.respond_script);
     run_command(buf);
   } else if (action == FW_STOP) {
-    snprintf(buf, BUFSIZE, "%s stop", FWLW_RESPOND);
+    snprintf(buf, BUFSIZE, "%s stop", opt.respond_script);
     run_command(buf);
   }
 }
@@ -104,9 +108,9 @@ void react(unsigned char mode, struct known_hosts *this_host)
   char buf[BUFSIZE], buf2[BUFSIZE];
 
   if(mode == EX_NOTIFY) {
-    strncpy(buf, FWLW_NOTIFY, BUFSIZE);
+    strncpy(buf, opt.notify_script, BUFSIZE);
   } else {
-    strncpy(buf, FWLW_RESPOND, BUFSIZE);
+    strncpy(buf, opt.respond_script, BUFSIZE);
     if(mode == EX_RESPOND_ADD) {
       strncat(buf, " add", BUFSIZE);
     } else {
@@ -166,7 +170,7 @@ void remove_old()
       diff = now - this->start_time;
     if (diff >= opt.recent) {
       if(opt.verbose == 2)
-	syslog(LOG_NOTICE, "Deleting packet cache entry (%s)", inet_ntoa(this->shost));
+	syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), inet_ntoa(this->shost));
       if (is_first == 1) {
 	prev = this->next;
 	free(this);
@@ -188,7 +192,7 @@ void remove_old()
   while (this_host != NULL) {
     if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
       if (opt.verbose == 2)
-	syslog(LOG_NOTICE, "Deleting host status entry (%s)", inet_ntoa(this_host->shost));
+	syslog(LOG_NOTICE, _("Deleting host status entry (%s)"), inet_ntoa(this_host->shost));
       if (opt.response & OPT_RESPOND)
 	react(EX_RESPOND_REMOVE, this_host);
       if (is_first == 1) {
@@ -228,27 +232,40 @@ void look_for_alert()
 
   this = first;
   while (this != NULL) {
-    if ((this->count >= opt.threshold) && (!is_known(this->shost))) {
+    if (this->count >= opt.threshold) {
       struct known_hosts *this_host;
-
-      this_host = xmalloc(sizeof(struct known_hosts));
-      this_host->time = time(NULL);
-      this_host->count = this->count;
-      this_host->shost = this->shost;
-      this_host->netmask.s_addr = 0xFFFFFFFF;
-      this_host->protocol = this->protocol;
-      this_host->dhost = this->dhost;
-      this_host->sport = this->sport;
-      this_host->dport = this->dport;
-      this_host->next = first_host;
-      first_host = this_host;
-
-      syslog(LOG_NOTICE, "ALERT: %d attempts from %s", this->count, inet_ntoa(this->shost));
-
-      if(opt.response & OPT_NOTIFY)
-	react(EX_NOTIFY, this_host);
-      if(opt.response & OPT_RESPOND)
-	react(EX_RESPOND_ADD, this_host);
+      if (!is_known(this->shost)) {
+	this_host = xmalloc(sizeof(struct known_hosts));
+	this_host->time = time(NULL);
+	this_host->count = this->count;
+	this_host->shost = this->shost;
+	this_host->netmask.s_addr = 0xFFFFFFFF;
+	this_host->protocol = this->protocol;
+	this_host->dhost = this->dhost;
+	this_host->sport = this->sport;
+	this_host->dport = this->dport;
+	this_host->next = first_host;
+	first_host = this_host;
+	if(opt.response & OPT_NOTIFY)
+	  react(EX_NOTIFY, this_host);
+	if(opt.response & OPT_RESPOND)
+	  react(EX_RESPOND_ADD, this_host);
+      } else {
+	this_host = first_host;
+	while (this_host != NULL) {
+	  if (this_host->shost.s_addr != this->shost.s_addr) {goto no_match;}
+	  if ((opt.dst_ip) && (this_host->dhost.s_addr != this->dhost.s_addr)) {goto no_match;}
+	  if ((opt.dst_port) && (this_host->dport != this->dport)) {goto no_match;}
+	  if ((opt.src_port) && (this_host->sport != this->sport)) {goto no_match;}
+	  if ((opt.proto) && (this_host->protocol != this->protocol)) {goto no_match;}
+	  this_host->time = this->end_time;
+	  this_host->count = this_host->count + this->count;
+	  break;
+	no_match:
+	  this_host = this_host->next;
+	}
+      }
+      syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this->count, inet_ntoa(this->shost));
       this->end_time = 1;
     }
     this = this->next;

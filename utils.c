@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: utils.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@ void *xmalloc(int size)
 
   ptr = malloc(size);
   if (ptr == NULL) {
-    fprintf(stderr, "\nMemory allocation error, exiting.\n");
+    fprintf(stderr, _("\nMemory allocation error, exiting.\n"));
     exit(EXIT_FAILURE);
   }
 
@@ -39,7 +39,7 @@ void log_exit(unsigned char returncode)
 	syslog(LOG_NOTICE, "unlink %s: %s", opt.pidfile, strerror(errno));
     }
   }
-  syslog(LOG_NOTICE, "Exiting");
+  syslog(LOG_NOTICE, _("Exiting"));
   exit(returncode);
 }
 
@@ -48,12 +48,12 @@ void run_command(char *buf)
   pid_t pid;
 
   if (strstr(buf, "%") != NULL) {
-    syslog(LOG_NOTICE, "Not executing buffer containing format string");
+    syslog(LOG_NOTICE, _("Not executing buffer containing format string"));
     return;
   }
 
   if(opt.verbose == 2) {
-    syslog(LOG_NOTICE, "Executing '%s'", buf);
+    syslog(LOG_NOTICE, _("Executing '%s'"), buf);
   }
 
   pid = fork();
@@ -142,11 +142,11 @@ void init_line()
 
 void mode_error()
 {
-  printf("fwlogwatch error: mode collision, please check that you didn't specify\n"
+  printf(_("fwlogwatch error: mode collision, please check that you didn't specify\n"
 	 "   several modes on the command line or a second mode is active in the\n"
 	 "   default or specified configuration file.\n"
 	 "   Please use a separate configuration file for each mode or comment out all\n"
-	 "   entries in the default configuration and use command line parameters.\n");
+	 "   entries in the default configuration and use command line parameters.\n"));
   exit(EXIT_FAILURE);
 }
 
@@ -204,7 +204,7 @@ unsigned char convert_ip(char *ip, struct in_addr *addr)
   if (addr->s_addr == INADDR_NONE) {
 #endif
     if (opt.verbose)
-      fprintf(stderr, "IP address error: %s\n", ip);
+      fprintf(stderr, _("IP address error: %s\n"), ip);
     return IN_ADDR_ERROR;
   }
   return IN_ADDR_OK;
@@ -219,7 +219,7 @@ unsigned long int parse_cidr(char *input)
   if (pnt != NULL) {
     mask = atoi(pnt+1);
     if ((mask < 0) || (mask > 32)) {
-      fprintf(stderr, "Error in CIDR format: %s\n", input);
+      fprintf(stderr, _("Error in CIDR format: %s\n"), input);
       exit(EXIT_FAILURE);
     }
     *pnt = '\0';
@@ -240,7 +240,7 @@ void add_known_host(char *ip)
   host->count = 0;
   host->netmask.s_addr = parse_cidr(ip);
   if(convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
-    printf("(known host)\n");
+    printf(_("(known host)\n"));
     free(host);
     exit(EXIT_FAILURE);
   }
@@ -262,7 +262,7 @@ void add_exclude_hp(char *input, unsigned char mode)
   excluded_this->mode = mode;
   if(mode & PARSER_MODE_HOST) {
     if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
-      printf("(excluded host)\n");
+      printf(_("(excluded host)\n"));
       free(excluded_this);
       exit(EXIT_FAILURE);
     }

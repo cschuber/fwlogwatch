@@ -1,4 +1,15 @@
-$Id: ChangeLog,v 1.15 2002/02/14 21:32:47 bwess Exp $
+$Id: ChangeLog,v 1.16 2002/02/14 21:36:53 bwess Exp $
+
+Version 0.5 2001-10-11
+- Added internationalization support with german as first language
+- Added support for input from stdin in all modes
+- Added options to specify paths for notifications and response scripts
+- Made the check for correct ipchains rules a config file option
+- Modified realtime response reaction behaviour when attacker insists
+- Added display of selected parser options in realtime response status page
+- Added automatic refresh of realtime response status page
+- FreeBSD portablility fixes
+- Various small fixes
 
 Version 0.4 2001-08-19
 - Added whois information lookup

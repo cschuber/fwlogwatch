@@ -1,4 +1,4 @@
-/* $Id: report.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: report.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,80 +46,80 @@ void generate_report(FILE *fd, struct report_data *data, unsigned char options)
 {
   if(options & OPT_MODIFY)
     fprintf(fd, " 5 ");
-  fprintf(fd, "Offending IP address:      %s\n", data->shost);
+  fprintf(fd, _("Offending IP address:      %s\n"), data->shost);
 
   if((strlen(data->shostname) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, " 6 ");
-    fprintf(fd, "Offending IP name:         %s\n", data->shostname);
+    fprintf(fd, _("Offending IP name:         %s\n"), data->shostname);
   }
 
   if(options & OPT_MODIFY)
     fprintf(fd, " 7 ");
-  fprintf(fd, "Target IP address:         %s\n", data->dhost);
+  fprintf(fd, _("Target IP address:         %s\n"), data->dhost);
 
   if((strlen(data->dhostname) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, " 8 ");
-    fprintf(fd, "Target IP name:            %s\n", data->dhostname);
+    fprintf(fd, _("Target IP name:            %s\n"), data->dhostname);
   }
 
   if(options & OPT_MODIFY)
     fprintf(fd, " 9 ");
-  fprintf(fd, "Number of logged attempts: %s\n", data->count);
+  fprintf(fd, _("Number of logged attempts: %s\n"), data->count);
 
   if((strlen(data->t_start) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "10 ");
-    fprintf(fd, "Start time:                %s\n", data->t_start);
+    fprintf(fd, _("Start time:                %s\n"), data->t_start);
   }
 
   if((strlen(data->t_end) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "11 ");
-    fprintf(fd, "End time:                  %s\n", data->t_end);
+    fprintf(fd, _("End time:                  %s\n"), data->t_end);
   }
 
   if((strlen(data->timezone) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "12 ");
-    fprintf(fd, "Timezone:                  %s\n", data->timezone);
+    fprintf(fd, _("Timezone:                  %s\n"), data->timezone);
   }
 
   if((strlen(data->duration) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "13 ");
-    fprintf(fd, "Duration:                  %s\n", data->duration);
+    fprintf(fd, _("Duration:                  %s\n"), data->duration);
   }
 
   if((strlen(data->protocol) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "14 ");
-    fprintf(fd, "Protocol:                  %s\n", data->protocol);
+    fprintf(fd, _("Protocol:                  %s\n"), data->protocol);
   }
 
   if((strlen(data->sport) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "15 ");
-    fprintf(fd, "Source port:               %s\n", data->sport);
+    fprintf(fd, _("Source port:               %s\n"), data->sport);
   }
 
   if((strlen(data->dport) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "16 ");
-    fprintf(fd, "Destination port:          %s\n", data->dport);
+    fprintf(fd, _("Destination port:          %s\n"), data->dport);
   }
 
   if((strlen(data->syn) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "17 ");
-    fprintf(fd, "TCP options:               %s\n", data->syn);
+    fprintf(fd, _("TCP options:               %s\n"), data->syn);
   }
 
   if((strlen(data->tracking) > 0) || (options & OPT_MODIFY)) {
     if(options & OPT_MODIFY)
       fprintf(fd, "18 ");
-    fprintf(fd, "Tracking number:           %s\n", data->tracking);
+    fprintf(fd, _("Tracking number:           %s\n"), data->tracking);
   }
 }
 
@@ -207,7 +207,7 @@ void generate_with_template(struct report_data *data)
     perror("fclose");
   }
 
-  printf("Sending...\n");
+  printf(_("Sending...\n"));
 
   snprintf(buf, BUFSIZE, "%s %s | %s -t", P_CAT, file, P_SENDMAIL);
   run_command(buf);
@@ -228,7 +228,7 @@ void fill_report(struct conn_data *this, struct report_data *data)
   strncpy(data->cc, opt.cc, EMAILSIZE);
 
   strftime(stime, TIMESIZE, "%Y%m%d", localtime(&this->start_time));
-  snprintf(data->subject, EMAILSIZE, "Incident report %s-%s", stime, inet_ntoa(this->shost));
+  snprintf(data->subject, EMAILSIZE, _("Incident report %s-%s"), stime, inet_ntoa(this->shost));
 
   if(opt.src_ip)
     strncpy(data->shost, inet_ntoa(this->shost), IPLEN);
@@ -306,9 +306,9 @@ void fill_report(struct conn_data *this, struct report_data *data)
 
   if (opt.opts) {
     if (this->flags & TCP_SYN) {
-      strncpy(data->syn, "no SYNs", SHORTLEN);
+      strncpy(data->syn, _("no SYNs"), SHORTLEN);
     } else {
-      strncpy(data->syn, "SYNs only", SHORTLEN);
+      strncpy(data->syn, _("SYNs only"), SHORTLEN);
     }
   } else {
     data->syn[0] = '\0';
@@ -328,7 +328,7 @@ void modify_report(struct report_data *data)
     generate_header(stdout, data, OPT_MODIFY);
     generate_report(stdout, data, OPT_MODIFY);
     printf("----------------------------------------------------------------------\n");
-    printf("\nWhat do you want to change? [1-18/(o)k] ");
+    printf(_("\nWhat do you want to change? [1-18/(o)k] "));
     fgets(buf, BUFSIZE, stdin);
     if(buf[0] == 'o' || buf[0] == 'O') {
       break;
@@ -337,7 +337,7 @@ void modify_report(struct report_data *data)
     if((num < 1) || (num > 18)) {
       continue;
     }
-    printf("New value: ");
+    printf(_("New value: "));
     fgets(buf, BUFSIZE, stdin);
     pnt = buf;
     while ((*pnt != '\n') && (*pnt != '\0')) pnt++;
@@ -419,7 +419,7 @@ void report()
 	printf("----------------------------------------------------------------------\n");
 	show_with_template(data);
 	printf("----------------------------------------------------------------------\n");
-	printf("\nShould this report be sent? [(s)end/(m)odify/(q)uit] ");
+	printf(_("\nShould this report be sent? [(s)end/(m)odify/(q)uit] "));
 	smq = getchar();
 	while(getchar() != '\n');
 	if(smq == 's' || smq == 'S') {

@@ -1,4 +1,4 @@
-/* $Id: rcfile.h,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: rcfile.h,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #ifndef _RCFILE_H
 #define _RCFILE_H

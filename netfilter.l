@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.4 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: netfilter.l,v 1.5 2002/02/14 21:36:54 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"

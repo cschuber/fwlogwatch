@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: rcfile.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,11 +91,11 @@ void parse_rcfile(char *input)
   /* Evaluation options */
 
   if (strncmp(command, "src_ip_off", 10) == 0) {
-    opt.src_port = 0;
+    opt.src_ip = 0;
     return;
   }
   if (strncmp(command, "dst_ip_off", 10) == 0) {
-    opt.dst_port = 0;
+    opt.dst_ip = 0;
     return;
   }
   if (strncmp(command, "protocol", 8) == 0) {
@@ -239,6 +239,10 @@ void parse_rcfile(char *input)
     opt.mode = REALTIME_RESPONSE;
     return;
   }
+  if (strncmp(command, "ipchains_check", 14) == 0) {
+    opt.ipchains_check = 1;
+    return;
+  }
   if (strncmp(command, "pidfile", 7) == 0) {
     strncpy(opt.pidfile, get_one_parameter(command+8), FILESIZE);
     return;
@@ -255,8 +259,16 @@ void parse_rcfile(char *input)
     opt.response = opt.response | OPT_RESPOND;
     return;
   }
+  if (strncmp(command, "notify_script", 13) == 0) {
+    strncpy(opt.notify_script, get_one_parameter(command+14), FILESIZE);
+    return;
+  }  
+  if (strncmp(command, "respond_script", 14) == 0) {
+    strncpy(opt.respond_script, get_one_parameter(command+15), FILESIZE);
+    return;
+  }  
   if (strncmp(command, "known_host", 10) == 0) {
-    add_known_host(command+11);
+    add_known_host(get_one_parameter(command+11));
     return;
   }
   if (strncmp(command, "server_status", 13) == 0) {
@@ -283,6 +295,10 @@ void parse_rcfile(char *input)
     strncpy(opt.password, get_one_parameter(command+16), PASSWORDSIZE);
     return;
   }
+  if (strncmp(command, "refresh", 7) == 0) {
+    opt.refresh = get_num_parameter(command+8);
+    return;
+  }
 
   /* Show log times mode */
 
@@ -296,7 +312,7 @@ void parse_rcfile(char *input)
   }
 
 
-  printf("Unrecognized option in rcfile: %s", command);
+  printf(_("Unrecognized option in rcfile: %s"), command);
 
   free(command);
 }
@@ -314,7 +330,7 @@ void read_rcfile(char *rcfile)
   }
 
   if (!S_ISREG(info.st_mode)) {
-    fprintf(stderr, "%s is not a regular file, ignoring.\n", rcfile);
+    fprintf(stderr, _("%s is not a regular file, ignoring.\n"), rcfile);
     return;
   }
 

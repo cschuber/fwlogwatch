@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: modes.c,v 1.18 2002/02/14 21:36:53 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,21 +33,34 @@ void mode_summary()
   time_t now;
   struct passwd *gen_user;
 
-  if (opt.verbose)
-    fprintf(stderr, "Opening input file '%s'\n", opt.inputfile);
+  if (opt.std_in) {
+    if (opt.verbose)
+      fprintf(stderr, _("Using stdin as input\n"));
 
-  opt.inputfd = gzopen(opt.inputfile, "rb");
-  if (opt.inputfd == NULL) {
-    fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
-    exit(EXIT_FAILURE);
+    opt.inputfd = stdin;
+  } else {
+    if (opt.verbose)
+      fprintf(stderr, _("Opening input file '%s'\n"), opt.inputfile);
+
+    opt.inputfd = gzopen(opt.inputfile, "rb");
+    if (opt.inputfd == NULL) {
+      fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
   }
 
   if (opt.verbose)
-    fprintf(stderr, "Processing\n");
+    fprintf(stderr, _("Processing\n"));
 
   opt.line = xmalloc(sizeof(struct log_line));
 
-  while (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL) {
+  if (opt.std_in) {
+    retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+  } else {
+    retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+  }
+
+  while (retval) {
     ++linenum;
     hit = PARSE_NO_HIT;
     hit = parse_line(buf, linenum);
@@ -68,27 +81,36 @@ void mode_summary()
       ++exnum;
       break;
     }
+
+    if (opt.std_in) {
+      retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+    } else {
+      retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+    }
   }
 
   if (opt.verbose == 2)
     fprintf(stderr, "\n");
-  if (opt.verbose)
-    fprintf(stderr, "Closing '%s'\n", opt.inputfile);
 
-  retval = gzclose(opt.inputfd);
-  if (retval != 0) {
-    if (retval != Z_ERRNO) {
-      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
-    } else {
-      perror("gzclose");
+  if(!opt.std_in) {
+    if (opt.verbose)
+      fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
+
+    retval = gzclose(opt.inputfd);
+    if (retval != 0) {
+      if (retval != Z_ERRNO) {
+	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
+      } else {
+	perror("gzclose");
+      }
+      exit(EXIT_FAILURE);
     }
-    exit(EXIT_FAILURE);
   }
 
   free(opt.line);
 
   if (opt.verbose)
-    fprintf(stderr, "Sorting data\n");
+    fprintf(stderr, _("Sorting data\n"));
 
   if(first != NULL) {
     opt.sortfield = SORT_START_TIME;
@@ -113,7 +135,7 @@ void mode_summary()
 
   if (opt.use_out) {
     if (opt.verbose)
-      fprintf(stderr, "Opening output file '%s'\n", opt.outputfile);
+      fprintf(stderr, _("Opening output file '%s'\n"), opt.outputfile);
 
     fflush(stdout);
     output = freopen(opt.outputfile, "w", stdout);
@@ -128,7 +150,7 @@ void mode_summary()
 
   now = time(NULL);
   strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
-  printf("Generated %s by ", nows);
+  printf(_("Generated %s by "), nows);
 
   gen_user = getpwuid(getuid());
   if (gen_user != NULL) {
@@ -138,7 +160,7 @@ void mode_summary()
       printf("%s.\n", gen_user->pw_name);
     }
   } else {
-    printf("unknown user.\n");
+    printf(_("an unknown user.\n"));
   }
 
   if (opt.html)
@@ -146,65 +168,73 @@ void mode_summary()
 
   printf("%d ", hitnum);
   if (oldnum > 0) {
-    printf("(and %d older than %d seconds) ", oldnum, opt.recent);
+    printf(_("(and %d older than %d seconds) "), oldnum, opt.recent);
   }
   if (errnum > 0) {
-    printf("(and %d malformed) ", errnum);
+    printf(_("(and %d malformed) "), errnum);
   }
-  printf("of %d entries in the file ", linenum);
-  printf("\"%s\" are packet logs, ", opt.inputfile);
+  printf(_("of %d entries in the file "), linenum);
+  printf(_("\"%s\" are packet logs, "), opt.inputfile);
   retval = list_stats();
-  printf("%d %s unique characteristics.\n", retval, (retval==1)?"has":"have");
+  if(retval == 1) {
+    printf(_("one has unique characteristics.\n"));
+  } else {
+    printf(_("%d have unique characteristics.\n"), retval);
+  }
 
   if (exnum != 0) {
     if (opt.html)
       printf("<br>\n");
 
-    printf("%d entr%s excluded by configuration.\n", exnum, (exnum==1)?"y was":"ies were");
+    if(exnum == 1) {
+      printf(_("One entry was excluded by configuration.\n"));
+    } else {
+      printf(_("%d entries were excluded by configuration.\n"), exnum);
+    }
   }
 
   if (opt.html)
     printf("<br>\n");
 
   if (first_entry[0] != '\0') {
-    printf("First packet log entry: %s, last: %s.\n", first_entry, last_entry);
+    printf(_("First packet log entry: %s, last: %s.\n"), first_entry, last_entry);
   } else {
-    printf("No valid time entries found.\n");
+    printf(_("No valid time entries found.\n"));
   }
 
   if(!opt.loghost) {
     if(opt.html)
       printf("<br>\n");
 
-    printf("All entries were logged by the same host: \"%s\".\n", opt.hostname);
+    printf(_("All entries were logged by the same host: \"%s\".\n"), opt.hostname);
   }
 
   if(!opt.chains) {
     if(opt.html)
       printf("<br>\n");
 
-    printf("All entries are from the same chain: \"%s\".\n", opt.chainlabel);
+    printf(_("All entries are from the same chain: \"%s\".\n"), opt.chainlabel);
   }
 
   if(!opt.branches) {
     if(opt.html)
       printf("<br>\n");
 
-    printf("All entries have the same target: \"%s\".\n", opt.branchname);
+    printf(_("All entries have the same target: \"%s\".\n"), opt.branchname);
   }
 
   if(!opt.ifs) {
     if(opt.html)
       printf("<br>\n");
 
-    printf("All entries are from the same interface: \"%s\".\n", opt.interface);
+    printf(_("All entries are from the same interface: \"%s\".\n"), opt.interface);
   }
 
   if(opt.least > 0) {
     if(opt.html)
       printf("<br>\n");
 
-    printf("Only entries with a count larger than %d are shown.\n", opt.least);
+    printf(_("Only entries with a count larger than %d are shown.\n"), opt.least);
   }
 
   if (opt.html)
@@ -213,7 +243,7 @@ void mode_summary()
     printf("\n");
 
   if(opt.mode == INTERACTIVE_REPORT)
-    printf("Reporting threshold: %d\n\n", opt.threshold);
+    printf(_("Reporting threshold: %d\n\n"), opt.threshold);
 
   show_list();
 
@@ -229,7 +259,7 @@ void mode_summary()
 
   if (opt.use_out) {
     if (opt.verbose)
-      fprintf(stderr, "Closing '%s'\n", opt.outputfile);
+      fprintf(stderr, _("Closing '%s'\n"), opt.outputfile);
 
     retval = fclose(output);
     if (retval == EOF) {
@@ -245,7 +275,7 @@ void check_pidfile()
 
   sbuf = xmalloc(sizeof(struct stat));
   if (stat(opt.pidfile, sbuf) != -1) {
-    fprintf(stderr, "Warning: pidfile exists, another fwlogwatch might be running.\n");
+    fprintf(stderr, _("Warning: pidfile exists, another fwlogwatch might be running.\n"));
   } else {
     if ((errno != ENOENT) && (errno != EACCES)){
       fprintf(stderr, "stat %s: %d, %s\n", opt.pidfile, errno, strerror(errno));
@@ -257,10 +287,14 @@ void check_pidfile()
 
 void mode_rt_response_open()
 {
-  opt.inputfd = fopen(opt.inputfile, "r");
-  if (opt.inputfd == NULL) {
-    syslog(LOG_NOTICE, "fopen %s: %s", opt.inputfile, strerror(errno));
-    log_exit(EXIT_FAILURE);
+  if(opt.std_in) {
+    opt.inputfd = stdin;
+  } else {
+    opt.inputfd = fopen(opt.inputfile, "r");
+    if (opt.inputfd == NULL) {
+      syslog(LOG_NOTICE, "fopen %s: %s", opt.inputfile, strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
   }
 }
 
@@ -268,14 +302,18 @@ void mode_rt_response_restart()
 {
   int retval;
 
-  syslog(LOG_NOTICE, "SIGHUP caught, reopening log file");
+  if(opt.std_in) {
+    syslog(LOG_NOTICE, _("SIGHUP caught, ignoring"));
+  } else {
+    syslog(LOG_NOTICE, _("SIGHUP caught, reopening log file"));
 
-  retval = fclose(opt.inputfd);
-  if(retval == EOF)
-    syslog(LOG_NOTICE, "fclose %s: %s", opt.inputfile, strerror(errno));
+    retval = fclose(opt.inputfd);
+    if(retval == EOF)
+      syslog(LOG_NOTICE, "fclose %s: %s", opt.inputfile, strerror(errno));
 
-  mode_rt_response_open();
-  signal(SIGHUP, mode_rt_response_restart);
+    mode_rt_response_open();
+    signal(SIGHUP, mode_rt_response_restart);
+  }
 }
 
 void mode_rt_response_core()
@@ -283,16 +321,18 @@ void mode_rt_response_core()
   char buf[BUFSIZE];
   int retval;
   struct stat info;
-  unsigned long size;
+  unsigned long size = 0;
   fd_set rfds;
   struct timeval tv;
 
-  retval = fstat(fileno(opt.inputfd), &info);
-  if (retval == -1) {
-    syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-    log_exit(EXIT_FAILURE);
+  if(!opt.std_in) {
+    retval = fstat(fileno(opt.inputfd), &info);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
+    size = info.st_size;
   }
-  size = info.st_size;
 
   while (1) {
     if(opt.status) {
@@ -301,6 +341,10 @@ void mode_rt_response_core()
       tv.tv_sec = 1;
       tv.tv_usec = 0;
       retval = select(opt.sock+1, &rfds, NULL, NULL, &tv);
+      if (retval == -1) {
+	syslog(LOG_NOTICE, "select: %s", strerror(errno));
+	exit(EXIT_FAILURE);
+      }
       if (retval) {
 	handshake();
       }
@@ -308,27 +352,36 @@ void mode_rt_response_core()
       sleep(1);
     }
 
-    retval = fstat(fileno(opt.inputfd), &info);
-    if (retval == -1) {
-      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
-      log_exit(EXIT_FAILURE);
-    }
     remove_old();
-    if(size != info.st_size) {
-      size = info.st_size;
+    if(opt.std_in) {
       while (fgets(buf, BUFSIZE, opt.inputfd)) {
 	opt.line = xmalloc(sizeof(struct log_line));
 	parse_line(buf, 0);
 	free(opt.line);
       }
       look_for_alert();
+    } else {
+      retval = fstat(fileno(opt.inputfd), &info);
+      if (retval == -1) {
+	syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+	log_exit(EXIT_FAILURE);
+      }
+      if(size != info.st_size) {
+	size = info.st_size;
+	while (fgets(buf, BUFSIZE, opt.inputfd)) {
+	  opt.line = xmalloc(sizeof(struct log_line));
+	  parse_line(buf, 0);
+	  free(opt.line);
+	}
+	look_for_alert();
+      }
     }
   }
 }
 
 void mode_rt_response_terminate()
 {
-  syslog(LOG_NOTICE, "SIGTERM caught, cleaning up");
+  syslog(LOG_NOTICE, _("SIGTERM caught, cleaning up"));
   free_hosts();
   if(opt.response & OPT_RESPOND)
     modify_firewall(FW_STOP);
@@ -382,10 +435,12 @@ void mode_rt_response()
     perror("close");
     exit(EXIT_FAILURE);
   }
-  retval = close(0);
-  if (retval == -1) {
-    perror("close");
-    exit(EXIT_FAILURE);
+  if(!opt.std_in) {
+    retval = close(0);
+    if (retval == -1) {
+      perror("close");
+      exit(EXIT_FAILURE);
+    }
   }
   retval = open("/dev/null",O_RDWR);
   if (retval == -1) {
@@ -397,16 +452,18 @@ void mode_rt_response()
     perror("dup");
     exit(EXIT_FAILURE);
   }
-  retval = dup(0);
-  if (retval == -1) {
-    perror("dup");
-    exit(EXIT_FAILURE);
+  if(!opt.std_in) {
+    retval = dup(0);
+    if (retval == -1) {
+      perror("dup");
+      exit(EXIT_FAILURE);
+    }
   }
   openlog("fwlogwatch", LOG_CONS, LOG_DAEMON);
 #else
   openlog("fwlogwatch", LOG_CONS|LOG_PERROR, LOG_DAEMON);
 #endif
-  syslog(LOG_NOTICE, "Starting (pid %d)", getpid());
+  syslog(LOG_NOTICE, _("Starting (pid %d)"), getpid());
 
   signal(SIGTERM, mode_rt_response_terminate);
 
@@ -426,34 +483,43 @@ void mode_rt_response()
   if(opt.status)
     prepare_socket();
 
-  if((opt.format & PARSER_IPCHAINS) != 0)
+  if((opt.ipchains_check == 1) && ((opt.format & PARSER_IPCHAINS) != 0))
     check_for_ipchains();
 
   if((opt.response & OPT_NOTIFY) != 0)
-    check_script_perms(FWLW_NOTIFY);
+    check_script_perms(opt.notify_script);
 
   if((opt.response & OPT_RESPOND) != 0) {
-    check_script_perms(FWLW_RESPOND);
+    check_script_perms(opt.respond_script);
     modify_firewall(FW_START);
   }
 
-  syslog(LOG_NOTICE, "Alert threshold is %d attempt%s", opt.threshold, (opt.threshold == 1)?"":"s");
+  if(opt.threshold == 1) {
+    syslog(LOG_NOTICE, _("Alert threshold is one attempt"));
+  } else {
+    syslog(LOG_NOTICE, _("Alert threshold is %d attempts"), opt.threshold);
+  }
 
-  syslog(LOG_NOTICE, "Events older than %d %s%s are discarded",
-	 (opt.recent < 3600)?opt.recent:opt.recent/3600,
-	 (opt.recent < 3600)?"second":"hour",
-	 ((opt.recent == 1) || (opt.recent == 3600))?"":"s");
+  if(opt.recent < 3600) {
+    syslog(LOG_NOTICE, _("Events older than %d second(s) are discarded"),
+	   opt.recent);
+  } else {
+    syslog(LOG_NOTICE, _("Events older than %d hour(s) are discarded"),
+	   opt.recent/3600);
+  }
 
-  syslog(LOG_NOTICE, "Response mode: log%s%s",
-	 (opt.response & OPT_NOTIFY)?", notify":"",
-	 (opt.response & OPT_RESPOND)?", respond":"");
+  syslog(LOG_NOTICE, _("Response mode: log%s%s"),
+	 (opt.response & OPT_NOTIFY)?_(", notify"):"",
+	 (opt.response & OPT_RESPOND)?_(", respond"):"");
 
   mode_rt_response_open();
 
-  retval = fseek(opt.inputfd, 0, SEEK_END);
-  if (retval == -1) {
-    syslog(LOG_NOTICE, "fseek %s: %s", opt.inputfile, strerror(errno));
-    log_exit(EXIT_FAILURE);
+  if(!stdin) {
+    retval = fseek(opt.inputfd, 0, SEEK_END);
+    if (retval == -1) {
+      syslog(LOG_NOTICE, "fseek %s: %s", opt.inputfile, strerror(errno));
+      log_exit(EXIT_FAILURE);
+    }
   }
 
   signal(SIGHUP, mode_rt_response_restart);
@@ -463,57 +529,79 @@ void mode_rt_response()
 void mode_show_log_times()
 {
   char first_entry[TIMESIZE], last_entry[TIMESIZE], buf[BUFSIZE], month[3];
-  int retval = 0, day, hour, minute, second, linenum = 0;
+  int retval = 0, retval2, day, hour, minute, second, linenum = 0;
   FILE *input;
 
-  input = gzopen(opt.inputfile, "rb");
-  if (input == NULL) {
-    fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
-    exit(EXIT_FAILURE);
+  if (opt.std_in) {
+    opt.inputfd = stdin;
+    input = 0;
+
+    if (opt.verbose)
+      fprintf(stderr, _("Reading standard input\n"));
+  } else {
+    input = gzopen(opt.inputfile, "rb");
+    if (input == NULL) {
+      fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+
+    if (opt.verbose)
+      fprintf(stderr, _("Reading '%s'\n"), opt.inputfile);
   }
 
-  if (opt.verbose)
-    fprintf(stderr, "Reading '%s'\n", opt.inputfile);
+  if (opt.std_in) {
+    retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+  } else {
+    retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+  }
 
-  while ((retval != 5) && (gzgets(input, buf, BUFSIZE) != Z_NULL)) {
+  while ((retval != 5) && (retval2)) {
     retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
     linenum++;
+
+    if (opt.std_in) {
+      retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+    } else {
+      retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+    }
   }
 
   if(retval == 5) {
     snprintf(first_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
 
     retval = 0;
-    while (gzgets(input, buf, BUFSIZE) != Z_NULL) {
+    while (retval2) {
       retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
       linenum++;
+      if (opt.std_in) {
+	retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+      } else {
+	retval2 = (gzgets(input, buf, BUFSIZE) != Z_NULL);
+      }
     }
 
+    printf(_("# of lines : %d\n"), linenum);
+    printf(_("First entry: %s\n"), first_entry);
     if (retval == 5) {
       snprintf(last_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
-
-      printf("# of lines : %d\n", linenum);
-      printf("First entry: %s\n", first_entry);
-      printf("Last entry : %s\n", last_entry);
-    } else {
-      printf("# of lines : %d\n", linenum);
-      printf("First entry: %s\n", first_entry);
+      printf(_("Last entry : %s\n"), last_entry);
     }
-
   } else {
-    printf("No valid time entries found.\n");
+    printf(_("No valid time entries found.\n"));
   }
 
-  if (opt.verbose)
-    fprintf(stderr, "Closing '%s'\n", opt.inputfile);
+  if(!opt.std_in) {
+    if (opt.verbose)
+      fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
 
-  retval = gzclose(input);
-  if (retval != 0) {
-    if (retval != Z_ERRNO) {
-      fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
-    } else {
-      perror("gzclose");
+    retval = gzclose(input);
+    if (retval != 0) {
+      if (retval != Z_ERRNO) {
+	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(input, &retval));
+      } else {
+	perror("gzclose");
+      }
+      exit(EXIT_FAILURE);
     }
-    exit(EXIT_FAILURE);
   }
 }

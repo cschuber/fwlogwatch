@@ -1,4 +1,4 @@
-/* $Id: netfilter.h,v 1.13 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: netfilter.h,v 1.14 2002/02/14 21:36:54 bwess Exp $ */
 
 #ifndef _NETFILTER_H
 #define _NETFILTER_H

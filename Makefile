@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2002/02/14 21:32:47 bwess Exp $
+# $Id: Makefile,v 1.18 2002/02/14 21:36:53 bwess Exp $
 
 # Linux
 CC = gcc
@@ -22,6 +22,11 @@ LIBS = -lcrypt -lz #-lc_p
 #LDFLAGS = #-g
 #LIBS = -lz
 
+# FreeBSD
+#CC = gcc
+#CFLAGS = -pipe -O2 -Wall #-pedantic #-g #-p
+#LDFLAGS = #-g
+#LIBS = -lcrypt -lz
 
 # You might want to add -DSHORT_NAMES to CFLAGS if you only intend to
 # analyze log formats with short list/chain/branch/interface names like
@@ -75,6 +80,10 @@ install-config:
 	$(INSTALL_DATA) fwlogwatch.config /etc/fwlogwatch.config
 	$(INSTALL_DATA) fwlogwatch.template /etc/fwlogwatch.template
 
+install-i18n:
+	cd po; make de
+	$(INSTALL_DATA) po/de.mo /usr/share/locale/de/LC_MESSAGES/fwlogwatch.mo
+
 uninstall:
 	@rm -f /usr/local/sbin/fwlogwatch \
 		/usr/local/sbin/fwlw_notify \
@@ -85,3 +94,4 @@ uninstall:
 
 clean:
 	rm -f *.o *~ *.bak fwlogwatch
+	cd po; make clean

@@ -1,4 +1,4 @@
-/* $Id: output.h,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: output.h,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #ifndef _OUTPUT_H
 #define _OUTPUT_H

@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogwatch.init.redhat,v 1.1 2002/02/14 21:32:47 bwess Exp $
+# $Id: fwlogwatch.init.redhat,v 1.2 2002/02/14 21:36:54 bwess Exp $
 #
 # Init file for fwlogwatch on redhat linux systems
 #

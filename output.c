@@ -1,7 +1,8 @@
-/* $Id: output.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: output.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -97,7 +98,7 @@ void output_resolved(struct conn_data *input)
     separate(SPACE);
 
     if(!opt.html)
-      printf("to ");
+      printf(_("to "));
 
     if(input->end_time != 0) {
       strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->end_time));
@@ -159,8 +160,13 @@ void output_resolved(struct conn_data *input)
     printf("%s", proto);
   }
 
-  if (!opt.html)
-    printf(" packet%s", (input->count == 1) ? "" : "s");
+  if (!opt.html) {
+    if(input->count == 1) {
+      printf(_(" packet"));
+    } else {
+      printf(_(" packets"));
+    }
+  }
 
   if (opt.datalen) {
     separate(SPACE);
@@ -171,14 +177,14 @@ void output_resolved(struct conn_data *input)
     printf("%d", input->datalen);
 
     if (!opt.html)
-      printf(" bytes)");
+      printf(_(" bytes)"));
   }
 
   if (opt.src_ip) {
     separate(SPACE);
 
     if (!opt.html)
-      printf("from ");
+      printf(_("from "));
 
     printf("%s", inet_ntoa(input->shost));
 
@@ -206,7 +212,7 @@ void output_resolved(struct conn_data *input)
     separate(SPACE);
 
     if (!opt.html)
-      printf("port ");
+      printf(_("port "));
 
     printf("%d", input->sport);
 
@@ -217,7 +223,7 @@ void output_resolved(struct conn_data *input)
     separate(SPACE);
 
     if (!opt.html)
-      printf("to ");
+      printf(_("to "));
 
     printf("%s", inet_ntoa(input->dhost));
 
@@ -230,7 +236,7 @@ void output_resolved(struct conn_data *input)
     separate(SPACE);
 
     if (!opt.html)
-      printf("port ");
+      printf(_("port "));
 
     printf("%d", input->dport);
 
@@ -274,14 +280,14 @@ void output_html_header()
   char time[TIMESIZE];
 
   strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-  printf("<html><head><title>fwlogwatch output: %s</title>\n", time);
+  printf(_("<html><head><title>fwlogwatch output: %s</title>\n"), time);
   printf("<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
   printf("<meta http-equiv=\"expires\" content=\"0\">\n");
   printf("</head>\n");
   printf("<body text=\"#%s\" bgcolor=\"#%s\" link=\"#%s\" alink=\"#%s\" vlink=\"#%s\">\n", opt.textcol, opt.bgcol, opt.textcol, opt.textcol, opt.textcol);
   printf("<font face=\"Arial, Helvetica\">");
   printf("<div align=\"center\">\n");
-  printf("<h1>fwlogwatch output</h1>\n");
+  printf(_("<h1>fwlogwatch output</h1>\n"));
 }
 
 void output_html_table()
@@ -291,51 +297,51 @@ void output_html_table()
   printf("<tr bgcolor=\"#%s\" align=\"center\"><td>#</td>", opt.rowcol1);
 
   if(opt.times)
-    printf("<td>start</td><td>end</td>");
+    printf(_("<td>start</td><td>end</td>"));
 
   if(opt.duration)
-    printf("<td>interval</td>");
+    printf(_("<td>interval</td>"));
 
   if(opt.loghost)
-    printf("<td>loghost</td>");
+    printf(_("<td>loghost</td>"));
 
   if(opt.chains)
-    printf("<td>chain</td>");
+    printf(_("<td>chain</td>"));
 
   if(opt.branches)
-    printf("<td>target</td>");
+    printf(_("<td>target</td>"));
 
   if(opt.ifs)
-    printf("<td>interface</td>");
+    printf(_("<td>interface</td>"));
 
   if(opt.proto)
-    printf("<td>proto</td>");
+    printf(_("<td>proto</td>"));
 
   if(opt.datalen)
-    printf("<td>bytes</td>");
+    printf(_("<td>bytes</td>"));
 
   if(opt.src_ip) {
-    printf("<td>source</td>");
+    printf(_("<td>source</td>"));
     if(opt.resolve)
-      printf("<td>hostname</td>");
+      printf(_("<td>hostname</td>"));
     if(opt.whois_lookup)
-      printf("<td>whois information</td>");
+      printf(_("<td>whois information</td>"));
   }
 
   if (opt.src_port)
-    printf("<td>port</td><td>service</td>");
+    printf(_("<td>port</td><td>service</td>"));
 
   if(opt.dst_ip) {
-    printf("<td>destination</td>");
+    printf(_("<td>destination</td>"));
     if(opt.resolve)
-      printf("<td>hostname</td>");
+      printf(_("<td>hostname</td>"));
   }
 
   if (opt.dst_port)
-    printf("<td>port</td><td>service</td>");
+    printf(_("<td>port</td><td>service</td>"));
 
   if (opt.opts)
-    printf("<td>opts</td>");
+    printf(_("<td>opts</td>"));
 
   printf("</tr>\n");
 }
@@ -354,6 +360,7 @@ void output_raw_data(struct conn_data *input)
   this = first;
   while (this != NULL) {
 #ifndef __OpenBSD__
+#ifndef __FreeBSD__
     printf("%d;%ld;%ld;"
 	   "%s;%s;%s;"
 	   "%s;%d;"
@@ -366,6 +373,20 @@ void output_raw_data(struct conn_data *input)
 	   ntohl(input->shost.s_addr), input->sport,
 	   ntohl(input->dhost.s_addr), input->dport,
 	   input->flags);
+#else
+    printf("%d;%ld;%ld;"
+	   "%s;%s;%s;"
+	   "%s;%d;"
+	   "%ld;%d;"
+	   "%ld;%d;"
+	   "%d\n",
+	   input->count, input->start_time, input->end_time,
+	   input->hostname, input->chainlabel, input->branchname,
+	   input->interface, input->protocol,
+	   ntohl(input->shost.s_addr), input->sport,
+	   ntohl(input->dhost.s_addr), input->dport,
+	   input->flags);
+#endif
 #else
     printf("%d;%d;%d;"
 	   "%s;%s;%s;"

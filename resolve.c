@@ -1,8 +1,9 @@
-/* $Id: resolve.c,v 1.17 2002/02/14 21:32:47 bwess Exp $ */
+/* $Id: resolve.c,v 1.18 2002/02/14 21:36:54 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -40,7 +41,7 @@ char * resolve_service(int port, char *proto)
   if (servent != NULL) {
     p = ntohs(servent->s_port);
     if (p != port) {
-      fprintf(stderr, "port mismatch: %d != %d\n", p, port);
+      fprintf(stderr, _("port mismatch: %d != %d\n"), p, port);
     } else {
       return (servent->s_name);
     }
@@ -58,7 +59,7 @@ char * resolve_hostname(struct in_addr ip)
   while(dns != NULL) {
     if (ip.s_addr == dns->ip.s_addr) {
       if(opt.verbose) {
-	fprintf(stderr, "Resolving %s from cache\n", inet_ntoa(ip));
+	fprintf(stderr, _("Resolving %s from cache\n"), inet_ntoa(ip));
       }
       return (dns->fqdn);
     }
@@ -66,7 +67,7 @@ char * resolve_hostname(struct in_addr ip)
   }
 
   if(opt.verbose)
-    fprintf(stderr, "Resolving %s\n", inet_ntoa(ip));
+    fprintf(stderr, _("Resolving %s\n"), inet_ntoa(ip));
 
   reverse = gethostbyaddr((void *)&ip.s_addr, sizeof(struct in_addr), AF_INET);
 
@@ -75,7 +76,7 @@ char * resolve_hostname(struct in_addr ip)
 
   if((reverse != NULL) && (reverse->h_name != NULL)) {
     if (reverse->h_length > sizeof(struct in_addr)) {
-      fprintf(stderr, "Wrong host name size\n");
+      fprintf(stderr, _("Wrong host name size\n"));
       reverse->h_length = sizeof(struct in_addr);
       reverse->h_name[reverse->h_length] = '\0';
     }
@@ -92,17 +93,17 @@ char * resolve_hostname(struct in_addr ip)
     }
 
     if(opt.verbose)
-      fprintf(stderr, "Resolving %s\n", reverse->h_name);
+      fprintf(stderr, _("Resolving %s\n"), reverse->h_name);
 
     forward = gethostbyname(reverse->h_name);
     if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
       if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
 	strncpy(dns->fqdn, reverse->h_name, HOSTLEN);
       } else {
-	snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup: %s]", reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
+	snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
       }
     } else {
-      snprintf(dns->fqdn, HOSTLEN, "%s [forward lookup failed]", reverse->h_name);
+      snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup failed]"), reverse->h_name);
     }
   } else {
     strncpy(dns->fqdn, "-", HOSTLEN);

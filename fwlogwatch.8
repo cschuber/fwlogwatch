@@ -1,4 +1,4 @@
-.\" $Id: fwlogwatch.8,v 1.16 2002/02/14 21:32:47 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.17 2002/02/14 21:36:53 bwess Exp $
 .TH FWLOGWATCH 8 "28 July 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
@@ -35,7 +35,9 @@ Specify an input file (defaults to
 .B /var/log/messages
 ). Relevant entries are automatically detected so combined log files (e.g.
 from a log host) are no problem. Compressed files are supported (except in
-realtime response mode).
+realtime response mode). The '-' sign may be used for reading from standard
+input (stdin). In realtime response mode the file needs to be specified with
+full path since the daemon is rooted in /.
 .IP \-h
 Show the available options.
 .IP \-L\ \fIfile\fR
