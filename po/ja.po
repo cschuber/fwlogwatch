@@ -1,32 +1,35 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: fwlogwatch 0.5.2\n"
+"Project-Id-Version: fwlogwatch 0.5\n"
 "POT-Creation-Date: 2004-03-28 20:54+0200\n"
-"PO-Revision-Date: 2001-11-11 00:20+0100\n"
-"Last-Translator: Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>\n"
+"PO-Revision-Date: 2002-03-06 00:00+0900\n"
+"Last-Translator: Takashi Kobayashi <kobayasi@res.kutc.kansai-u.ac.jp>\n"
 "Language-Team: -\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=Big5\n"
+"Content-Type: text/plain; charset=euc-jp\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../compare.c:134
 msgid "conn_sort_up: wrong mode\n"
-msgstr "conn_sort_up: 模式錯誤\n"
+msgstr "conn_sort_up: 棉啜勻凶乒□玉匹允\n"
 
 #: ../compare.c:230
 #, c-format
 msgid "Error in sort string: '%c', order expected, ignoring.\n"
-msgstr "排序錯誤: '%c', 需要順序,忽略\n"
+msgstr ""
+"末□玄妐儂昫 '%c' 匹棉啜中互丐曰引允﹝賜輛互渝謹今木化中引允﹝拑骰仄引允﹝\n"
 
 #: ../compare.c:244
 #, c-format
 msgid "Error in sort string: '%c', direction expected, ignoring.\n"
-msgstr "排序錯誤: '%c', 需要范圍,忽略\n"
+msgstr ""
+"末□玄妐儂昫 '%c' 匹棉啜中互丐曰引允﹝杅輊互渝謹今木化中引允﹝拑骰仄引允﹝\n"
 
 #: ../compare.c:248
 #, fuzzy
 msgid "Error in sort string, direction expected, ignoring.\n"
-msgstr "排序錯誤: '%c', 需要范圍,忽略\n"
+msgstr ""
+"末□玄妐儂昫 '%c' 匹棉啜中互丐曰引允﹝杅輊互渝謹今木化中引允﹝拑骰仄引允﹝\n"
 
 #: ../compare.c:324 ../compare.c:326 ../modes.c:175 ../modes.c:181
 #: ../modes.c:772 ../modes.c:774 ../output.c:82 ../output.c:89 ../output.c:169
@@ -37,56 +40,60 @@ msgstr ""
 #: ../compare.c:325
 #, c-format
 msgid "Timewarp in log file (%s"
-msgstr "log文件中的時間(%s"
+msgstr "正奶丞伐□皿�素�: 伕弘白央奶伙(%s"
 
 #: ../main.c:25
 #, fuzzy, c-format
 msgid "Usage: %s [options] [input_files]\n"
-msgstr "使用方法: %s [選項] \n"
+msgstr "銀迕芊: %s [左皿扑亦件]\n"
 
 #: ../main.c:26
 #, fuzzy
 msgid "General options:\n"
-msgstr "全局選項: \n"
+msgstr "蟈�旼炊吤炙蚰極蟡�:\n"
 
 #: ../main.c:27
 #, fuzzy
 msgid "  -h           this help\n"
-msgstr "        -h          \t幫助文件\n"
+msgstr "         -h          仇及目伙皿毛刓憎允月\n"
 
 #: ../main.c:28
 #, fuzzy
 msgid "  -L           show time of first and last log entry\n"
-msgstr "        -L <文件>   \t顯示文件中第一次與最後一次登陸紀錄的時間\n"
+msgstr ""
+"         -L <白央奶伙>\n"
+"                     白央奶伙ま及瘉賡午瘉詨及巨件玄伉及凜對毛刓憎允月\n"
 
 #: ../main.c:29
 #, fuzzy
 msgid "  -V           show version and copyright info\n"
-msgstr "        -V          \t顯示版本與版權信息\n"
+msgstr "         -V          田□斥亦件午難綜腺樹扷毛刓憎允月\n"
 
 #: ../main.c:32
 msgid "Global options:\n"
-msgstr "全局選項: \n"
+msgstr "蟈�旼炊吤炙蚰極蟡�:\n"
 
 #: ../main.c:33
 #, fuzzy
 msgid "  -b           show amount of data (sum of total packet lengths)\n"
-msgstr "        -b\t\t顯示數據量 (所有數據包長度的總和)\n"
+msgstr "         -b          犯□正及寧煌(蟈蟲及由弗永玄贏及寧煌)毛刓憎允月\n"
 
 #: ../main.c:34
 #, fuzzy, c-format
 msgid "  -c <file>    specify config file (defaults to %s)\n"
-msgstr "        -c <文件>\t指定配置文件 (缺省 %s) \n"
+msgstr ""
+"         -c <白央奶伙>\n"
+"                     澀爛白央奶伙毛隙爛允月(犯白巧伙玄 %s)\n"
 
 #: ../main.c:35
 #, fuzzy
 msgid "  -D           do not differentiate destination IP addresses\n"
-msgstr "        -D          \t不區分目標IP地址\n"
+msgstr "         -D          偶燮 IP 失玉伊旦毛嗉帎仄卅中\n"
 
 #: ../main.c:36
 #, fuzzy
 msgid "  -d           differentiate destination ports\n"
-msgstr "        -d          \t區分目標端口\n"
+msgstr "         -d          偶燮禾□玄毛嗉帎允月\n"
 
 #: ../main.c:37
 msgid "  -E <format>  select or exclude hosts, ports, chains and targets\n"
@@ -95,7 +102,9 @@ msgstr ""
 #: ../main.c:38
 #, fuzzy
 msgid "  -m <count>   only show entries with at least so many incidents\n"
-msgstr "\t-m <數量> \t只顯示至少有這麼多數量的記錄\n"
+msgstr ""
+"         -m <市它件玄>\n"
+"                     劑卅仁午手聶中儀瘀卞蜃勻凶巨件玄伉毛刓憎允月分仃\n"
 
 #: ../main.c:39
 msgid "  -M <number>  only show this amount of entries\n"
@@ -104,32 +113,36 @@ msgstr ""
 #: ../main.c:40
 #, fuzzy
 msgid "  -N           resolve service names\n"
-msgstr "        -n          \t解析域名\n"
+msgstr "         -N          扔□申旦抩毛荸瑁允月\n"
 
 #: ../main.c:41
 #, fuzzy
 msgid "  -n           resolve host names\n"
-msgstr "        -n          \t解析域名\n"
+msgstr "         -n          石旦玄抩毛荸瑁允月\n"
 
 #: ../main.c:42
 #, fuzzy
 msgid "  -O <order>   define the sort order (see the man page for details)\n"
-msgstr "\t-O <排序方法> \t對輸出進行排序 (具體參見相應文檔\n"
+msgstr ""
+"         -O <賜輛>   岈屯庍尹及賜輛毛爛聒允月\n"
+"                     (擇稱卞勾中化反穴瓦亙失伙矢□斥毛輔寰)\n"
 
 #: ../main.c:43
 #, fuzzy
 msgid "  -P <format>  use only parsers for specific formats\n"
-msgstr "        -P <格式>  \n"
+msgstr ""
+"         -P <白巧□穴永玄>\n"
+"                     隙爛白巧□穴永玄及雖犖及心毛銀丹\n"
 
 #: ../main.c:44
 #, fuzzy
 msgid "  -p           differentiate protocols\n"
-msgstr "        -p          \t區分傳輸協議\n"
+msgstr "         -p          皿伕玄戊伙毛嗉帎允月\n"
 
 #: ../main.c:45
 #, fuzzy
 msgid "  -s           differentiate source ports\n"
-msgstr "        -s          \t區分源端口\n"
+msgstr "         -s          霜耨葭 IP 禾□玄毛嗉帎允月\n"
 
 #: ../main.c:46
 msgid "  -U <title>   set report and status page title and email subject\n"
@@ -138,134 +151,155 @@ msgstr ""
 #: ../main.c:47
 #, fuzzy
 msgid "  -v           verbose, specify twice for more info\n"
-msgstr "        -v          \t處理時顯示信息,使用 -vv 得到更多信息\n"
+msgstr "         -v          暸贏卞允月﹞ㄡ蘸隙爛允月午今日卞暸贏卞卅月\n"
 
 #: ../main.c:48
 #, fuzzy
 msgid "  -y           differentiate TCP options\n"
-msgstr "        -y          \t區分TCP選項\n"
+msgstr "         -y          TCP 左皿扑亦件毛嗉帎允月\n"
 
 #: ../main.c:51
 msgid "Log summary mode (default):\n"
-msgstr ""
+msgstr "伕弘螂煌乒□玉 (犯白巧伙玄):\n"
 
 #: ../main.c:52
 #, fuzzy
 msgid "  -C <email>   carbon copy recipients\n"
-msgstr "        -C <email>  \t轉發地址\n"
+msgstr "         -C <email>  市□示件戊疋□熬耨樊\n"
 
 #: ../main.c:53
 #, fuzzy
 msgid "  -e           show end times\n"
-msgstr "        -t          \t顯示開始與結束時間\n"
+msgstr "         -e          蔽弇凜對毛刓憎允月\n"
 
 #: ../main.c:54
 #, fuzzy
 msgid "  -l <time>    process recent events only (defaults to off)\n"
-msgstr "        -l <時間>   \t只處理當前事件 (缺省為關閉)\n"
+msgstr ""
+"         -l <凜對>\n"
+"                     瘉嗤及奶矛件玄及心毛質咥允月(犯白巧伙玄 off)\n"
 
 #: ../main.c:55
 #, fuzzy
 msgid "  -o <file>    specify output file\n"
-msgstr "        -o <文件>   \t指定輸出文件\n"
+msgstr ""
+"         -o <白央奶伙>\n"
+"                     請恘白央奶伙毛隙爛允月\n"
 
 #: ../main.c:56
 #, fuzzy
 msgid "  -S           do not differentiate source IP addresses\n"
-msgstr "        -S          \t不區分源IP地址\n"
+msgstr "         -S          霜耨葭 IP 失玉伊旦毛嗉帎仄卅中\n"
 
 #: ../main.c:57
+#, fuzzy
 msgid "  -T <email>   send report by email to this address\n"
 msgstr ""
+"         -F <email>\n"
+"                     伊禾□玄及霜耨樊失玉伊旦\n"
 
 #: ../main.c:58
 #, fuzzy
 msgid "  -t           show start times\n"
-msgstr "        -t          \t顯示開始與結束時間\n"
+msgstr "         -t          釩銨凜對毛刓憎允月\n"
 
 #: ../main.c:59
 #, fuzzy
 msgid "  -W           activate whois lookups for source addresses\n"
-msgstr "        -W          \t啟動對源IP地址的whois查詢\n"
+msgstr "         -W          霜耨葭失玉伊旦及 whois 腹綢毛肣躲卞允月\n"
 
 #: ../main.c:60
 #, fuzzy
 msgid "  -w           HTML output\n"
-msgstr "        -w          \t以HTML格式輸出\n"
+msgstr "         -w          HTML 請恘\n"
 
 #: ../main.c:61
 #, fuzzy
 msgid "  -z           show time interval\n"
-msgstr "        -z          \t顯示時間間隔\n"
+msgstr "         -z          凜對棉厥毛刓憎允月\n"
 
 #: ../main.c:64
 #, fuzzy
 msgid "Interactive report mode (summary mode extension):\n"
-msgstr "交互式報告模式:\n"
+msgstr "覆狪伊禾□玄乒□玉:\n"
 
 #: ../main.c:65
 #, fuzzy
 msgid "  -i <count>   interactive mode with report threshold\n"
-msgstr "        -i <數量> \t報告流交互模式\n"
+msgstr ""
+"         -i <市它件玄>\n"
+"                     伊禾□玄允月檭襖毛尥笛仄凶覆狪乒□玉\n"
 
 #: ../main.c:66
 #, fuzzy, c-format
 msgid "  -F <email>   report sender address (defaults to '%s')\n"
-msgstr "        -F <email>  \t發信人地址\n"
+msgstr ""
+"         -F <email>\n"
+"                     伊禾□玄及霜耨樊失玉伊旦\n"
 
 #: ../main.c:67
 #, fuzzy
 msgid "  -T <email>   address of CERT or abuse contact to send report to\n"
-msgstr "\t-T <email> \t收信人地址 (CERT或聯系人)\n"
+msgstr ""
+"         -T <email>  伊禾□玄毛霜尥允月 CERT 引凶反尕懇厙迕覆殺楮溢樊及失玉伊"
+"旦\n"
 
 #: ../main.c:68
 #, fuzzy, c-format
 msgid "  -I <file>    template file for report (defaults to %s)\n"
-msgstr "        -I <文件>   \t報告模板文件\n"
+msgstr ""
+"         -I <白央奶伙>\n"
+"                     伊禾□玄及氾件皿伊□玄白央奶伙\n"
 
 #: ../main.c:71
 msgid "Realtime response mode:\n"
-msgstr "實時回應模式:\n"
+msgstr "撢凜棉殺蠶乒□玉:\n"
 
 #: ../main.c:72
 #, fuzzy
 msgid "  -R           realtime response as daemon (default action: log only)\n"
-msgstr "\t-R \t\t實時回應作為傳輸代理程序 (缺省: 只有運行記錄)\n"
+msgstr ""
+"         -R          daemon午仄化撢凜棉覆殺 (犯白巧伙玄が綜: 伕弘及心)\n"
 
 #: ../main.c:73
 #, fuzzy, c-format
 msgid "  -a <count>   alert threshold (defaults to %d entries)\n"
-msgstr "\t-a <數量>   \t警告流 (缺省 %d 記錄)\n"
+msgstr ""
+"         -a <市它件玄>\n"
+"                     煞屢及檭襖 (犯白巧伙玄 %d 巨件玄伉)\n"
 
 #: ../main.c:74
 #, fuzzy, c-format
 msgid "  -l <time>    forget events this old (defaults to %d hours)\n"
-msgstr "\t-l <時間>   \t忽略此時間前舊事件 (缺省: %d小時)\n"
+msgstr ""
+"         -l <time>   仇木方曰衙中奶矛件玄毛侉木月 (犯白巧伙玄 %d 凜棉)\n"
 
 #: ../main.c:75
 #, fuzzy
 msgid "  -k <IP/net>  add this IP address or net to the list of known hosts\n"
-msgstr "\t-k <IP/網絡> \t將此IP地址加入到已知主機列表中\n"
+msgstr ""
+"         -k <IP/net> 湃襞及石旦玄及伉旦玄卞仇及 IP 失玉伊旦引凶反 net 毛馨笛"
+"允月\n"
 
 #: ../main.c:76
 #, fuzzy
 msgid "  -A           invoke notification script if threshold is reached\n"
-msgstr "\t-A\t\t如果有流進入啟動通知文本\n"
+msgstr "         -A          檭襖卞瓊仄凶凜卞騷襞旦弁伉皿玄毛粟が允月\n"
 
 #: ../main.c:77
 #, fuzzy
 msgid "  -B           invoke response action script (e.g. block host)\n"
-msgstr "\t-B\t    \t啟動回應文本 (比如 切斷主機與外部聯系)\n"
+msgstr ""
+"         -B          殺蠶旦弁伉皿玄毛粟が允月 (拺尹壬石旦玄毛皮伕永弁允月\n"
 
 #: ../main.c:78
 #, fuzzy
 msgid "  -X <port>    activate internal status information web server\n"
-msgstr "\t-X          \t啟動內部狀態信息web服務器\n"
+msgstr "         -X          ま朿橇謫及樹扷及它尼皮扔□田毛肣躲卞允月\n"
 
 #: ../main.c:104
-#, fuzzy
 msgid "You can contact the author at <bw@inside-security.de>."
-msgstr "請使用以下地址與作者聯系實際<bw@inside-security.de>."
+msgstr ""
 
 #: ../main.c:106
 msgid "Compile-time options of this version:"
@@ -302,7 +336,7 @@ msgstr ""
 
 #: ../main.c:288 ../main.c:305 ../main.c:314 ../main.c:475
 msgid "Exiting\n"
-msgstr "退出\n"
+msgstr "蔽弇\n"
 
 #: ../main.c:304
 #, c-format
@@ -316,16 +350,16 @@ msgstr ""
 
 #: ../modes.c:99
 msgid "Using stdin as input\n"
-msgstr "使用標準輸入\n"
+msgstr "ェ恘卞伓賞ェ恘毛銀中引允\n"
 
 #: ../modes.c:105
 #, c-format
 msgid "Opening input file '%s'\n"
-msgstr "打開輸入文件 '%s'\n"
+msgstr "ェ恘白央奶伙 '%s' 毛釩中化中引允\n"
 
 #: ../modes.c:123
 msgid "Processing\n"
-msgstr "處理\n"
+msgstr "質咥醱\n"
 
 #: ../modes.c:130
 msgid "Unrecognized entries or tokens can be submitted at\n"
@@ -334,21 +368,21 @@ msgstr ""
 #: ../modes.c:138 ../modes.c:361 ../modes.c:741 ../rcfile.c:389
 #, c-format
 msgid "Closing '%s'\n"
-msgstr "關閉 '&s'\n"
+msgstr "'%s' 毛岉元化中引允\n"
 
 #: ../modes.c:167
 msgid "Sorting data\n"
-msgstr "數據排序\n"
+msgstr "犯□正及岈屯庍尹醱\n"
 
 #: ../modes.c:193
 #, c-format
 msgid "Opening output file '%s'\n"
-msgstr "打開輸出文件 '%s'\n"
+msgstr "請恘白央奶伙 '%s' 毛釩中化中引允\n"
 
 #: ../modes.c:204 ../report.c:210
 #, fuzzy
 msgid "Sending\n"
-msgstr "發送...\n"
+msgstr "霜耨醱...\n"
 
 #: ../modes.c:227 ../net.c:350 ../net.c:353
 msgid "%A %B %d %H:%M:%S %Z %Y"
@@ -357,26 +391,26 @@ msgstr ""
 #: ../modes.c:228
 #, c-format
 msgid "Generated %s by "
-msgstr "生成 %s 由"
+msgstr "綜嶽ゥ: %s, 綜嶽樊: "
 
 #: ../modes.c:238
 msgid "an unknown user.\n"
-msgstr "不明使用者\n"
+msgstr "an unknown user.\n"
 
 #: ../modes.c:246
 #, c-format
 msgid "(and %d older than %d seconds) "
-msgstr "(並且 &d 比 %d 老) "
+msgstr "(and %d older than %d seconds) "
 
 #: ../modes.c:249
 #, c-format
 msgid "(and %d malformed) "
-msgstr "(並且 %d 有錯誤)"
+msgstr "(and %d malformed) "
 
 #: ../modes.c:252
 #, fuzzy, c-format
 msgid "of %d entries in the file \"%s\" are packet logs, "
-msgstr "\"%s\" 是數據包記錄"
+msgstr "of %d entries in the file "
 
 #: ../modes.c:254
 #, c-format
@@ -384,66 +418,66 @@ msgid "of %d entries in standard input are packet logs, "
 msgstr ""
 
 #: ../modes.c:256
-#, c-format
+#, fuzzy, c-format
 msgid "of %d entries in %d input files are packet logs, "
-msgstr ""
+msgstr "of %d entries in the file "
 
 #: ../modes.c:260
 msgid "one has unique characteristics.\n"
-msgstr "一個有特殊形式\n"
+msgstr "one has unique characteristics.\n"
 
 #: ../modes.c:262
 #, c-format
 msgid "%d have unique characteristics.\n"
-msgstr "%d有特殊形式\n"
+msgstr "%d have unique characteristics.\n"
 
 #: ../modes.c:270
 msgid "One entry was excluded by configuration.\n"
-msgstr "一條記錄在配置時被刪除\n"
+msgstr "ㄠ勾及巨件玄伉互澀爛卞方勻化輪陸今木引仄凶﹝\n"
 
 #: ../modes.c:272
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
-msgstr "%d記錄在配置時被刪除\n"
+msgstr "%d 巨件玄伉互澀爛卞方勻化輪陸今木引仄凶﹝\n"
 
 #: ../modes.c:280
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
-msgstr "第一條數據包登陸記錄: %s, 最後一條: %s.\n"
+msgstr "瘉賡及由弗永玄伕弘巨件玄伉: %s, 瘉詨: %s\n"
 
 #: ../modes.c:282 ../modes.c:770
 msgid "No valid time entries found.\n"
-msgstr "沒找到有效時間記錄\n"
+msgstr "肣躲卅凜對巨件玄伉互葦勾井曰引六氏匹仄凶﹝\n"
 
 #: ../modes.c:289
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
-msgstr "所有的記錄都是從同一個主機登陸的: \"%s\".\n"
+msgstr "允屯化及巨件玄伉互き元石旦玄 \"%s\" 匹伕弘今木引仄凶﹝\n"
 
 #: ../modes.c:296
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
-msgstr "所有的記錄都來自同一個鏈: \"%s\".\n"
+msgstr "允屯化及巨件玄伉互き元民尼奶件 \"%s\" 井日侳化中引允﹝\n"
 
 #: ../modes.c:303
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
-msgstr "所有的記錄都有同樣的目標:  \"%s\".\n"
+msgstr "允屯化及巨件玄伉互き元正□必永玄 \"%s\" 毛儅勻化中引允﹝\n"
 
 #: ../modes.c:310
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
-msgstr "所有的記錄都來自同一個界面: \"%s\".\n"
+msgstr "允屯化及巨件玄伉互き元奶件正□白尼奶旦 \"%s\" 井日侳化中引允﹝\n"
 
 #: ../modes.c:317
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
-msgstr "只顯示大于%d的記錄.\n"
+msgstr "%d 動曉及莢醒及巨件玄伉分仃毛刓憎仄化中引允﹝\n"
 
 #: ../modes.c:324
 #, fuzzy, c-format
 msgid "Only the top %d entries are shown.\n"
-msgstr "只顯示大于%d的記錄.\n"
+msgstr "%d 動曉及莢醒及巨件玄伉分仃毛刓憎仄化中引允﹝\n"
 
 #: ../modes.c:333
 #, c-format
@@ -451,22 +485,24 @@ msgid ""
 "Reporting threshold: %d\n"
 "\n"
 msgstr ""
-"報告流: %d\n"
+"伊禾□玄及檭襖: %d\n"
 "\n"
 
 #: ../modes.c:381
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
-msgstr "警告: 存在pid文件,可能另一個fwlogwatch在運行.\n"
+msgstr ""
+"Warning: pidfile 互繡箕仄化中引允﹝職及 fwlogwatch 互が中化中月井手襞木引六"
+"氏﹝\n"
 
 #: ../modes.c:395
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
-msgstr "捕捉到SIGHUP, 重新打開log文件"
+msgstr "SIGHUP 毛熬仃潸曰引仄凶及匹﹞伕弘白央奶伙毛瘋太釩中化中引允"
 
 #: ../modes.c:397
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
-msgstr "捕捉到SIGHUP, 重新打開log文件"
+msgstr "SIGHUP 毛熬仃潸曰引仄凶及匹﹞伕弘白央奶伙毛瘋太釩中化中引允"
 
 #: ../modes.c:420
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
@@ -475,16 +511,16 @@ msgstr ""
 #: ../modes.c:422
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
-msgstr "捕捉到SIGHUP, 重新打開log文件"
+msgstr "SIGHUP 毛熬仃潸曰引仄凶及匹﹞伕弘白央奶伙毛瘋太釩中化中引允"
 
 #: ../modes.c:494
 msgid "SIGTERM caught, cleaning up"
-msgstr "捕捉到SIGTERM, 清除內存"
+msgstr "SIGTERM 毛熬仃潸曰引仄凶及匹﹞鄹輪仄化中引允"
 
 #: ../modes.c:576
 #, c-format
 msgid "Starting (pid %d)"
-msgstr "開始 (pid %d)"
+msgstr "釩銨仄化中引允 (pid %d)"
 
 #: ../modes.c:616
 msgid "User to run as was not found"
@@ -502,64 +538,64 @@ msgstr ""
 
 #: ../modes.c:637
 msgid "Alert threshold is one attempt"
-msgstr "警告threshold是一次嘗試"
+msgstr "Alert threshold is one attempt"
 
 #: ../modes.c:639
 #, c-format
 msgid "Alert threshold is %d attempts"
-msgstr "警告threshold是%d次嘗試"
+msgstr "Alert threshold is %d attempts"
 
 #: ../modes.c:643
 #, c-format
 msgid "Events older than %d second(s) are discarded"
-msgstr "在%d秒之前的事件將不受理"
+msgstr "%d 卍方曰衙中奶矛件玄互г滋今木引允"
 
 #: ../modes.c:646
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
-msgstr "在%d小時之前的事件將不受理"
+msgstr "%d 凜棉方曰衙中奶矛件玄互г滋今木引允"
 
 #: ../modes.c:650
 #, fuzzy, c-format
 msgid "Response mode: Log%s%s"
-msgstr "回應模式: log%s%s"
+msgstr "殺蠶乒□玉: log%s%s"
 
 #: ../modes.c:651 ../net.c:359
 msgid ", notify"
-msgstr "通知"
+msgstr ", 騷襞"
 
 #: ../modes.c:652 ../net.c:359
 msgid ", respond"
-msgstr ". 回答"
+msgstr ", 殺蠶"
 
 #: ../modes.c:682
 msgid "Reading standard input\n"
-msgstr "讀取標準輸入\n"
+msgstr "伓賞ェ恘毛づ心午勻化中引允\n"
 
 #: ../modes.c:700
 #, c-format
 msgid "Reading '%s'\n"
-msgstr "讀 '%s'\n"
+msgstr "'%s' 毛づ心午勻化中引允\n"
 
 #: ../modes.c:767
 #, fuzzy, c-format
 msgid "Number of files: %d\n"
-msgstr "嘗試登陸的次數: %s\n"
+msgstr "Number of logged attempts: %s\n"
 
 #: ../modes.c:768
 #, fuzzy, c-format
 msgid "Number of lines: %d\n"
-msgstr "行數 : %d\n"
+msgstr "墊醒: %d\n"
 
 #: ../modes.c:773
 #, c-format
 msgid "First entry: %s\n"
-msgstr "第一條記錄:  %s\n"
+msgstr "瘉賡及巨件玄伉: %s\n"
 
 #: ../modes.c:775
 #, c-format
 msgid "Last entry : %s\n"
-msgstr "最後一條記錄 : %s\n"
+msgstr "瘉詨及巨件玄伉: %s\n"
 
 #: ../modes.c:777
 #, c-format
@@ -569,16 +605,16 @@ msgstr ""
 #: ../net.c:124 ../net.c:126
 #, c-format
 msgid "Listening on %s port %i"
-msgstr "列出在 &s 上的端口 %i"
+msgstr "%s 曉及禾□玄 %i 匹謹切熬仃醱匹允"
 
 #: ../net.c:158
 msgid "decode_base64: input string incomplete"
-msgstr "decode_base64: 輸入字符串不完整"
+msgstr "decode_base64: ェ恘妐儂昫互尕敦蟈匹允"
 
 #: ../net.c:165
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
-msgstr "decode_base64: 在輸入字符串有非法字符  '%c'"
+msgstr "decode_base64: 尕懇卅妐儂 '%c' 互ェ恘妐儂昫卞殖引木化中引允"
 
 #: ../net.c:200
 msgid "count"
@@ -595,7 +631,7 @@ msgstr ""
 #: ../net.c:205
 #, fuzzy
 msgid "bytes"
-msgstr "字節)"
+msgstr " (%d 田奶玄)"
 
 #: ../net.c:206
 msgid "source"
@@ -604,43 +640,38 @@ msgstr ""
 #: ../net.c:208 ../net.c:217
 #, fuzzy
 msgid "hostname"
-msgstr "<td>主機名</td>"
+msgstr "<td>石旦玄抩</td>"
 
 #: ../net.c:210 ../net.c:220
 #, fuzzy
 msgid "port"
-msgstr "端口"
+msgstr " port %d"
 
 #: ../net.c:212 ../net.c:222
 #, fuzzy
 msgid "service"
-msgstr "<td>源</td>"
+msgstr "<td>扔□申旦</td>"
 
 #: ../net.c:215
 #, fuzzy
 msgid "destination"
-msgstr "<td>目標</td>"
+msgstr "<td>偶燮</td>"
 
 #: ../net.c:225
 msgid "opts"
 msgstr ""
 
 #: ../net.c:226
-#, fuzzy
 msgid "time remaining"
-msgstr "<td>剩余時間</td></tr>\n"
+msgstr ""
 
 #: ../net.c:227
 msgid "action"
 msgstr ""
 
 #: ../net.c:279 ../net.c:281 ../net.c:346
-#, fuzzy
 msgid "Information"
 msgstr ""
-"\n"
-"</div>\n"
-"<h2>基本信息</h2>\n"
 
 #: ../net.c:285 ../net.c:287 ../net.c:384
 msgid "Options"
@@ -649,12 +680,12 @@ msgstr ""
 #: ../net.c:291 ../net.c:293 ../net.c:412
 #, fuzzy
 msgid "Packet cache"
-msgstr "<h2> 數據緩存</h2>\n"
+msgstr "<h2>由弗永玄平乓永扑亙</h2>\n"
 
 #: ../net.c:297 ../net.c:299 ../net.c:472
 #, fuzzy
 msgid "Host status"
-msgstr "<h2>主機狀態</h2>\n"
+msgstr "<h2>石旦玄橇謫</h2>\n"
 
 #: ../net.c:302
 msgid "Reload"
@@ -679,7 +710,7 @@ msgstr ""
 #: ../net.c:360
 #, fuzzy
 msgid "Response mode"
-msgstr "回應模式: log%s%s"
+msgstr "殺蠶乒□玉: log%s%s"
 
 #: ../net.c:362
 msgid "Lines seen"
@@ -694,14 +725,12 @@ msgid "Old/excluded/malformed"
 msgstr ""
 
 #: ../net.c:371
-#, fuzzy
 msgid "Entries in packet cache"
-msgstr "<h2> 數據緩存</h2>\n"
+msgstr ""
 
 #: ../net.c:378
-#, fuzzy
 msgid "Entries in host status"
-msgstr "<h2>主機狀態</h2>\n"
+msgstr ""
 
 #: ../net.c:386
 msgid "Parameter"
@@ -722,7 +751,7 @@ msgstr ""
 #: ../net.c:394
 #, fuzzy
 msgid "Alert threshold"
-msgstr "警告threshold是一次嘗試"
+msgstr "Alert threshold is one attempt"
 
 #: ../net.c:396
 msgid "Discard timeout"
@@ -746,36 +775,36 @@ msgstr ""
 
 #: ../net.c:498 ../net.c:515 ../net.c:517 ../net.c:519
 msgid "<td>any</td>"
-msgstr "<td>任何</td>"
+msgstr "<td>窒匹手</td>"
 
 #: ../net.c:510
 #, fuzzy
 msgid "<td>(known host)</td>"
-msgstr "<td>-</td><td>%s/%d (已知主機/網絡)</td>"
+msgstr "<td>伕弘石旦玄</td>"
 
 #: ../net.c:512
 #, fuzzy
 msgid "<td>(known net)</td>"
-msgstr "<td>-</td><td>%s/%d (已知主機/網絡)</td>"
+msgstr "<td>禾□玄</td>"
 
 #: ../net.c:610 ../net.c:613
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
-msgstr "拒絕來自 %s 端口 %i 的訪問"
+msgstr "袱第今木化中卅中 ip %s 禾□玄 %i 井日及 Rejected 濤糧"
 
 #: ../net.c:624 ../net.c:626
 #, c-format
 msgid "Connect from %s port %i"
-msgstr "來自 %s 端口  %i 的訪問"
+msgstr "%s 禾□玄 %i 井日及濤糧"
 
 #: ../net.c:690
 msgid "Authorization failed"
-msgstr "檢驗錯誤"
+msgstr "ロ據撩л"
 
 #: ../net.c:693
 #, fuzzy
 msgid "Authorization required"
-msgstr "檢驗錯誤"
+msgstr "ロ據撩л"
 
 #: ../net.c:770
 msgid "Bad request"
@@ -796,125 +825,124 @@ msgstr ""
 
 #: ../net.c:790
 msgid "Connection closed"
-msgstr "關閉聯接"
+msgstr "濤糧互岉元引仄凶"
 
 #: ../output.c:176
-#, fuzzy
 msgid " to "
-msgstr "到"
+msgstr " to "
 
 #: ../output.c:231
 msgid " packet"
-msgstr "數據包"
+msgstr " 由弗永玄 "
 
 #: ../output.c:233
 msgid " packets"
-msgstr "數據包"
+msgstr " 由弗永玄"
 
 #: ../output.c:237
-#, fuzzy, c-format
+#, c-format
 msgid " (%d bytes)"
-msgstr "字節)"
+msgstr " (%d 田奶玄)"
 
 #: ../output.c:240
-#, fuzzy, c-format
+#, c-format
 msgid " from %s"
-msgstr "從"
+msgstr " from %s"
 
 #: ../output.c:256 ../output.c:269
-#, fuzzy, c-format
+#, c-format
 msgid " port %d"
-msgstr "端口"
+msgstr " port %d"
 
 #: ../output.c:262
-#, fuzzy, c-format
+#, c-format
 msgid " to %s"
-msgstr "到"
+msgstr " to %s"
 
 #: ../output.c:289
 #, fuzzy
 msgid "<th>start</th>"
-msgstr "<td>目標</td>"
+msgstr "<td>釩銨</td>"
 
 #: ../output.c:292
 #, fuzzy
 msgid "<th>end</th>"
-msgstr "<td>任何</td>"
+msgstr "<td>蔽弇</td>"
 
 #: ../output.c:295
 #, fuzzy
 msgid "<th>interval</th>"
-msgstr "<td>間距</td>"
+msgstr "<td>棉厥</td>"
 
 #: ../output.c:298
 #, fuzzy
 msgid "<th>loghost</th>"
-msgstr "<td>log主機</td>"
+msgstr "<td>伕弘石旦玄</td>"
 
 #: ../output.c:301
 #, fuzzy
 msgid "<th>chain</th>"
-msgstr "<td>chain</td>"
+msgstr "<td>民尼奶件</td>"
 
 #: ../output.c:304
 #, fuzzy
 msgid "<th>target</th>"
-msgstr "<td>目標</td>"
+msgstr "<td>杴伓</td>"
 
 #: ../output.c:307
 #, fuzzy
 msgid "<th>interface</th>"
-msgstr "<td>界面</td>"
+msgstr "<td>奶件正□白尼奶旦</td>"
 
 #: ../output.c:310
 #, fuzzy
 msgid "<th>proto</th>"
-msgstr "<td>傳輸協議</td>"
+msgstr "<td>皿伕玄戊伙</td>"
 
 #: ../output.c:313
 #, fuzzy
 msgid "<th>bytes</th>"
-msgstr "<td>字節</td>"
+msgstr "<td>田奶玄</td>"
 
 #: ../output.c:316
 #, fuzzy
 msgid "<th>source</th>"
-msgstr "<td>源</td>"
+msgstr "<td>霜耨葭</td>"
 
 #: ../output.c:318 ../output.c:332
 #, fuzzy
 msgid "<th>hostname</th>"
-msgstr "<td>主機名</td>"
+msgstr "<td>石旦玄抩</td>"
 
 #: ../output.c:320
 #, fuzzy
 msgid "<th>whois information</th>"
-msgstr "<td>whois信息</td>"
+msgstr "<td>whois 樹扷</td>"
 
 #: ../output.c:324 ../output.c:336
 #, fuzzy
 msgid "<th>port</th>"
-msgstr "<td>傳輸協議</td>"
+msgstr "<td>禾□玄</td>"
 
 #: ../output.c:326 ../output.c:338
 #, fuzzy
 msgid "<th>service</th>"
-msgstr "<td>源</td>"
+msgstr "<td>扔□申旦</td>"
 
 #: ../output.c:330
 #, fuzzy
 msgid "<th>destination</th>"
-msgstr "<td>目標</td>"
+msgstr "<td>偶燮</td>"
 
 #: ../output.c:342
 #, fuzzy
 msgid "<th>opts</th>"
-msgstr "<td>選項</td>"
+msgstr "<td>opts</td>"
 
 #: ../parser.c:272
 #, c-format
 msgid "Unknown parser: '%c'.\n"
-msgstr "不知parser: '%c'.\n"
+msgstr "Unknown parser: '%c'.\n"
 
 #: ../rcfile.c:57
 #, c-format
@@ -929,105 +957,105 @@ msgstr ""
 #: ../rcfile.c:346
 #, fuzzy, c-format
 msgid "Unrecognized option in configuration file '%s' line %d\n"
-msgstr "配置文件中不明選項: %s"
+msgstr "Unrecognized option in rcfile: %s"
 
 #: ../rcfile.c:367
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
-msgstr "%s 不是標準文件, 忽略.\n"
+msgstr "%s 反騷橘及白央奶伙匹反丐曰引六氏﹝拑骰仄引允﹝\n"
 
 #: ../rcfile.c:375
 #, fuzzy, c-format
 msgid "Opening configuration file '%s'\n"
-msgstr "打開輸入文件 '%s'\n"
+msgstr "ェ恘白央奶伙 '%s' 毛釩中化中引允\n"
 
 #: ../report.c:49
 #, c-format
 msgid "Offending IP address:      %s\n"
-msgstr "進攻IP地址:\t%s\n"
+msgstr "Offending IP address:      %s\n"
 
 #: ../report.c:54
 #, c-format
 msgid "Offending IP name:         %s\n"
-msgstr "進攻IP地址名:\t%s\n"
+msgstr "Offending IP name:         %s\n"
 
 #: ../report.c:59
 #, c-format
 msgid "Target IP address:         %s\n"
-msgstr "目標IP地址:\t%s\n"
+msgstr "Target IP address:         %s\n"
 
 #: ../report.c:64
 #, c-format
 msgid "Target IP name:            %s\n"
-msgstr "目標IP地址名:\t%s\n"
+msgstr "Target IP name:            %s\n"
 
 #: ../report.c:69
 #, c-format
 msgid "Number of logged attempts: %s\n"
-msgstr "嘗試登陸的次數: %s\n"
+msgstr "Number of logged attempts: %s\n"
 
 #: ../report.c:74
 #, c-format
 msgid "Start time:                %s\n"
-msgstr "開始時間:\t\t%s\n"
+msgstr "Start time:                %s\n"
 
 #: ../report.c:80
 #, c-format
 msgid "End time:                  %s\n"
-msgstr "結束時間:               %s\n"
+msgstr "End time:                  %s\n"
 
 #: ../report.c:86
 #, c-format
 msgid "Timezone:                  %s\n"
-msgstr "時間區:\t\t\t %s\n"
+msgstr "Timezone:                  %s\n"
 
 #: ../report.c:92
 #, c-format
 msgid "Duration:                  %s\n"
-msgstr "持續:\t\t\t%s\n"
+msgstr "Duration:                  %s\n"
 
 #: ../report.c:98
 #, c-format
 msgid "Protocol:                  %s\n"
-msgstr "傳輸協議:\t\t %s\n"
+msgstr "Protocol:                  %s\n"
 
 #: ../report.c:104
 #, c-format
 msgid "Source port:               %s\n"
-msgstr "源端口:\t\t\t%s\n"
+msgstr "Source port:               %s\n"
 
 #: ../report.c:110
 #, c-format
 msgid "Destination port:          %s\n"
-msgstr "目標端口:                 %s\n"
+msgstr "Destination port:          %s\n"
 
 #: ../report.c:116
 #, c-format
 msgid "TCP options:               %s\n"
-msgstr "TCP選項:               %s\n"
+msgstr "TCP options:               %s\n"
 
 #: ../report.c:122
 #, c-format
 msgid "Tracking number:           %s\n"
-msgstr "Tracking數:           %s\n"
+msgstr "Tracking number:           %s\n"
 
 #: ../report.c:231
 #, c-format
 msgid "Incident report %s-%s"
-msgstr "事件報告 %s-%s"
+msgstr "奶件扑犯件玄伊禾□玄 %s-%s"
 
 #: ../report.c:299 ../report.c:314
 #, c-format
 msgid "%d (unknown)"
-msgstr ""
+msgstr "%d (尕抸)"
 
 #: ../report.c:325
 msgid "no SYNs"
-msgstr "沒有SYNs"
+msgstr "SYN 卅仄"
 
 #: ../report.c:327
 msgid "SYNs only"
-msgstr "只有SYNs"
+msgstr "SYN 及心"
 
 #: ../report.c:347
 msgid ""
@@ -1035,11 +1063,11 @@ msgid ""
 "What do you want to change? [1-18/(o)k] "
 msgstr ""
 "\n"
-"您想修改什麼? [1-18/(o)k] "
+"窒毛庍凳仄凶中匹允井〝 [1-18/(o)k] "
 
 #: ../report.c:356
 msgid "New value: "
-msgstr "新值:"
+msgstr "蕙仄中襖: "
 
 #: ../report.c:438
 msgid ""
@@ -1047,69 +1075,71 @@ msgid ""
 "Should this report be sent? [(s)end/(m)odify/(q)uit] "
 msgstr ""
 "\n"
-"是否傳送這份報告? [(s)end/(m)odify/(q)uit] "
+"仇及伊禾□玄毛霜耨仄化手方欠仄中匹仄斤丹井〝 [(s)end/(m)odify/(q)uit] "
 
 #: ../resolve.c:45
 #, c-format
 msgid "port mismatch: %d != %d\n"
-msgstr "端口不匹配: %d != %d\n"
+msgstr "禾□玄互域譙仄引六氏: %d != %d\n"
 
 #: ../resolve.c:63
 #, c-format
 msgid "Resolving %s from cache\n"
-msgstr "緩存中解析%s\n"
+msgstr "平乓永扑亙井日 %s 毛荸瑁仄化中引允\n"
 
 #: ../resolve.c:71 ../resolve.c:97
 #, c-format
 msgid "Resolving %s\n"
-msgstr "解析 %s\n"
+msgstr "%s 毛荸瑁仄化中引允\n"
 
 #: ../resolve.c:80
 msgid "Wrong host name size\n"
-msgstr "主機名長度錯誤\n"
+msgstr "棉啜勻凶石旦玄抩及扔奶朮匹允\n"
 
 #: ../resolve.c:104
 #, c-format
 msgid "%s [forward lookup: %s]"
-msgstr "%s [向前搜索: %s]"
+msgstr "%s [蟆輊五腹綢: %s]"
 
 #: ../resolve.c:107
 #, c-format
 msgid "%s [forward lookup failed]"
-msgstr "%s [向前搜索失敗]"
+msgstr "%s [蟆輊五腹綢撩л]"
 
 #: ../response.c:59
 msgid "One logging ipchains firewall rule defined"
-msgstr "一條登陸ipchains防火牆規定已定義"
+msgstr "ㄠ勾及伕弘今木月 ipchains 白央奶失它巧□伙伙□伙互爛聒今木化中引允"
 
 #: ../response.c:61
 #, c-format
 msgid "%u logging ipchains firewall rules defined"
-msgstr "條登陸ipchains防火牆規定已定義"
+msgstr "%u 及伕弘今木月 ipchains 白央奶失它巧□伙伙□伙互爛聒今木化中引允"
 
 #: ../response.c:64
 msgid "No logging ipchains firewall rules defined, format was requested"
-msgstr "沒有定義登陸ipchains防火牆規定, 需要格式"
+msgstr ""
+"伕弘今木月 ipchains 白央奶失它巧□伙伙□伙互爛聒今木化中引六氏\n"
+"及匹﹞溥摯互邰菲今木引仄凶"
 
 #: ../response.c:85
 #, c-format
 msgid "%s is group/world writable"
-msgstr "%s 可被group/world修改"
+msgstr "%s 卞弘伙□皿/伐□伙玉及踏五慇心腺蜃互丐曰引允"
 
 #: ../response.c:171
 #, c-format
 msgid "Deleting packet cache entry (%s)"
-msgstr "刪除數據包緩存中的內容"
+msgstr "由弗永玄平乓永扑亙巨件玄伉 (%s) 毛綽輪仄化中引允"
 
 #: ../response.c:205
 #, c-format
 msgid "Deleting host status entry (%s)"
-msgstr "刪除主機狀態中的內容"
+msgstr "石旦玄橇謫巨件玄伉 (%s) 毛綽輪仄化中引允"
 
 #: ../response.c:268
 #, c-format
 msgid "ALERT: %d attempts from %s"
-msgstr "警告: 來自 %s 的 %d 嘗試"
+msgstr "ALERT: %d attempts from %s"
 
 #: ../utils.c:53
 msgid ""
@@ -1117,20 +1147,20 @@ msgid ""
 "Memory allocation error, exiting.\n"
 msgstr ""
 "\n"
-"尋找內存地址錯誤, 退出.\n"
+"丟乒伉□割忡巨仿□匹允及匹﹞蔽弇仄引允﹝\n"
 
 #: ../utils.c:68
 msgid "Exiting"
-msgstr "退出"
+msgstr "蔽弇仄化中引允"
 
 #: ../utils.c:77
 msgid "Not executing buffer containing format string"
-msgstr "帶有格式字符緩存將不被執行"
+msgstr "Not executing buffer containing format string"
 
 #: ../utils.c:82
 #, c-format
 msgid "Executing '%s'"
-msgstr "執行 '%s"
+msgstr "'%s' 撢墊醱"
 
 #: ../utils.c:194
 #, fuzzy
@@ -1142,165 +1172,135 @@ msgid ""
 "all\n"
 "   entries in the default configuration and use command line parameters.\n"
 msgstr ""
-"fwlogwatch錯誤: 模式沖突, 請檢查您沒有在命令行中指定多種模式\n"
-"   或者有第二種模式被默認啟動,或在配置文件中有否指定\n"
-"   對于不同的模式請使用不同的配置文件, 或使用命令行參數\n"
+"fwlogwatch error: 乒□玉及擋ど互丐曰引允及匹﹞呁醒及乒□玉毛隙爛仄化\n"
+"  中卅中井﹞引凶反鎔ㄡ及乒□玉互伓賞匹引凶反隙爛今木凶澀爛白央奶伙匹\n"
+"  肣躲卞卅勻化中卅中井民尼永弁仄化票今中﹝\n"
+"  公木冗木及乒□玉迕卞坌喃仄凶澀爛白央奶伙毛銀丹井﹞犯白巧伙玄及澀爛\n"
+"  及允屯化及巨件玄伉毛戊丟件玄失它玄仄化戊穴件玉仿奶件由仿丟□正毛銀\n"
+"  勻化仁分今中﹝\n"
 
 #: ../utils.c:256
 #, c-format
 msgid "IP address error: %s\n"
-msgstr "IP地址錯誤:  %s\n"
+msgstr "IP 失玉伊旦卞巨仿□互丐曰引允: %s\n"
 
 #: ../utils.c:282
 #, c-format
 msgid "Error in CIDR format: %s\n"
-msgstr "CIDR格式有錯誤: %s\n"
+msgstr "CIDR白巧□穴永玄卞巨仿□互丐曰引允: %s\n"
 
 #: ../utils.c:300
 msgid "(known host)\n"
-msgstr "(不明主機)\n"
+msgstr "(湃襞及石旦玄)\n"
 
 #: ../utils.c:339
 msgid "(excluded host)\n"
-msgstr "(被排除的主機)\n"
+msgstr "(輪陸允月石旦玄)\n"
 
 #: ../whois.c:220
 #, c-format
 msgid "Looking up whois info for %s from cache\n"
-msgstr "在緩存中為 %s 尋找whois信息\n"
+msgstr "平乓永扑亙井日 %s 及 whois 樹扷毛腹綢仄化中引允\n"
 
 #: ../whois.c:227
 #, c-format
 msgid "Looking up whois info for %s\n"
-msgstr "為 %s 尋找whois信息\n"
+msgstr "%s 及 whois 樹扷毛腹綢仄化中引允\n"
 
 #: ../whois.c:248
 #, c-format
 msgid "lookup failed: %s\n"
-msgstr "搜索失敗: %s\n"
+msgstr "腹綢卞撩л: %s\n"
 
 #: ../main.h:281
 msgid "fwlogwatch summary"
-msgstr ""
+msgstr "fwlogwatch 及域厖"
 
 #: ../main.h:305
 msgid "fwlogwatch status"
-msgstr ""
+msgstr "fwlogwatch 及橇謫"
 
-#, fuzzy
-#~ msgid "<tr><td align=\"right\">Daemon start time:</td><td>%s</td></tr>\n"
-#~ msgstr "<tr><td>Daemon啟動時間:</td><td>%s</td></tr>\n"
-
-#, fuzzy
-#~ msgid "<tr><td align=\"right\">Current time:</td><td>%s</td></tr>\n"
-#~ msgstr "<tr><td>當前時間:</td><td>%s</td></tr>\n"
-
-#, fuzzy
-#~ msgid "<tr><td align=\"right\">Running time:</td><td>%s</td></tr>\n"
-#~ msgstr "<tr><td>運行時間:</td><td>%s</td></tr>\n"
-
-#, fuzzy
-#~ msgid "<tr><td align=\"right\">Response mode:</td><td>Log%s%s</td></tr>\n"
-#~ msgstr "<tr><td>回應模式:</td><td>log%s%s</td></tr>\n"
-
-#, fuzzy
-#~ msgid "Host status: %d</td></tr>\n"
-#~ msgstr "<h2>主機狀態</h2>\n"
-
-#, fuzzy
-#~ msgid "<tr align=\"center\"><th>count</th><th>added</th>"
+#~ msgid "         -f <file>   specify input file (defaults to %s)\n"
 #~ msgstr ""
-#~ "<tr bgcolor=\"#%s\" align=\"center\"><td>數量</td><td>加入</td><td>源IP地"
-#~ "址</td>"
-
-#~ msgid "Authorization failed (%s)"
-#~ msgstr "檢驗錯誤 (%s)"
-
-#~ msgid ""
-#~ "<body>\n"
-#~ "<h1>Authorization Required</h1>\n"
-#~ "</body>\n"
-#~ "</html>\n"
-#~ msgstr ""
-#~ "<body>\n"
-#~ "<h1>需要身份檢驗</h1>\n"
-#~ "</body>\n"
-#~ "</html>\n"
-
-#, fuzzy
-#~ msgid "<p><a href=\"/\">Reload</a>"
-#~ msgstr "<a href=\"/\">刷新</a><br>\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "<br>\n"
-#~ "(automatic refresh every %d seconds)</p>\n"
-#~ msgstr "(每%d秒鐘後自動刷新)<br>\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
-#~ "<tr><td>Discard timeout:</td><td>%s</td></tr>\n"
-#~ msgstr ""
-#~ "<tr><td>警告threshold:</td><td>%d entries</td></tr>\n"
-#~ "<tr><td>超時:</td><td>%d 秒</td></tr>\n"
-
-#, fuzzy
-#~ msgid "  -f <file>    specify input file (defaults to %s)\n"
-#~ msgstr "        -f <文件>   \t指定輸入文件  (缺省 %s) \n"
+#~ "         -f <白央奶伙>\n"
+#~ "                     ェ恘白央奶伙毛隙爛允月(犯白巧伙玄 %s)\n"
 
 #~ msgid "                     (defaults to '%s')\n"
-#~ msgstr "                   \t(缺省為 '%s')\n"
+#~ msgstr "                     (犯白巧伙玄 '%s')\n"
 
 #~ msgid "                     (defaults to %s)\n"
-#~ msgstr "\t\t    \t(缺省為 %s)\n"
+#~ msgstr "                     (犯白巧伙玄 %s)\n"
+
+#~ msgid "\"%s\" are packet logs, "
+#~ msgstr "\"%s\" 互由弗永玄伕弘匹﹞"
 
 #~ msgid "SIGHUP caught, ignoring"
-#~ msgstr "捕捉到SIGHUP, 忽略"
+#~ msgstr "SIGHUP 毛熬仃潸曰引仄凶互﹞拑骰仄引允"
+
+#~ msgid ""
+#~ "<tr bgcolor=\"#%s\" align=\"center\"><td>Count</td><td>Added</"
+#~ "td><td>Source IP address</td>"
+#~ msgstr ""
+#~ "<tr bgcolor=\"#%s\" align=\"center\"><td>Count</td><td>Added</td><td>霜耨"
+#~ "葭IP 失玉伊旦</td>"
 
 #~ msgid "<td>Hostname</td>"
-#~ msgstr "<td>主機名</td>"
+#~ msgstr "<td>石旦玄抩</td>"
 
 #~ msgid "<td>Destination IP address</td>"
-#~ msgstr "<td>目標IP地址</td>"
+#~ msgstr "<td>偶燮 IP 失玉伊旦</td>"
 
 #~ msgid "<td>Protocol</td>"
-#~ msgstr "<td>傳輸協議</td>"
+#~ msgstr "<td>皿伕玄戊伙</td>"
 
 #~ msgid "<td>Source port</td>"
-#~ msgstr "<td>源端口</td>"
+#~ msgstr "<td>霜耨葭禾□玄</td>"
 
-#, fuzzy
 #~ msgid "<td>Service</td>"
-#~ msgstr "<td>源</td>"
+#~ msgstr "<td>扔□申旦</td>"
 
 #~ msgid "<td>Destination port</td>"
-#~ msgstr "<td>目標端口</td>"
+#~ msgstr "<td>偶燮禾□玄</td>"
+
+#~ msgid "<td>Remaining time</td></tr>\n"
+#~ msgstr "<td>酸曰凜棉</td></tr>\n"
+
+#~ msgid "Authorization failed (%s)"
+#~ msgstr "ロ據撩л (%s)"
+
+#~ msgid "<a href=\"/\">Reload</a><br>\n"
+#~ msgstr "<a href=\"/\">凳蕙</a><br>\n"
+
+#~ msgid "(automatic refresh every %d seconds)<br>\n"
+#~ msgstr "(%d 卍咍卞憤が凳蕙)<br>\n"
 
 #~ msgid ""
-#~ "<html>\n"
-#~ "<head>\n"
-#~ "<title>fwlogwatch status</title>\n"
+#~ "\n"
+#~ "</div>\n"
+#~ "<h2>General information</h2>\n"
 #~ msgstr ""
-#~ "<html>\n"
-#~ "<head>\n"
-#~ "<title>fwlogwatch狀態</title>\n"
+#~ "\n"
+#~ "</div>\n"
+#~ "<h2>蟈蟲讀卅樹扷</h2>\n"
+
+#~ msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
+#~ msgstr "<tr><td>Daemon 釩銨凜對:</td><td>%s</td></tr>\n"
+
+#~ msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
+#~ msgstr "<tr><td>蜇箕凜對:</td><td>%s</td></tr>\n"
+
+#~ msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
+#~ msgstr "<tr><td>が綜凜棉:</td><td>%s</td></tr>\n"
 
 #~ msgid ""
-#~ "<div align=\"center\">\n"
-#~ "<h1>fwlogwatch status</h1>\n"
+#~ "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
+#~ "<tr><td>Discard timeout:</td><td>%d seconds</td></tr>\n"
 #~ msgstr ""
-#~ "<div align=\"center\">\n"
-#~ "<h1>fwlogwatch狀態</h1>\n"
+#~ "<tr><td>煞屢及檭襖:</td><td>%d 巨件玄伉</td></tr>\n"
+#~ "<tr><td>г滋允月謹切凜棉:</td><td>%d 卍</td></tr>\n"
 
-#~ msgid "<html><head><title>fwlogwatch output: %s</title>\n"
-#~ msgstr "<html><head><title>fwlogwatch輸出: %s</title>\n"
+#~ msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
+#~ msgstr "<tr><td>殺蠶乒□玉:</td><td>log%s%s</td></tr>\n"
 
-#~ msgid "<h1>fwlogwatch output</h1>\n"
-#~ msgstr "<h1>fwlogwatch輸出</h1>\n"
-
-#~ msgid "<td>start</td><td>end</td>"
-#~ msgstr "<td>開始</td><td>end</td>"
-
-#~ msgid "<td>port</td><td>service</td>"
-#~ msgstr "<td>端口</td><td>服務</td>"
+#~ msgid "<td>-</td><td>%s/%d (known host/net)</td>"
+#~ msgstr "<td>-</td><td>%s/%d (湃襞及石旦玄/net)</td>"

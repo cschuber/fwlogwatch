@@ -1,5 +1,6 @@
 <?
-/* $Id: fwlogwatch.php,v 1.4 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: fwlogwatch.php,v 1.5 2004/04/25 18:56:37 bwess Exp $ */
 
 /*
   This program is a rewrite based on work by

@@ -1,4 +1,5 @@
-/* $Id: ipfilter.l,v 1.15 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: ipfilter.l,v 1.16 2004/04/25 18:56:21 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -224,6 +225,7 @@ unsigned char flex_ipfilter(char *input, int linenum)
   init_line();
   ipf_scan_string(input);
   ipflex();
+  ipf_delete_buffer(YY_CURRENT_BUFFER);
 
   if (opt.parser & IPF_NO_HIT)
     return PARSE_NO_HIT;
@@ -233,6 +235,8 @@ unsigned char flex_ipfilter(char *input, int linenum)
   } else {
     if(opt.verbose)
       fprintf(stderr, "ipfilter parse error in line %d, ignoring.\n", linenum);
+    if(opt.verbose == 2)
+      fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
 }

@@ -1,4 +1,18 @@
-$Id: ChangeLog,v 1.26 2003/06/23 15:26:53 bwess Exp $
+$Id: ChangeLog,v 1.27 2004/04/25 18:56:18 bwess Exp $
+
+Version 1.0 2004-04-25
+- Made status page interactive
+- Added dynamic memory allocation and fixed memory leaks
+- Added basic ipfw and fwsm support
+- Added stateful start to realtime response mode
+- Added command line option to set report title
+- Added port number to -X option
+- Added CIDR support for host inclusion/exclusion
+- Created web page for submission of unrecognized entries
+- Updated HTML DTD to XHTML 1.1
+- Updated CSS and inverted the color scheme
+- Small parser improvements
+- Various small fixes
 
 Version 0.9.3 2003-06-23
 - Added inclusion/exclusion functions to the command line

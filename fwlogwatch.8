@@ -1,5 +1,6 @@
-.\" $Id: fwlogwatch.8,v 1.27 2003/06/23 15:26:53 bwess Exp $
-.TH FWLOGWATCH 8 "19 June 2003" RUS-CERT
+.\" Copyright (C) 2000-2004 Boris Wesslowski
+.\" $Id: fwlogwatch.8,v 1.28 2004/04/25 18:56:19 bwess Exp $
+.TH FWLOGWATCH 8 "25 April 2004" IS
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -8,9 +9,9 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .SH DESCRIPTION
 .B fwlogwatch
 produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
-ipfilter, Cisco IOS, Cisco PIX, NetScreen, Windows XP firewall, Elsa Lancom
-router and Snort IDS log summary reports in plain text and HTML form and
-has a lot of options to analyze and display relevant patterns. It can
+ipfilter, ipfw, Cisco IOS, Cisco PIX, NetScreen, Windows XP firewall, Elsa
+Lancom router and Snort IDS log summary reports in plain text and HTML form
+and has a lot of options to analyze and display relevant patterns. It can
 produce customizable incident reports and send them to abuse contacts at
 offending sites or CERTs. Finally, it can also run as daemon (with web
 interface) doing realtime log monitoring and reporting anomalies or
@@ -30,6 +31,10 @@ Show version and copyright information and the options used to compile
 fwlogwatch.
 .SH "GLOBAL OPTIONS"
 The global options for all modes are:
+.IP \-b
+Show the amount of data in bytes this entry represents, this is the sum of
+total packet lengths of packets matching this rule (obviously only available
+for log formats that contain this information).
 .IP \-c\ \fIconfig\fR
 Use the alternate configuration file
 .IR config
@@ -44,8 +49,9 @@ whole subnets.
 Differentiate destination ports.
 .IP \-E\ \fIformat\fR
 Specific hosts, ports, chains and branches (targets) can be selected or
-excluded, selections an exclusions can be combined and added. The format is
-composed of one of the functions
+excluded, selections an exclusions can be added and combined. The
+.I format
+is composed of one of the functions
 .I i
 include or
 .I e
@@ -62,12 +68,13 @@ branch. In case of a host or port a third parameter for
 source or
 .I d
 destination is needed. Finally, the object is directly appended, in case of
-a host this is an IP address, port is a number and chain and branch are
-strings. To show entries with destination port 25 you would use
+a host this is an IP address (networks can be specified in CIDR format),
+port is a number and chain and branch are strings. To show entries with
+destination port 25 you would use
 .B -Eipd25
-and to exclude entries which have localhost as source host or belong to the
-chain INPUT:
-.B -Eehs127.0.0.1 -EecINPUT
+and to exclude entries which have the class C network 192.168.1.0 as source
+or belong to the chain INPUT:
+.B -Eehs192.168.1.0/24 -EecINPUT
 .IP \-M\ \fInumber\fR
 If you only want to see a fixed maximum amount of entries (e.g. the "top 20")
 this option will trim the output for you.
@@ -143,6 +150,8 @@ ipchains,
 netfilter,
 .I f
 ipfilter,
+.I b
+ipfw,
 .I c
 Cisco IOS,
 .I p
@@ -161,6 +170,11 @@ Differentiate protocols. This is activated automatically if you
 differentiate source and/or destination ports.
 .IP \-s
 Differentiate source ports.
+.IP \-U\ \fItitle\fR
+Set
+.I title
+as title of the report and status page and as subject for reports sent by
+email.
 .IP \-v
 Be verbose. You can specify it twice for more information.
 In very verbose mode while parsing the log file you will see "." for
@@ -173,10 +187,6 @@ other TCP flags are shown in full format if they are available (ipchains
 does not log them, netfilter and ipfilter do, Cisco IOS doesn't even log SYNs).
 .SH "LOG SUMMARY MODE"
 This are additional options that are only available in log summary mode:
-.IP \-b
-Show the amount of data in bytes this entry represents, this is the sum of
-total packet lengths of packets matching this rule (obviously only available
-for log formats that contain this information).
 .IP \-e
 Show timestamp of last packet logged. End times are only available if
 there is more than one packet log entry with unique characteristics.
@@ -257,23 +267,26 @@ The chain and its content is removed if
 .B fwlogwatch
 is terminated normally. The example scripts contain actions for ipchains
 and netfilter, you can modify them or add others as you like.
-.IP \-X
-Activate the internal web server to monitor the current status of the program.
-Use the configuration file to change it's options. The default user name is
+.IP \-X\ \fIport\fR
+Activate the internal web server to monitor and control the current status
+of the daemon. It listens on the specified
+.I port
+and by default only allows connections from localhost. The default user
+name is
 .B admin
 and the default password is
 .B fwlogwat
-(since DES can only encrypt 8 characters). By default it listens on port
-888 and only allows connections from localhost.
+(since DES can only encrypt 8 characters). All options related to the
+status web server can be changed in the configuration file.
 .SH "INPUT FILES"
 You can specify one or more input files (if none is given it defaults to
 .B /var/log/messages
 ). Relevant entries are automatically detected so combined log files (e.g.
 from a log host) are no problem. Compressed files are supported (except in
-realtime response mode where they don' make sense anyway). The '-' sign may be
-used for reading from standard input (stdin). In realtime response mode the
-file needs to be specified with an absolute path since the daemon uses the file
-system root (/) as working directory.
+realtime response mode where they don't make sense anyway). The '-' sign
+may be used for reading from standard input (stdin). In realtime response
+mode the file needs to be specified with an absolute path since the daemon
+uses the file system root (/) as working directory.
 .SH "TIME FORMAT"
 Time is specified as
 .B nx
@@ -318,9 +331,9 @@ external cascading stylesheet can be referenced.
 Verification of ipchains rules, PID file handling, the user
 .B fwlogwatch
 should run as, the location of the notification and response scripts, which
-interfaces the web interface listens on, which host can connect, the port
-used, the refresh interval of the status page and the admin name and password
-can be configured.
+address the status web server listens on, which host can connect, the
+refresh interval of the status page and the admin name and password can be
+configured.
 .SH SECURITY
 Since
 .B fwlogwatch
@@ -336,5 +349,4 @@ can configure fwlogwatch to drop root privileges as soon as possible after
 allocating these resources (the notification and response scripts will still
 be executed with user privileges and log rotation might not work).
 .SH AUTHOR
-Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>,
-RUS-CERT http://cert.uni-stuttgart.de
+Boris Wesslowski <bw@inside-security.de>

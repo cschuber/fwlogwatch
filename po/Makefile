@@ -1,7 +1,9 @@
-# $Id: Makefile,v 1.11 2003/06/23 15:26:53 bwess Exp $
+# Copyright (C) 2000-2004 Boris Wesslowski
+# $Id: Makefile,v 1.12 2004/04/25 18:56:37 bwess Exp $
 
 all:
 	msgfmt -v -o de.mo de.po
+	msgfmt -v -o ja.mo ja.po
 	msgfmt -v -o pt_BR.mo pt_BR.po
 	msgfmt -v -o sv.mo sv.po
 	msgfmt -v -o zh_CN.mo zh_CN.po
@@ -12,6 +14,7 @@ strings:
 
 merge:
 	msgmerge -v -o de.po.new de.po fwlogwatch.pot
+	msgmerge -v -o ja.po.new ja.po fwlogwatch.pot
 	msgmerge -v -o pt_BR.po.new pt_BR.po fwlogwatch.pot
 	msgmerge -v -o sv.po.new sv.po fwlogwatch.pot
 	msgmerge -v -o zh_CN.po.new zh_CN.po fwlogwatch.pot

@@ -1,0 +1,93 @@
+#!/bin/sh
+# $Id: fwlogwatch.init.suse,v 1.1 2004/04/25 18:57:48 bwess Exp $
+#
+# /etc/init.d/fwlogwatch
+#
+### BEGIN INIT INFO
+# Provides: fwlogwatch
+# Required-Start: $local_fs $network
+# X-UnitedLinux-Should-Start: $local_fs $network
+# Required-Stop: $local_fs $remote_fs $network
+# X-UnitedLinux-Should-Stop:
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Short-Description: fwlogwatch analyzer
+# Description: Firewall log analysis with realtime response
+### END INIT INFO
+
+#
+# load the configuration
+#
+test -s /etc/rc.status && \
+    . /etc/rc.status
+test -s /etc/sysconfig/fwlogwatch && \
+    . /etc/sysconfig/fwlogwatch
+
+FWLOGWATCH_BIN="/usr/sbin/fwlogwatch"
+test -x $FWLOGWATCH_BIN || exit 5
+rc_reset
+
+#
+# The echo return value for success (defined in /etc/rc.status).
+#
+return=$rc_done
+
+start()
+{
+	echo -n "Starting fwlogwatch:"
+	#startproc $FWLOGWATCH_BIN -R -A -X 888 -Pn
+	startproc $FWLOGWATCH_BIN -R -A -Pn
+	ret=$?
+	[ "$ret" = 0 ] && touch /var/lock/subsys/fwlogwatch
+	rc_failed $ret
+	rc_status -v
+}
+
+stop()
+{
+	echo -n "Stopping fwlogwatch:"
+	killproc $FWLOGWATCH_BIN -TERM
+	ret=$?
+	[ "$ret" = 0 ] && rm -f /var/lock/subsys/fwlogwatch
+	rc_status -v
+}
+
+reload()
+{
+	echo -n "Reloading fwlogwatch:"
+	killproc $FWLOGWATCH_BIN -HUP
+	ret=$?
+	rc_status -v
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		reload
+		;;
+	condrestart)
+		if [ -f /var/lock/subsys/fwlogwatch ] ; then
+			stop
+			sleep 3
+			start
+		fi
+		;;
+	status)
+		echo -n "Checking for fwlogwatch: "
+		checkproc $FWLOGWATCH_BIN
+		rc_status -v
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
+		RETVAL=1
+esac
+rc_exit

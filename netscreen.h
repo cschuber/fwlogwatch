@@ -1,4 +1,5 @@
-/* $Id: netscreen.h,v 1.4 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: netscreen.h,v 1.5 2004/04/25 18:56:22 bwess Exp $ */
 
 #ifndef _NETSCREEN_H
 #define _NETSCREEN_H

@@ -1,7 +1,7 @@
-$Id: CREDITS,v 1.27 2003/06/23 15:26:53 bwess Exp $
+$Id: CREDITS,v 1.28 2004/04/25 18:56:18 bwess Exp $
 
 This program was written by
-Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
+Boris Wesslowski <bw@inside-security.de>
 
 Thanks go to the following persons:
 Oliver Goebel <Goebel@CERT.Uni-Stuttgart.DE>
@@ -95,3 +95,9 @@ Mirko Zeibig <mirko@zeibig.net>
 
 Ronald Ruijgrok <Ronald.Ruijgrok@werklinq.nl>
   for pushing me to extend CSS support.
+
+Andrew Beresford <a.j.beresford@sheffield.ac.uk>
+  for suggesting fwsm support.
+
+Robert Oschwald <roschwald@users.sourceforge.net>
+  for contributing a SuSE init script.

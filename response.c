@@ -1,4 +1,5 @@
-/* $Id: response.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: response.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "response.h"
-#include "output.h"
+#include "main.h"
 #include "utils.h"
 
 struct known_hosts *first_host = NULL;
@@ -152,62 +153,72 @@ void react(unsigned char mode, struct known_hosts *this_host)
   run_command(buf);
 }
 
-void remove_old()
+void remove_old(unsigned char mode)
 {
-  struct conn_data *prev, *this;
-  struct known_hosts *prev_host, *this_host;
-  time_t now, diff;
+  time_t now;
   unsigned char is_first;
 
   now = time(NULL);
 
-  prev = this = first;
-  is_first = 1;
-  while (this != NULL) {
-    if (this->end_time != 0)
-      diff = now - this->end_time;
-    else
-      diff = now - this->start_time;
-    if (diff >= opt.recent) {
-      if(opt.verbose == 2)
-	syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), inet_ntoa(this->shost));
-      if (is_first == 1) {
-	prev = this->next;
-	free(this);
-	first = this = prev;
+  if(mode & RESP_REMOVE_OPC) {
+    struct conn_data *prev, *this;
+
+    prev = this = first;
+    is_first = 1;
+    while (this != NULL) {
+      if ((now - this->end_time) >= opt.recent) {
+	if(opt.verbose == 2)
+	  syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), inet_ntoa(this->shost));
+	if (is_first == 1) {
+	  prev = this->next;
+	  free(this->hostname);
+	  free(this->chainlabel);
+	  free(this->branchname);
+	  free(this->interface);
+	  free(this);
+	  first = this = prev;
+	} else {
+	  this = this->next;
+	  free(prev->next->hostname);
+	  free(prev->next->chainlabel);
+	  free(prev->next->branchname);
+	  free(prev->next->interface);
+	  free(prev->next);
+	  prev->next = this;
+	}
       } else {
+	prev = this;
 	this = this->next;
-	free(prev->next);
-	prev->next = this;
+	is_first = 0;
       }
-    } else {
-      prev = this;
-      this = this->next;
-      is_first = 0;
     }
   }
 
-  prev_host = this_host = first_host;
-  is_first = 1;
-  while (this_host != NULL) {
-    if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
-      if (opt.verbose == 2)
-	syslog(LOG_NOTICE, _("Deleting host status entry (%s)"), inet_ntoa(this_host->shost));
-      if (opt.response & OPT_RESPOND)
-	react(EX_RESPOND_REMOVE, this_host);
-      if (is_first == 1) {
-	prev_host = this_host->next;
-	free(this_host);
-	first_host = this_host = prev_host;
+  if(mode & RESP_REMOVE_OHS) {
+    struct known_hosts *prev_host, *this_host;
+
+    prev_host = this_host = first_host;
+    is_first = 1;
+    while (this_host != NULL) {
+      if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
+	if (opt.verbose == 2)
+	  syslog(LOG_NOTICE, _("Deleting host status entry (%s)"), inet_ntoa(this_host->shost));
+	if (opt.response & OPT_RESPOND)
+	  react(EX_RESPOND_REMOVE, this_host);
+	if (is_first == 1) {
+	  prev_host = this_host->next;
+	  free(this_host);
+	  first_host = this_host = prev_host;
+	} else {
+	  this_host = this_host->next;
+	  free(prev_host->next);
+	  prev_host->next = this_host;
+	}
       } else {
+	prev_host = this_host;
 	this_host = this_host->next;
-	free(prev_host->next);
-	prev_host->next = this_host;
+	is_first = 0;
       }
-    } else {
-      prev_host = this_host;
-      this_host = this_host->next;
-      is_first = 0;
     }
   }
 }
@@ -234,6 +245,7 @@ struct known_hosts * is_known(struct conn_data *host)
 void look_for_alert()
 {
   struct conn_data *this;
+  unsigned char modified = 0;
 
   this = first;
   while (this != NULL) {
@@ -243,27 +255,168 @@ void look_for_alert()
       if (this_host == NULL) {
 	this_host = xmalloc(sizeof(struct known_hosts));
 	this_host->time = time(NULL);
-	this_host->count = this->count;
+	this_host->count = (this->count / opt.threshold) * opt.threshold;
 	this_host->shost = this->shost;
 	this_host->netmask.s_addr = 0xFFFFFFFF;
 	this_host->protocol = this->protocol;
 	this_host->dhost = this->dhost;
 	this_host->sport = this->sport;
 	this_host->dport = this->dport;
+	this_host->id = opt.global_id++;
 	this_host->next = first_host;
 	first_host = this_host;
-	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this->count, inet_ntoa(this->shost));
+	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this_host->count, inet_ntoa(this_host->shost));
 	if(opt.response & OPT_NOTIFY)
 	  react(EX_NOTIFY, this_host);
 	if(opt.response & OPT_RESPOND)
 	  react(EX_RESPOND_ADD, this_host);
       } else {
-	this_host->count = this_host->count + this->count;
+	this_host->count = this_host->count + ((this->count / opt.threshold) * opt.threshold);
 	if (this_host->time != 0)
 	  this_host->time = time(NULL);
       }
-      this->end_time = 1;
+      this->count = (this->count % opt.threshold);
+      if(this->count == 0) {
+	this->end_time = 1;
+	modified = 1;
+      }
     }
     this = this->next;
   }
+  if(modified)
+    remove_old(RESP_REMOVE_OPC);
+}
+
+unsigned char hs_compare(struct known_hosts *op1, struct known_hosts *op2)
+{
+  unsigned char cond = 0;
+  time_t now;
+
+  switch(opt.sortfield) {
+  case SORT_COUNT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->count > op2->count) cond++;
+    } else {
+      if (op1->count < op2->count) cond++;
+    }
+    break;
+  case SORT_START_TIME:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->time > op2->time) cond++;
+    } else {
+      if (op1->time < op2->time) cond++;
+    }
+    break;
+  case SORT_END_TIME:
+    now = time(NULL);
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if ((now - op1->time) < (now - op2->time)) cond++;
+    } else {
+      if ((now - op1->time) > (now - op2->time)) cond++;
+    }
+    break;
+  case SORT_PROTOCOL:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->protocol > op2->protocol) cond++;
+    } else {
+      if (op1->protocol < op2->protocol) cond++;
+    }
+    break;
+  case SORT_SOURCEHOST:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr)) cond++;
+    } else {
+      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr)) cond++;
+    }
+    break;
+  case SORT_SOURCEPORT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->sport > op2->sport) cond++;
+    } else {
+      if (op1->sport < op2->sport) cond++;
+    }
+    break;
+  case SORT_DESTHOST:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr)) cond++;
+    } else {
+      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr)) cond++;
+    }
+    break;
+  case SORT_DESTPORT:
+    if (opt.sortmode == ORDER_ASCENDING) {
+      if (op1->dport > op2->dport) cond++;
+    } else {
+      if (op1->dport < op2->dport) cond++;
+    }
+  }
+
+  return cond;
+}
+
+struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list) {
+  struct known_hosts *p, *q, *e, *tail;
+  int size, merges, psize, qsize, i;
+
+  switch(opt.sortfield) {
+  case SORT_COUNT:
+  case SORT_START_TIME:
+  case SORT_END_TIME:
+  case SORT_PROTOCOL:
+  case SORT_SOURCEHOST:
+  case SORT_SOURCEPORT:
+  case SORT_DESTHOST:
+  case SORT_DESTPORT:
+    if(list != NULL) {
+      size = 1;
+      while(1) {
+	p = list;
+	list = tail = NULL;
+	merges = 0;
+	while (p != NULL) {
+	  merges++;
+	  q = p;
+	  psize = 0;
+	  for (i = 0; i < size; i++) {
+	    psize++;
+	    q = q->next;
+	    if (q == NULL) break;
+	  }
+	  qsize = size;
+	  while (psize > 0 || ((qsize > 0) && (q != NULL))) {
+	    if (psize == 0) {
+	      e = q; q = q->next; qsize--;
+	    } else if (qsize == 0 || (q == NULL)) {
+	      e = p; p = p->next; psize--;
+	    } else if (hs_compare(p,q) <= 0) {
+	      e = p; p = p->next; psize--;
+	    } else {
+	      e = q; q = q->next; qsize--;
+	    }
+	    if (tail != NULL) {
+	      tail->next = e;
+	    } else {
+	      list = e;
+	    }
+	    tail = e;
+	  }
+	  p = q;
+	}
+	tail->next = NULL;
+	if (merges <= 1)
+	  return list;
+	size *= 2;
+      }
+    } else {
+      return NULL;
+    }
+    break;
+  default:
+    return list;
+  }
+}
+
+void sort_hs()
+{
+  first_host = fwlw_hs_mergesort(first_host);
 }

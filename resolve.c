@@ -1,4 +1,5 @@
-/* $Id: resolve.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: resolve.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +54,7 @@ char * resolve_hostname(struct in_addr ip)
 {
   struct hostent *reverse, *forward;
   struct dns_cache *dns;
-  char *pnt;
+  char *pnt, fqdn[HOSTLEN];
 
   dns = dns_first;
   while(dns != NULL) {
@@ -98,16 +99,19 @@ char * resolve_hostname(struct in_addr ip)
     forward = gethostbyname(reverse->h_name);
     if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
       if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
-	xstrncpy(dns->fqdn, reverse->h_name, HOSTLEN);
+	xstrncpy(fqdn, reverse->h_name, HOSTLEN);
       } else {
-	snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
+	snprintf(fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
       }
     } else {
-      snprintf(dns->fqdn, HOSTLEN, _("%s [forward lookup failed]"), reverse->h_name);
+      snprintf(fqdn, HOSTLEN, _("%s [forward lookup failed]"), reverse->h_name);
     }
   } else {
-    xstrncpy(dns->fqdn, "-", HOSTLEN);
+    xstrncpy(fqdn, "-", HOSTLEN);
   }
+
+  dns->fqdn = xmalloc(strlen(fqdn)+1);
+  xstrncpy(dns->fqdn, fqdn, strlen(fqdn)+1);
 
   dns->next = dns_first;
   dns_first = dns;

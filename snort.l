@@ -1,4 +1,5 @@
-/* $Id: snort.l,v 1.6 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: snort.l,v 1.7 2004/04/25 18:56:22 bwess Exp $ */
 
 %option prefix="snort"
 %option outfile="snort.c"
@@ -136,6 +137,7 @@ unsigned char flex_snort(char *input, int linenum)
   init_line();
   snort_scan_string(input);
   snortlex();
+  snort_delete_buffer(YY_CURRENT_BUFFER);
 
   xstrncpy(opt.line->interface, "-", SHORTLEN);
   opt.line->count = 1;
@@ -148,6 +150,8 @@ unsigned char flex_snort(char *input, int linenum)
   } else {
     if(opt.verbose)
       fprintf(stderr, "snort parse error in line %d, ignoring.\n", linenum);
+    if(opt.verbose == 2)
+      fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
 }

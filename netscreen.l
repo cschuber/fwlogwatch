@@ -1,4 +1,5 @@
-/* $Id: netscreen.l,v 1.4 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: netscreen.l,v 1.5 2004/04/25 18:56:22 bwess Exp $ */
 
 %option prefix="ns"
 %option outfile="netscreen.c"
@@ -97,6 +98,7 @@ unsigned char flex_netscreen(char *input, int linenum)
   init_line();
   ns_scan_string(input);
   nslex();
+  ns_delete_buffer(YY_CURRENT_BUFFER);
 
   xstrncpy(opt.line->chainlabel, "-", SHORTLEN);
   xstrncpy(opt.line->interface, "-", SHORTLEN);
@@ -107,6 +109,8 @@ unsigned char flex_netscreen(char *input, int linenum)
   } else {
     if(opt.verbose)
       fprintf(stderr, "netscreen parse error in line %d, ignoring.\n", linenum);
+    if(opt.verbose == 2)
+      fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
 }

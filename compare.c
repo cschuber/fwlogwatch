@@ -1,4 +1,5 @@
-/* $Id: compare.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: compare.c,v 1.29 2004/04/25 18:56:19 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,11 +22,19 @@ void add_entry()
 
   data->count = opt.line->count;
   data->start_time = opt.line->time;
-  data->end_time = 0;
-  xstrncpy(data->hostname, opt.line->hostname, SHOSTLEN);
-  xstrncpy(data->chainlabel, opt.line->chainlabel, SHORTLEN);
-  xstrncpy(data->branchname, opt.line->branchname, SHORTLEN);
-  xstrncpy(data->interface, opt.line->interface, SHORTLEN);
+  if(opt.mode != REALTIME_RESPONSE) {
+    data->end_time = 0;
+  } else {
+    data->end_time = opt.line->time;
+  }
+  data->hostname = xmalloc(strlen(opt.line->hostname)+1);
+  xstrncpy(data->hostname, opt.line->hostname, strlen(opt.line->hostname)+1);
+  data->chainlabel = xmalloc(strlen(opt.line->chainlabel)+1);
+  xstrncpy(data->chainlabel, opt.line->chainlabel, strlen(opt.line->chainlabel)+1);
+  data->branchname = xmalloc(strlen(opt.line->branchname)+1);
+  xstrncpy(data->branchname, opt.line->branchname, strlen(opt.line->branchname)+1);
+  data->interface = xmalloc(strlen(opt.line->interface)+1);
+  xstrncpy(data->interface, opt.line->interface, strlen(opt.line->interface)+1);
   data->protocol = opt.line->protocol;
   data->datalen = opt.line->datalen;
   data->shost = opt.line->shost;
@@ -33,6 +42,7 @@ void add_entry()
   data->dhost = opt.line->dhost;
   data->dport = opt.line->dport;
   data->flags = opt.line->flags;
+  data->id = opt.global_id++;
 
   data->next = first;
   first = data;
@@ -255,7 +265,7 @@ void build_list()
 
   if (opt.loghost == 0) {
     if (opt.hostname[0] != '\0') {
-      if (strncmp(opt.hostname, opt.line->hostname, SHOSTLEN) != 0) {
+      if (strcmp(opt.hostname, opt.line->hostname) != 0) {
 	opt.loghost = 1;
       }
     } else {
@@ -301,19 +311,19 @@ void build_list()
     if ((opt.src_port) && (this->sport != opt.line->sport)) {goto no_match;}
     if ((opt.proto) && (this->protocol != opt.line->protocol)) {goto no_match;}
     if ((opt.opts) && (this->flags != opt.line->flags)) {goto no_match;}
-    if (strncmp(this->interface, opt.line->interface, SHORTLEN) != 0) {goto no_match;}
-    if (strncmp(this->branchname, opt.line->branchname, SHORTLEN) != 0) {goto no_match;}
-    if (strncmp(this->chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {goto no_match;}
-    if (strncmp(this->hostname, opt.line->hostname, SHOSTLEN) != 0) {goto no_match;}
+    if (strcmp(this->interface, opt.line->interface) != 0) {goto no_match;}
+    if (strcmp(this->branchname, opt.line->branchname) != 0) {goto no_match;}
+    if (strcmp(this->chainlabel, opt.line->chainlabel) != 0) {goto no_match;}
+    if (strcmp(this->hostname, opt.line->hostname) != 0) {goto no_match;}
 
     this->datalen = this->datalen + opt.line->datalen;
     if (opt.line->time >= this->end_time) {
       this->end_time = opt.line->time;
     } else {
       if(opt.verbose) {
-	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&this->end_time));
+	strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&this->end_time));
 	fprintf(stderr, _("Timewarp in log file (%s"), stime);
-	strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&opt.line->time));
+	strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&opt.line->time));
 	fprintf(stderr, " < %s).\n", stime);
       }
     }

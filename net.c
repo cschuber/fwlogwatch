@@ -1,4 +1,5 @@
-/* $Id: net.c,v 1.26 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: net.c,v 1.27 2004/04/25 18:56:21 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +18,9 @@
 
 #ifndef __OpenBSD__
 #ifndef __FreeBSD__
+#ifndef __NetBSD__
 #include <crypt.h>
+#endif
 #endif
 #endif
 
@@ -75,6 +78,10 @@ void prepare_socket()
 
 #ifndef HAVE_IPV6
   ina.s_addr = inet_addr(opt.listenif);
+  if (ina.s_addr == -1) {
+    syslog(LOG_NOTICE, "inet_addr: Bad address %s", opt.listenif);
+    log_exit(EXIT_FAILURE);
+  }
   bzero(&sa, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_port = htons(opt.listenport);
@@ -86,7 +93,7 @@ void prepare_socket()
     snprintf(nnb, HOSTLEN, "::ffff:%s", opt.listenif);
     retval = inet_pton(AF_INET6, nnb, in6a.s6_addr);
     if (retval != 1) {
-      syslog(LOG_NOTICE, "inet_pton: Wrong address %s", opt.listenif);
+      syslog(LOG_NOTICE, "inet_pton: Bad address %s", opt.listenif);
       log_exit(EXIT_FAILURE);
     }
   }
@@ -178,43 +185,395 @@ void decode_base64(char *input)
   }
 }
 
-void table_header(int conn, unsigned char mode)
+void put_entry(int conn, char *field, char sort, unsigned char mode)
 {
-  fdprintf(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-  fdprintf(conn, _("<tr align=\"center\"><th>count</th><th>added</th>"));
-  if(opt.proto)
-    fdprintf(conn, _("<th>proto</th>"));
-  fdprintf(conn, _("<th>source</th>"));
-  if(opt.resolve)
-    fdprintf(conn, _("<th>hostname</th>"));
-  if(opt.src_port) {
-    fdprintf(conn, _("<th>port</th>"));
-    if(opt.sresolve)
-      fdprintf(conn, _("<th>service</th>"));
+  if((mode == NO_SORTING) || (sort == 0)) {
+    fdprintf(conn, "<th>%s</th>\n", field);
+  } else {
+    fdprintf(conn, "<th>%s<br /><a href=\"?sort=%ca\">&lt;</a>&nbsp;<a href=\"?sort=%cd\">&gt;</a></th>\n", field, sort, sort);
   }
-  if(opt.dst_ip) {
-    fdprintf(conn, _("<th>destination</th>"));
-    if(opt.resolve)
-      fdprintf(conn, _("<th>hostname</th>"));
-  }
-  if(opt.dst_port) {
-    fdprintf(conn, _("<th>port</th>"));
-    if(opt.sresolve)
-      fdprintf(conn, _("<th>service</th>"));
-  }
-  if(mode == TCP_OPTS) {
-    if (opt.opts)
-      fdprintf(conn, _("<th>opts</th>"));
-  }
-  fdprintf(conn, _("<th>time remaining</th></tr>\n"));
 }
 
-void handshake()
+void table_header(int conn, unsigned char mode, unsigned char opts)
+{
+  fdprintf(conn, "<table cellspacing=\"1\" cellpadding=\"3\">\n<tr>\n");
+  put_entry(conn, _("count"), 'c', mode);
+  put_entry(conn, _("added"), 't', mode);
+  if(opt.proto)
+    put_entry(conn, _("proto"), 'p', mode);
+  if((opts == NET_OPTS_PC) && (opt.datalen))
+    put_entry(conn, _("bytes"), 'b', mode);
+  put_entry(conn, _("source"), 'S', mode);
+  if(opt.resolve)
+    put_entry(conn, _("hostname"), 0, mode);
+  if(opt.src_port) {
+    put_entry(conn, _("port"), 's', mode);
+    if(opt.sresolve)
+      put_entry(conn, _("service"), 0, mode);
+  }
+  if(opt.dst_ip) {
+    put_entry(conn, _("destination"), 'D', mode);
+    if(opt.resolve)
+      put_entry(conn, _("hostname"), 0, mode);
+  }
+  if(opt.dst_port) {
+    put_entry(conn, _("port"), 'd', mode);
+    if(opt.sresolve)
+      put_entry(conn, _("service"), 0, mode);
+  }
+  if((opts == NET_OPTS_PC) && (opt.opts))
+    put_entry(conn, _("opts"), 'z', mode);
+  put_entry(conn, _("time remaining"), 'e', mode);
+  put_entry(conn, _("action"), 0, mode);
+  fdprintf(conn, "</tr>\n");
+}
+
+void make_header_h2(int conn, char *text)
+{
+  fdprintf(conn, "<h2>%s</h2>\n", text);
+}
+
+void make_link(int conn, char *text, char *url)
+{
+  fdprintf(conn, "<a href=\"%s\">%s</a>", url, text);
+}
+
+void make_gen_table_int(int conn, char *desc, int current)
+{
+  fdprintf(conn, "<tr class=\"r1\"><td align=\"right\">%s:</td><td align=\"left\">%d</td></tr>\n", desc, current);
+}
+
+void make_gen_table_str(int conn, char *desc, char *current)
+{
+  fdprintf(conn, "<tr class=\"r1\"><td align=\"right\">%s:</td><td align=\"left\">%s</td></tr>\n", desc, current);
+}
+
+void make_opt_table_start(int conn, char *desc, char *opt)
+{
+  fdprintf(conn, "<tr class=\"r1\"><td align=\"right\">%s:</td><td><a href=\"?%s=l\">&lt;</a></td><td>", desc, opt);
+}
+
+void make_opt_table_end(int conn, char *opt)
+{
+  fdprintf(conn, "</td><td><a href=\"?%s=m\">&gt;</a></td></tr>\n", opt);
+}
+
+void make_opt_table_int(int conn, char *desc, char *opt, int current)
+{
+  make_opt_table_start(conn, desc, opt);
+  fdprintf(conn, "%d", current);
+  make_opt_table_end(conn, opt);
+}
+
+void make_opt_table_str(int conn, char *desc, char *opt, char *current)
+{
+  make_opt_table_start(conn, desc, opt);
+  fdprintf(conn, "%s", current);
+  make_opt_table_end(conn, opt);
+}
+
+void show_navigation(int conn)
+{
+  fdprintf(conn, "<p>[ ");
+  if(opt.webpage == 'i') {
+    fdprintf(conn, _("Information"));
+  } else {
+    make_link(conn, _("Information"), "?page=i");
+  }
+  fdprintf(conn, " | ");
+  if(opt.webpage == 'o') {
+    fdprintf(conn, _("Options"));
+  } else {
+    make_link(conn, _("Options"), "?page=o");
+  }
+  fdprintf(conn, " | ");
+  if(opt.webpage == 'p') {
+    fdprintf(conn, _("Packet cache"));
+  } else {
+    make_link(conn, _("Packet cache"), "?page=p");
+  }
+  fdprintf(conn, " | ");
+  if(opt.webpage == 'h') {
+    fdprintf(conn, _("Host status"));
+  } else {
+    make_link(conn, _("Host status"), "?page=h");
+  }
+  fdprintf(conn, " | ");
+  make_link(conn, _("Reload"), "/");
+  fdprintf(conn, " ]</p>\n");
+}
+
+void http_header(int conn, char *code, unsigned char complete)
+{
+  fdprintf(conn, "HTTP/1.1 %s\r\n", code);
+  fdprintf(conn, "Server: %s/%s (C) %s\r\n", PACKAGE, VERSION, COPYRIGHT);
+  fdprintf(conn, "Connection: close\r\n");
+  fdprintf(conn, "Content-Type: text/html; charset=ISO-8859-1\r\n");
+  if(complete == HEADER_COMPLETE)
+    fdprintf(conn, "\r\n");
+
+/*
+  Date: Mon, 07 Jul 2003 21:27:17 GMT
+  Last-Modified: Mon, 07 Jul 2003 21:25:26 GMT
+  Accept-Ranges: bytes
+  Content-Length: 80
+*/
+}
+
+void basic_html_body(int conn, char *title, char *header)
+{
+  fdprintf(conn, "<html>\n<head>\n<title>%s</title>\n</head>\n", title);
+  fdprintf(conn, "<body>\n<h1>%s</h1>\n</body>\n</html>\n", header);
+}
+
+void show_status(int conn, int linenum, int hitnum, int ignored)
+{
+  char buf[BUFSIZE], nows[TIMESIZE];
+  struct conn_data *this;
+  struct known_hosts *this_host;
+  unsigned char color = 1;
+  time_t now;
+  int count = 0, max = 0;
+
+  http_header(conn, "200 OK", HEADER_COMPLETE);
+
+  output_html_header(conn);
+  show_navigation(conn);
+
+  now = time(NULL);
+
+  if(opt.webpage == 'i') {
+    make_header_h2(conn, _("Information"));
+
+    fdprintf(conn, "<table cellspacing=\"1\" cellpadding=\"3\">\n");
+
+    strftime(nows, TIMESIZE, _("%A %B %d %H:%M:%S %Z %Y"), localtime(&opt.now));
+    make_gen_table_str(conn, _("Daemon start time"), nows);
+
+    strftime(nows, TIMESIZE, _("%A %B %d %H:%M:%S %Z %Y"), localtime(&now));
+    make_gen_table_str(conn, _("Current time"), nows);
+
+    output_timediff(opt.now, now, nows);
+    make_gen_table_str(conn, _("Running time"), nows);
+
+    snprintf(buf, BUFSIZE, "%s%s%s", _("Log"), (opt.response & OPT_NOTIFY)?_(", notify"):"", (opt.response & OPT_RESPOND)?_(", respond"):"");
+    make_gen_table_str(conn, _("Response mode"), buf);
+
+    make_gen_table_int(conn, _("Lines seen"), linenum);
+    make_gen_table_int(conn, _("Hits"), hitnum);
+    make_gen_table_int(conn, _("Old/excluded/malformed"), ignored);
+
+    this = first;
+    while(this != NULL) {
+      this = this->next;
+      count++;
+    }
+    make_gen_table_int(conn, _("Entries in packet cache"), count);
+    this_host = first_host;
+    count = 0;
+    while(this_host != NULL) {
+      this_host = this_host->next;
+      count++;
+    }
+    make_gen_table_int(conn, _("Entries in host status"), count);
+
+    fdprintf(conn, "</table>\n");
+  }
+
+  if(opt.webpage == 'o') {
+    make_header_h2(conn, _("Options"));
+    fdprintf(conn, "<table cellspacing=\"1\" cellpadding=\"3\">\n<tr>\n<th>");
+    fdprintf(conn, _("Parameter"));
+    fdprintf(conn, "</th>\n<th>");
+    fdprintf(conn, _("Decrease"));
+    fdprintf(conn, "</th>\n<th>");
+    fdprintf(conn, _("Current"));
+    fdprintf(conn, "</th>\n<th>");
+    fdprintf(conn, _("Increase"));
+    fdprintf(conn, "</th>\n</tr>\n");
+    make_opt_table_int(conn, _("Alert threshold"), "alert", opt.threshold);
+    output_timediff(0, opt.recent, nows);
+    make_opt_table_str(conn, _("Discard timeout"), "recent", nows);
+    make_opt_table_int(conn, _("Minimum count in packet cache"), "least", opt.least);
+    if(opt.max > 0) {
+      make_opt_table_int(conn, _("Top amount of entries in packet cache"), "max", opt.max);
+    } else {
+      make_opt_table_str(conn, _("Top amount of entries in packet cache"), "max", "-");
+    }
+    if(opt.refresh > 0) {
+      make_opt_table_int(conn, _("Refresh time"), "refresh", opt.refresh);
+    } else {
+      make_opt_table_str(conn, _("Refresh time"), "refresh", "-");
+    }
+    fdprintf(conn, "</table>\n");
+  }
+
+  if(opt.webpage == 'p') {
+    make_header_h2(conn, _("Packet cache"));
+
+    table_header(conn, SORTING, NET_OPTS_PC);
+
+    sort_data();
+
+    this = first;
+    while((this != NULL) && ((opt.max == 0) || (max < opt.max)) && (opt.status != FD_ERROR)) {
+      if(this->count >= opt.least) {
+        if (opt.max != 0)
+          max++;
+        strftime(nows, TIMESIZE, _("%Y/%m/%d %H:%M:%S"), localtime(&this->start_time));
+        fdprintf(conn, "<tr class=\"r%d\"><td>%d</td><td>%s</td>", color, this->count, nows);
+        if(opt.proto) {
+          fdprintf(conn, "<td>%s</td>", resolve_protocol(this->protocol));
+        }
+        if(opt.datalen) {
+          fdprintf(conn, "<td>%d</td>", this->datalen);
+        }
+        fdprintf(conn, "<td>%s</td>", inet_ntoa(this->shost));
+        if(opt.resolve) {
+          fdprintf(conn, "<td>%s</td>", resolve_hostname(this->shost));
+        }
+        if(opt.src_port) {
+          fdprintf(conn, "<td>%d</td>", this->sport);
+          if(opt.sresolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
+          }
+        }
+        if(opt.dst_ip) {
+          fdprintf(conn, "<td>%s</td>", inet_ntoa(this->dhost));
+          if(opt.resolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_hostname(this->dhost));
+          }
+        }
+        if(opt.dst_port) {
+          fdprintf(conn, "<td>%d</td>", this->dport);
+          if(opt.sresolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
+          }
+        }
+        if(opt.opts) {
+          output_tcp_opts(this, buf);
+          fdprintf(conn, "<td>%s</td>", buf);
+        }
+        output_timediff(0, opt.recent - (now - this->end_time), nows);
+        fdprintf(conn, "<td>%s</td>", nows);
+        fdprintf(conn, "<td><a href=\"?pcdrop=%0.10d\">drop</a> <a href=\"?escalate=%0.10d\">escalate</a></td></tr>\n", this->id, this->id);
+        if (color == 1) {
+          color = 2;
+        } else {
+          color = 1;
+        }
+      }
+      this = this->next;
+    }
+    fdprintf(conn, "</table>\n");
+  }
+
+  if(opt.webpage == 'h') {
+    make_header_h2(conn, _("Host status"));
+
+    color = 1;
+    table_header(conn, SORTING, NO_NET_OPTS_PC);
+
+    sort_hs();
+
+    this_host = first_host;
+    while(this_host != NULL && (opt.status != FD_ERROR)) {
+      fdprintf(conn, "<tr class=\"r%d\"><td>%d</td>", color, this_host->count);
+
+      if (this_host->time == 0) {
+        int mask;
+        unsigned long int netmask[33] = {
+          0x0,
+          0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
+          0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
+          0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
+          0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
+          0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
+          0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
+          0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
+          0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
+        };
+
+        fdprintf(conn, "<td>-</td>");
+        if(opt.proto) { fdprintf(conn, _("<td>any</td>")); }
+        for(mask=0;mask<32;mask++) {
+          if (ntohl(netmask[mask]) == this_host->netmask.s_addr)
+            break;
+        }
+        if(mask == 32) {
+          fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->shost));
+        } else {
+          fdprintf(conn, "<td>%s/%d</td>", inet_ntoa(this_host->shost), mask);
+        }
+        if(opt.resolve) {
+          if(mask == 32) {
+            fdprintf(conn, _("<td>(known host)</td>"));
+          } else {
+            fdprintf(conn, _("<td>(known net)</td>"));
+          }
+        }
+        if(opt.src_port) { fdprintf(conn, _("<td>any</td>"));
+        if(opt.sresolve) { fdprintf(conn, "<td>-</td>"); } }
+        if(opt.dst_ip) { fdprintf(conn, _("<td>any</td>"));
+        if(opt.resolve) { fdprintf(conn, "<td>-</td>"); } }
+        if(opt.dst_port) { fdprintf(conn, _("<td>any</td>"));
+        if(opt.sresolve) { fdprintf(conn, "<td>-</td>"); } }
+        fdprintf(conn, "<td>-</td></tr>\n");
+      } else {
+        strftime(nows, TIMESIZE, _("%Y/%m/%d %H:%M:%S"), localtime(&this_host->time));
+        fdprintf(conn, "<td>%s</td>", nows);
+        if(opt.proto) {
+          fdprintf(conn, "<td>%s</td>", resolve_protocol(this_host->protocol));
+        }
+        fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->shost));
+        if(opt.resolve) {
+          fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->shost));
+        }
+        if(opt.src_port) {
+          fdprintf(conn, "<td>%d</td>", this_host->sport);
+          if(opt.sresolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_service(this_host->sport, resolve_protocol(this_host->protocol)));
+          }
+        }
+        if(opt.dst_ip) {
+          fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->dhost));
+          if(opt.resolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->dhost));
+          }
+        }
+        if(opt.dst_port) {
+          fdprintf(conn, "<td>%d</td>", this_host->dport);
+          if(opt.sresolve) {
+            fdprintf(conn, "<td>%s</td>", resolve_service(this_host->dport, resolve_protocol(this_host->protocol)));
+          }
+        }
+        output_timediff(0, opt.recent - (now - this_host->time), nows);
+        fdprintf(conn, "<td>%s</td>", nows);
+        fdprintf(conn, "<td><a href=\"?hsdrop=%0.10d\">drop</a></td></tr>\n", this_host->id);
+      }
+
+      if (color == 1) {
+        color = 2;
+      } else {
+        color = 1;
+      }
+
+      this_host = this_host->next;
+    }
+
+    fdprintf(conn, "</table>\n");
+  }
+
+  show_navigation(conn);
+  output_html_footer(conn);
+}
+
+void handshake(int linenum, int hitnum, int ignored)
 {
 #ifdef SOLARIS
   typedef int socklen_t; /* undefined and not unsigned as in linux */
 #endif
-  int conn, retval;
+  int conn, retval, id = 0;
 #ifndef IRIX
   socklen_t socks;
 #else
@@ -226,12 +585,8 @@ void handshake()
   struct sockaddr_in6 sain6;
   char nab[INET6_ADDRSTRLEN];
 #endif
-  char buf[BUFSIZE], nows[TIMESIZE], password[PASSWORDSIZE], salt[2], *pnt;
-  time_t now;
-  struct conn_data *this;
-  struct known_hosts *this_host;
-  unsigned char auth = 0, color = 1;
-  int max = 0;
+  char buf[BUFSIZE], password[PASSWORDSIZE], salt[3], *pnt, command[9] = "", option1 = 'm', option2 ='m';
+  unsigned char auth = 0;
 
 #ifndef HAVE_IPV6
   socks = sizeof(struct sockaddr_in);
@@ -273,8 +628,45 @@ void handshake()
 
   secure_read(conn, buf, BUFSIZE);
   while(!(strncmp(buf, "", BUFSIZE) == 0)) {
-    if((strlen(buf) == 22) && (strncmp(buf, "GET /?sort=", 11) == 0) && (strchr("ctpSsDdze", buf[11]) != NULL) && (strchr("ad", buf[12]) != NULL)) {
-      snprintf(opt.sort_order, MAXSORTSIZE, "%c%c", buf[11], buf[12]);
+#ifdef WEB_DEBUG
+    fprintf(stderr, "%3d %s\n", strlen(buf), buf);
+#endif
+    if((strlen(buf) == 14) && (strncmp(buf, "GET / HTTP/1.", 13) == 0)) {
+      strcpy(command, "show");
+    } else if((strlen(buf) == 21) && (strncmp(buf, "GET /?page=", 11) == 0) && (strchr("ioph", buf[11]) != NULL)) {
+      strcpy(command, "page");
+      option1 = buf[11];
+    } else if((strlen(buf) == 22) && (strncmp(buf, "GET /?sort=", 11) == 0) && (strchr("ctpbSsDdze", buf[11]) != NULL) && (strchr("ad", buf[12]) != NULL)) {
+      strcpy(command, "sort");
+      option1 = buf[11];
+      option2 = buf[12];
+    } else if((strlen(buf) == 22) && (strncmp(buf, "GET /?least=", 12) == 0) && (strchr("ml", buf[12]) != NULL)) {
+      strcpy(command, "least");
+      option1 = buf[12];
+    } else if((strlen(buf) == 20) && (strncmp(buf, "GET /?max=", 10) == 0) && (strchr("ml", buf[10]) != NULL)) {
+      strcpy(command, "max");
+      option1 = buf[10];
+    } else if((strlen(buf) == 22) && (strncmp(buf, "GET /?alert=", 12) == 0) && (strchr("ml", buf[12]) != NULL)) {
+      strcpy(command, "alert");
+      option1 = buf[12];
+    } else if((strlen(buf) == 24) && (strncmp(buf, "GET /?refresh=", 14) == 0) && (strchr("ml", buf[14]) != NULL)) {
+      strcpy(command, "refresh");
+      option1 = buf[14];
+    } else if((strlen(buf) == 23) && (strncmp(buf, "GET /?recent=", 13) == 0) && (strchr("ml", buf[13]) != NULL)) {
+      strcpy(command, "recent");
+      option1 = buf[13];
+    } else if((strlen(buf) == 32) && (strncmp(buf, "GET /?pcdrop=", 13) == 0)) {
+      id = atoi(buf+13);
+      if((id >= 0) && (id < INT_MAX))
+	strcpy(command, "pcdrop");
+    } else if((strlen(buf) == 34) && (strncmp(buf, "GET /?escalate=", 15) == 0)) {
+      id = atoi(buf+15);
+      if((id >= 0) && (id < INT_MAX))
+	strcpy(command, "escalate");
+    } else if((strlen(buf) == 32) && (strncmp(buf, "GET /?hsdrop=", 13) == 0)) {
+      id = atoi(buf+13);
+      if((id >= 0) && (id < INT_MAX))
+	strcpy(command, "hsdrop");
     } else if(strncmp(buf, "Authorization: Basic ", 21) == 0) {
       xstrncpy(password, buf+21, PASSWORDSIZE);
       decode_base64(password);
@@ -294,201 +686,94 @@ void handshake()
   signal(SIGPIPE, SIG_IGN);
 
   if (auth == 0) {
-    if(opt.verbose == 2) {
-      syslog(LOG_NOTICE, _("Authorization failed (%s)"), password);
-    } else if(opt.verbose) {
+    if(opt.verbose)
       syslog(LOG_NOTICE, _("Authorization failed"));
-    }
-    fdprintf(conn, "HTTP/1.0 401 Authorization Required\r\n");
-    fdprintf(conn, "Server: %s %s (C) %s\r\n", PACKAGE, VERSION, COPYRIGHT);
-    fdprintf(conn, "WWW-Authenticate: Basic realm=\"fwlogwatch\"\r\n");
-    fdprintf(conn, "Connection: close\r\n");
-    fdprintf(conn, "Content-Type: text/html\r\n\r\n");
-    fdprintf(conn, "<html>\n<head>\n<title>Authorization Required</title>\n</head>\n");
-    fdprintf(conn, _("<body>\n<h1>Authorization Required</h1>\n</body>\n</html>\n"));
+    http_header(conn, "401 Authorization Required", HEADER_CONTINUES);
+    fdprintf(conn, "WWW-Authenticate: Basic realm=\"fwlogwatch\"\r\n\r\n");
+    basic_html_body(conn, _("Authorization required"), _("Authorization required"));
   } else {
-    fdprintf(conn, "HTTP/1.0 200 OK\r\n");
-    fdprintf(conn, "Server: %s %s (C) %s\r\n", PACKAGE, VERSION, COPYRIGHT);
-    fdprintf(conn, "Connection: close\r\n");
-    fdprintf(conn, "Content-Type: text/html\r\n\r\n");
-
-    output_html_header(conn);
-
-    fdprintf(conn, _("<p><a href=\"/\">Reload</a>"));
-    if(opt.refresh > 0) {
-      fdprintf(conn, _("<br>\n(automatic refresh every %d seconds)</p>\n"), opt.refresh);
+    if(strncmp(command, "show", 4) == 0) {
+      show_status(conn, linenum, hitnum, ignored);
+    } else if(strncmp(command, "page", 4) == 0) {
+      opt.webpage = option1;
+    } else if(strncmp(command, "sort", 4) == 0) {
+      snprintf(opt.sort_order, MAXSORTSIZE, "%c%c", option1, option2);
+    } else if(strncmp(command, "least", 5) == 0) {
+      if((option1 =='l') && (opt.least > 1)) {
+	opt.least--;
+      } else if(option1 =='m') {
+	opt.least++;
+      }
+    } else if(strncmp(command, "max", 3) == 0) {
+      opt.max -= opt.max%10;
+      if((option1 =='l') && (opt.max > 9)) {
+	opt.max = opt.max - 10;
+      } else if(option1 =='m') {
+	opt.max = opt.max + 10;
+      }
+    } else if(strncmp(command, "alert", 5) == 0) {
+      if((option1 =='l') && (opt.threshold > 1)) {
+	opt.threshold--;
+      } else if(option1 =='m') {
+	opt.threshold++;
+      }
+      look_for_alert();
+    } else if(strncmp(command, "refresh", 7) == 0) {
+      opt.refresh -= opt.refresh%15;
+      if((option1 =='l') && (opt.refresh > 14)) {
+	opt.refresh = opt.refresh - 15;
+      } else if(option1 =='m') {
+	opt.refresh = opt.refresh + 15;
+      }
+    } else if(strncmp(command, "recent", 6) == 0) {
+      opt.recent -= opt.recent%300;
+      if((option1 =='l') && (opt.recent > 600)) {
+	opt.recent = opt.recent - 300;
+      } else if(option1 =='m') {
+	opt.recent = opt.recent + 300;
+      }
+    } else if(strncmp(command, "pcdrop", 6) == 0) {
+      struct conn_data *this;
+      this = first;
+      while(this != NULL) {
+	if (this->id == id) {
+	  this->end_time = 1;
+	  remove_old(RESP_REMOVE_OPC);
+	  break;
+	}
+	this = this->next;
+      }
+    } else if(strncmp(command, "escalate", 8) == 0) {
+      struct conn_data *this;
+      this = first;
+      while(this != NULL) {
+	if (this->id == id) {
+	  this->count += opt.threshold - this->count;
+	  look_for_alert();
+	  break;
+	}
+	this = this->next;
+      }
+    } else if(strncmp(command, "hsdrop", 6) == 0) {
+      struct known_hosts *this_host;
+      this_host = first_host;
+      while(this_host != NULL) {
+	if (this_host->id == id) {
+	  this_host->time = 1;
+	  remove_old(RESP_REMOVE_OHS);
+	  break;
+	}
+	this_host = this_host->next;
+      }
     } else {
-      fdprintf(conn, "</p>\n");
+      http_header(conn, "400 Bad request", HEADER_COMPLETE);
+      basic_html_body(conn, _("Bad request"), _("Bad request"));
     }
-    fdprintf(conn, _("<h2>General information</h2>\n"));
-
-    fdprintf(conn, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-    strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-    fdprintf(conn, _("<tr><td>Daemon start time:</td><td>%s</td></tr>\n"), nows);
-
-    now = time(NULL);
-    strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
-    fdprintf(conn, _("<tr><td>Current time:</td><td>%s</td></tr>\n"), nows);
-
-    output_timediff(opt.now, now, nows);
-    fdprintf(conn, _("<tr><td>Running time:</td><td>%s</td></tr>\n"), nows);
-
-    output_timediff(0, opt.recent, nows);
-    fdprintf(conn, _("<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n<tr><td>Discard timeout:</td><td>%s</td></tr>\n"), opt.threshold, nows);
-
-    fdprintf(conn, _("<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"),
-	     (opt.response & OPT_NOTIFY)?_(", notify"):"",
-	     (opt.response & OPT_RESPOND)?_(", respond"):"");
-
-    if(opt.least > 1) {
-      fdprintf(conn, _("<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in the packet cache.<td></tr>\n"), opt.least);
+    if((strncmp(command, "show", 4) != 0) && (command[0] != 0)) {
+      http_header(conn, "302 Found", HEADER_CONTINUES);
+      fdprintf(conn, "Location: /\r\n\r\n");
+      basic_html_body(conn, _("Redirect"), _("You should be redirected to the <a href=\"/\">root directory</a>"));
     }
-    if(opt.max != 0) {
-      fdprintf(conn, _("<tr><td colspan=\"2\">Only the top %d entries are shown in the packet cache.<td></tr>\n"), opt.max);
-    }
-
-    fdprintf(conn, "</table>\n");
-
-    fdprintf(conn, _("<h2>Packet cache</h2>\n"));
-
-    table_header(conn, TCP_OPTS);
-
-    sort_data();
-
-    this = first;
-    while((this != NULL) && ((opt.max == 0) || (max < opt.max))) {
-      time_t remaining;
-
-      if (opt.max != 0)
-	max++;
-      if(this->count >= opt.least) {
-	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this->start_time));
-	fdprintf(conn, "<tr class=\"r%d\" align=\"center\"><td>%d</td><td>%s</td>", color, this->count, nows);
-	if(opt.proto) {
-	  fdprintf(conn, "<td>%s</td>", resolve_protocol(this->protocol));
-	}
-	fdprintf(conn, "<td>%s</td>", inet_ntoa(this->shost));
-	if(opt.resolve) {
-	  fdprintf(conn, "<td>%s</td>", resolve_hostname(this->shost));
-	}
-	if(opt.src_port) {
-	  fdprintf(conn, "<td>%d</td>", this->sport);
-	  if(opt.sresolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_service(this->sport, resolve_protocol(this->protocol)));
-	  }
-	}
-	if(opt.dst_ip) {
-	  fdprintf(conn, "<td>%s</td>", inet_ntoa(this->dhost));
-	  if(opt.resolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_hostname(this->dhost));
-	  }
-	}
-	if(opt.dst_port) {
-	  fdprintf(conn, "<td>%d</td>", this->dport);
-	  if(opt.sresolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_service(this->dport, resolve_protocol(this->protocol)));
-	  }
-	}
-	if(opt.opts) {
-	  output_tcp_opts(this, buf);
-	  fdprintf(conn, "<td>%s</td>", buf);
-	}
-	if (this->end_time != 0) {
-	  remaining = opt.recent - (now - this->end_time);
-	} else {
-	  remaining = opt.recent - (now - this->start_time);
-	}
-	output_timediff(0, remaining, nows);
-	fdprintf(conn, "<td>%s</td></tr>\n", nows);
-	if (color == 1) {
-	  color = 2;
-	} else {
-	  color = 1;
-	}
-      }
-      this = this->next;
-    }
-    fdprintf(conn, "</table>\n");
-
-    color = 1;
-    fdprintf(conn, _("<h2>Host status</h2>\n"));
-
-    table_header(conn, NO_TCP_OPTS);
-
-    this_host = first_host;
-    while(this_host != NULL) {
-      fdprintf(conn, "<tr class=\"r%d\" align=\"center\"><td>%d</td>", color, this_host->count);
-
-      if (this_host->time == 0) {
-	int mask;
-	unsigned long int netmask[33] = {
-	  0x0,
-	  0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
-	  0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
-	  0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
-	  0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
-	  0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
-	  0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
-	  0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
-	  0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
-	};
-
-	fdprintf(conn, "<td>-</td>");
-	if(opt.proto) { fdprintf(conn, _("<td>any</td>")); }
-	for(mask=0;mask<32;mask++) {
-	  if (ntohl(netmask[mask]) == this_host->netmask.s_addr)
-	    break;
-	}
-	fdprintf(conn, _("<td>%s/%d (known host/net)</td>"), inet_ntoa(this_host->shost), mask);
-	if(opt.resolve) { fdprintf(conn, "<td>-</td>"); }
-	if(opt.src_port) { fdprintf(conn, _("<td>any</td>"));
-	if(opt.sresolve) { fdprintf(conn, "<td>-</td>"); } }
-	if(opt.dst_ip) { fdprintf(conn, _("<td>any</td>"));
-	if(opt.resolve) { fdprintf(conn, "<td>-</td>"); } }
-	if(opt.dst_port) { fdprintf(conn, _("<td>any</td>"));
-	if(opt.sresolve) { fdprintf(conn, "<td>-</td>"); } }
-	fdprintf(conn, "<td>-</td></tr>\n");
-      } else {
-	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this_host->time));
-	fdprintf(conn, "<td>%s</td>", nows);
-	if(opt.proto) {
-	  fdprintf(conn, "<td>%s</td>", resolve_protocol(this_host->protocol));
-	}
-	fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->shost));
-	if(opt.resolve) {
-	  fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->shost));
-	}
-	if(opt.src_port) {
-	  fdprintf(conn, "<td>%d</td>", this_host->sport);
-	  if(opt.sresolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_service(this_host->sport, resolve_protocol(this_host->protocol)));
-	  }
-	}
-	if(opt.dst_ip) {
-	  fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->dhost));
-	  if(opt.resolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->dhost));
-	  }
-	}
-	if(opt.dst_port) {
-	  fdprintf(conn, "<td>%d</td>", this_host->dport);
-	  if(opt.sresolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_service(this_host->dport, resolve_protocol(this_host->protocol)));
-	  }
-	}
-	output_timediff(0, opt.recent - (now - this_host->time), nows);
-	fdprintf(conn, "<td>%s</td></tr>\n", nows);
-      }
-
-      if (color == 1) {
-	color = 2;
-      } else {
-	color = 1;
-      }
-
-      this_host = this_host->next;
-    }
-    output_html_footer(conn);
   }
 
   signal(SIGPIPE, SIG_DFL);
@@ -498,8 +783,9 @@ void handshake()
     syslog(LOG_NOTICE, "close: %s", strerror(errno));
   }
 
+  if(opt.verbose == 2)
+    syslog(LOG_NOTICE, _("Requested function: %s"), command);
+
   if(opt.verbose)
     syslog(LOG_NOTICE, _("Connection closed"));
-
-  return;
 }

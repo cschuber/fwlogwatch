@@ -1,4 +1,5 @@
-/* $Id: cisco_pix.l,v 1.14 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: cisco_pix.l,v 1.15 2004/04/25 18:56:19 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
@@ -28,7 +29,8 @@ DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
-PIX	"%PIX-"[1-6]"-"[0-9]{6}":"
+SYSID	"%PIX"|"%FWSM"
+PIX	{SYSID}"-"[1-6]"-"[0-9]{6}":"
 
 %%
 
@@ -192,12 +194,15 @@ unsigned char flex_cisco_pix(char *input, int linenum)
 
   cisco_pix_scan_string(input);
   cisco_pixlex();
+  cisco_pix_delete_buffer(YY_CURRENT_BUFFER);
 
   if (opt.parser == (CISCO_PIX_DATE|CISCO_PIX_SRC|CISCO_PIX_DST)) {
     return PARSE_OK;
   } else {
     if(opt.verbose)
-      fprintf(stderr, "cisco pix log parse error in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "cisco_pix parse error in line %d, ignoring.\n", linenum);
+    if(opt.verbose == 2)
+      fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
 }

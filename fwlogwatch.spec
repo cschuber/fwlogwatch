@@ -1,12 +1,13 @@
-# $Id: fwlogwatch.spec,v 1.28 2003/06/23 15:26:53 bwess Exp $
+# Copyright (C) 2000-2004 Boris Wesslowski
+# $Id: fwlogwatch.spec,v 1.29 2004/04/25 18:56:20 bwess Exp $
 
 Name: fwlogwatch
-Version: 0.9.3
+Version: 1.0
 Release: 1
 Group: Applications/Utilities
-Packager: Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
-Vendor: RUS-CERT
-URL: http://cert.uni-stuttgart.de/projects/fwlogwatch/
+Packager: Boris Wesslowski <bw@inside-security.de>
+Vendor: Inside Security GmbH
+URL: http://fwlogwatch.inside-security.de/
 License: GPL
 Summary: Firewall log analyzer, report generator and realtime response agent
 Source: %{name}-%{version}.tar.gz
@@ -37,6 +38,7 @@ reporting anomalies or starting attack countermeasures.
 %__install -d "${RPM_BUILD_ROOT}%{_sysconfdir}/rc.d/init.d"
 %__install -d "${RPM_BUILD_ROOT}%{_mandir}/man8"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/de/LC_MESSAGES"
+%__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/ja/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/pt_BR/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/sv/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/zh_CN/LC_MESSAGES"
@@ -63,6 +65,7 @@ reporting anomalies or starting attack countermeasures.
 %{_sbindir}/fwlogwatch
 %{_mandir}/man8/fwlogwatch.8.gz
 %lang(de) %{_datadir}/locale/de/LC_MESSAGES/fwlogwatch.mo
+%lang(ja) %{_datadir}/locale/ja/LC_MESSAGES/fwlogwatch.mo
 %lang(pt_BR) %{_datadir}/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
 %lang(sv) %{_datadir}/locale/sv/LC_MESSAGES/fwlogwatch.mo
 %lang(zh_CN) %{_datadir}/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo

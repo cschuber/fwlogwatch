@@ -1,4 +1,5 @@
-/* $Id: output.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: output.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -67,25 +68,25 @@ void output_tcp_opts(struct conn_data *input, char *buf)
 
 void output_html_entry(struct conn_data *input, FILE *fd)
 {
-  char *proto, time[TIMESIZE], buf[HOSTLEN];
+  char *proto = NULL, time[TIMESIZE], buf[HOSTLEN];
 
   if (opt.html == 2) {
-    fprintf(fd, "<tr class=\"r%d\" align=\"center\"><td>", opt.html);
+    fprintf(fd, "<tr class=\"r%d\"><td>", opt.html);
   } else {
-    fprintf(fd, "<tr class=\"r%d\" align=\"center\"><td>", opt.html);
+    fprintf(fd, "<tr class=\"r%d\"><td>", opt.html);
   }
 
   fprintf(fd, "%d", input->count);
 
   if(opt.stimes) {
-    strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->start_time));
+    strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->start_time));
     fprintf(fd, "</td><td>%s", time);
   }
 
   if(opt.etimes) {
     fprintf(fd, "</td><td>");
     if(input->end_time != 0) {
-      strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->end_time));
+      strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->end_time));
       fprintf(fd, "%s", time);
     } else {
       fprintf(fd, "-");
@@ -109,9 +110,10 @@ void output_html_entry(struct conn_data *input, FILE *fd)
   if(opt.ifs)
     fprintf(fd, "</td><td>%s", input->interface);
 
-  proto = resolve_protocol(input->protocol);
-  if(opt.proto)
+  if(opt.proto) {
+    proto = resolve_protocol(input->protocol);
     fprintf(fd, "</td><td>%s", proto);
+  }
 
   if (opt.datalen)
     fprintf(fd, "</td><td>%d", input->datalen);
@@ -164,7 +166,7 @@ void output_text_entry(struct conn_data *input, FILE *fd)
   unsigned char first = 1;
 
   if(opt.stimes) {
-    strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->start_time));
+    strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->start_time));
     fprintf(fd, "%s", time);
     first = 0;
   }
@@ -173,7 +175,7 @@ void output_text_entry(struct conn_data *input, FILE *fd)
     if(!first)
       fprintf(fd, _(" to "));
     if(input->end_time != 0) {
-      strftime(time, TIMESIZE, "%b %d %H:%M:%S", localtime(&input->end_time));
+      strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->end_time));
       fprintf(fd, "%s", time);
     } else {
       fprintf(fd, "-");
@@ -280,8 +282,8 @@ void output_text_entry(struct conn_data *input, FILE *fd)
 void output_html_table(FILE *fd)
 {
   fprintf(fd, "</p>\n");
-  fprintf(fd, "<table border=\"0\" cellspacing=\"1\" cellpadding=\"3\">\n");
-  fprintf(fd, "<tr align=\"center\"><th>#</th>");
+  fprintf(fd, "<table cellspacing=\"1\" cellpadding=\"3\">\n");
+  fprintf(fd, "<tr><th>#</th>");
 
   if(opt.stimes)
     fprintf(fd, _("<th>start</th>"));
@@ -343,20 +345,22 @@ void output_html_table(FILE *fd)
 }
 
 void output_html_header(int fd) {
-  char time[TIMESIZE];
+  char nows[TIMESIZE];
+  time_t now;
 
-  fdprintf(fd, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-  strftime(time, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&opt.now));
-  fdprintf(fd, "<html>\n<head>\n<title>%s - %s</title>\n", opt.title, time);
-  fdprintf(fd, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\">\n");
-  fdprintf(fd, "<meta http-equiv=\"pragma\" content=\"no-cache\">\n");
-  fdprintf(fd, "<meta http-equiv=\"expires\" content=\"0\">\n");
+  fdprintf(fd, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
+  now = time(NULL);
+  strftime(nows, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&now));
+  fdprintf(fd, "<html>\n<head>\n<title>%s - %s</title>\n", opt.title, nows);
+  fdprintf(fd, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\n");
+  fdprintf(fd, "<meta http-equiv=\"pragma\" content=\"no-cache\" />\n");
+  fdprintf(fd, "<meta http-equiv=\"expires\" content=\"0\" />\n");
   if((opt.mode == REALTIME_RESPONSE) && (opt.refresh > 0)) {
-    fdprintf(fd, "<meta http-equiv=\"refresh\" content=\"%d\">\n", opt.refresh);
+    fdprintf(fd, "<meta http-equiv=\"refresh\" content=\"%d\" />\n", opt.refresh);
   }
   if (opt.stylesheet[0] != '\0') {
     if ((opt.mode != REALTIME_RESPONSE) || (strncmp(opt.stylesheet, "http", 4) == 0)) {
-      fdprintf(fd, "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\">\n", opt.stylesheet);
+      fdprintf(fd, "<link rel=\"stylesheet\" href=\"%s\" type=\"text/css\" />\n", opt.stylesheet);
     } else {
       char buf[BUFSIZE];
       FILE *cssfd;
@@ -376,21 +380,22 @@ void output_html_header(int fd) {
     }
   } else {
     fdprintf(fd, "<style type=\"text/css\">\n<!--\n");
-    fdprintf(fd, "body {font-family: verdana, arial, helvetica, sans-serif; font-size: 11px; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
-    fdprintf(fd, "th, td {font-family: verdana, arial, helvetica, sans-serif; font-size: 11px; font-weight: normal; color: %s}\n", opt.textcol);
-    fdprintf(fd, ".r1 {background: %s}\n", opt.rowcol1);
-    fdprintf(fd, ".r2 {background: %s}\n", opt.rowcol2);
+    fdprintf(fd, "body {font-family: verdana, arial, helvetica, sans-serif; font-size: 9pt; text-align: center; color: %s; background: %s}\n", opt.textcol, opt.bgcol);
+    fdprintf(fd, "table {margin-left: auto; margin-right: auto; border: 1px solid %s}\n", opt.rowcol2);
+    fdprintf(fd, "th {vertical-align: top}\n", opt.rowcol2);
     fdprintf(fd, "a:link, a:active, a:visited {color: %s}\n", opt.textcol);
+    fdprintf(fd, ".r1 {color: %s; background: %s}\n", opt.textcol, opt.rowcol1);
+    fdprintf(fd, ".r2 {color: %s; background: %s}\n", opt.textcol, opt.rowcol2);
+    fdprintf(fd, ".copyright {font-size: x-small}\n");
     fdprintf(fd, "-->\n</style>\n");
   }
-  fdprintf(fd, "</head>\n<body>\n<center>\n");
+  fdprintf(fd, "</head>\n<body>\n");
   fdprintf(fd, "<h1>%s</h1>\n", opt.title);
 }
 
 void output_html_footer(int fd)
 {
-  fdprintf(fd, "</table>\n</center>\n");
-  fdprintf(fd, "<p><small><a href=\"http://cert.uni-stuttgart.de/projects/fwlogwatch/\">%s</a> %s &copy; %s</small></p>\n", PACKAGE, VERSION, COPYRIGHT);
+  fdprintf(fd, "<p class=\"copyright\"><a href=\"http://fwlogwatch.inside-security.de/\">%s</a> %s &copy; %s</p>\n", PACKAGE, VERSION, COPYRIGHT);
   fdprintf(fd, "</body>\n</html>\n");
 }
 

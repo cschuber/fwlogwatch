@@ -1,4 +1,5 @@
-/* $Id: response.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: response.h,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #ifndef _RESPONSE_H
 #define _RESPONSE_H
@@ -9,7 +10,8 @@
 void check_for_ipchains(void);
 void check_script_perms(char *name);
 void modify_firewall(unsigned char action);
-void remove_old(void);
+void remove_old(unsigned char mode);
 void look_for_alert(void);
+void sort_hs(void);
 
 #endif

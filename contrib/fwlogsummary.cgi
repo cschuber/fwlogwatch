@@ -1,5 +1,6 @@
 #!/bin/sh
-# $Id: fwlogsummary.cgi,v 1.27 2003/06/23 15:26:53 bwess Exp $
+# Copyright (C) 2000-2004 Boris Wesslowski
+# $Id: fwlogsummary.cgi,v 1.28 2004/04/25 18:56:24 bwess Exp $
 
 # This script generates 8 fwlogwatch html summaries in a directory visible
 # to your web server.
@@ -77,7 +78,7 @@ cat <<EOF > $WEBDIR/index.html
 </ul>
 <br>
 <hr>
-<small><a href="http://cert.uni-stuttgart.de/projects/fwlogwatch/">fwlogwatch</a> &copy; Boris Wesslowski, RUS-CERT</small>
+<small><a href="http://fwlogwatch.inside-security.de/">fwlogwatch</a> &copy; Boris Wesslowski</small>
 
 </font>
 </body>

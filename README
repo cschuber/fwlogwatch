@@ -1,68 +1,71 @@
-$Id: README,v 1.27 2003/06/23 15:26:53 bwess Exp $
+$Id: README,v 1.28 2004/04/25 18:56:19 bwess Exp $
 
-fwlogwatch is a security tool written in C by Boris Wesslowski for
+fwlogwatch is a security tool written in C by Boris Wesslowski originally for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
-lot of log formats and analysis options. It also features incident report
-and realtime response capabilities, a web interface and internationalization.
+lot of log formats and has many analysis options. It also features incident
+report and realtime response capabilities, an interactive web interface and
+internationalization.
 
-It is available from the RUS-CERT website
-http://cert.uni-stuttgart.de/projects/fwlogwatch/
-and from
-http://www.kyb.uni-stuttgart.de/boris/software.shtml
-
-The inter-release changes in the source can be reviewed with
-cvsweb at SourceForge: http://sourceforge.net/projects/fwlogwatch/
+It is available at http://fwlogwatch.inside-security.de/
 
 
 FEATURES
-- General Features:
+- General features:
   - Can detect and process log entries in the following formats:
-    Linux ipchains, Linux netfilter/iptables,
-    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX, NetScreen,
-    Windows XP firewall, Elsa Lancom router and the Snort IDS.
-  - Entries can be parsed in combined log files, the parsers to be used
-    can be selected.
-  - Gzip-compressed logs are supported.
-  - Can separate recent from old entries and detects timewarps in log files.
+    - Linux ipchains
+    - Linux netfilter/iptables
+    - Solaris/BSD/Irix/HP-UX ipfilter
+    - BSD ipfw
+    - Cisco IOS
+    - Cisco PIX / FWSM
+    - NetScreen
+    - Windows XP firewall
+    - Elsa Lancom router
+    - Snort IDS
+  - Entries can be parsed from single, multiple and combined log files, the
+    parsers to be used can be selected.
+  - Gzip-compressed logs are supported transparently.
+  - Can separate recent from old entries and detects timewarps in log
+    files.
   - Can recognize 'last message repeated' entries concerning the firewall.
   - Integrated resolver for protocols, services and host names.
   - Can do lookups in the whois database.
   - Own DNS and whois information cache for faster lookups.
-  - Hosts, ports, chains and branches (targets) can be selected or
-    excluded as needed.
-  - Support for internationalization (available in English, German,
-    Portuguese, simplified and traditional Chinese and Swedish).
-
+  - Hosts, networks, ports, chains and branches (targets) can be selected
+    or excluded as needed.
+  - Support for internationalization (available in english, german,
+    portuguese, simplified and traditional chinese, swedish and japanese).
 - Log summary mode:
   - A lot of options to find and display relevant patterns in connection
     attempts.
   - Intelligent selection of certain fields (e.g. the host name column is
-    omitted and the host mentioned in the header of the summary if the
-    log is from a single host, the same happens with the chains, targets
-    and interfaces).
-  - Plain text and HTML (with CSS) output with many sort options.
-  - Can send reports by email.
-
+    omitted and the host mentioned in the header of the summary if the log
+    is from a single host, the same happens with chains, targets and
+    interfaces).
+  - Output as plain text or HTML (W3C XHTML 1.1 with inline or linked CSS
+    level 2) with limit and sort options.
+  - Can send summaries by email.
 - Interactive report mode:
-  - The integrated report generator fills and presents a
-    report that can be sent to abuse contacts of attacking sites or
-    computer emergency response teams (CERTs).
+  - The integrated report generator fills in and presents a report that can
+    be sent to abuse contacts of attacking sites or computer emergency
+    response teams (CERTs).
   - Supports templates and incident number generation.
   - All fields can be adjusted as needed interactively.
-
 - Realtime response mode:
-  - The program detaches and stays in the background as a daemon.
-  - Detection of the necessary ipchains rules with logging turned on can be
-    configured.
+  - The program detaches and stays in background as a daemon.
+  - For ipchains setups detection of necessary rules with logging turned on
+    can be configured.
+  - Can catch up reading existing entries to provide up-to-date state
+    information from program start on.
   - Response can be a notification (in form of a log file entry, an email,
     a remote winpopup message or whatever you can put into a shell script),
     or a customizable firewall modification.
   - The included response script adds a new chain for fwlogwatch to
-    ipchains or netfilter setups and attackers are blocked with
-    new firewall rules.
+    ipchains or netfilter setups and attackers are blocked with new
+    firewall rules.
   - Supports trusted hosts (anti-spoofing).
-  - The current status of the program can be followed through a web
-    interface (supports IPv6).
+  - The current status of the program can be followed and controlled
+    through a web interface (supports IPv6).
 
 The commented configuration file supports and explains all options and will
 get you started quickly. Please read the man page for details on the
@@ -186,8 +189,8 @@ CONFIGURATION AND EXAMPLES
   header of the script to adapt it to your system (e.g. prefix of the log
   file names, location of fwlogwatch).
 
-- A sample init file (for Red Hat Linux systems) for starting fwlogwatch
-  in realtime response mode at system start is also included.
+- Sample init files (for Red Hat and SuSE Linux systems) to start
+  fwlogwatch in realtime response mode at system start are also included.
 
 - You might want to replace your /etc/services file by the one supplied
   with nmap (http://www.insecure.org/nmap/), a lot more services will be
@@ -198,8 +201,10 @@ CONFIGURATION AND EXAMPLES
 
 FEEDBACK
   If you find a bug or have an idea for a new feature please send an email
-  to Wesslowski@CERT.Uni-Stuttgart.DE
+  to Boris Wesslowski <bw@inside-security.de>.
 
   If you want to report a parser problem please specify which log format you
   are trying to parse, the version of the log generator and fwlogwatch you
   are using and provide a sample incuding log lines for which parsing fails.
+  You also can submit unrecognized entries at
+  http://fwlogwatch.inside-security.de/unrecognized.php

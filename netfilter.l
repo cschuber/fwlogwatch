@@ -1,4 +1,5 @@
-/* $Id: netfilter.l,v 1.15 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.16 2004/04/25 18:56:22 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -23,7 +24,7 @@ void nf_parse_proto(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
-PREFIX	[ -~¡-ÿ]+
+PREFIX	[ -OQ-~¡-ÿ]+|([ -OQ-~¡-ÿ]*P[ -GI-~¡-ÿ]*)|([ -OQ-~¡-ÿ]*PH[ -XZ-~¡-ÿ]*)|([ -OQ-~¡-ÿ]*PHY[ -RT-~¡-ÿ]*)
 LOGHOST	[0-9.a-zA-Z()_:-]*
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
@@ -42,6 +43,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 " klogd: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
 " "{PREFIX}"IN="{STRING}?		nf_parse_prefix(nftext+1, NF_OPT_PREFIX);
 "OUT="{STRING}?		/* ignore */
+"PHYSIN="{STRING}?	/* ignore */
+"PHYSOUT="{STRING}?	/* ignore */
 "MAC="(({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
 "SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);
 "DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_DST);
@@ -165,6 +168,7 @@ unsigned char flex_netfilter(char *input, int linenum)
   init_line();
   nf_scan_string(input);
   nflex();
+  nf_delete_buffer(YY_CURRENT_BUFFER);
 
   xstrncpy(opt.line->branchname, "-", SHORTLEN);
   opt.line->count = 1;
@@ -175,7 +179,7 @@ unsigned char flex_netfilter(char *input, int linenum)
   if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
     return PARSE_OK;
   }
-  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 47)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
+  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 47) || (opt.line->protocol == 50)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
     return PARSE_OK;
   }
   if(opt.verbose)

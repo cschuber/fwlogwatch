@@ -1,4 +1,5 @@
-/* $Id: parser.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: parser.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,13 +8,12 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "parser.h"
 #include "compare.h"
-#include "utils.h"
 #include "cisco_ios.h"
 #include "cisco_pix.h"
 #include "ipchains.h"
 #include "ipfilter.h"
+#include "ipfw.h"
 #include "netfilter.h"
 #include "win_xp.h"
 #include "snort.h"
@@ -66,7 +66,9 @@ unsigned char parse_line(char *input, int linenum)
     /* For ipfilter log format see the source */
     /* http://coombs.anu.edu.au/~avalon/ */
     retval = flex_ipfilter(input, linenum);
-  } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-"))) {
+  } else if ((opt.format & PARSER_IPFW) && (strstr(input, " ipfw: "))) {
+    retval = flex_ipfw(input, linenum);
+  } else if ((opt.format & PARSER_CISCO_PIX) && ((strstr(input, "%PIX-") || strstr(input, "%FWSM-")))) {
     /* For cisco log format see CCO */
     retval = flex_cisco_pix(input, linenum);
   } else if ((opt.format & PARSER_NETSCREEN) && (strstr(input, " NetScreen "))) {
@@ -87,14 +89,12 @@ unsigned char parse_line(char *input, int linenum)
     return PARSE_NO_HIT;
   }
 
-  if(opt.mode != REALTIME_RESPONSE) {
-    if(opt.recent != 0) {
-      if((opt.now - opt.line->time) > opt.recent) {
-	if(opt.verbose == 2) {
-	  fprintf(stderr, "o");
-	}
-	return PARSE_TOO_OLD;
+  if(opt.recent != 0) {
+    if((opt.now - opt.line->time) > opt.recent) {
+      if(opt.verbose == 2) {
+	fprintf(stderr, "o");
       }
+      return PARSE_TOO_OLD;
     }
   }
 
@@ -107,7 +107,7 @@ unsigned char parse_line(char *input, int linenum)
       while(excluded_this != NULL) {
 	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_HOST) != 0) {
 	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    if(opt.line->shost.s_addr == excluded_this->value) {
+	    if((opt.line->shost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
@@ -115,7 +115,7 @@ unsigned char parse_line(char *input, int linenum)
 	      }
 	    }
 	  } else {
-	    if(opt.line->dhost.s_addr == excluded_this->value) {
+	    if((opt.line->dhost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
 	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
@@ -144,7 +144,7 @@ unsigned char parse_line(char *input, int linenum)
 	  }
 	}
 	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
-	  if(strncmp(opt.line->chainlabel, excluded_this->svalue, SHORTLEN) == 0) {
+	  if(strcmp(opt.line->chainlabel, excluded_this->svalue) == 0) {
 	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
 	    } else {
@@ -153,7 +153,7 @@ unsigned char parse_line(char *input, int linenum)
 	  }
 	}
 	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
-	  if(strncmp(opt.line->branchname, excluded_this->svalue, SHORTLEN) == 0) {
+	  if(strcmp(opt.line->branchname, excluded_this->svalue) == 0) {
 	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
 	    } else {
@@ -214,10 +214,10 @@ int parse_time(char *input)
       seconds = seconds * 60 * 60 * 24 * 7;
       break;
     case 'M':
-      seconds = seconds * 60 * 60 * 24 * 31;
+      seconds = seconds * 60 * 60 * 24 * 30;
       break;
     case 'y':
-      seconds = seconds * 60 * 60 * 24 * 31 * 12;
+      seconds = seconds * 60 * 60 * 24 * 365;
       break;
     }
   } else {
@@ -264,6 +264,9 @@ void select_parsers()
 	break;
       case 's':
 	opt.format = opt.format | PARSER_SNORT;
+	break;
+      case 'b':
+	opt.format = opt.format | PARSER_IPFW;
 	break;
       default:
 	fprintf(stderr, _("Unknown parser: '%c'.\n"), opt.format_sel[i]);

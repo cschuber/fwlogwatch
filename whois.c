@@ -1,4 +1,5 @@
-/* $Id: whois.c,v 1.12 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: whois.c,v 1.13 2004/04/25 18:56:23 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,11 +7,13 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+
 #ifndef SOLARIS
 #include <string.h>
 #else
 #include <strings.h>
 #endif
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "main.h"
@@ -97,10 +100,9 @@ char *whois_get_from_as(int asn)
   return (data);
 }
 
-unsigned char whois_search_desc(struct whois_entry *we)
+void whois_search_desc(struct whois_entry *we)
 {
   char *obj, *descs, *desce;
-  unsigned char ok = 0;
 
   obj = whois_get_from_as(we->as_number);
   if (obj != NULL) {
@@ -112,23 +114,21 @@ unsigned char whois_search_desc(struct whois_entry *we)
       desce = strchr(descs, '\n');
       if (desce != NULL)
 	*desce = '\0';
-      xstrncpy(we->as_descr, descs, WHOISDESCLEN);
-      ok++;
+      we->as_descr = xmalloc(strlen(descs)+1);
+      xstrncpy(we->as_descr, descs, strlen(descs)+1);
     }
     free(obj);
   }
-
-  return(ok);
 }
 
 void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 {
   char cmdstr[WHOISCMDLEN], *data, *descs, *desce;
 
-  we->as_number=0;
-  we->ip_route[0]='\0';
-  we->ip_descr[0]='\0';
-  we->as_descr[0]='\0';
+  we->as_number = 0;
+  we->ip_route = NULL;
+  we->ip_descr = NULL;
+  we->as_descr = NULL;
 
   snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", inet_ntoa(ip));
   write(opt.whois_sock, cmdstr, strlen(cmdstr));
@@ -148,23 +148,25 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 	we->as_number = atoi(descs);
 	whois_search_desc(we);
 	descs = desce + 1;
-      } else if ((!we->ip_route[0]) && (strstr(descs, "route:") == descs)) {
+      } else if ((we->ip_route == NULL) && (strstr(descs, "route:") == descs)) {
 	descs += 6;
 	while ((*descs == ' ') || (*descs == '\t'))
 	  descs++;
 	desce = strchr(descs, '\n');
 	if (desce != NULL)
 	  *desce = '\0';
-	xstrncpy(we->ip_route, descs, WHOISROUTELEN);
+	we->ip_route = xmalloc(strlen(descs)+1);
+	xstrncpy(we->ip_route, descs, strlen(descs)+1);
 	descs = desce + 1;
-      } else if ((!we->ip_descr[0]) && (strstr(descs, "descr:") == descs)) {
+      } else if ((we->ip_descr == NULL) && (strstr(descs, "descr:") == descs)) {
 	descs += 6;
 	while ((*descs == ' ') || (*descs == '\t'))
 	  descs++;
 	desce = strchr(descs, '\n');
 	if (desce != NULL)
 	  *desce = '\0';
-	xstrncpy(we->ip_descr, descs, WHOISDESCLEN);
+	we->ip_descr = xmalloc(strlen(descs)+1);
+	xstrncpy(we->ip_descr, descs, strlen(descs)+1);
 	descs = desce + 1;
       } else {
 	descs++;
@@ -174,12 +176,18 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
   }
 
   if(we->as_number > 0) {
-    if(!we->ip_route[0])
-      xstrncpy(we->ip_route, "-", WHOISROUTELEN);
-    if(!we->ip_descr[0])
-      xstrncpy(we->ip_descr, "-", WHOISDESCLEN);
-    if(!we->as_descr[0])
-      xstrncpy(we->as_descr, "-", WHOISDESCLEN);
+    if(we->ip_route == NULL) {
+      we->ip_route = xmalloc(2);
+      xstrncpy(we->ip_route, "-", 2);
+    }
+    if(we->ip_descr == NULL) {
+      we->ip_descr = xmalloc(2);
+      xstrncpy(we->ip_descr, "-", 2);
+    }
+    if(we->as_descr == NULL) {
+      we->as_descr = xmalloc(2);
+      xstrncpy(we->as_descr, "-", 2);
+    }
   }
 }
 

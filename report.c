@@ -1,4 +1,5 @@
-/* $Id: report.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: report.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +8,6 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "main.h"
 #include "resolve.h"
 #include "output.h"
 #include "response.h"

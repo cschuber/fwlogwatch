@@ -1,4 +1,5 @@
-/* $Id: rcfile.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: rcfile.h,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #ifndef _RCFILE_H
 #define _RCFILE_H

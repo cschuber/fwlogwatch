@@ -1,4 +1,5 @@
-/* $Id: whois.h,v 1.12 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: whois.h,v 1.13 2004/04/25 18:56:23 bwess Exp $ */
 
 #ifndef _WHOIS_H
 #define _WHOIS_H

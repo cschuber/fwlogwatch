@@ -1,4 +1,5 @@
-/* $Id: utils.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: utils.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@ extern struct options opt;
 extern struct conn_data *first;
 extern struct dns_cache *dns_first;
 extern struct known_hosts *first_host;
+extern struct whois_entry *whois_first;
 extern struct parser_options *excluded_first;
 
 
@@ -103,6 +105,10 @@ void free_conn_data()
   while (this != NULL) {
     first = this;
     this = this->next;
+    free(first->hostname);
+    free(first->chainlabel);
+    free(first->branchname);
+    free(first->interface);
     free(first);
   }
   first = NULL;
@@ -116,9 +122,26 @@ void free_dns_cache()
   while (dns_this != NULL) {
     dns_first = dns_this;
     dns_this = dns_this->next;
+    free(dns_first->fqdn);
     free(dns_first);
   }
   dns_first = NULL;
+}
+
+void free_whois()
+{
+  struct whois_entry *whois_this;
+
+  whois_this = whois_first;
+  while (whois_this != NULL) {
+    whois_first = whois_this;
+    whois_this = whois_this->next;
+    free(whois_first->ip_route);
+    free(whois_first->ip_descr);
+    free(whois_first->as_descr);
+    free(whois_first);
+  }
+  whois_first = NULL;
 }
 
 void free_hosts()
@@ -142,6 +165,8 @@ void free_exclude_data()
   while (excluded_this != NULL) {
     excluded_first = excluded_this;
     excluded_this = excluded_this->next;
+    if(excluded_first->svalue != NULL)
+      free(excluded_first->svalue);
     free(excluded_first);
   }
   excluded_first = NULL;
@@ -277,22 +302,24 @@ void add_known_host(char *ip)
     exit(EXIT_FAILURE);
   }
 
+  host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
+
   test_host = first_host;
   while (test_host != NULL) {
-    if (test_host->shost.s_addr == (host->shost.s_addr & test_host->netmask.s_addr)) {
+    if (test_host->shost.s_addr == host->shost.s_addr) {
       free(host);
       return;
     }
     test_host = test_host->next;
   }
 
-  host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
   host->time = 0;
   host->count = 0;
   host->protocol = 0;
   host->dhost.s_addr = 0;
   host->sport = 0;
   host->dport = 0;
+  host->id = opt.global_id++;
   host->next = first_host;
   first_host = host;
 }
@@ -304,19 +331,29 @@ void add_exclude_hpb(char *input, unsigned char mode)
 
   excluded_this = xmalloc(sizeof(struct parser_options));
   excluded_this->mode = mode;
+  excluded_this->svalue = NULL;
   if(mode & PARSER_MODE_HOST) {
+    struct parser_options *excluded_test;
+    excluded_this->netmask.s_addr = parse_cidr(input);
     if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
       fprintf(stderr, _("(excluded host)\n"));
       free(excluded_this);
       exit(EXIT_FAILURE);
     }
-    excluded_this->value = ip.s_addr;
-  }
-  if(mode & PARSER_MODE_PORT) {
+    excluded_this->value = ip.s_addr & excluded_this->netmask.s_addr;
+    excluded_test = excluded_first;
+    while (excluded_test != NULL) {
+      if (excluded_test->value == excluded_this->value) {
+	free(excluded_this);
+	return;
+      }
+      excluded_test = excluded_test->next;
+    }
+  } else if(mode & PARSER_MODE_PORT) {
     excluded_this->value = atoi(input);
-  }
-  if(mode & (PARSER_MODE_CHAIN | PARSER_MODE_BRANCH)) {
-    xstrncpy(excluded_this->svalue, input, SHORTLEN);
+  } else if(mode & (PARSER_MODE_CHAIN | PARSER_MODE_BRANCH)) {
+    excluded_this->svalue = xmalloc(strlen(input)+1);
+    xstrncpy(excluded_this->svalue, input, strlen(input)+1);
   }
   excluded_this->next = excluded_first;
   excluded_first = excluded_this;
@@ -372,7 +409,7 @@ void generate_email_header(FILE *fd)
   char stime[TIMESIZE];
 
   now = time(NULL);
-  strftime(stime, TIMESIZE, "%Y%m%d%H%M%S", localtime(&now));
+  strftime(stime, TIMESIZE, "%Y%m%d-%H%M%S", localtime(&now));
 
   fprintf(fd, "From: %s\n", opt.sender);
   fprintf(fd, "To: %s\n", opt.recipient);
@@ -383,7 +420,7 @@ void generate_email_header(FILE *fd)
   if(opt.html) {
     fprintf(fd, "Mime-Version: 1.0\n");
     fprintf(fd, "Content-Type: text/html; charset=iso-8859-1\n");
-    fprintf(fd, "Content-Disposition: attachment; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
+    fprintf(fd, "Content-Disposition: inline; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
   }
   fprintf(fd, "\n");
 }

@@ -1,4 +1,5 @@
-/* $Id: lancom.c,v 1.4 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: lancom.c,v 1.5 2004/04/25 18:56:21 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

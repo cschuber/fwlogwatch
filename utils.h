@@ -1,4 +1,5 @@
-/* $Id: utils.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: utils.h,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -9,6 +10,7 @@ void log_exit(unsigned char returncode);
 void run_command(char *buf);
 void free_conn_data(void);
 void free_dns_cache(void);
+void free_whois(void);
 void free_hosts(void);
 void free_exclude_data(void);
 void init_line(void);

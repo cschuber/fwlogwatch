@@ -1,4 +1,5 @@
-/* $Id: main.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: main.c,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,7 @@ void usage(char *me, unsigned char exitcode)
   printf("\n");
 
   printf(_("Global options:\n"));
+  printf(_("  -b           show amount of data (sum of total packet lengths)\n"));
   printf(_("  -c <file>    specify config file (defaults to %s)\n"), RCFILE);
   printf(_("  -D           do not differentiate destination IP addresses\n"));
   printf(_("  -d           differentiate destination ports\n"));
@@ -41,12 +43,13 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -P <format>  use only parsers for specific formats\n"));
   printf(_("  -p           differentiate protocols\n"));
   printf(_("  -s           differentiate source ports\n"));
+  printf(_("  -U <title>   set report and status page title and email subject\n"));
   printf(_("  -v           verbose, specify twice for more info\n"));
   printf(_("  -y           differentiate TCP options\n"));
   printf("\n");
 
   printf(_("Log summary mode (default):\n"));
-  printf(_("  -b           show amount of data (sum of total packet lengths)\n"));
+  printf(_("  -C <email>   carbon copy recipients\n"));
   printf(_("  -e           show end times\n"));
   printf(_("  -l <time>    process recent events only (defaults to off)\n"));
   printf(_("  -o <file>    specify output file\n"));
@@ -62,7 +65,6 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -i <count>   interactive mode with report threshold\n"));
   printf(_("  -F <email>   report sender address (defaults to '%s')\n"), opt.sender);
   printf(_("  -T <email>   address of CERT or abuse contact to send report to\n"));
-  printf(_("  -C <email>   carbon copy recipients\n"));
   printf(_("  -I <file>    template file for report (defaults to %s)\n"), TEMPLATE);
   printf("\n");
 
@@ -73,7 +75,7 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -k <IP/net>  add this IP address or net to the list of known hosts\n"));
   printf(_("  -A           invoke notification script if threshold is reached\n"));
   printf(_("  -B           invoke response action script (e.g. block host)\n"));
-  printf(_("  -X           activate internal status information web server\n"));
+  printf(_("  -X <port>    activate internal status information web server\n"));
   printf("\n");
 
   exit(exitcode);
@@ -83,7 +85,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2003 Boris Wesslowski, RUS-CERT");
+  puts("Copyright (C) 2000-2004 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -99,7 +101,7 @@ void info()
   puts("along with this program; if not, write to the Free Software");
   puts("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA");
   puts("\n");
-  puts(_("You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."));
+  puts(_("You can contact the author at <bw@inside-security.de>."));
   puts("\n");
   puts(_("Compile-time options of this version:"));
   printf(_("Short name limit "));
@@ -148,7 +150,7 @@ void init_options()
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
-  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO_IOS|PARSER_CISCO_PIX|PARSER_IPFILTER;
+  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO_IOS|PARSER_CISCO_PIX|PARSER_IPFILTER|PARSER_IPFW;
   opt.parser = 0;
   opt.repeated = 0;
   opt.orig_count = 0;
@@ -195,7 +197,7 @@ void init_options()
   opt.recent = 0;
 
   opt.threshold = 0;
-  opt.least = 0;
+  opt.least = 1;
   opt.max = 0;
   opt.sender[0] = '\0';
   opt.recipient[0] = '\0';
@@ -209,13 +211,16 @@ void init_options()
   xstrncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
   opt.run_as[0] = '\0';
   opt.status = STATUS_OFF;
+  opt.stateful_start = 1;
   opt.sock = 0;
-  xstrncpy(opt.listenif, LISTENIF, IPLEN);
+  xstrncpy(opt.listenif, LISTENIF, IP6LEN);
   opt.listenport = LISTENPORT;
   opt.listento[0] = '\0';
   xstrncpy(opt.user, DEFAULT_USER, USERSIZE);
   xstrncpy(opt.password, DEFAULT_PASSWORD, PASSWORDSIZE);
   opt.refresh = 0;
+  opt.webpage = 'i';
+  opt.global_id = 0;
 
   user = getenv("USER");
   if (user == NULL) {
@@ -243,7 +248,7 @@ int main(int argc, char **argv)
   textdomain(PACKAGE);
 #endif
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeE:F:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeE:F:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:U:vVwWX:yz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -382,6 +387,9 @@ int main(int argc, char **argv)
     case 'T':
       xstrncpy(opt.recipient, optarg, EMAILSIZE);
       break;
+    case 'U':
+      xstrncpy(opt.title, optarg, TITLESIZE);
+      break;
     case 'v':
       opt.verbose++;
       break;
@@ -396,6 +404,9 @@ int main(int argc, char **argv)
       break;
     case 'X':
       opt.status = STATUS_OK;
+      opt.listenport = atoi(optarg);
+      if((opt.listenport < 1) || (opt.listenport > 65535))
+	opt.listenport = LISTENPORT;
       break;
     case 'y':
       opt.opts = 1;

@@ -1,11 +1,12 @@
-/* $Id: main.h,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: main.h,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.9.3 2003/06/23"
-#define COPYRIGHT "Boris Wesslowski, RUS-CERT"
+#define VERSION "1.0 2004/04/25"
+#define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
 
@@ -33,6 +34,7 @@
 #define SHOSTLEN 32
 #define SHOSTLEN_S "32"
 #define IPLEN 16
+#define IP6LEN 40
 #define EMAILSIZE 80
 #define REPORTLEN 52
 #define COLORSIZE 8
@@ -93,6 +95,7 @@ enum {
 #define PARSER_SNORT 64
 #define PARSER_NETSCREEN 128
 #define PARSER_LANCOM 256
+#define PARSER_IPFW 512
 
 enum {
   PARSE_OK,
@@ -195,6 +198,22 @@ enum {
 #define IPF_OPT_PORT 32
 #define IPF_OPT_RPORT 64
 
+/* ipfw support */
+
+#define IPFW_DATE 1
+#define IPFW_CHAIN 2
+#define IPFW_BRANCH 4
+#define IPFW_PROTO 8
+#define IPFW_IPS 16
+#define IPFW_PORTS 32
+#define IPFW_IF 64
+
+enum {
+  IPFW_OPT_NONE,
+  IPFW_OPT_ICMP,
+  IPFW_OPT_PORTS
+};
+
 /* snort support */
 
 #define SNORT_DATE 1
@@ -252,10 +271,10 @@ enum {
 
 /* HTML output */
 
-#define TEXTCOLOR "white"
-#define BGCOLOR "black"
-#define ROWCOLOR1 "#555555"
-#define ROWCOLOR2 "#333333"
+#define TEXTCOLOR "black"
+#define BGCOLOR "white"
+#define ROWCOLOR1 "#EEEEEE"
+#define ROWCOLOR2 "#DDDDDD"
 
 /* Log summary mode */
 
@@ -302,20 +321,30 @@ enum {
 #define EX_RESPOND_ADD 2
 #define EX_RESPOND_REMOVE 3
 
+#define RESP_REMOVE_OPC 1
+#define RESP_REMOVE_OHS 2
+
 enum {
   FW_START,
   FW_STOP
 };
 
 enum {
-  NO_TCP_OPTS,
-  TCP_OPTS
+  NO_NET_OPTS_PC,
+  NET_OPTS_PC,
+  NO_SORTING,
+  SORTING
 };
 
 enum {
   STATUS_OFF,
   STATUS_OK,
   FD_ERROR
+};
+
+enum {
+  HEADER_COMPLETE,
+  HEADER_CONTINUES
 };
 
 /* Data structures */
@@ -343,10 +372,10 @@ struct conn_data {
   int count;
   time_t start_time;
   time_t end_time;
-  char hostname[SHOSTLEN];
-  char chainlabel[SHORTLEN];
-  char branchname[SHORTLEN];
-  char interface[SHORTLEN];
+  char *hostname;
+  char *chainlabel;
+  char *branchname;
+  char *interface;
   int protocol;
   int datalen;
   struct in_addr shost;
@@ -354,6 +383,7 @@ struct conn_data {
   struct in_addr dhost;
   int dport;
   unsigned char flags;
+  int id;
   struct conn_data *next;
 };
 
@@ -364,15 +394,15 @@ struct input_file {
 
 struct dns_cache {
   struct in_addr ip;
-  char fqdn[HOSTLEN];
+  char *fqdn;
   struct dns_cache *next;
 };
 
 struct whois_entry {
-  char ip_route[WHOISROUTELEN];
+  char *ip_route;
   int as_number;
-  char ip_descr[WHOISDESCLEN];
-  char as_descr[WHOISDESCLEN];
+  char *ip_descr;
+  char *as_descr;
   struct whois_entry *next;
 };
 
@@ -406,13 +436,15 @@ struct known_hosts {
   int protocol;
   int sport;
   int dport;
+  int id;
   struct known_hosts *next;
 };
 
 struct parser_options {
   unsigned char mode;
   unsigned long int value;
-  char svalue[SHORTLEN];
+  struct in_addr netmask;
+  char *svalue;
   struct parser_options *next;
 };
 
@@ -507,13 +539,16 @@ struct options {
   char respond_script[FILESIZE];
   char run_as[USERSIZE];
   unsigned char status;
+  unsigned char stateful_start;
   int sock;
-  char listenif[IPLEN];
+  char listenif[IP6LEN];
   int listenport;
   char listento[IPLEN];
   char user[USERSIZE];
   char password[PASSWORDSIZE];
   int refresh;
+  unsigned char webpage;
+  int global_id;
 };
 
 #endif

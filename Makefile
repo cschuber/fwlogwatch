@@ -1,4 +1,5 @@
-# $Id: Makefile,v 1.28 2003/06/23 15:26:53 bwess Exp $
+# Copyright (C) 2000-2004 Boris Wesslowski
+# $Id: Makefile,v 1.29 2004/04/25 18:56:19 bwess Exp $
 
 # Linux
 CC = gcc
@@ -44,32 +45,34 @@ INSTALL_DIR = /usr/local
 CONF_DIR = /etc
 LOCALE_DIR = /usr
 
-OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o lancom.o \
-       main.o modes.o net.o netfilter.o netscreen.o output.o parser.o \
-       rcfile.o report.o resolve.o response.o snort.o utils.o \
+OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o ipfw.o \
+       lancom.o main.o modes.o net.o netfilter.o netscreen.o output.o \
+       parser.o rcfile.o report.o resolve.o response.o snort.o utils.o \
        whois.o win_xp.o
 
 all:	fwlogwatch
 
 cisco_ios.o:	main.h utils.h
 cisco_pix.o:	main.h utils.h
-compare.o:	compare.h main.h output.h
+compare.o:	compare.h main.h output.h utils.h
 ipchains.o:	main.h utils.h
 ipfilter.o:	main.h utils.h
+ipfw.o:		main.h utils.h
 lancom.o:	main.h utils.h
-main.o:		main.h modes.h parser.h rcfile.h
-modes.o:	compare.h main.h net.h output.h parser.h report.h \
-		response.h whois.h
-net.o:		main.h utils.h
+main.o:		main.h modes.h parser.h rcfile.h utils.h
+modes.o:	compare.h main.h net.h output.h parser.h rcfile.h report.h \
+		resolve.h response.h utils.h whois.h
+net.o:		compare.h main.h output.h resolve.h response.h utils.h
 netfilter.o:	main.h utils.h
 netscreen.o:	main.h utils.h
-output.o:	main.h output.h resolve.h
+output.o:	main.h output.h resolve.h utils.h whois.h
 parser.o:	cisco_ios.h cisco_pix.h compare.h ipchains.h ipfilter.h \
-		main.h netfilter.h netscreen.h parser.h win_xp.h
-rcfile.o:	main.h parser.h rcfile.h
-report.o:	main.h output.h resolve.h response.h
-resolve.o:	main.h resolve.h
-response.o:	main.h output.h response.h
+		ipfw.h main.h netfilter.h netscreen.h parser.h snort.h \
+		win_xp.h
+rcfile.o:	main.h parser.h rcfile.h utils.h
+report.o:	main.h output.h resolve.h response.h utils.h
+resolve.o:	main.h resolve.h utils.h
+response.o:	main.h response.h utils.h
 snort.o:	main.h utils.h
 utils.o:	main.h
 whois.o:	main.h utils.h
@@ -91,6 +94,7 @@ install-config:
 install-i18n:
 	cd po; make
 	$(INSTALL_DATA) po/de.mo $(LOCALE_DIR)/share/locale/de/LC_MESSAGES/fwlogwatch.mo
+	$(INSTALL_DATA) po/ja.mo $(LOCALE_DIR)/share/locale/ja/LC_MESSAGES/fwlogwatch.mo
 	$(INSTALL_DATA) po/pt_BR.mo $(LOCALE_DIR)/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
 	$(INSTALL_DATA) po/sv.mo $(LOCALE_DIR)/share/locale/sv/LC_MESSAGES/fwlogwatch.mo
 	$(INSTALL_DATA) po/zh_CN.mo $(LOCALE_DIR)/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
@@ -105,6 +109,7 @@ uninstall:
 		$(INSTALL_DIR)/sbin/fwlw_respond \
 		$(INSTALL_DIR)/share/man/man8/fwlogwatch.8 \
 		$(LOCALE_DIR)/share/locale/de/LC_MESSAGES/fwlogwatch.mo \
+		$(LOCALE_DIR)/share/locale/ja/LC_MESSAGES/fwlogwatch.mo \
 		$(LOCALE_DIR)/share/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo \
 		$(LOCALE_DIR)/share/locale/sv/LC_MESSAGES/fwlogwatch.mo \
 		$(LOCALE_DIR)/share/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo \

@@ -1,4 +1,5 @@
-/* $Id: cisco_ios.l,v 1.14 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: cisco_ios.l,v 1.15 2004/04/25 18:56:19 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -187,12 +188,15 @@ unsigned char flex_cisco_ios(char *input, int linenum)
   init_line();
   cisco_ios_scan_string(input);
   cisco_ioslex();
+  cisco_ios_delete_buffer(YY_CURRENT_BUFFER);
 
   if (opt.parser == (CISCO_IOS_DATE|CISCO_IOS_SRC|CISCO_IOS_PROTO|CISCO_IOS_DST|CISCO_IOS_COUNT)) {
     return PARSE_OK;
   } else {
     if(opt.verbose)
-      fprintf(stderr, "cisco parse error in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "cisco_ios parse error in line %d, ignoring.\n", linenum);
+    if(opt.verbose == 2)
+      fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
 }

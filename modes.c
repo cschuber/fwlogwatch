@@ -1,4 +1,5 @@
-/* $Id: modes.c,v 1.28 2003/06/23 15:26:53 bwess Exp $ */
+/* Copyright (C) 2000-2004 Boris Wesslowski */
+/* $Id: modes.c,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,11 +33,59 @@ extern struct options opt;
 extern struct conn_data *first;
 extern struct input_file *first_file;
 
+void common_input_loop(int *linenum, int *hitnum, int *errnum, int *oldnum, int *exnum)
+{
+  char buf[BUFSIZE];
+  int retval, hit = 0;
+
+#ifdef HAVE_ZLIB
+  if ((opt.std_in) || (opt.mode == REALTIME_RESPONSE)) {
+#endif
+    retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
+  } else {
+    retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+  }
+#endif
+
+  while (retval) {
+    *linenum += 1;
+    hit = PARSE_NO_HIT;
+    hit = parse_line(buf, *linenum);
+    opt.repeated = 0;
+    switch (hit) {
+    case PARSE_OK:
+      *hitnum += 1;
+      opt.repeated = 1;
+      break;
+    case PARSE_WRONG_FORMAT:
+      *errnum += 1;
+      break;
+    case PARSE_TOO_OLD:
+      *oldnum += 1;
+      break;
+    case PARSE_EXCLUDED:
+      *hitnum += 1;
+      *exnum += 1;
+    }
+
+#ifdef HAVE_ZLIB
+    if ((opt.std_in) || (opt.mode == REALTIME_RESPONSE)) {
+#endif
+      retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
+    } else {
+      retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+    }
+#endif
+  }
+}
+
 void mode_summary()
 {
-  char buf[BUFSIZE], nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE], *input = NULL, last_file = 0;
+  char nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE], *input = NULL, last_file = 0;
   FILE *output = NULL;
-  int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0, exnum = 0;
+  int retval, linenum = 0, hitnum = 0, errnum = 0, oldnum = 0, exnum = 0;
   time_t now;
   struct passwd *gen_user;
   struct input_file *file;
@@ -73,51 +122,14 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, _("Processing\n"));
 
-#ifdef HAVE_ZLIB
-    if (opt.std_in) {
-#endif
-      retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
-#ifdef HAVE_ZLIB
-    } else {
-      retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
-    }
-#endif
-
-    while (retval) {
-      ++linenum;
-      hit = PARSE_NO_HIT;
-      hit = parse_line(buf, linenum);
-      opt.repeated = 0;
-      switch (hit) {
-      case PARSE_OK:
-	++hitnum;
-	opt.repeated = 1;
-	break;
-      case PARSE_WRONG_FORMAT:
-	++errnum;
-	break;
-      case PARSE_TOO_OLD:
-	++oldnum;
-	break;
-      case PARSE_EXCLUDED:
-	++hitnum;
-	++exnum;
-	break;
-      }
-
-#ifdef HAVE_ZLIB
-      if (opt.std_in) {
-#endif
-	retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
-#ifdef HAVE_ZLIB
-      } else {
-	retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
-      }
-#endif
-    }
+    common_input_loop(&linenum, &hitnum, &errnum, &oldnum, &exnum);
 
     if (opt.verbose == 2)
       fprintf(stderr, "\n");
+    if (errnum && opt.verbose) {
+      fprintf(stderr, _("Unrecognized entries or tokens can be submitted at\n"));
+      fprintf(stderr, "http://fwlogwatch.inside-security.de/unrecognized.php\n");
+    }
 
     if(opt.std_in) {
       last_file++;
@@ -160,13 +172,13 @@ void mode_summary()
     first = fwlw_mergesort(first);
     if(opt.verbose == 2)
       fprintf(stderr, ".");
-    strftime(last_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->end_time));
+    strftime(last_entry, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&first->end_time));
     opt.sortfield = SORT_START_TIME;
     opt.sortmode = ORDER_ASCENDING;
     first = fwlw_mergesort(first);
     if(opt.verbose == 2)
       fprintf(stderr, ".");
-    strftime(first_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->start_time));
+    strftime(first_entry, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&first->start_time));
   } else {
     first_entry[0] = '\0';
   }
@@ -199,6 +211,7 @@ void mode_summary()
     }
 
     generate_email_header(output);
+    fflush(output);
   } else {
     output = stdout;
   }
@@ -211,7 +224,7 @@ void mode_summary()
   }
 
   now = time(NULL);
-  strftime(nows, TIMESIZE, "%a %b %d %H:%M:%S %Z %Y", localtime(&now));
+  strftime(nows, TIMESIZE, _("%A %B %d %H:%M:%S %Z %Y"), localtime(&now));
   fprintf(output, _("Generated %s by "), nows);
 
   gen_user = getpwuid(getuid());
@@ -226,7 +239,7 @@ void mode_summary()
   }
 
   if (opt.html)
-    fprintf(output, "<br>\n");
+    fprintf(output, "<br />\n");
 
   fprintf(output, "%d ", hitnum);
   if (oldnum > 0) {
@@ -251,7 +264,7 @@ void mode_summary()
 
   if (exnum != 0) {
     if (opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     if(exnum == 1) {
       fprintf(output, _("One entry was excluded by configuration.\n"));
@@ -261,7 +274,7 @@ void mode_summary()
   }
 
   if (opt.html)
-    fprintf(output, "<br>\n");
+    fprintf(output, "<br />\n");
 
   if (first_entry[0] != '\0') {
     fprintf(output, _("First packet log entry: %s, last: %s.\n"), first_entry, last_entry);
@@ -271,42 +284,42 @@ void mode_summary()
 
   if(!opt.loghost) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("All entries were logged by the same host: \"%s\".\n"), opt.hostname);
   }
 
   if(!opt.chains) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("All entries are from the same chain: \"%s\".\n"), opt.chainlabel);
   }
 
   if(!opt.branches) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("All entries have the same target: \"%s\".\n"), opt.branchname);
   }
 
   if(!opt.ifs) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("All entries are from the same interface: \"%s\".\n"), opt.interface);
   }
 
   if(opt.least > 1) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("Only entries with a count of at least %d are shown.\n"), opt.least);
   }
 
   if(opt.max) {
     if(opt.html)
-      fprintf(output, "<br>\n");
+      fprintf(output, "<br />\n");
 
     fprintf(output, _("Only the top %d entries are shown.\n"), opt.max);
   }
@@ -323,6 +336,7 @@ void mode_summary()
     whois_connect(RADB);
 
   show_list(output);
+  fflush(output);
 
   if(opt.whois_lookup)
     whois_close();
@@ -331,12 +345,14 @@ void mode_summary()
     report();
 
   if (opt.html) {
+    fprintf(output, "</table>\n");
     fflush(output);
     output_html_footer(fileno(output));
   }
 
   free_conn_data();
   free_dns_cache();
+  free_whois();
   free_exclude_data();
   free_input_file();
 
@@ -416,14 +432,13 @@ void mode_rt_response_reopen_log()
 
 void mode_rt_response_core()
 {
-  char buf[BUFSIZE];
-  int retval;
+  int retval, linenum = 0, hitnum = 0, ignored = 0;
   struct stat info;
   off_t size = 0;
   fd_set rfds;
   struct timeval tv;
 
-  if(!opt.std_in) {
+  if((!opt.std_in) && (!opt.stateful_start)) {
     retval = fstat(fileno(opt.inputfd), &info);
     if (retval == -1) {
       syslog(LOG_NOTICE, "fstat %s: %s", first_file->name, strerror(errno));
@@ -431,6 +446,8 @@ void mode_rt_response_core()
     }
     size = info.st_size;
   }
+
+  opt.line = xmalloc(sizeof(struct log_line));
 
   while (1) {
     if(opt.status) {
@@ -446,19 +463,15 @@ void mode_rt_response_core()
 	}
       }
       if (retval > 0) {
-	handshake();
+	handshake(linenum, hitnum, ignored);
       }
     } else {
       sleep(1);
     }
 
-    remove_old();
+    remove_old(RESP_REMOVE_OPC|RESP_REMOVE_OHS);
     if(opt.std_in) {
-      while (fgets(buf, BUFSIZE, opt.inputfd)) {
-	opt.line = xmalloc(sizeof(struct log_line));
-	parse_line(buf, 0);
-	free(opt.line);
-      }
+      common_input_loop(&linenum, &hitnum, &ignored, &ignored, &ignored);
       look_for_alert();
     } else {
       retval = fstat(fileno(opt.inputfd), &info);
@@ -469,11 +482,7 @@ void mode_rt_response_core()
       if(size != info.st_size) {
 	size = info.st_size;
 	clearerr(opt.inputfd);
-	while (fgets(buf, BUFSIZE, opt.inputfd)) {
-	  opt.line = xmalloc(sizeof(struct log_line));
-	  parse_line(buf, 0);
-	  free(opt.line);
-	}
+	common_input_loop(&linenum, &hitnum, &ignored, &ignored, &ignored);
 	look_for_alert();
       }
     }
@@ -604,7 +613,7 @@ void mode_rt_response()
 
     pwe = getpwnam(opt.run_as);
     if(pwe == NULL) {
-      syslog(LOG_NOTICE, "User to run as was not found");
+      syslog(LOG_NOTICE, _("User to run as was not found"));
       log_exit(EXIT_FAILURE);
     }
     olduid = getuid();
@@ -619,9 +628,9 @@ void mode_rt_response()
       syslog(LOG_NOTICE, "setuid: %s", strerror(errno));
       log_exit(EXIT_FAILURE);
     }
-    syslog(LOG_NOTICE, "Changed uid from %d to %d, gid from %d to %d", olduid, getuid(), oldgid, getgid());
+    syslog(LOG_NOTICE, _("Changed uid from %d to %d, gid from %d to %d"), olduid, getuid(), oldgid, getgid());
   } else {
-    syslog(LOG_NOTICE, "Running with uid %d, gid %d", getuid(), getgid());
+    syslog(LOG_NOTICE, _("Running with uid %d, gid %d"), getuid(), getgid());
   }
 
   if(opt.threshold == 1) {
@@ -638,11 +647,11 @@ void mode_rt_response()
 	   opt.recent/3600);
   }
 
-  syslog(LOG_NOTICE, _("Response mode: log%s%s"),
+  syslog(LOG_NOTICE, _("Response mode: Log%s%s"),
 	 (opt.response & OPT_NOTIFY)?_(", notify"):"",
 	 (opt.response & OPT_RESPOND)?_(", respond"):"");
 
-  if(!opt.std_in) {
+  if((!opt.std_in) && (!opt.stateful_start)) {
     retval = fseek(opt.inputfd, 0, SEEK_END);
     if (retval == -1) {
       syslog(LOG_NOTICE, "fseek %s: %s", first_file->name, strerror(errno));
@@ -760,9 +769,9 @@ void mode_show_log_times()
   if (first == 0) {
     printf(_("No valid time entries found.\n"));
   } else {
-    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&first));
+    strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&first));
     printf(_("First entry: %s\n"), stime);
-    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&last));
+    strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&last));
     printf(_("Last entry : %s\n"), stime);
     output_timediff(first, last, stime);
     printf(_("Difference : %s\n"), stime);
