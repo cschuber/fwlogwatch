@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.23 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: net.c,v 1.24 2003/03/22 23:16:48 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@ extern struct known_hosts *first_host;
 void secure_read(int file, char *data_out, int maxlen)
 {
   int j = 0;
-  char c;
+  signed char c;
 
   read(file, &c, 1);
   while (!(c == EOF || c == '\n') && (j < (maxlen - 1))) {
@@ -379,7 +379,7 @@ void handshake()
     sort_data();
 
     this = first;
-    while((this != NULL) && (max < opt.max)) {
+    while((this != NULL) && ((opt.max == 0) || (max < opt.max))) {
       time_t remaining;
 
       if (opt.max != 0)

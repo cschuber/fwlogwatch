@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: main.c,v 1.26 2003/03/22 23:16:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +21,10 @@ extern char *optarg;
 void usage(char *me, unsigned char exitcode)
 {
   printf("%s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
-  printf(_("Usage: %s [options]\n"), me);
+  printf(_("Usage: %s [options] [input_files]\n"), me);
   printf(_("General options:\n"));
   printf(_("  -h           this help\n"));
-  printf(_("  -L <file>    show time of first and last log entry in file\n"));
+  printf(_("  -L           show time of first and last log entry\n"));
   printf(_("  -V           show version and copyright info\n"));
   printf("\n");
 
@@ -32,7 +32,6 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -c <file>    specify config file (defaults to %s)\n"), RCFILE);
   printf(_("  -D           do not differentiate destination IP addresses\n"));
   printf(_("  -d           differentiate destination ports\n"));
-  printf(_("  -f <file>    specify input file (defaults to %s)\n"), INFILE);
   printf(_("  -m <count>   only show entries with at least so many incidents\n"));
   printf(_("  -M <number>  only show this amount of entries\n"));
   printf(_("  -N           resolve service names\n"));
@@ -51,6 +50,7 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -l <time>    process recent events only (defaults to off)\n"));
   printf(_("  -o <file>    specify output file\n"));
   printf(_("  -S           do not differentiate source IP addresses\n"));
+  printf(_("  -T <email>   send report by email to this address\n"));
   printf(_("  -t           show start times\n"));
   printf(_("  -W           activate whois lookups for source addresses\n"));
   printf(_("  -w           HTML output\n"));
@@ -143,7 +143,6 @@ void init_options()
   opt.sresolve = 0;
   opt.whois_lookup = 0;
   opt.whois_sock = -1;
-  xstrncpy(opt.inputfile, INFILE, FILESIZE);
   xstrncpy(opt.rcfile, RCFILE, FILESIZE);
 
   opt.line = NULL;
@@ -243,7 +242,7 @@ int main(int argc, char **argv)
   textdomain(PACKAGE);
 #endif
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeF:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -273,9 +272,6 @@ int main(int argc, char **argv)
     case 'e':
       opt.etimes = 1;
       break;
-    case 'f':
-      xstrncpy(opt.inputfile, optarg, FILESIZE);
-      break;
     case 'F':
       xstrncpy(opt.sender, optarg, EMAILSIZE);
       break;
@@ -303,7 +299,6 @@ int main(int argc, char **argv)
 	mode_error();
       }
       opt.mode = SHOW_LOG_TIMES;
-      xstrncpy(opt.inputfile, optarg, FILESIZE);
       break;
     case 'm':
       opt.least = atoi(optarg);
@@ -380,8 +375,11 @@ int main(int argc, char **argv)
     read_rcfile(opt.rcfile, MUST_EXIST);
   }
 
-  if(!strncmp(opt.inputfile, "-", FILESIZE))
-    opt.std_in = 1;
+  while (optind < argc)
+    add_input_file(argv[optind++]);
+
+  if (opt.filecount == 0)
+    add_input_file(INFILE);
 
   select_parsers();
 

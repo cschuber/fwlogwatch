@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogsummary.cgi,v 1.24 2002/08/20 21:17:45 bwess Exp $
+# $Id: fwlogsummary.cgi,v 1.25 2003/03/22 23:16:50 bwess Exp $
 
 # This script generates 8 fwlogwatch html summaries in a directory visible
 # to your web server.
@@ -31,9 +31,9 @@ fi
 
 if [ -z $1 ]
 then
-  MESSAGES="-f /var/log/messages"
+  MESSAGES="/var/log/messages"
 else
-  MESSAGES="-f $1"
+  MESSAGES="$1"
 fi
 
 $FWLOGWATCH $MESSAGES $RECENT -w -t -z -S                -o $WEBDIR/dst.html

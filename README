@@ -1,4 +1,4 @@
-$Id: README,v 1.24 2002/08/20 21:17:44 bwess Exp $
+$Id: README,v 1.25 2003/03/22 23:16:46 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
@@ -71,7 +71,7 @@ command line options.
 
 PARSER NOTES
   - Cisco PIX support focuses on denied packets and ignores all other kinds
-    of PIX log entries. Basic PIX OS version 6 is available.
+    of PIX log entries. Basic PIX OS version 6 support is available.
   - The ipfilter parser does not support logs with resolved service names
     and tcp/udp entries without ports.
   - The Snort parser does not analyze portscan entries yet.
@@ -159,14 +159,15 @@ CONFIGURATION AND EXAMPLES
   the included sample file, it should be easy to adapt to your needs.
 
 - Example (the options are in the order they are mentioned in the text):
-  If you want very verbose generation of a HTML summary in the file
-  'log.html' of all packet filter entries at most one day old representing
-  at least two connection attempts logged to the file 'messages' with
-  output including start and end timestamps, time intervals, resolved IP
-  addresses and service names and with connections separated by protocol,
-  source and destination ports and TCP options you would use the command
+  If you want very verbose generation of a HTML summary in the file 'log.html'
+  of all packet filter entries at most one day old representing at least two
+  connection attempts with output including start and end timestamps, time
+  intervals, resolved IP addresses and service names and with connections
+  separated by protocol, source and destination ports and TCP options using
+  the files that match the expression 'messages*.gz' as input you would use
+  the command
 
-  fwlogwatch -v -v -w -o log.html -l 1d -m 2 -f messages -t -e -z -n -N -p -s -d -y
+  fwlogwatch -v -v -w -o log.html -l 1d -m 2 -t -e -z -n -N -p -s -d -y messages*.gz
 
 - If you want to use fwlogwatch as a CGI, e.g. to have a quick look at
   what happened in the last hour when you get a notification:
@@ -182,10 +183,10 @@ CONFIGURATION AND EXAMPLES
 
 - Contrib also contains a web frontend written in PHP (fwlogwatch.php) to
   apply fwlogwatch to selected files and test different options. Change the
-  header of the script to adapt it to your systemi (e.g. prefix of the log
+  header of the script to adapt it to your system (e.g. prefix of the log
   file names, location of fwlogwatch).
 
-- An sample init file (for Red Hat Linux systems) for starting fwlogwatch
+- A sample init file (for Red Hat Linux systems) for starting fwlogwatch
   in realtime response mode at system start is also included.
 
 - You might want to replace your /etc/services file by the one supplied

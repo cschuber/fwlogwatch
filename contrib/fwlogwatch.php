@@ -1,5 +1,16 @@
 <?
-/* $Id: fwlogwatch.php,v 1.1 2002/08/20 21:17:45 bwess Exp $ */
+/* $Id: fwlogwatch.php,v 1.2 2003/03/22 23:16:50 bwess Exp $ */
+
+/*
+  This program is a rewrite based on work by
+
+  Kyle Amon
+  amonk@backwatcher.com
+  BackWatcher, Inc.
+  www.backwatcher.com
+
+  released under the terms of the GNU General Public License.
+*/
 
 $debug = '0';
 $logdir = "/var/log";
@@ -620,7 +631,7 @@ function report() {
   if($parserstr) {
     $parser = "-P $parserstr";
   }
-  $args = "-w$selectivity -O $sorting $hide $top $old $parser -f $logdir/$logfile";
+  $args = "-w$selectivity -O $sorting $hide $top $old $parser $logdir/$logfile";
   $report = `$fwlogwatch $args 2>&1`;
   if(!$debug) {
     $report = ereg_replace("<!DOCTYPE.*<body>", "", "$report");

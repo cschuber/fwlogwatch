@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: main.h,v 1.26 2003/03/22 23:16:47 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.9"
-#define COPYRIGHT "2002-08-20 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.9.1"
+#define COPYRIGHT "2003-03-22 Boris Wesslowski, RUS-CERT"
 
 /* Paths */
 
@@ -351,6 +351,11 @@ struct conn_data {
   struct conn_data *next;
 };
 
+struct input_file {
+  char *name;
+  struct input_file *next;
+};
+
 struct dns_cache {
   struct in_addr ip;
   char fqdn[HOSTLEN];
@@ -428,7 +433,7 @@ struct options {
   unsigned char sresolve;
   unsigned char whois_lookup;
   int whois_sock;
-  char inputfile[FILESIZE];
+  int filecount;
   char rcfile[FILESIZE];
 
   struct log_line *line;

@@ -1,10 +1,10 @@
-.\" $Id: fwlogwatch.8,v 1.24 2002/08/20 21:17:44 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.25 2003/03/22 23:16:46 bwess Exp $
 .TH FWLOGWATCH 8 "25 July 2002" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
 .B fwlogwatch
-.RI [ options ]
+.RI [ options ]\ [ input_files ]
 .SH DESCRIPTION
 .B fwlogwatch
 produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
@@ -20,10 +20,9 @@ starting attack countermeasures.
 These options are independent from the main modes of operation.
 .IP \-h
 Show the available options.
-.IP \-L\ \fIfile\fR
-Show time of the first and the last log entry in the input
-.I file
-which can be a compressed or plain log file. Summary mode will show the
+.IP \-L
+Show time of the first and the last log entry. The input file(s)
+can be compressed or plain log file(s). Summary mode will show the
 time of the first and last packet log entry, this log times mode
 will show the time of the first and last entry overall.
 .IP \-V
@@ -43,14 +42,6 @@ Do not differentiate destination IP addresses. Useful for finding scans in
 whole subnets.
 .IP \-d
 Differentiate destination ports.
-.IP \-f\ \fIfile\fR
-Specify an input file (defaults to
-.B /var/log/messages
-). Relevant entries are automatically detected so combined log files (e.g.
-from a log host) are no problem. Compressed files are supported (except in
-realtime response mode). The '-' sign may be used for reading from standard
-input (stdin). In realtime response mode the file needs to be specified with
-full path since the daemon is rooted in /.
 .IP \-M\ \fInumber\fR
 If you only want to see a fixed maximum amount of entries (e.g. the "top 20")
 this option will trim the output for you.
@@ -171,6 +162,10 @@ below for the time options.
 Specify an output file.
 .IP \-S
 Do not differentiate source IP addresses.
+.IP \-T\ \fIemail\fR
+The summary will be sent by email to this address. If HTML output is
+selected the report will be embedded as attachment so HTML-aware mail
+clients can show it directly.
 .IP \-t
 Show timestamp of first packet logged.
 .IP \-W
@@ -196,8 +191,7 @@ report will be filled in.
 This is the address the email containing the report will be sent from.
 .IP \-T\ \fIemail\fR
 This is the email address of the abuse contact or CERT the report will be
-sent to. When used in log summary mode the summary will be sent to this
-address.
+sent to.
 .IP \-C\ \fIemail\fR
 These email recipients will get a carbon copy of the report (e.g. for your
 archives).
@@ -245,6 +239,15 @@ and the default password is
 .B fwlogwat
 (since DES can only encrypt 8 characters). By default it listens on port
 888 and only allows connections from localhost.
+.SH "INPUT FILES"
+You can specify one or more input files (if none is given it defaults to
+.B /var/log/messages
+). Relevant entries are automatically detected so combined log files (e.g.
+from a log host) are no problem. Compressed files are supported (except in
+realtime response mode where they don' make sense anyway). The '-' sign may be
+used for reading from standard input (stdin). In realtime response mode the
+file needs to be specified with an absolute path since the daemon uses the file
+system root (/) as working directory.
 .SH "TIME FORMAT"
 Time is specified as
 .B nx

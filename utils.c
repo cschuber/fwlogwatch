@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: utils.c,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +11,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "main.h"
+
+struct input_file *first_file = NULL;
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -317,6 +319,50 @@ void add_exclude_hpb(char *input, unsigned char mode)
   }
   excluded_this->next = excluded_first;
   excluded_first = excluded_this;
+}
+
+void add_input_file(char *name)
+{
+  struct input_file *file, *ptr;
+
+  if(!strncmp(name, "-", FILESIZE))
+    opt.std_in = 1;
+
+  if (opt.std_in) {
+    opt.filecount = 0;
+    return;
+  }
+
+  file = xmalloc(sizeof(struct input_file));
+  file->name = xmalloc(strlen(name));
+  file->next = NULL;
+
+  xstrncpy(file->name, name, strlen(name)+1);
+
+  ptr = first_file;
+  if (ptr == NULL) {
+    first_file = file;
+  } else {
+    while (ptr->next != NULL) {
+      ptr = ptr->next;
+    }
+    ptr->next = file;
+  }
+  opt.filecount++;
+}
+
+void free_input_file()
+{
+  struct input_file *file;
+
+  file = first_file;
+  while (file != NULL) {
+    free(file->name);
+    first_file = file;
+    file = file->next;
+    free(first_file);
+  }
+  first_file = NULL;
 }
 
 void generate_email_header(FILE *fd)

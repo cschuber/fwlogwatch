@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: rcfile.c,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,7 +122,7 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
     return;
   }
   if (strncasecmp(command, "input", 5) == 0) {
-    xstrncpy(opt.inputfile, get_one_parameter(command+6, COMMENT_HASH), FILESIZE);
+    add_input_file(get_one_parameter(command+6, COMMENT_HASH));
     return;
   }
 
@@ -401,7 +401,6 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
       mode_error();
     }
     opt.mode = SHOW_LOG_TIMES;
-    xstrncpy(opt.inputfile, get_one_parameter(command+15, COMMENT_HASH), FILESIZE);
     return;
   }
 

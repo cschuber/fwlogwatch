@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5.2\n"
-"POT-Creation-Date: 2002-08-20 20:11+0200\n"
+"POT-Creation-Date: 2003-03-22 19:58+0100\n"
 "PO-Revision-Date: 2001-11-11 00:20+0100\n"
 "Last-Translator: Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>\n"
 "Language-Team: -\n"
@@ -34,8 +34,8 @@ msgid "Timewarp in log file (%s"
 msgstr "log文件中的時間(%s"
 
 #: ../main.c:24
-#, c-format
-msgid "Usage: %s [options]\n"
+#, fuzzy, c-format
+msgid "Usage: %s [options] [input_files]\n"
 msgstr "使用方法: %s [選項] \n"
 
 #: ../main.c:25
@@ -50,7 +50,7 @@ msgstr "        -h          \t幫助文件\n"
 
 #: ../main.c:27
 #, fuzzy
-msgid "  -L <file>    show time of first and last log entry in file\n"
+msgid "  -L           show time of first and last log entry\n"
 msgstr "        -L <文件>   \t顯示文件中第一次與最後一次登陸紀錄的時間\n"
 
 #: ../main.c:28
@@ -78,87 +78,86 @@ msgid "  -d           differentiate destination ports\n"
 msgstr "        -d          \t區分目標端口\n"
 
 #: ../main.c:35
-#, fuzzy, c-format
-msgid "  -f <file>    specify input file (defaults to %s)\n"
-msgstr "        -f <文件>   \t指定輸入文件  (缺省 %s) \n"
-
-#: ../main.c:36
 #, fuzzy
 msgid "  -m <count>   only show entries with at least so many incidents\n"
 msgstr "\t-m <數量> \t只顯示至少有這麼多數量的記錄\n"
 
-#: ../main.c:37
+#: ../main.c:36
 msgid "  -M <number>  only show this amount of entries\n"
 msgstr ""
 
-#: ../main.c:38
+#: ../main.c:37
 #, fuzzy
 msgid "  -N           resolve service names\n"
 msgstr "        -n          \t解析域名\n"
 
-#: ../main.c:39
+#: ../main.c:38
 #, fuzzy
 msgid "  -n           resolve host names\n"
 msgstr "        -n          \t解析域名\n"
 
-#: ../main.c:40
+#: ../main.c:39
 #, fuzzy
 msgid "  -O <order>   define the sort order (see the man page for details)\n"
 msgstr "\t-O <排序方法> \t對輸出進行排序 (具體參見相應文檔\n"
 
-#: ../main.c:41
+#: ../main.c:40
 #, fuzzy
 msgid "  -P <format>  use only parsers for specific formats\n"
 msgstr "        -P <格式>  \n"
 
-#: ../main.c:42
+#: ../main.c:41
 #, fuzzy
 msgid "  -p           differentiate protocols\n"
 msgstr "        -p          \t區分傳輸協議\n"
 
-#: ../main.c:43
+#: ../main.c:42
 #, fuzzy
 msgid "  -s           differentiate source ports\n"
 msgstr "        -s          \t區分源端口\n"
 
-#: ../main.c:44
+#: ../main.c:43
 #, fuzzy
 msgid "  -v           verbose, specify twice for more info\n"
 msgstr "        -v          \t處理時顯示信息,使用 -vv 得到更多信息\n"
 
-#: ../main.c:45
+#: ../main.c:44
 #, fuzzy
 msgid "  -y           differentiate TCP options\n"
 msgstr "        -y          \t區分TCP選項\n"
 
-#: ../main.c:48
+#: ../main.c:47
 msgid "Log summary mode (default):\n"
 msgstr ""
 
-#: ../main.c:49
+#: ../main.c:48
 #, fuzzy
 msgid "  -b           show amount of data (sum of total packet lengths)\n"
 msgstr "        -b\t\t顯示數據量 (所有數據包長度的總和)\n"
 
-#: ../main.c:50
+#: ../main.c:49
 #, fuzzy
 msgid "  -e           show end times\n"
 msgstr "        -t          \t顯示開始與結束時間\n"
 
-#: ../main.c:51
+#: ../main.c:50
 #, fuzzy
 msgid "  -l <time>    process recent events only (defaults to off)\n"
 msgstr "        -l <時間>   \t只處理當前事件 (缺省為關閉)\n"
 
-#: ../main.c:52
+#: ../main.c:51
 #, fuzzy
 msgid "  -o <file>    specify output file\n"
 msgstr "        -o <文件>   \t指定輸出文件\n"
 
-#: ../main.c:53
+#: ../main.c:52
 #, fuzzy
 msgid "  -S           do not differentiate source IP addresses\n"
 msgstr "        -S          \t不區分源IP地址\n"
+
+#: ../main.c:53
+msgid "  -T <email>   send report by email to this address\n"
+msgstr ""
 
 #: ../main.c:54
 #, fuzzy
@@ -282,129 +281,134 @@ msgstr ""
 msgid "IPv6 support "
 msgstr ""
 
-#: ../main.c:427
+#: ../main.c:425
 msgid "Exiting\n"
 msgstr "退出\n"
 
-#: ../modes.c:44
+#: ../modes.c:50
 msgid "Using stdin as input\n"
 msgstr "使用標準輸入\n"
 
-#: ../modes.c:49
+#: ../modes.c:56
 #, c-format
 msgid "Opening input file '%s'\n"
 msgstr "打開輸入文件 '%s'\n"
 
-#: ../modes.c:67
+#: ../modes.c:74
 msgid "Processing\n"
 msgstr "處理\n"
 
-#: ../modes.c:119 ../modes.c:321 ../modes.c:718 ../rcfile.c:450
+#: ../modes.c:126 ../modes.c:342 ../modes.c:729 ../rcfile.c:449
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "關閉 '&s'\n"
 
-#: ../modes.c:141
+#: ../modes.c:155
 msgid "Sorting data\n"
 msgstr "數據排序\n"
 
-#: ../modes.c:166
+#: ../modes.c:181
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr "打開輸出文件 '%s'\n"
 
-#: ../modes.c:177 ../report.c:210
+#: ../modes.c:192 ../report.c:210
 #, fuzzy
 msgid "Sending\n"
 msgstr "發送...\n"
 
-#: ../modes.c:199
+#: ../modes.c:214
 #, c-format
 msgid "Generated %s by "
 msgstr "生成 %s 由"
 
-#: ../modes.c:209
+#: ../modes.c:224
 msgid "an unknown user.\n"
 msgstr "不明使用者\n"
 
-#: ../modes.c:217
+#: ../modes.c:232
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(並且 &d 比 %d 老) "
 
-#: ../modes.c:220
+#: ../modes.c:235
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(並且 %d 有錯誤)"
 
-#: ../modes.c:222
-#, c-format
-msgid "of %d entries in the file "
-msgstr ""
-
-#: ../modes.c:223
-#, c-format
-msgid "\"%s\" are packet logs, "
+#: ../modes.c:238
+#, fuzzy, c-format
+msgid "of %d entries in the file \"%s\" are packet logs, "
 msgstr "\"%s\" 是數據包記錄"
 
-#: ../modes.c:226
+#: ../modes.c:240
+#, c-format
+msgid "of %d entries in standard input are packet logs, "
+msgstr ""
+
+#: ../modes.c:242
+#, c-format
+msgid "of %d entries in %d input files are packet logs, "
+msgstr ""
+
+#: ../modes.c:246
 msgid "one has unique characteristics.\n"
 msgstr "一個有特殊形式\n"
 
-#: ../modes.c:228
+#: ../modes.c:248
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d有特殊形式\n"
 
-#: ../modes.c:236
+#: ../modes.c:256
 msgid "One entry was excluded by configuration.\n"
 msgstr "一條記錄在配置時被刪除\n"
 
-#: ../modes.c:238
+#: ../modes.c:258
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d記錄在配置時被刪除\n"
 
-#: ../modes.c:246
+#: ../modes.c:266
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "第一條數據包登陸記錄: %s, 最後一條: %s.\n"
 
-#: ../modes.c:248 ../modes.c:713
+#: ../modes.c:268 ../modes.c:758
 msgid "No valid time entries found.\n"
 msgstr "沒找到有效時間記錄\n"
 
-#: ../modes.c:255
+#: ../modes.c:275
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "所有的記錄都是從同一個主機登陸的: \"%s\".\n"
 
-#: ../modes.c:262
+#: ../modes.c:282
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "所有的記錄都來自同一個鏈: \"%s\".\n"
 
-#: ../modes.c:269
+#: ../modes.c:289
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "所有的記錄都有同樣的目標:  \"%s\".\n"
 
-#: ../modes.c:276
+#: ../modes.c:296
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "所有的記錄都來自同一個界面: \"%s\".\n"
 
-#: ../modes.c:283
+#: ../modes.c:303
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "只顯示大于%d的記錄.\n"
 
-#: ../modes.c:290
+#: ../modes.c:310
 #, fuzzy, c-format
 msgid "Only the top %d entries are shown.\n"
 msgstr "只顯示大于%d的記錄.\n"
 
-#: ../modes.c:299
+#: ../modes.c:319
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
@@ -413,93 +417,103 @@ msgstr ""
 "報告流: %d\n"
 "\n"
 
-#: ../modes.c:341
+#: ../modes.c:362
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr "警告: 存在pid文件,可能另一個fwlogwatch在運行.\n"
 
-#: ../modes.c:355
+#: ../modes.c:376
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:357
+#: ../modes.c:378
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:380
+#: ../modes.c:401
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:382
+#: ../modes.c:403
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "捕捉到SIGHUP, 重新打開log文件"
 
-#: ../modes.c:461
+#: ../modes.c:482
 msgid "SIGTERM caught, cleaning up"
 msgstr "捕捉到SIGTERM, 清除內存"
 
-#: ../modes.c:543
+#: ../modes.c:564
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "開始 (pid %d)"
 
-#: ../modes.c:604
+#: ../modes.c:625
 msgid "Alert threshold is one attempt"
 msgstr "警告threshold是一次嘗試"
 
-#: ../modes.c:606
+#: ../modes.c:627
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "警告threshold是%d次嘗試"
 
-#: ../modes.c:610
+#: ../modes.c:631
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "在%d秒之前的事件將不受理"
 
-#: ../modes.c:613
+#: ../modes.c:634
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "在%d小時之前的事件將不受理"
 
-#: ../modes.c:617
+#: ../modes.c:638
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "回應模式: log%s%s"
 
-#: ../modes.c:618 ../net.c:363
+#: ../modes.c:639 ../net.c:363
 msgid ", notify"
 msgstr "通知"
 
-#: ../modes.c:619 ../net.c:364
+#: ../modes.c:640 ../net.c:364
 msgid ", respond"
 msgstr ". 回答"
 
-#: ../modes.c:643
+#: ../modes.c:670
 msgid "Reading standard input\n"
 msgstr "讀取標準輸入\n"
 
-#: ../modes.c:660
+#: ../modes.c:688
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "讀 '%s'\n"
 
-#: ../modes.c:706
-#, c-format
-msgid "# of lines : %d\n"
+#: ../modes.c:755
+#, fuzzy, c-format
+msgid "Number of files: %d\n"
+msgstr "嘗試登陸的次數: %s\n"
+
+#: ../modes.c:756
+#, fuzzy, c-format
+msgid "Number of lines: %d\n"
 msgstr "行數 : %d\n"
 
-#: ../modes.c:707
+#: ../modes.c:761
 #, c-format
 msgid "First entry: %s\n"
 msgstr "第一條記錄:  %s\n"
 
-#: ../modes.c:710
+#: ../modes.c:763
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "最後一條記錄 : %s\n"
+
+#: ../modes.c:765
+#, c-format
+msgid "Difference : %s\n"
+msgstr ""
 
 #: ../net.c:117 ../net.c:119
 #, c-format
@@ -769,17 +783,17 @@ msgstr ""
 msgid "Error in configuration file '%s' line %d, assuming 'true'\n"
 msgstr ""
 
-#: ../rcfile.c:409
+#: ../rcfile.c:408
 #, fuzzy, c-format
 msgid "Unrecognized option in configuration file '%s' line %d\n"
 msgstr "配置文件中不明選項: %s"
 
-#: ../rcfile.c:428
+#: ../rcfile.c:427
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr "%s 不是標準文件, 忽略.\n"
 
-#: ../rcfile.c:436
+#: ../rcfile.c:435
 #, fuzzy, c-format
 msgid "Opening configuration file '%s'\n"
 msgstr "打開輸入文件 '%s'\n"
@@ -954,7 +968,7 @@ msgstr "刪除主機狀態中的內容"
 msgid "ALERT: %d attempts from %s"
 msgstr "警告: 來自 %s 的 %d 嘗試"
 
-#: ../utils.c:48
+#: ../utils.c:50
 msgid ""
 "\n"
 "Memory allocation error, exiting.\n"
@@ -962,20 +976,20 @@ msgstr ""
 "\n"
 "尋找內存地址錯誤, 退出.\n"
 
-#: ../utils.c:63
+#: ../utils.c:65
 msgid "Exiting"
 msgstr "退出"
 
-#: ../utils.c:72
+#: ../utils.c:74
 msgid "Not executing buffer containing format string"
 msgstr "帶有格式字符緩存將不被執行"
 
-#: ../utils.c:77
+#: ../utils.c:79
 #, c-format
 msgid "Executing '%s'"
 msgstr "執行 '%s"
 
-#: ../utils.c:166
+#: ../utils.c:168
 #, fuzzy
 msgid ""
 "fwlogwatch error: mode collision, please check that you didn't specify\n"
@@ -989,35 +1003,35 @@ msgstr ""
 "   或者有第二種模式被默認啟動,或在配置文件中有否指定\n"
 "   對于不同的模式請使用不同的配置文件, 或使用命令行參數\n"
 
-#: ../utils.c:228
+#: ../utils.c:230
 #, c-format
 msgid "IP address error: %s\n"
 msgstr "IP地址錯誤:  %s\n"
 
-#: ../utils.c:254
+#: ../utils.c:256
 #, c-format
 msgid "Error in CIDR format: %s\n"
 msgstr "CIDR格式有錯誤: %s\n"
 
-#: ../utils.c:272
+#: ../utils.c:274
 msgid "(known host)\n"
 msgstr "(不明主機)\n"
 
-#: ../utils.c:306
+#: ../utils.c:308
 msgid "(excluded host)\n"
 msgstr "(被排除的主機)\n"
 
-#: ../whois.c:210
+#: ../whois.c:211
 #, c-format
 msgid "Looking up whois info for %s from cache\n"
 msgstr "在緩存中為 %s 尋找whois信息\n"
 
-#: ../whois.c:217
+#: ../whois.c:218
 #, c-format
 msgid "Looking up whois info for %s\n"
 msgstr "為 %s 尋找whois信息\n"
 
-#: ../whois.c:238
+#: ../whois.c:239
 #, c-format
 msgid "lookup failed: %s\n"
 msgstr "搜索失敗: %s\n"
@@ -1029,6 +1043,10 @@ msgstr ""
 #: ../main.h:286
 msgid "fwlogwatch status"
 msgstr ""
+
+#, fuzzy
+#~ msgid "  -f <file>    specify input file (defaults to %s)\n"
+#~ msgstr "        -f <文件>   \t指定輸入文件  (缺省 %s) \n"
 
 #~ msgid "                     (defaults to '%s')\n"
 #~ msgstr "                   \t(缺省為 '%s')\n"

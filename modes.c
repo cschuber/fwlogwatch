@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: modes.c,v 1.26 2003/03/22 23:16:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,75 +30,48 @@
 
 extern struct options opt;
 extern struct conn_data *first;
+extern struct input_file *first_file;
 
 void mode_summary()
 {
-  char buf[BUFSIZE], nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE];
+  char buf[BUFSIZE], nows[TIMESIZE], first_entry[TIMESIZE], last_entry[TIMESIZE], *input = NULL, last_file = 0;
   FILE *output = NULL;
   int retval, linenum = 0, hitnum = 0, hit = 0, errnum = 0, oldnum = 0, exnum = 0;
   time_t now;
   struct passwd *gen_user;
-
-  if (opt.std_in) {
-    if (opt.verbose)
-      fprintf(stderr, _("Using stdin as input\n"));
-
-    opt.inputfd = stdin;
-  } else {
-    if (opt.verbose)
-      fprintf(stderr, _("Opening input file '%s'\n"), opt.inputfile);
-
-#ifdef HAVE_ZLIB
-    opt.inputfd = gzopen(opt.inputfile, "rb");
-#else
-    opt.inputfd = fopen(opt.inputfile, "r");
-#endif
-    if (opt.inputfd == NULL) {
-#ifdef HAVE_ZLIB
-      fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
-#else
-      fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
-#endif
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  if (opt.verbose)
-    fprintf(stderr, _("Processing\n"));
+  struct input_file *file;
 
   opt.line = xmalloc(sizeof(struct log_line));
 
-#ifdef HAVE_ZLIB
-  if (opt.std_in) {
-#endif
-    retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
-#ifdef HAVE_ZLIB
-  } else {
-    retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
-  }
-#endif
+  file = first_file;
+  while (last_file == 0) {
+    if (opt.std_in) {
+      if (opt.verbose)
+	fprintf(stderr, _("Using stdin as input\n"));
 
-  while (retval) {
-    ++linenum;
-    hit = PARSE_NO_HIT;
-    hit = parse_line(buf, linenum);
-    opt.repeated = 0;
-    switch (hit) {
-    case PARSE_OK:
-      ++hitnum;
-      opt.repeated = 1;
-      break;
-    case PARSE_WRONG_FORMAT:
-      ++errnum;
-      break;
-    case PARSE_TOO_OLD:
-      ++oldnum;
-      break;
-    case PARSE_EXCLUDED:
-      ++hitnum;
-      ++exnum;
-      break;
+      opt.inputfd = stdin;
+    } else {
+      input = file->name;
+      if (opt.verbose)
+	fprintf(stderr, _("Opening input file '%s'\n"), input);
+
+#ifdef HAVE_ZLIB
+      opt.inputfd = gzopen(input, "rb");
+#else
+      opt.inputfd = fopen(input, "r");
+#endif
+      if (opt.inputfd == NULL) {
+#ifdef HAVE_ZLIB
+	fprintf(stderr, "gzopen %s: %s\n", input, strerror(errno));
+#else
+	fprintf(stderr, "fopen %s: %s\n", input, strerror(errno));
+#endif
+	exit(EXIT_FAILURE);
+      }
     }
+
+    if (opt.verbose)
+      fprintf(stderr, _("Processing\n"));
 
 #ifdef HAVE_ZLIB
     if (opt.std_in) {
@@ -109,29 +82,70 @@ void mode_summary()
       retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
     }
 #endif
-  }
 
-  if (opt.verbose == 2)
-    fprintf(stderr, "\n");
+    while (retval) {
+      ++linenum;
+      hit = PARSE_NO_HIT;
+      hit = parse_line(buf, linenum);
+      opt.repeated = 0;
+      switch (hit) {
+      case PARSE_OK:
+	++hitnum;
+	opt.repeated = 1;
+	break;
+      case PARSE_WRONG_FORMAT:
+	++errnum;
+	break;
+      case PARSE_TOO_OLD:
+	++oldnum;
+	break;
+      case PARSE_EXCLUDED:
+	++hitnum;
+	++exnum;
+	break;
+      }
 
-  if(!opt.std_in) {
-    if (opt.verbose)
-      fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
-
-#ifndef HAVE_ZLIB
-    retval = fclose(opt.inputfd);
-    if (retval == EOF) {
-      perror("fclose");
-#else
-    retval = gzclose(opt.inputfd);
-    if (retval != 0) {
-      if (retval != Z_ERRNO) {
-	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
+#ifdef HAVE_ZLIB
+      if (opt.std_in) {
+#endif
+	retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+#ifdef HAVE_ZLIB
       } else {
-	perror("gzclose");
+	retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
       }
 #endif
-      exit(EXIT_FAILURE);
+    }
+
+    if (opt.verbose == 2)
+      fprintf(stderr, "\n");
+
+    if(opt.std_in) {
+      last_file++;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, _("Closing '%s'\n"), input);
+
+#ifndef HAVE_ZLIB
+      retval = fclose(opt.inputfd);
+      if (retval == EOF) {
+	perror("fclose");
+#else
+      retval = gzclose(opt.inputfd);
+      if (retval != 0) {
+	if (retval != Z_ERRNO) {
+	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.inputfd, &retval));
+	} else {
+	  perror("gzclose");
+	}
+#endif
+	exit(EXIT_FAILURE);
+      }
+
+      if (file->next != NULL) {
+	file = file->next;
+      } else {
+	last_file++;
+      }
     }
   }
 
@@ -141,12 +155,13 @@ void mode_summary()
     fprintf(stderr, _("Sorting data\n"));
 
   if(first != NULL) {
-    opt.sortfield = SORT_START_TIME;
+    opt.sortfield = SORT_END_TIME;
     opt.sortmode = ORDER_DESCENDING;
     first = fwlw_mergesort(first);
     if(opt.verbose == 2)
       fprintf(stderr, ".");
-    strftime(last_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->start_time));
+    strftime(last_entry, TIMESIZE, "%b %d %H:%M:%S", localtime(&first->end_time));
+    opt.sortfield = SORT_START_TIME;
     opt.sortmode = ORDER_ASCENDING;
     first = fwlw_mergesort(first);
     if(opt.verbose == 2)
@@ -219,8 +234,13 @@ void mode_summary()
   if (errnum > 0) {
     fprintf(output, _("(and %d malformed) "), errnum);
   }
-  fprintf(output, _("of %d entries in the file "), linenum);
-  fprintf(output, _("\"%s\" are packet logs, "), opt.inputfile);
+  if (opt.filecount == 1) {
+    fprintf(output, _("of %d entries in the file \"%s\" are packet logs, "), linenum, input);
+  } else if (opt.filecount == 0) {
+    fprintf(output, _("of %d entries in standard input are packet logs, "), linenum);
+  } else {
+    fprintf(output, _("of %d entries in %d input files are packet logs, "), linenum, opt.filecount);
+  }
   retval = list_stats();
   if(retval == 1) {
     fprintf(output, _("one has unique characteristics.\n"));
@@ -315,6 +335,7 @@ void mode_summary()
   free_conn_data();
   free_dns_cache();
   free_exclude_data();
+  free_input_file();
 
   if (opt.use_out) {
     if (opt.verbose)
@@ -364,9 +385,9 @@ void mode_rt_response_open()
   if(opt.std_in) {
     opt.inputfd = stdin;
   } else {
-    opt.inputfd = fopen(opt.inputfile, "r");
+    opt.inputfd = fopen(first_file->name, "r");
     if (opt.inputfd == NULL) {
-      syslog(LOG_NOTICE, "fopen %s: %s", opt.inputfile, strerror(errno));
+      syslog(LOG_NOTICE, "fopen %s: %s", first_file->name, strerror(errno));
       log_exit(EXIT_FAILURE);
     }
   }
@@ -379,11 +400,11 @@ void mode_rt_response_reopen_log()
   if(opt.std_in) {
     syslog(LOG_NOTICE, _("SIGUSR1 caught, reading input from stdin, no need to reopen log file"));
   } else {
-    syslog(LOG_NOTICE, _("SIGUSR1 caught, reopening log file %s"), opt.inputfile);
+    syslog(LOG_NOTICE, _("SIGUSR1 caught, reopening log file %s"), first_file->name);
 
     retval = fclose(opt.inputfd);
     if(retval == EOF)
-      syslog(LOG_NOTICE, "fclose %s: %s", opt.inputfile, strerror(errno));
+      syslog(LOG_NOTICE, "fclose %s: %s", first_file->name, strerror(errno));
 
     mode_rt_response_open();
     signal(SIGUSR1, mode_rt_response_reopen_log);
@@ -402,7 +423,7 @@ void mode_rt_response_core()
   if(!opt.std_in) {
     retval = fstat(fileno(opt.inputfd), &info);
     if (retval == -1) {
-      syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+      syslog(LOG_NOTICE, "fstat %s: %s", first_file->name, strerror(errno));
       log_exit(EXIT_FAILURE);
     }
     size = info.st_size;
@@ -439,7 +460,7 @@ void mode_rt_response_core()
     } else {
       retval = fstat(fileno(opt.inputfd), &info);
       if (retval == -1) {
-	syslog(LOG_NOTICE, "fstat %s: %s", opt.inputfile, strerror(errno));
+	syslog(LOG_NOTICE, "fstat %s: %s", first_file->name, strerror(errno));
 	log_exit(EXIT_FAILURE);
       }
       if(size != info.st_size) {
@@ -621,7 +642,7 @@ void mode_rt_response()
   if(!opt.std_in) {
     retval = fseek(opt.inputfd, 0, SEEK_END);
     if (retval == -1) {
-      syslog(LOG_NOTICE, "fseek %s: %s", opt.inputfile, strerror(errno));
+      syslog(LOG_NOTICE, "fseek %s: %s", first_file->name, strerror(errno));
       log_exit(EXIT_FAILURE);
     }
   }
@@ -633,104 +654,116 @@ void mode_rt_response()
 
 void mode_show_log_times()
 {
-  char first_entry[TIMESIZE], last_entry[TIMESIZE], buf[BUFSIZE], month[3];
-  int retval = 0, retval2, day, hour, minute, second, linenum = 0;
+  char buf[BUFSIZE], stime[TIMESIZE], month[3], *input = NULL, last_file = 0;
+  int retval = 0, loop, day, hour, minute, second, linenum = 0;
+  struct input_file *file;
+  time_t first = 0, last = 0;
 
-  if (opt.std_in) {
-    opt.inputfd = stdin;
+  opt.line = xmalloc(sizeof(struct log_line));
 
-    if (opt.verbose)
-      fprintf(stderr, _("Reading standard input\n"));
-  } else {
+  file = first_file;
+  while (last_file == 0) {
+    if (opt.std_in) {
+      opt.inputfd = stdin;
+
+      if (opt.verbose)
+	fprintf(stderr, _("Reading standard input\n"));
+    } else {
+      input = file->name;
 #ifdef HAVE_ZLIB
-    opt.inputfd = gzopen(opt.inputfile, "rb");
+      opt.inputfd = gzopen(input, "rb");
 #else
-    opt.inputfd = fopen(opt.inputfile, "r");
+      opt.inputfd = fopen(input, "r");
 #endif
-    if (opt.inputfd == NULL) {
+      if (opt.inputfd == NULL) {
 #ifdef HAVE_ZLIB
-      fprintf(stderr, "gzopen %s: %s\n", opt.inputfile, strerror(errno));
+	fprintf(stderr, "gzopen %s: %s\n", input, strerror(errno));
 #else
-      fprintf(stderr, "fopen %s: %s\n", opt.inputfile, strerror(errno));
+	fprintf(stderr, "fopen %s: %s\n", input, strerror(errno));
 #endif
-      exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
+      }
+
+      if (opt.verbose)
+	fprintf(stderr, _("Reading '%s'\n"), input);
     }
-
-    if (opt.verbose)
-      fprintf(stderr, _("Reading '%s'\n"), opt.inputfile);
-  }
-
-#ifdef HAVE_ZLIB
-  if (opt.std_in) {
-#endif
-    retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
-#ifdef HAVE_ZLIB
-  } else {
-    retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
-  }
-#endif
-
-  while ((retval != 5) && (retval2)) {
-    retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
-    linenum++;
 
 #ifdef HAVE_ZLIB
     if (opt.std_in) {
 #endif
-      retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+      loop = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
     } else {
-      retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+      loop = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
     }
 #endif
-  }
 
-  if(retval == 5) {
-    snprintf(first_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
-
-    retval = 0;
-    while (retval2) {
-      retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
+    while (loop) {
       linenum++;
+      retval = sscanf(buf, "%3s %2d %2d:%2d:%2d ", month, &day, &hour, &minute, &second);
+      if(retval == 5) {
+	build_time(month, day, hour, minute, second);
+	if (first == 0)
+	  first = last = opt.line->time;
+	if (opt.line->time < first)
+	  first = opt.line->time;
+	if (opt.line->time > last)
+	  last = opt.line->time;
+      }
+
 #ifdef HAVE_ZLIB
       if (opt.std_in) {
 #endif
-	retval2 = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
+	loop = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
       } else {
-	retval2 = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+	loop = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
       }
 #endif
     }
 
-    printf(_("# of lines : %d\n"), linenum);
-    printf(_("First entry: %s\n"), first_entry);
-    if (retval == 5) {
-      snprintf(last_entry, TIMESIZE, "%s %02d %02d:%02d:%02d", month, day, hour, minute, second);
-      printf(_("Last entry : %s\n"), last_entry);
-    }
-  } else {
-    printf(_("No valid time entries found.\n"));
-  }
-
-  if(!opt.std_in) {
-    if (opt.verbose)
-      fprintf(stderr, _("Closing '%s'\n"), opt.inputfile);
+    if(opt.std_in) {
+      last_file++;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, _("Closing '%s'\n"), input);
 
 #ifndef HAVE_ZLIB
-    retval = fclose(opt.inputfd);
-    if (retval == EOF) {
-      perror("fclose");
+      retval = fclose(opt.inputfd);
+      if (retval == EOF) {
+	perror("fclose");
 #else
-    retval = gzclose(opt.inputfd);
-    if (retval != 0) {
-      if (retval != Z_ERRNO) {
-	fprintf(stderr, "gzclose %s: %s\n", opt.inputfile, gzerror(opt.inputfd, &retval));
-      } else {
-	perror("gzclose");
-      }
+      retval = gzclose(opt.inputfd);
+      if (retval != 0) {
+	if (retval != Z_ERRNO) {
+	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.inputfd, &retval));
+	} else {
+	  perror("gzclose");
+	}
 #endif
-      exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
+      }
+
+      if (file->next != NULL) {
+	file = file->next;
+      } else {
+	last_file++;
+      }
     }
   }
+
+  printf(_("Number of files: %d\n"), opt.filecount);
+  printf(_("Number of lines: %d\n"), linenum);
+  if (first == 0) {
+    printf(_("No valid time entries found.\n"));
+  } else {
+    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&first));
+    printf(_("First entry: %s\n"), stime);
+    strftime(stime, TIMESIZE, "%b %d %H:%M:%S", localtime(&last));
+    printf(_("Last entry : %s\n"), stime);
+    output_timediff(first, last, stime);
+    printf(_("Difference : %s\n"), stime);    
+  }
+
+  free(opt.line);
 }

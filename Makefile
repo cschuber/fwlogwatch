@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.25 2002/08/20 21:17:44 bwess Exp $
+# $Id: Makefile,v 1.26 2003/03/22 23:16:46 bwess Exp $
 
 # Linux
 CC = gcc
-CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -DHAVE_IPV6 -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
+CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = #-g #-static -p
 LIBS = -lcrypt -lz #-lc_p
 

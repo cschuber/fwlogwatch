@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.9 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: whois.c,v 1.10 2003/03/22 23:16:49 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +25,8 @@ extern struct options opt;
 int whois_get_type(char *type)
 {
   int cnt = 0, retval = -1;
-  char c, buffer[WHOISCMDLEN];
+  char buffer[WHOISCMDLEN];
+  signed char c;
 
   read(opt.whois_sock, &c, 1);
   while ((c != '\n') && (c != EOF) && (cnt < WHOISCMDLEN)) {

@@ -1,4 +1,4 @@
-/* $Id: ipchains.l,v 1.12 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: ipchains.l,v 1.13 2003/03/22 23:16:47 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"

@@ -1,4 +1,4 @@
-/* $Id: ipchains.h,v 1.18 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: ipchains.h,v 1.19 2003/03/22 23:16:47 bwess Exp $ */
 
 #ifndef _IPCHAINS_H
 #define _IPCHAINS_H

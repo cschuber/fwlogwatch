@@ -1,4 +1,4 @@
-/* $Id: lancom.c,v 1.1 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: lancom.c,v 1.2 2003/03/22 23:16:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

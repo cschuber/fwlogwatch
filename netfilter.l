@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.12 2002/08/20 21:17:44 bwess Exp $ */
+/* $Id: netfilter.l,v 1.13 2003/03/22 23:16:48 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -38,6 +38,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start(nftext);
 " kernel: IN="{STRING}?			nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
 " kernel: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
+" klogd: IN="{STRING}?			nf_parse_prefix(nftext+11, NF_OPT_NOPREFIX);
+" klogd: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
 "OUT="{STRING}?		/* ignore */
 "MAC="(({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
 "SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);

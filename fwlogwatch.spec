@@ -1,7 +1,7 @@
-# $Id: fwlogwatch.spec,v 1.25 2002/08/20 21:17:44 bwess Exp $
+# $Id: fwlogwatch.spec,v 1.26 2003/03/22 23:16:47 bwess Exp $
 
 Name: fwlogwatch
-Version: 0.9
+Version: 0.9.1
 Release: 1
 Group: Applications/Utilities
 Packager: Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
@@ -58,9 +58,9 @@ reporting anomalies or starting attack countermeasures.
 %config(noreplace) %{_sysconfdir}/fwlogwatch.config
 %config(noreplace) %{_sysconfdir}/fwlogwatch.template
 %config(noreplace) %{_sysconfdir}/rc.d/init.d/fwlogwatch
+%config(noreplace) %{_sbindir}/fwlw_notify
+%config(noreplace) %{_sbindir}/fwlw_respond
 %{_sbindir}/fwlogwatch
-%{_sbindir}/fwlw_notify
-%{_sbindir}/fwlw_respond
 %{_mandir}/man8/fwlogwatch.8.gz
 %lang(de) %{_datadir}/locale/de/LC_MESSAGES/fwlogwatch.mo
 %lang(pt_BR) %{_datadir}/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
