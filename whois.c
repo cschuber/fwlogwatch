@@ -1,4 +1,4 @@
-/* $Id: whois.c,v 1.10 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: whois.c,v 1.11 2003/04/08 21:43:03 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +34,7 @@ int whois_get_type(char *type)
     cnt++;
     read(opt.whois_sock, &c, 1);
   }
+  buffer[cnt] = '\0';
 
   switch (buffer[0]) {
   case 'A':

@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: rcfile.c,v 1.27 2003/04/08 21:42:47 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

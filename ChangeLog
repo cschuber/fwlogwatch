@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.24 2003/03/22 23:16:46 bwess Exp $
+$Id: ChangeLog,v 1.25 2003/04/08 21:42:31 bwess Exp $
+
+Version 0.9.2 2003-04-08
+- Fixed problems with multiple input file support, whois resolver and
+  status web server page reload
 
 Version 0.9.1 2003-03-22
 - Added multiple input file support

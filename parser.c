@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: parser.c,v 1.27 2003/04/08 21:42:43 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +55,7 @@ unsigned char parse_line(char *input, int linenum)
     /* For ipchains log format see (in kernel 2.2 source) */
     /* /usr/src/linux/net/ipv4/ip_fw.c */
     retval = flex_ipchains(input, linenum);
-  } else if ((opt.format & PARSER_NETFILTER) && (strstr(input, "IN="))) {
+  } else if ((opt.format & PARSER_NETFILTER) && (strstr(input, " OUT="))) {
     /* For netfilter log format see (in kernel 2.4 source) */
     /* /usr/src/linux/net/ipv4/netfilter/ipt_LOG.c */
     retval = flex_netfilter(input, linenum);

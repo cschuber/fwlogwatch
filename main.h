@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.26 2003/03/22 23:16:47 bwess Exp $ */
+/* $Id: main.h,v 1.27 2003/04/08 21:42:40 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.9.1"
-#define COPYRIGHT "2003-03-22 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.9.2"
+#define COPYRIGHT "2003-04-08 Boris Wesslowski, RUS-CERT"
 
 /* Paths */
 
@@ -247,7 +247,7 @@ enum {
 
 /* WHOIS lookup */
 
-#define RADB "whois.ra.net"
+#define RADB "whois.radb.net"
 #define WHOIS 43
 
 /* HTML output */
@@ -310,6 +310,12 @@ enum {
 enum {
   NO_TCP_OPTS,
   TCP_OPTS
+};
+
+enum {
+  STATUS_OFF,
+  STATUS_OK,
+  FD_ERROR
 };
 
 /* Data structures */

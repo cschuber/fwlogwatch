@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.26 2003/03/22 23:16:47 bwess Exp $ */
+/* $Id: main.c,v 1.27 2003/04/08 21:42:39 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,7 +82,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2002 Boris Wesslowski, RUS-CERT");
+  puts("Copyright (C) 2000-2003 Boris Wesslowski, RUS-CERT");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -207,7 +207,7 @@ void init_options()
   xstrncpy(opt.notify_script, FWLW_NOTIFY, FILESIZE);
   xstrncpy(opt.respond_script, FWLW_RESPOND, FILESIZE);
   opt.run_as[0] = '\0';
-  opt.status = 0;
+  opt.status = STATUS_OFF;
   opt.sock = 0;
   xstrncpy(opt.listenif, LISTENIF, IPLEN);
   opt.listenport = LISTENPORT;
@@ -356,7 +356,7 @@ int main(int argc, char **argv)
       opt.whois_lookup = 1;
       break;
     case 'X':
-      opt.status = 1;
+      opt.status = STATUS_OK;
       break;
     case 'y':
       opt.opts = 1;

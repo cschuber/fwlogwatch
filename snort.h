@@ -1,4 +1,4 @@
-/* $Id: snort.h,v 1.4 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: snort.h,v 1.5 2003/04/08 21:42:53 bwess Exp $ */
 
 #ifndef _SNORT_H
 #define _SNORT_H

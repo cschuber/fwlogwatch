@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: utils.c,v 1.27 2003/04/08 21:42:55 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -334,7 +334,7 @@ void add_input_file(char *name)
   }
 
   file = xmalloc(sizeof(struct input_file));
-  file->name = xmalloc(strlen(name));
+  file->name = xmalloc(strlen(name)+1);
   file->next = NULL;
 
   xstrncpy(file->name, name, strlen(name)+1);

@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.13 2003/03/22 23:16:48 bwess Exp $ */
+/* $Id: netfilter.l,v 1.14 2003/04/08 21:42:42 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -174,7 +174,12 @@ unsigned char flex_netfilter(char *input, int linenum)
   if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
     return PARSE_OK;
   }
+  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 47)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
+    return PARSE_OK;
+  }
   if(opt.verbose)
     fprintf(stderr, "netfilter parse error in line %d, ignoring.\n", linenum);
+  if(opt.verbose == 2)
+    fprintf(stderr, "input was: \"%s\"\n", input);
   return PARSE_WRONG_FORMAT;
 }

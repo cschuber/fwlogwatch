@@ -1,4 +1,4 @@
-/* $Id: ipfilter.l,v 1.13 2003/03/22 23:16:47 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.14 2003/04/08 21:42:37 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"

@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.24 2003/03/22 23:16:48 bwess Exp $ */
+/* $Id: net.c,v 1.25 2003/04/08 21:42:41 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -180,14 +180,22 @@ void decode_base64(char *input)
 
 void fdprintf(int fd, char *format, ...)
 {
-  char buf[BUFSIZE];
-  va_list argv;
+  if(opt.status != FD_ERROR) {
+    char buf[BUFSIZE];
+    va_list argv;
+    ssize_t retval;
 
-  va_start(argv, format);
-  vsnprintf(buf, BUFSIZE, format, argv);
-  write(fd, buf, strlen(buf));
-  va_end(argv);
-  fflush(stdout);
+    va_start(argv, format);
+    vsnprintf(buf, BUFSIZE, format, argv);
+    retval = write(fd, buf, strlen(buf));
+    va_end(argv);
+    if(retval == -1) {
+      syslog(LOG_NOTICE, "write: %s", strerror(errno));
+      opt.status = FD_ERROR;
+      return;
+    }
+    fflush(NULL);
+  }
 }
 
 void table_header(int conn, unsigned char mode)
@@ -260,6 +268,7 @@ void handshake()
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
     return;
   }
+  opt.status = STATUS_OK;
 
 #ifndef HAVE_IPV6
   if((opt.listento[0] != '\0') && (strncmp(opt.listento,inet_ntoa(sac.sin_addr),IPLEN) != 0)) {

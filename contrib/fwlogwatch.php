@@ -1,5 +1,5 @@
 <?
-/* $Id: fwlogwatch.php,v 1.2 2003/03/22 23:16:50 bwess Exp $ */
+/* $Id: fwlogwatch.php,v 1.3 2003/04/08 21:43:05 bwess Exp $ */
 
 /*
   This program is a rewrite based on work by

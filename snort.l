@@ -1,4 +1,4 @@
-/* $Id: snort.l,v 1.4 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: snort.l,v 1.5 2003/04/08 21:42:54 bwess Exp $ */
 
 %option prefix="snort"
 %option outfile="snort.c"

@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.26 2003/03/22 23:16:46 bwess Exp $ */
+/* $Id: compare.c,v 1.27 2003/04/08 21:42:35 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

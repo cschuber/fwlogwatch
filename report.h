@@ -1,4 +1,4 @@
-/* $Id: report.h,v 1.26 2003/03/22 23:16:49 bwess Exp $ */
+/* $Id: report.h,v 1.27 2003/04/08 21:42:50 bwess Exp $ */
 
 #ifndef _REPORT_H
 #define _REPORT_H
