@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: parser.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,8 @@
 #include "parser.h"
 #include "compare.h"
 #include "utils.h"
-#include "cisco.h"
+#include "cisco_ios.h"
+#include "cisco_pix.h"
 #include "ipchains.h"
 #include "ipfilter.h"
 #include "netfilter.h"
@@ -21,6 +22,19 @@ extern struct options opt;
 unsigned char parse_line(char *input, int linenum)
 {
   unsigned char retval;
+  char *pnt;
+
+  pnt = strstr(input, " last message repeated ");
+  if ((opt.repeated == 1) && (pnt != NULL)) {
+    int repeated;
+
+    repeated = atoi(pnt+23);
+    opt.line->count = opt.orig_count * repeated;
+    build_list();
+    if (opt.verbose == 2)
+      fprintf(stderr, "r");
+    return PARSE_OK;
+  }
 
   if ((opt.format & PARSER_IPCHAINS) && (strstr(input, " kernel: Packet log: "))) {
     /* For ipchains log format see (in kernel 2.2 source) */
@@ -30,13 +44,16 @@ unsigned char parse_line(char *input, int linenum)
     /* For netfilter log format see (in kernel 2.4 source) */
     /* /usr/src/linux/net/ipv4/netfilter/ipt_LOG.c */
     retval = flex_netfilter(input, linenum);
-  } else if ((opt.format & PARSER_CISCO) && (strstr(input, "%SEC-6-IPACCESSLOG"))) {
+  } else if ((opt.format & PARSER_CISCO_IOS) && (strstr(input, "%SEC-6-IPACCESSLOG"))) {
     /* For cisco log format see CCO */
-    retval = flex_cisco(input, linenum);
+    retval = flex_cisco_ios(input, linenum);
   } else if ((opt.format & PARSER_IPFILTER) && (strstr(input, " ipmon"))) {
     /* For ipfilter log format see the source */
     /* http://coombs.anu.edu.au/~avalon/ */
     retval = flex_ipfilter(input, linenum);
+  } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-2-"))) {
+    /* For cisco log format see CCO */
+    retval = flex_cisco_pix(input, linenum);
   } else {
     retval = PARSE_NO_HIT;
   }
@@ -122,6 +139,7 @@ unsigned char parse_line(char *input, int linenum)
       }
     }
 
+    opt.orig_count = opt.line->count;
     build_list();
     if (opt.verbose == 2)
       fprintf(stderr, ".");
@@ -188,7 +206,10 @@ void select_parsers()
 	opt.format = opt.format | PARSER_NETFILTER;
 	break;
       case 'c':
-	opt.format = opt.format | PARSER_CISCO;
+	opt.format = opt.format | PARSER_CISCO_IOS;
+	break;
+      case 'p':
+	opt.format = opt.format | PARSER_CISCO_PIX;
 	break;
       case 'f':
 	opt.format = opt.format | PARSER_IPFILTER;

@@ -1,4 +1,4 @@
-$Id: README,v 1.13 2002/02/14 21:15:35 bwess Exp $
+$Id: README,v 1.14 2002/02/14 21:21:20 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
 RUS-CERT. It is a packet filter/firewall log analyzer with support for
@@ -20,6 +20,7 @@ FEATURES
     log is from a single host, the same happens with the chains, targets
     and interfaces).
   - Can separate recent from old entries and detects timewarps in log files.
+  - Can recognize 'last message repeated' entries concerning the firewall.
   - Plain text and HTML output with sort options.
   - Ports and hosts can be selected or excluded as needed.
   - Integrated resolver for protocols, services and host names.
@@ -37,13 +38,14 @@ FEATURES
 
 - Realtime response mode:
   - The program detaches and stays in the background as a daemon.
-  - It detects if the necessary ipchains rules with logging turned on exist.
-  - Response can be a notification (in form of a log file entry, an email or
-    a remote winpopup message), a firewall modification or anything you can
-    invoke in a shell.
-  - In block mode a new chain for fwlogwatch is added and attackers are
-    completely blocked with new firewall rules. Supports trusted hosts
-    (anti-spoof).
+  - If the ipchains parser is activated it detects if the necessary ipchains
+    rules with logging turned on exist.
+  - Response can be a notification (in form of a log file entry, an email,
+    a remote winpopup message or whatever you can put into a shell script),
+    or a customizable firewall modification.
+  - The included response script adds a new chain for fwlogwatch to
+    ipchains or netfilter setups and attackers are completely blocked with
+    new firewall rules. Supports trusted hosts (anti-spoof).
   - The current status of the program can be followed through a web
     interface.
 
@@ -54,11 +56,11 @@ get you started quickly.
 NETFILTER, IPFILTER AND CISCO SUPPORT
 fwlogwatch also features iptables/netfilter, ipfilter and cisco log file
 support, it can even combine or separate the formats if you activate or
-deactivate the corresponding parsers. Some restrictions apply because not all
-fields exist or make sense in all log file types. The block response in
-realtime response mode only works for ipchains and you will need to
-deactivate the ipchains parser if you want to use realtime response mode on
-a system without ipchains.
+deactivate the corresponding parsers. Some restrictions apply because not
+all fields exist or make sense in all log file types. The included script
+for realtime response mode supports ipchains and netfilter, you will need
+to deactivate the ipchains parser if you want to use realtime response mode
+on a system without ipchains.
 
 
 INSTALLATION
@@ -76,8 +78,9 @@ header files to compile fwlogwatch.
 
 A simple 'make' should be enough to obtain a working binary. If you use the
 realtime response mode you will need to install fwlogwatch with superuser
-permissions. If all you need is read access to the system's standard log
-file (e.g. /var/log/messages) you can use group permissions.
+permissions for certain configurations. If all you need is read access to
+the system's standard log file (e.g. /var/log/messages) you can use group
+permissions. You can also bind a nonprivileged port for the status server.
 'make install' will install the binary (in /usr/local/sbin) and the man
 page, 'make install-config' will also install a sample configuration file
 and template in /etc.

@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.14 2002/02/14 21:15:35 bwess Exp $ */
+/* $Id: main.h,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.2.1"
-#define COPYRIGHT "2001-03-09 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.3"
+#define COPYRIGHT "2001-04-08 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -16,7 +16,6 @@
 #define SHOSTLEN 32
 #define IPLEN 16
 #define EMAILSIZE 80
-#define ACTIONSIZE 128
 #define REPORTLEN 52
 #define COLORSIZE 7
 #define MAXSORTSIZE 16
@@ -48,8 +47,9 @@ enum {
 
 #define PARSER_IPCHAINS 1
 #define PARSER_NETFILTER 2
-#define PARSER_CISCO 4
+#define PARSER_CISCO_IOS 4
 #define PARSER_IPFILTER 8
+#define PARSER_CISCO_PIX 16
 
 enum {
   PARSE_OK,
@@ -91,21 +91,36 @@ enum {
 #define NF_DPT 64
 #define NF_TYPE 128
 
-/* cisco support */
+/* cisco ios support */
 
-#define CISCO_DATE 1
-#define CISCO_SRC 2
-#define CISCO_DST 4
-#define CISCO_PROTO 8
-#define CISCO_COUNT 16
+#define CISCO_IOS_DATE 1
+#define CISCO_IOS_SRC 2
+#define CISCO_IOS_DST 4
+#define CISCO_IOS_PROTO 8
+#define CISCO_IOS_COUNT 16
 
 enum {
-  C_OPT_NONE,
-  C_OPT_HOST,
-  C_OPT_MSEC,
-  C_OPT_PORT,
-  C_OPT_MISSING,
-  C_OPT_TYPE
+  CI_OPT_NONE,
+  CI_OPT_HOST,
+  CI_OPT_MSEC,
+  CI_OPT_PORT,
+  CI_OPT_MISSING,
+  CI_OPT_TYPE
+};
+
+/* cisco pix support */
+
+#define CISCO_PIX_DATE 1
+#define CISCO_PIX_SRC 2
+#define CISCO_PIX_DST 4
+
+enum {
+  CP_OPT_NONE,
+  CP_OPT_ITCP,
+  CP_OPT_TCP,
+  CP_OPT_UDP,
+  CP_OPT_ICMP,
+  CP_OPT_TO
 };
 
 /* ipfilter support */
@@ -175,28 +190,25 @@ enum {
 
 #define ALERT 5
 #define FORGET 86400
-#define P_IPCHAINS "/sbin/ipchains"
-#define CHAINLABEL "flwblock"
-#define P_ECHO "/bin/echo"
-#define P_MAIL "/bin/mail"
-#define P_SMBCLIENT "/usr/bin/smbclient"
+#define FWLW_NOTIFY "/usr/local/sbin/fwlw_notify"
+#define FWLW_RESPOND "/usr/local/sbin/fwlw_respond"
 #define LISTENHOST "127.0.0.1"
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
 #define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
 					    DES only supports 8 characters */
 
-#define KNOWN_HOST 0
-
 #define OPT_LOG 1
-#define OPT_BLOCK 2
-#define OPT_NOTIFY_EMAIL 4
-#define OPT_NOTIFY_SMB 8
-#define OPT_CUSTOM_ACTION 16
+#define OPT_NOTIFY 2
+#define OPT_RESPOND 4
+
+#define EX_NOTIFY 1
+#define EX_RESPOND_ADD 2
+#define EX_RESPOND_REMOVE 3
 
 enum {
-  ADD_CHAIN,
-  REMOVE_CHAIN
+  FW_START,
+  FW_STOP
 };
 
 /* Data structures */
@@ -267,8 +279,13 @@ struct report_data {
 
 struct known_hosts {
   time_t time;
+  int count;
   struct in_addr shost;
   struct in_addr netmask;
+  struct in_addr dhost;
+  int protocol;
+  int sport;
+  int dport;
   struct known_hosts *next;
 };
 
@@ -299,6 +316,8 @@ struct options {
   char format_sel[SHORTLEN];
   unsigned char format;
   unsigned char parser;
+  unsigned char repeated;
+  int orig_count;
 
   unsigned char src_ip;
   unsigned char dst_ip;
@@ -346,8 +365,6 @@ struct options {
   char templatefile[FILESIZE];
 
   unsigned char response;
-  char action[ACTIONSIZE];
-  char smb_host[SHOSTLEN];
   unsigned char status;
   char listenhost[IPLEN];
   int listenport;

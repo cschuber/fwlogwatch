@@ -1,4 +1,4 @@
-$Id: CREDITS,v 1.13 2002/02/14 21:15:35 bwess Exp $
+$Id: CREDITS,v 1.14 2002/02/14 21:21:20 bwess Exp $
 
 This program was written by
 Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>
@@ -42,3 +42,9 @@ Neil McCalden <nm@advinfo.co.uk>
 
 Carl Wilhelm Soderstrom <chrome@real-time.com>
   for improvements of the rpm spec file.
+
+Tobias Hunger <tobias@berlin-consortium.org>
+  for contributing to the improved response mode.
+
+Diederick van Dijk <diedvdyk@jedi.van-dijk.net>
+  for contributing to cisco PIX support.

@@ -1,4 +1,4 @@
-/* $Id: response.h,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: response.h,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #ifndef _RESPONSE_H
 #define _RESPONSE_H
@@ -6,8 +6,8 @@
 #define IP_FW_F_PRN     0x0001 /* from <linux/ip_fw.h>,
 				  gcc segfaults if included */
 
-void look_for_log_rules();
-void show_mode_opts(char *buf);
+void check_for_ipchains();
+void check_script_perms(char *name);
 void modify_firewall(unsigned char action);
 void remove_old();
 void look_for_alert();

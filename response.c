@@ -1,12 +1,15 @@
-/* $Id: response.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: response.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <time.h>
 #include <errno.h>
 #include <syslog.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "response.h"
 #include "output.h"
 #include "utils.h"
@@ -15,7 +18,7 @@ struct known_hosts *first_host = NULL;
 extern struct options opt;
 extern struct conn_data *first;
 
-void look_for_log_rules()
+void check_for_ipchains()
 {
   char buf[BUFSIZE];
   unsigned int found = 0;
@@ -57,105 +60,90 @@ void look_for_log_rules()
   }
 }
 
-void show_mode_opts(char *buf)
+void check_script_perms(char *name)
 {
-  if (opt.response & OPT_NOTIFY_EMAIL) {
-    if (strstr(opt.recipient, "%")) {
-      strncpy(opt.recipient, "[invalid]", EMAILSIZE);
-      syslog (LOG_NOTICE, "Warning, format character in email string");
+  int retval;
+  struct stat *buf;
+
+  buf = xmalloc(sizeof(struct stat));
+
+  retval = stat(name, buf);
+  if (retval == -1) {
+    syslog(LOG_NOTICE, "stat %s: %s", name, strerror(errno));
+    free(buf);
+    log_exit();
+  }
+
+  if((getuid() == 0) || (geteuid() == 0)) {
+    if ((buf->st_mode & (S_IWGRP|S_IWOTH)) != 0) {
+      syslog(LOG_NOTICE, "%s is group/world writable", FWLW_NOTIFY);
+      free(buf);
+      log_exit();
     }
   }
-  if (opt.response & OPT_NOTIFY_SMB) {
-    if (strstr(opt.smb_host, "%")) {
-      strncpy(opt.smb_host, "[invalid]", SHOSTLEN);
-      syslog (LOG_NOTICE, "Warning, format character in smb string");
-    }
-  }
-  if (opt.response & OPT_CUSTOM_ACTION) {
-    if (strstr(opt.action, "%")) {
-      strncpy(opt.action, "[invalid]", ACTIONSIZE);
-      syslog (LOG_NOTICE, "Warning, format character in action string");
-    }
-  }
-  snprintf(buf, BUFSIZE, "log%s%s%s%s%s%s%s%s",
-	   (opt.response & OPT_BLOCK)?", block host":"",
-	   (opt.response & OPT_NOTIFY_EMAIL)?", email notification to ":"",
-	   (opt.response & OPT_NOTIFY_EMAIL)?opt.recipient:"",
-	   (opt.response & OPT_NOTIFY_SMB)?", winpopup notification on host ":"",
-	   (opt.response & OPT_NOTIFY_SMB)?opt.smb_host:"",
-	   (opt.response & OPT_CUSTOM_ACTION)?", custom action '":"",
-	   (opt.response & OPT_CUSTOM_ACTION)?opt.action:"",
-	   (opt.response & OPT_CUSTOM_ACTION)?"'":"");
+
+  free(buf);
 }
 
 void modify_firewall(unsigned char action)
 {
   char buf[BUFSIZE];
-  unsigned char found_label = 0;
-  FILE *fd;
-  int retval;
 
-  fd = fopen("/proc/net/ip_fwnames", "r");
-  if (fd == NULL) {
-    syslog(LOG_NOTICE, "fopen /proc/net/ip_fwnames: %s", strerror(errno));
-    log_exit();
-  }
-
-  while (fgets(buf, BUFSIZE, fd)) {
-    if(strncmp(buf, CHAINLABEL, strlen(CHAINLABEL)) == 0) {
-      found_label = 1;
-    }
-  }
-
-  retval = fclose(fd);
-  if (retval == EOF) {
-    syslog(LOG_NOTICE, "fclose /proc/net/ip_fwnames: %s", strerror(errno));
-  }
-
-  if (action == ADD_CHAIN) {
-    if(!found_label) {
-      syslog(LOG_NOTICE, "Adding %s chain", CHAINLABEL);
-
-      snprintf(buf, BUFSIZE, "%s -N %s", P_IPCHAINS, CHAINLABEL);
-      run_command(buf);
-
-      snprintf(buf, BUFSIZE, "%s -I input -j %s", P_IPCHAINS, CHAINLABEL);
-      run_command(buf);
-    }
-  }
-  if (action == REMOVE_CHAIN) {
-    if(found_label) {
-      syslog(LOG_NOTICE, "Removing %s chain", CHAINLABEL);
-
-      snprintf(buf, BUFSIZE, "%s -D input -j %s", P_IPCHAINS, CHAINLABEL);
-      run_command(buf);
-
-      snprintf(buf, BUFSIZE, "%s -F %s", P_IPCHAINS, CHAINLABEL);
-      run_command(buf);
-
-      snprintf(buf, BUFSIZE, "%s -X %s", P_IPCHAINS, CHAINLABEL);
-      run_command(buf);
-    }
+  if (action == FW_START) {
+    snprintf(buf, BUFSIZE, "%s start", FWLW_RESPOND);
+    run_command(buf);
+  } else if (action == FW_STOP) {
+    snprintf(buf, BUFSIZE, "%s stop", FWLW_RESPOND);
+    run_command(buf);
   }
 }
 
-void add_rule(char *ip)
+void react(unsigned char mode, struct known_hosts *this_host)
 {
-  char buf[BUFSIZE];
+  char buf[BUFSIZE], buf2[BUFSIZE];
 
-  syslog(LOG_NOTICE, "Adding block for %s", ip);
+  if(mode == EX_NOTIFY) {
+    strncpy(buf, FWLW_NOTIFY, BUFSIZE);
+  } else {
+    strncpy(buf, FWLW_RESPOND, BUFSIZE);
+    if(mode == EX_RESPOND_ADD) {
+      strncat(buf, " add", BUFSIZE);
+    } else {
+      strncat(buf, " remove", BUFSIZE);
+    }
+  }
 
-  snprintf(buf, BUFSIZE, "%s -A %s -s %s -j DENY", P_IPCHAINS, CHAINLABEL, ip);
-  run_command(buf);
-}
+  snprintf(buf2, BUFSIZE, " %d %s", this_host->count, inet_ntoa(this_host->shost));
+  strncat(buf, buf2, BUFSIZE);
 
-void remove_rule(char *ip)
-{
-  char buf[BUFSIZE];
+  if(opt.dst_ip) {
+    snprintf(buf2, BUFSIZE, " %s", inet_ntoa(this_host->dhost));
+    strncat(buf, buf2, BUFSIZE);
+  } else {
+    strncat(buf, " -", BUFSIZE);
+  }
 
-  syslog(LOG_NOTICE, "Removing block for %s", ip);
+  if(opt.proto) {
+    snprintf(buf2, BUFSIZE, " %d", this_host->protocol);
+    strncat(buf, buf2, BUFSIZE);
+  } else {
+    strncat(buf, " -", BUFSIZE);
+  }
 
-  snprintf(buf, BUFSIZE, "%s -D %s -s %s -j DENY", P_IPCHAINS, CHAINLABEL, ip);
+  if(opt.src_port) {
+    snprintf(buf2, BUFSIZE, " %d", this_host->sport);
+    strncat(buf, buf2, BUFSIZE);
+  } else {
+    strncat(buf, " -", BUFSIZE);
+  }
+
+  if(opt.dst_port) {
+    snprintf(buf2, BUFSIZE, " %d", this_host->dport);
+    strncat(buf, buf2, BUFSIZE);
+  } else {
+    strncat(buf, " -", BUFSIZE);
+  }
+
   run_command(buf);
 }
 
@@ -200,8 +188,8 @@ void remove_old()
     if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
       if (opt.verbose == 2)
 	syslog(LOG_NOTICE, "Deleting host status entry (%s)", inet_ntoa(this_host->shost));
-      if (opt.response & OPT_BLOCK)
-	remove_rule(inet_ntoa(this_host->shost));
+      if (opt.response & OPT_RESPOND)
+	react(EX_RESPOND_REMOVE, this_host);
       if (is_first == 1) {
 	prev_host = this_host->next;
 	free(this_host);
@@ -236,40 +224,31 @@ unsigned char is_known(struct in_addr shost)
 void look_for_alert()
 {
   struct conn_data *this;
-  char buf[BUFSIZE];
 
   this = first;
   while (this != NULL) {
     if ((this->count >= opt.threshold) && (!is_known(this->shost))) {
+      struct known_hosts *this_host;
+
+      this_host = xmalloc(sizeof(struct known_hosts));
+      this_host->time = time(NULL);
+      this_host->count = this->count;
+      this_host->shost = this->shost;
+      this_host->netmask.s_addr = 0xFFFFFFFF;
+      this_host->protocol = this->protocol;
+      this_host->dhost = this->dhost;
+      this_host->sport = this->sport;
+      this_host->dport = this->dport;
+      this_host->next = first_host;
+      first_host = this_host;
+
       syslog(LOG_NOTICE, "ALERT: %d attempts from %s", this->count, inet_ntoa(this->shost));
 
-      add_host_ip_net(inet_ntoa(this->shost), time(NULL));
-
-      if(opt.response & OPT_BLOCK) {
-	add_rule(inet_ntoa(this->shost));
-      }
-      if(opt.response & OPT_NOTIFY_EMAIL) {
-	snprintf(buf, BUFSIZE,
-		 "%s | %s -s 'fwlogwatch alert: %d packet%s from %s' %s",
-		 P_ECHO, P_MAIL,
-		 this->count, (this->count == 1)?"":"s",
-		 inet_ntoa(this->shost), opt.recipient);
-	run_command(buf);
-      }
-      if(opt.response & OPT_NOTIFY_SMB) {
-	snprintf(buf, BUFSIZE,
-		 "%s 'fwlogwatch alert: %d packet%s from %s' | %s -M %s",
-		 P_ECHO,
-		 this->count, (this->count == 1)?"":"s",
-		 inet_ntoa(this->shost),
-		 P_SMBCLIENT, opt.smb_host);
-	run_command(buf);
-      }
-      if(opt.response & OPT_CUSTOM_ACTION) {
-	run_command(opt.action);
-      }
+      if(opt.response & OPT_NOTIFY)
+	react(EX_NOTIFY, this_host);
+      if(opt.response & OPT_RESPOND)
+	react(EX_RESPOND_ADD, this_host);
       this->end_time = 1;
-      remove_old();
     }
     this = this->next;
   }

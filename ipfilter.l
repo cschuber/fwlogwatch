@@ -1,4 +1,4 @@
-/* $Id: ipfilter.l,v 1.1 2002/02/14 21:15:35 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.2 2002/02/14 21:21:20 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -60,8 +60,8 @@ TARGET		[SpPbBnL]
 ({HEXDIGIT}{HEXDIGIT}[ ]?)+[ ]+[ -~]+									opt.parser=opt.parser|IPF_NO_HIT;
 [ \t]+		/* ignore whitespace */
 [\n]		/* ignore */
-{STRING}	fprintf(stderr, "Unrecognized token: %s\n", ipftext);
-.		fprintf(stderr, "Unrecognized character: %s\n", ipftext);
+{STRING}	if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", ipftext);
+.		if(opt.verbose) fprintf(stderr, "Unrecognized character: %s\n", ipftext);
 
 %%
 

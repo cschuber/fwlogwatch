@@ -1,4 +1,4 @@
-/* $Id: modes.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: modes.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,10 +51,23 @@ void mode_summary()
     ++linenum;
     hit = PARSE_NO_HIT;
     hit = parse_line(buf, linenum);
-    if (hit == PARSE_OK) { ++hitnum; }
-    if (hit == PARSE_WRONG_FORMAT) { ++errnum; }
-    if (hit == PARSE_TOO_OLD) { ++oldnum; }
-    if (hit == PARSE_EXCLUDED) { ++hitnum; ++exnum; }
+    opt.repeated = 0;
+    switch (hit) {
+    case PARSE_OK:
+      ++hitnum;
+      opt.repeated = 1;
+      break;
+    case PARSE_WRONG_FORMAT:
+      ++errnum;
+      break;
+    case PARSE_TOO_OLD:
+      ++oldnum;
+      break;
+    case PARSE_EXCLUDED:
+      ++hitnum;
+      ++exnum;
+      break;
+    }
   }
 
   if (opt.verbose == 2)
@@ -230,8 +243,8 @@ void terminate()
 {
   syslog(LOG_NOTICE, "SIGTERM caught, cleaning up");
   free_hosts();
-  if(opt.response & OPT_BLOCK)
-    modify_firewall(REMOVE_CHAIN);
+  if(opt.response & OPT_RESPOND)
+    modify_firewall(FW_STOP);
   log_exit();
 }
 
@@ -345,7 +358,15 @@ void mode_rt_response()
     sock = prepare_socket();
 
   if((opt.format & PARSER_IPCHAINS) != 0)
-    look_for_log_rules();
+    check_for_ipchains();
+
+  if((opt.response & OPT_NOTIFY) != 0)
+    check_script_perms(FWLW_NOTIFY);
+
+  if((opt.response & OPT_RESPOND) != 0) {
+    check_script_perms(FWLW_RESPOND);
+    modify_firewall(FW_START);
+  }
 
   syslog(LOG_NOTICE, "Alert threshold is %d attempt%s", opt.threshold, (opt.threshold == 1)?"":"s");
 
@@ -354,11 +375,9 @@ void mode_rt_response()
 	 (opt.recent < 3600)?"second":"hour",
 	 ((opt.recent == 1) || (opt.recent == 3600))?"":"s");
 
-  show_mode_opts(buf);
-  syslog(LOG_NOTICE, "Response mode: %s", buf);
-
-  if(opt.response & OPT_BLOCK)
-    modify_firewall(ADD_CHAIN);
+  syslog(LOG_NOTICE, "Response mode: log%s%s",
+	 (opt.response & OPT_NOTIFY)?", notify":"",
+	 (opt.response & OPT_RESPOND)?", respond":"");
 
   input = fopen(opt.inputfile, "r");
   if (input == NULL) {

@@ -1,0 +1,43 @@
+#!/bin/sh
+# $Id: fwlw_notify,v 1.1 2002/02/14 21:21:20 bwess Exp $
+# fwlogwatch realtime notification script
+
+# You can invoke a custom action through this script when fwlogwatch
+# issues an alert. A few commented examples are shown below.
+# The available arguments (if activated in the configuration, if not the
+# fields will contain a '-') are:
+# $1 count
+# $2 source IP
+# $3 destination IP
+# $4 protocol
+# $5 source port
+# $6 destination port
+
+
+### Use the following lines for email notifications, $EMAIL is the recipient
+#
+#EMAIL=root@localhost
+#
+#/bin/echo "fwlogwatch ALERT on $HOSTNAME: $1 packet(s) from $2 to $3" | /bin/mail -s "fwlogwatch ALERT: $1 packet(s) from $2" $EMAIL
+
+
+### Use the following lines for SMB notifications, $SMBHOST is the host the
+### alert should appear
+#
+#SMBHOST=hostname
+#
+#/bin/echo "fwlogwatch ALERT on $HOSTNAME: $1 packet(s) from $2" | /usr/bin/smbclient -M $SMBHOST
+
+
+### Use the following line to generate a custom log entry
+#
+#/usr/bin/logger -p security.alert -t "fwlogwatch ALERT" "$1 packet(s) from $2"
+
+
+### You may also want to log alerts to a file
+#
+#NOW=`date +'%Y-%m-%d-%H-%M-%S'`
+#/bin/echo "$NOW: $1 packet(s) from $2 to $3" >> /tmp/fwlw.log
+
+
+### Insert your own ideas here, anything is possible. :-)

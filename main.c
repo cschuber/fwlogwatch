@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.14 2002/02/14 21:15:35 bwess Exp $ */
+/* $Id: main.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,10 +60,8 @@ void usage(char *me, unsigned char exitcode)
   printf("         -a <count>  alert threshold (defaults to %d entries)\n", ALERT);
   printf("         -l <time>   forget events this old (defaults to %d hours)\n", FORGET/3600);
   printf("         -k <IP/net> add this IP address or net to the list of known hosts\n");
-  printf("         -M <email>  send email notifications on incidents\n");
-  printf("         -B          block host completely with new firewall rule\n");
-  printf("         -W <host>   send a winpopup alert message to host\n");
-  printf("         -A <action> custom action to take when threshold is reached\n");
+  printf("         -A          invoke notification script if threshold is reached\n");
+  printf("         -B          invoke response action script (e.g. block host)\n");
   printf("         -X          activate internal status information web server\n");
   printf("\n");
 
@@ -111,8 +109,10 @@ void init_options()
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
-  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO|PARSER_IPFILTER;
+  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO_IOS|PARSER_CISCO_PIX|PARSER_IPFILTER;
   opt.parser = 0;
+  opt.repeated = 0;
+  opt.orig_count = 0;
 
   opt.src_ip = 1;
   opt.dst_ip = 1;
@@ -160,7 +160,6 @@ void init_options()
   strncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
   opt.response = OPT_LOG;
-  opt.action[0] = '\0';
   opt.status = 0;
   strncpy(opt.listenhost, LISTENHOST, IPLEN);
   opt.listenport = LISTENPORT;
@@ -203,20 +202,19 @@ int main(int argc, char **argv)
   strncpy(rcfile, RCFILE, FILESIZE);
   read_rcfile(rcfile);
 
-  while ((iopt = getopt(argc, argv, "a:A:bBc:C:dDf:F:hi:I:k:l:L:m:M:no:O:pP:RsStT:vVwW:Xyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDf:F:hi:I:k:l:L:m:no:O:pP:RsStT:vVwXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
       break;
     case 'A':
-      opt.response = opt.response | OPT_CUSTOM_ACTION;
-      strncpy(opt.action, optarg, ACTIONSIZE);
+      opt.response = opt.response | OPT_NOTIFY;
       break;
     case 'b':
       opt.datalen = 1;
       break;
     case 'B':
-      opt.response = opt.response | OPT_BLOCK;
+      opt.response = opt.response | OPT_RESPOND;
       break;
     case 'c':
       strncpy(rcfile, optarg, FILESIZE);
@@ -251,7 +249,7 @@ int main(int argc, char **argv)
       strncpy(opt.templatefile, optarg, FILESIZE);
       break;
     case 'k':
-      add_host_ip_net(optarg, KNOWN_HOST);
+      add_known_host(optarg);
       break;
     case 'l':
       opt.recent = parse_time(optarg);
@@ -265,10 +263,6 @@ int main(int argc, char **argv)
       break;
     case 'm':
       opt.least = atoi(optarg);
-      break;
-    case 'M':
-      opt.response = opt.response | OPT_NOTIFY_EMAIL;
-      strncpy(opt.recipient, optarg, EMAILSIZE);
       break;
     case 'n':
       opt.resolve = 1;
@@ -313,10 +307,6 @@ int main(int argc, char **argv)
     case 'w':
       opt.html = 1;
       break;
-    case 'W':
-      opt.response = opt.response | OPT_NOTIFY_SMB;
-      strncpy(opt.smb_host, optarg, SHOSTLEN);
-      break;
     case 'X':
       opt.status = 1;
       break;
@@ -351,11 +341,6 @@ int main(int argc, char **argv)
     mode_summary();
     break;
   case REALTIME_RESPONSE:
-    if (((opt.format & PARSER_IPCHAINS) == 0)
-	&& ((opt.response & OPT_BLOCK) != 0)) {
-      fprintf(stderr, "Error: the block response is only available for ipchains\n");
-      return EXIT_FAILURE;
-    }
     if (opt.src_ip == 0)
       opt.src_ip = 1;
     if (opt.threshold == 0)

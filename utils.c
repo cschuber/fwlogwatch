@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: utils.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,8 +44,8 @@ void run_command(char *buf)
 {
   pid_t pid;
 
-  if (strstr(buf, "[invalid]") != NULL) {
-    syslog(LOG_NOTICE, "Not executing buffer containing invalid string");
+  if (strstr(buf, "%") != NULL) {
+    syslog(LOG_NOTICE, "Not executing buffer containing format string");
     return;
   }
 
@@ -228,24 +228,29 @@ unsigned long int parse_cidr(char *input)
   }
 }
 
-void add_host_ip_net(char *input, time_t time)
+void add_known_host(char *ip)
 {
   struct known_hosts *host;
 
   host = xmalloc(sizeof(struct known_hosts));
-  host->time = time;
-  host->netmask.s_addr = parse_cidr(input);
-  if(convert_ip(input, &host->shost) == IN_ADDR_ERROR) {
+  host->time = 0;
+  host->count = 0;
+  host->netmask.s_addr = parse_cidr(ip);
+  if(convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
     printf("(known host)\n");
     free(host);
     exit(EXIT_FAILURE);
   }
   host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
+  host->protocol = 0;
+  host->dhost.s_addr = 0;
+  host->sport = 0;
+  host->dport = 0;
   host->next = first_host;
   first_host = host;
 }
 
-void add_exclude_host_port(char *input, unsigned char mode)
+void add_exclude_hp(char *input, unsigned char mode)
 {
   struct parser_options *excluded_this;
   struct in_addr ip;

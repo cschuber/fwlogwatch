@@ -1,4 +1,4 @@
-/* $Id: ipchains.l,v 1.1 2002/02/14 21:15:35 bwess Exp $ */
+/* $Id: ipchains.l,v 1.2 2002/02/14 21:21:20 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -49,8 +49,8 @@ IPCHAINS	" kernel: Packet log: "
 "(#"{NUMBER}")"	/* ignore */
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
-{STRING}	fprintf(stderr, "Unrecognized token: %s\n", ipchainstext);
-.		fprintf(stderr, "Unrecognized character: %s\n", ipchainstext);
+{STRING}	if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", ipchainstext);
+.		if(opt.verbose) fprintf(stderr, "Unrecognized character: %s\n", ipchainstext);
 
 %%
 

@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.12 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: net.c,v 1.13 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -234,12 +234,9 @@ void handshake(int fd)
     snprintf(buf, BUFSIZE, "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n<tr><td>Discard timeout:</td><td>%d seconds</td></tr>\n", opt.threshold, opt.recent);
     net_output(conn, buf);
 
-    {
-      char buf2[BUFSIZE];
-
-      show_mode_opts(buf2);
-      snprintf(buf, BUFSIZE, "<tr><td>Response mode:</td><td>%s</td></tr>\n", buf2);
-    }
+    snprintf(buf, BUFSIZE, "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n",
+	     (opt.response & OPT_NOTIFY)?", notify":"",
+	     (opt.response & OPT_RESPOND)?", respond":"");
     net_output(conn, buf);
 
     net_output(conn, "</table>\n");

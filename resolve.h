@@ -1,4 +1,4 @@
-/* $Id: resolve.h,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: resolve.h,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #ifndef _RESOLVE_H
 #define _RESOLVE_H

@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.13 2002/02/14 21:15:35 bwess Exp $
-.TH FWLOGWATCH 8 "9 March 2001" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.14 2002/02/14 21:21:20 bwess Exp $
+.TH FWLOGWATCH 8 "3 April 2001" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -61,7 +61,9 @@ ipchains,
 .I n
 netfilter,
 .I c
-cisco and
+cisco IOS,
+.I p
+cisco PIX and
 .I f
 ipfilter.
 .IP \-p
@@ -79,12 +81,13 @@ Show version and copyright information.
 .IP \-v
 Be verbose. You can specify it twice for more information.
 In very verbose mode while parsing the log file you will see "." for
-relevant packet filter log entries, "o" for packet filter log entries that
-are too old and "_" for entries that are not packet filter logs.
+relevant packet filter log entries, "r" for 'last message repeated' entries
+concerning packet filter logs, "o" for packet filter log entries that are
+too old and "_" for entries that are not packet filter logs.
 .IP \-y
 Differentiate TCP options. All packets with a SYN are listed separately,
 other TCP flags are shown in full format if they are available (ipchains
-does not log them, netfilter and ipfilter do, cisco doesn't even log SYNs).
+does not log them, netfilter and ipfilter do, cisco IOS doesn't even log SYNs).
 .IP \-z
 Show time interval between start and end time of packet log entries. This
 is only available if there is more than one packet log entry with unique
@@ -182,24 +185,20 @@ below for the time options.
 This option defines a host or network in CIDR notation that will never be
 blocked or other actions taken against. To specify more than one, use the
 -k parameter again for each IP address or network you want to add.
-.IP \-M\ \fIemail\fR
-Send an email notification to the specified
-.I email
-address.
+.IP \-A
+The notification script is invoked when the threshold is reached. A few
+examples of possible notifications are included in fwlw_notify, you can add
+your own ones as you see fit.
 .IP \-B
-Block host completely with new firewall rule. A new chain for
+The response script is invoked when the threshold is reached. This will
+usually block the attacking host completely with a new firewall rule.
+A new chain for
 .B fwlogwatch
 actions is inserted in the input chain and block rules added as needed.
 The chain and its content is removed if
 .B fwlogwatch
-is terminated normally.
-.IP \-W\ \fIhost\fR
-Send a winpopup alert message to the windows machine
-.IR host .
-.IP \-A\ \fIaction\fR
-This custom
-.I action
-is executed in a shell.
+is terminated normally. The default scripts contains actions for ipchains
+and netfilter, you can modify them or add others as you like.
 .IP \-X
 Activate the internal web server to monitor the current status of the program.
 Use the configuration file to change it's options. The default user name is
@@ -252,13 +251,14 @@ user and password can be changed.
 .IP host\ and\ port\ selection\ and\ exclusion
 Hosts and ports to be summarized can be selected or excluded.
 .SH "NETFILTER, IPFILTER AND CISCO SUPPORT"
-fwlogwatch also features iptables/netfilter, ipfilter and cisco log file
-support, it can even combine or separate the formats if you activate or
-deactivate the corresponding parsers. Some restrictions apply because not all
-fields exist or make sense in all log file types. The block response in
-realtime response mode only works for ipchains and you will need to
-deactivate the ipchains parser if you want to use realtime response mode on
-a system without ipchains.
+fwlogwatch also features iptables/netfilter, ipfilter and cisco IOS/PIX log
+file support, it can even combine or separate the formats if you activate
+or deactivate the corresponding parsers. Some restrictions apply because
+not all fields exist or make sense in all log file types. Realtime response
+has predefined actions for ipchains and netfilter, you can add whatever you
+want done to the fwlw_respond script. You will need to deactivate the
+ipchains parser if you want to use realtime response mode on a system
+without ipchains.
 .SH SECURITY
 Since
 .B fwlogwatch
@@ -269,7 +269,8 @@ group
 .B /var/log/messages
 is in if all you need is to be able to read this file. Only the realtime
 response mode with activated ipchains parser needs superuser permissions
-to analyze (and in block mode also modify) the firewall rules.
+to analyze the firewall rules. You might also need them for the response
+script and for binding the default status port.
 .SH AUTHOR
 Boris Wesslowski <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>,
 RUS-CERT http://cert.uni-stuttgart.de

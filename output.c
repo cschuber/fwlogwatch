@@ -1,4 +1,4 @@
-/* $Id: output.c,v 1.14 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: output.c,v 1.15 2002/02/14 21:21:20 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>

@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.1 2002/02/14 21:15:36 bwess Exp $ */
+/* $Id: netfilter.l,v 1.2 2002/02/14 21:21:20 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -70,8 +70,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 "SPI="{HEXNUM}		/* ignore */
 [ ]+			/* ignore whitespace */
 [\n]			return 0;
-{STRING}		fprintf(stderr, "Unrecognized token: %s\n", nftext);
-.			fprintf(stderr, "Unrecognized character: %s\n", nftext);
+{STRING}		if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", nftext);
+.			if(opt.verbose) fprintf(stderr, "Unrecognized character: %s\n", nftext);
 
 %%
 
