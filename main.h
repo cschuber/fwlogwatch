@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: main.h,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.0.25"
-#define COPYRIGHT "2000-11-06 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.0.26"
+#define COPYRIGHT "2000-11-11 Boris Wesslowski, RUS-CERT"
 
 /* Data sizes */
 
@@ -59,6 +59,21 @@ enum {
 #define NF_DPT 64
 #define NF_TYPE 128
 
+/* Cisco support */
+
+#define CISCO_DATE 1
+#define CISCO_SRC 2
+#define CISCO_DST 4
+#define CISCO_PROTO 8
+#define CISCO_COUNT 16
+
+enum {
+  C_OPT_NONE,
+  C_OPT_HOST,
+  C_OPT_PORT,
+  C_OPT_TYPE
+};
+
 /* Sorting */
 
 enum {
@@ -96,8 +111,8 @@ enum {
 #define TEMPLATE "/etc/fwlogwatch.template"
 #define FILENAME "fwlogwatchXXXXXX"
 #define INSERTREPORT "# insert report here"
-#define CAT "/bin/cat"
-#define SENDMAIL "/usr/sbin/sendmail"
+#define P_CAT "/bin/cat"
+#define P_SENDMAIL "/usr/sbin/sendmail"
 
 enum {
   OPT_NONE,
@@ -109,11 +124,11 @@ enum {
 
 #define ALERT 5
 #define FORGET 86400
-#define IPCHAINS "/sbin/ipchains"
+#define P_IPCHAINS "/sbin/ipchains"
 #define CHAINLABEL "flwblock"
-#define ECHO "/bin/echo"
-#define MAIL "/bin/mail"
-#define SMBCLIENT "/usr/bin/smbclient"
+#define P_ECHO "/bin/echo"
+#define P_MAIL "/bin/mail"
+#define P_SMBCLIENT "/usr/bin/smbclient"
 #define LISTENHOST "127.0.0.1"
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
@@ -145,6 +160,7 @@ struct log_line {
   char dhost[IPLEN];
   int dport;
   unsigned char syn;
+  int count;
 };
 
 struct conn_data {
@@ -206,6 +222,7 @@ struct options {
 
   struct log_line *line;
   unsigned char nf;
+  unsigned char cisco;
 
   unsigned char src_ip;
   unsigned char dst_ip;
@@ -231,7 +248,7 @@ struct options {
   char hostname[SHOSTLEN];
 
   unsigned char chains;
-  char chainlabel[SHOSTLEN];
+  char chainlabel[SHORTLEN];
 
   unsigned char branches;
   char branchname[SHORTLEN];

@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: compare.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +16,7 @@ void add_entry()
 
   data = xmalloc(sizeof(struct conn_data));
 
-  data->count = 1;
+  data->count = opt.line->count;
   data->start_time = opt.line->time;
   data->end_time = 0;
   strncpy(data->hostname, opt.line->hostname, SHOSTLEN);
@@ -249,19 +249,20 @@ void build_list()
     if ((opt.opts) && (this->syn != opt.line->syn)) {goto no_match;}
     if ((opt.src_ip) && (strncmp(this->shost, opt.line->shost, IPLEN) != 0)) {goto no_match;}
     if ((opt.dst_ip) && (strncmp(this->dhost, opt.line->dhost, IPLEN) != 0)) {goto no_match;}
-    if (strncmp(this->interface, opt.line->interface, SHOSTLEN) != 0) {goto no_match;}
-    if (strncmp(this->branchname, opt.line->branchname, SHOSTLEN) != 0) {goto no_match;}
-    if (strncmp(this->chainlabel, opt.line->chainlabel, SHOSTLEN) != 0) {goto no_match;}
+    if (strncmp(this->interface, opt.line->interface, SHORTLEN) != 0) {goto no_match;}
+    if (strncmp(this->branchname, opt.line->branchname, SHORTLEN) != 0) {goto no_match;}
+    if (strncmp(this->chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {goto no_match;}
     if (strncmp(this->hostname, opt.line->hostname, SHOSTLEN) != 0) {goto no_match;}
 
     if (opt.line->time >= this->end_time) {
       this->end_time = opt.line->time;
     } else {
-      fprintf(stderr, "\nTimewarp in log file (%d < %d), ignoring.\n", (int)opt.line->time, (int)this->end_time);
+      if(opt.verbose)
+	fprintf(stderr, "Timewarp in log file (%d < %d), ignoring.\n", (int)opt.line->time, (int)this->end_time);
       return;
     }
 
-    this->count++;
+    this->count += opt.line->count;
     return;
 
   no_match: this = this->next;

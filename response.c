@@ -1,4 +1,4 @@
-/* $Id: response.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: response.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,10 +115,10 @@ void modify_firewall(unsigned char action)
     if(!found_label) {
       syslog(LOG_NOTICE, "Adding %s chain", CHAINLABEL);
 
-      snprintf(buf, BUFSIZE, "%s -N %s", IPCHAINS, CHAINLABEL);
+      snprintf(buf, BUFSIZE, "%s -N %s", P_IPCHAINS, CHAINLABEL);
       run_command(buf);
 
-      snprintf(buf, BUFSIZE, "%s -I input -j %s", IPCHAINS, CHAINLABEL);
+      snprintf(buf, BUFSIZE, "%s -I input -j %s", P_IPCHAINS, CHAINLABEL);
       run_command(buf);
     }
   }
@@ -126,13 +126,13 @@ void modify_firewall(unsigned char action)
     if(found_label) {
       syslog(LOG_NOTICE, "Removing %s chain", CHAINLABEL);
 
-      snprintf(buf, BUFSIZE, "%s -D input -j %s", IPCHAINS, CHAINLABEL);
+      snprintf(buf, BUFSIZE, "%s -D input -j %s", P_IPCHAINS, CHAINLABEL);
       run_command(buf);
 
-      snprintf(buf, BUFSIZE, "%s -F %s", IPCHAINS, CHAINLABEL);
+      snprintf(buf, BUFSIZE, "%s -F %s", P_IPCHAINS, CHAINLABEL);
       run_command(buf);
 
-      snprintf(buf, BUFSIZE, "%s -X %s", IPCHAINS, CHAINLABEL);
+      snprintf(buf, BUFSIZE, "%s -X %s", P_IPCHAINS, CHAINLABEL);
       run_command(buf);
     }
   }
@@ -144,7 +144,7 @@ void add_rule(char *ip)
 
   syslog(LOG_NOTICE, "Adding block for %s", ip);
 
-  snprintf(buf, BUFSIZE, "%s -A %s -s %s -j DENY", IPCHAINS, CHAINLABEL, ip);
+  snprintf(buf, BUFSIZE, "%s -A %s -s %s -j DENY", P_IPCHAINS, CHAINLABEL, ip);
   run_command(buf);
 }
 
@@ -154,7 +154,7 @@ void remove_rule(char *ip)
 
   syslog(LOG_NOTICE, "Removing block for %s", ip);
 
-  snprintf(buf, BUFSIZE, "%s -D %s -s %s -j DENY", IPCHAINS, CHAINLABEL, ip);
+  snprintf(buf, BUFSIZE, "%s -D %s -s %s -j DENY", P_IPCHAINS, CHAINLABEL, ip);
   run_command(buf);
 }
 
@@ -256,7 +256,7 @@ void look_for_alert()
       if(opt.response & OPT_NOTIFY_EMAIL) {
 	snprintf(buf, BUFSIZE,
 		 "%s | %s -s 'fwlogwatch alert: %d connection attempt%s from %s' %s",
-		 ECHO, MAIL,
+		 P_ECHO, P_MAIL,
 		 this->count, (this->count == 1)?"":"s",
 		 this->shost, opt.recipient);
 	run_command(buf);
@@ -264,9 +264,9 @@ void look_for_alert()
       if(opt.response & OPT_NOTIFY_SMB) {
 	snprintf(buf, BUFSIZE,
 		 "%s 'fwlogwatch alert: %d connection attempts from %s' | %s -M %s",
-		 ECHO,
+		 P_ECHO,
 		 this->count, this->shost,
-		 SMBCLIENT, opt.smb_host);
+		 P_SMBCLIENT, opt.smb_host);
 	run_command(buf);
       }
       if(opt.response & OPT_CUSTOM_ACTION) {

@@ -1,10 +1,13 @@
-$Id: README,v 1.4 2002/02/14 20:36:55 bwess Exp $
+$Id: README,v 1.5 2002/02/14 20:42:15 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for the
-RUS-CERT. It is a linux ipchains/iptables packet filter log analyzer with
-incident report and realtime response capability.
+RUS-CERT. It is a packet filter/firewall log analyzer with support for
+linux ipchains, netfilter/iptables and cisco log files. It also features
+incident report and realtime response capabilities.
 
-It is available from the RUS-CERT website http://cert.uni-stuttgart.de and
+It is available from the RUS-CERT website
+http://cert.uni-stuttgart.de/projects/fwlogwatch/
+and from
 http://www.kyb.uni-stuttgart.de/boris/software.shtml
 
 
@@ -20,6 +23,8 @@ FEATURES
   - Plain text and HTML output with sort options.
   - Integrated resolver for protocols, services and host names.
   - Own DNS cache for faster lookups.
+  - Detects and processes ipchains, netfilter/iptables and cisco log
+    entries, in separate files or even combined.
 
 - Interactive report mode:
   - The integrated report generator fills and presents a
@@ -44,7 +49,15 @@ The commented configuration file supports and explains all options and will
 get you started quickly.
 
 
-BASICS
+NETFILTER AND CISCO SUPPORT
+fwlogwatch features iptables/netfilter and cisco log file support, it can
+even parse combined log files. Some restrictions apply because not all
+fields exist or make sense in all log file types. Realtime response mode
+only works for ipchains. It is assumed that if you use netfilter or cisco
+you know how to get it to produce log entries.
+
+
+BASICS (for ipchains)
 - Create an ipchains packet filter with allow rules for all connections you
   need, as tight as possible.
 
@@ -89,12 +102,6 @@ and template in /etc.
 
 You can define the TMPDIR environment variable if you don't want fwlogwatch
 to create it's temporary files in /tmp.
-
-
-NETFILTER SUPPORT
-This release of fwlogwatch has alpha iptables/netfilter support, it can
-even parse combined ipchains/iptables log files but right now only log
-summary and interactive report mode are usable.
 
 
 CONFIGURATION AND EXAMPLES

@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.5 2002/02/14 20:36:55 bwess Exp $
+# $Id: Makefile,v 1.6 2002/02/14 20:42:14 bwess Exp $
 
 CC=gcc
 CFLAGS=-pipe -O2 -Wall #-pedantic -g -p
-OBJ= compare.o main.o modes.o net.o netfilter.o output.o parser.o \
+OBJ= cisco.o compare.o main.o modes.o net.o netfilter.o output.o parser.o \
   rcfile.o report.o resolve.o response.o utils.o
 LDFLAGS=-lcrypt #-lefence
 FLEX=flex
@@ -15,19 +15,22 @@ SHELL=/bin/sh
 
 all:	fwlogwatch
 
+cisco.o:	main.h utils.h
 compare.o:	compare.h main.h output.h
 main.o:		main.h modes.h parser.h rcfile.h
 modes.o:	compare.h main.h net.h output.h parser.h report.h response.h
 net.o:		main.h utils.h
-netfilter.o:	main.h netfilter.h
+netfilter.o:	main.h utils.h
 output.o:	main.h output.h resolve.h
-parser.o:	compare.h main.h parser.h
+parser.o:	cisco.h compare.h main.h netfilter.h parser.h
 rcfile.o:	main.h parser.h rcfile.h
 report.o:	main.h output.h resolve.h response.h
 resolve.o:	main.h resolve.h
 response.o:	main.h output.h response.h
 utils.o:	main.h
 
+cisco.c:	cisco.yy
+	$(FLEX) cisco.yy
 netfilter.c:	netfilter.yy
 	$(FLEX) netfilter.yy
 
@@ -55,4 +58,4 @@ profile:
 	$(CC) -static -g -p $(OBJ) -o fwlogwatch -lc_p $(LDFLAGS)
 
 clean:
-	rm -f *.o *~ *.bak netfilter.c fwlogwatch
+	rm -f *.o *~ *.bak cisco.c netfilter.c fwlogwatch

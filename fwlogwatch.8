@@ -1,7 +1,7 @@
 .\"
-.\" $Id: fwlogwatch.8,v 1.4 2002/02/14 20:36:55 bwess Exp $
+.\" $Id: fwlogwatch.8,v 1.5 2002/02/14 20:42:15 bwess Exp $
 .\"
-.TH FWLOGWATCH 8 "06 November 2000" RUS-CERT
+.TH FWLOGWATCH 8 "11 November 2000" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -9,11 +9,13 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .RI [ options ]
 .SH DESCRIPTION
 .B fwlogwatch
-produces ipchains and iptables/netfilter log summary reports in text and
-HTML form, with the data found it can produce customizable incident reports
-from a template and send them to abuse contacts at offending sites or CERT
-coordination centers. Finally, it can also run as daemon and report
-anomalies or start countermeasures.
+produces ipchains, netfilter/iptables and cisco log summary reports in text
+and HTML form and has a lot of options to find and display relevant
+patterns in connection attempts. With the data found it can produce
+customizable incident reports from a template and send them to abuse
+contacts at offending sites or CERT coordination centers. Finally, it can
+also run as daemon and report anomalies or start countermeasures.
+
 .SH OPTIONS
 The global options for all modes (at least where they make sense) are:
 .IP \-c\ \fIconfig\fR
@@ -33,7 +35,8 @@ Differentiate destination ports.
 .IP \-f\ \fIfile\fR
 Specify an input file (defaults to
 .B /var/log/messages
-).
+). Relevant entries are automatically detected so combined log files (e.g.
+from a log host) are no problem.
 .IP \-h
 Show the available options.
 .IP \-L
@@ -208,6 +211,11 @@ The colors of the HTML output page can be customized.
 .IP status\ server\ options
 The host that can access the web interface, the port it listens to and the
 user and password can be changed.
+.SH NETFILTER AND CISCO SUPPORT
+fwlogwatch features iptables/netfilter and cisco log file support, it can
+even parse combined log files. Some restrictions apply because not all
+fields exist or make sense in all log file types. Realtime response mode
+only works for ipchains.
 .SH SECURITY
 Since
 .B fwlogwatch

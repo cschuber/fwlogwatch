@@ -1,39 +1,40 @@
-/* $Id: netfilter.yy,v 1.1 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: netfilter.yy,v 1.2 2002/02/14 20:42:15 bwess Exp $ */
 
-%option noyywrap
-%option never-interactive
+%option prefix="nf"
 %option outfile="netfilter.c"
+%option noyywrap
 
 %{
 #define YY_NO_UNPUT
 
 #include <string.h>
 #include <time.h>
-#include "netfilter.h"
 #include "main.h"
+#include "utils.h"
 
 extern struct options opt;
 
-void parse_start(char *input);
-void parse_proto(char *input);
+void nf_parse_start(char *input);
+void nf_parse_proto(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-STRING	[a-zA-Z0-9-]*
-ISTRING	[a-zA-HJ-Z0-9-]*
+STRING	[a-zA-Z][a-zA-Z0-9.-]*
+ISTRING	[a-zA-HJ-Z0-9.-]*
 DIGIT	[0-9]
 HEXDIGIT	[0-9a-fA-F]
 NUMBER	{DIGIT}+
 HEXNUM	"0x"{HEXDIGIT}+
+OCTET   {DIGIT}{1,3}
 
 %%
 
-{MONTH}[ ]{1,2}{DIGIT}{1,2}" "{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}" "{STRING}" kernel: "{ISTRING}	parse_start(yytext);
-"IN="{STRING}		{ strncpy(opt.line->interface, yytext+3, SHORTLEN); opt.nf=opt.nf|NF_IN; }
-"OUT="{STRING}		/* ignore */
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{STRING}" kernel: "{ISTRING}	nf_parse_start(nftext);
+"IN="{STRING}?	{ strncpy(opt.line->interface, nftext+3, SHORTLEN); opt.nf=opt.nf|NF_IN; }
+"OUT="{STRING}?		/* ignore */
 "MAC="({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT}	/* ignore */
-"SRC="{DIGIT}{1,3}"."{DIGIT}{1,3}"."{DIGIT}{1,3}"."{DIGIT}{1,3} { strncpy(opt.line->shost, yytext+4, IPLEN); opt.nf=opt.nf|NF_SRC; }
-"DST="{DIGIT}{1,3}"."{DIGIT}{1,3}"."{DIGIT}{1,3}"."{DIGIT}{1,3} { strncpy(opt.line->dhost, yytext+4, IPLEN); opt.nf=opt.nf|NF_DST; }
+"SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->shost, nftext+4, IPLEN); opt.nf=opt.nf|NF_SRC; }
+"DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET} { strncpy(opt.line->dhost, nftext+4, IPLEN); opt.nf=opt.nf|NF_DST; }
 "LEN="{NUMBER}		/* ignore */
 "TOS="{HEXNUM}		/* ignore */
 "PREC="{HEXNUM}		/* ignore */
@@ -43,14 +44,14 @@ HEXNUM	"0x"{HEXDIGIT}+
 "DF"			/* ignore */
 "MF"			/* ignore */
 "FRAG:"{NUMBER}		/* ignore */
-"PROTO="{STRING}	parse_proto(yytext+6);
+"PROTO="{STRING}	nf_parse_proto(nftext+6);
 "INCOMPLETE ["{NUMBER}" bytes]" /* ignore */
-"TYPE="{NUMBER}		{ opt.line->sport = atoi(yytext+5); opt.nf=opt.nf|NF_TYPE; }
+"TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.nf=opt.nf|NF_TYPE; }
 "CODE="{NUMBER}		/* ignore */
 "SEQ="{NUMBER}		/* ignore */
 "ACK="{NUMBER}		/* ignore */
-"SPT="{NUMBER}		{ opt.line->sport = atoi(yytext+4); opt.nf=opt.nf|NF_SPT; }
-"DPT="{NUMBER}		{ opt.line->dport = atoi(yytext+4); opt.nf=opt.nf|NF_DPT; }
+"SPT="{NUMBER}		{ opt.line->sport = atoi(nftext+4); opt.nf=opt.nf|NF_SPT; }
+"DPT="{NUMBER}		{ opt.line->dport = atoi(nftext+4); opt.nf=opt.nf|NF_DPT; }
 "WINDOW="{NUMBER}	/* ignore */
 "RES="{HEXNUM}		/* ignore */
 "URG"			/* fixme */
@@ -64,12 +65,12 @@ HEXNUM	"0x"{HEXDIGIT}+
 "SPI="{HEXNUM}		/* ignore */
 [ ]+			/* ignore whitespace */
 [\n]			return 0;
-{STRING}		fprintf(stderr, "Unrecognized token: %s\n", yytext);
-.			fprintf(stderr, "Unrecognized character: %s\n", yytext);
+{STRING}		fprintf(stderr, "Unrecognized token: %s\n", nftext);
+.			fprintf(stderr, "Unrecognized character: %s\n", nftext);
 
 %%
 
-void parse_start(char *input)
+void nf_parse_start(char *input)
 {
   int retval;
   char smonth[3];
@@ -83,9 +84,10 @@ void parse_start(char *input)
 		  opt.line->chainlabel);
   if (retval != 7) {
     if (retval == 6) {
-      strncpy(opt.line->chainlabel, "-", 1);
+      strncpy(opt.line->chainlabel, "-", SHORTLEN);
     } else {
-      fprintf(stderr, "\nFormat mismatch: %d args, ignored.\n", retval);
+      if(opt.verbose)
+	fprintf(stderr, "netfilter format mismatch: %d args, ignoring.\n", retval);
       return;
     }
   }
@@ -114,7 +116,7 @@ void parse_start(char *input)
   opt.nf=opt.nf|NF_DATE;
 }
 
-void parse_proto(char *input)
+void nf_parse_proto(char *input)
 {
   if(strncmp(input, "TCP", 3) == 0) opt.line->protocol = 6;
   if(strncmp(input, "UDP", 3) == 0) opt.line->protocol = 17;
@@ -124,38 +126,23 @@ void parse_proto(char *input)
     opt.nf=opt.nf|NF_PROTO;
 }
 
-void init_line()
-{
-  opt.line->time = 0;
-  opt.line->hostname[0] = '\0';
-  opt.line->chainlabel[0] = '\0';
-  strncpy(opt.line->branchname, "-", 1);
-  opt.line->interface[0] = '\0';
-  opt.line->protocol = 0;
-  opt.line->shost[0] = '\0';
-  opt.line->sport = 0;
-  opt.line->dhost[0] = '\0';
-  opt.line->dport = 0;
-  opt.line->syn = 0;
-}
-
-unsigned char flex_netfilter(char *input)
+unsigned char flex_netfilter(char *input, int linenum)
 {
   opt.nf = 0;
   init_line();
-  yy_scan_string(input);
-  yylex();
+  nf_scan_string(input);
+  nflex();
 
-  if ((opt.nf&(NF_DATE|NF_PROTO)) && (opt.line->protocol != 0)) {
-    if (opt.line->protocol != 1) {
-      if(!opt.nf&(NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))
-	return PARSE_WRONG_FORMAT;
-    } else {
-      if(!opt.nf&(NF_IN|NF_SRC|NF_DST|NF_SPT))
-	return PARSE_WRONG_FORMAT;
-    }
-  } else {
-    return PARSE_WRONG_FORMAT;
+  strncpy(opt.line->branchname, "-", SHORTLEN);
+  opt.line->count = 1;
+
+  if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.nf == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {
+    return PARSE_OK;
   }
-  return PARSE_OK;
+  if ((opt.line->protocol == 1) && (opt.nf == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
+    return PARSE_OK;
+  }
+  if(opt.verbose)
+    fprintf(stderr, "netfilter parse error in line %d, ignoring.\n", linenum);
+  return PARSE_WRONG_FORMAT;
 }

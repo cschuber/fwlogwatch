@@ -1,4 +1,4 @@
-/* $Id: utils.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: utils.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,4 +96,20 @@ void free_hosts()
     this_host = this_host->next;
     free(first_host);
   }
+}
+
+void init_line()
+{
+  opt.line->time = 0;
+  opt.line->hostname[0] = '\0';
+  opt.line->chainlabel[0] = '\0';
+  opt.line->branchname[0] = '\0';
+  opt.line->interface[0] = '\0';
+  opt.line->protocol = 0;
+  opt.line->shost[0] = '\0';
+  opt.line->sport = 0;
+  opt.line->dhost[0] = '\0';
+  opt.line->dport = 0;
+  opt.line->syn = 0;
+  opt.line->count = 0;
 }

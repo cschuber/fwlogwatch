@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.5 2002/02/14 20:36:55 bwess Exp $ */
+/* $Id: parser.c,v 1.6 2002/02/14 20:42:15 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +11,7 @@
 #include "compare.h"
 #include "utils.h"
 #include "netfilter.h"
+#include "cisco.h"
 
 extern struct options opt;
 
@@ -59,9 +60,9 @@ unsigned char ipchains(char *input, int linenum)
   if (retval != 26) {
     if (opt.verbose) {
       if(linenum != 0) {
-	fprintf(stderr, "\nFormat mismatch in line %d: %d of 26 args, ignored.\n", linenum, retval);
+	fprintf(stderr, "ipchains format mismatch in line %d: %d of 26 args, ignoring.\n", linenum, retval);
       } else {
-	fprintf(stderr, "\nFormat mismatch: %d of 26 args, ignored.\n", retval);
+	fprintf(stderr, "ipchains format mismatch: %d of 26 args, ignoring.\n", retval);
       }
     }
     return PARSE_WRONG_FORMAT;
@@ -92,21 +93,25 @@ unsigned char ipchains(char *input, int linenum)
 
   snprintf(opt.line->dhost, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
 
+  opt.line->count = 1;
+
   return PARSE_OK;
 }
 
 unsigned char parse_line(char *input, int linenum)
 {
-  int retval;
+  unsigned char retval;
 
   if (strstr(input, " kernel: Packet log: ")) {
     retval = ipchains(input, linenum);
     /* For ipchains log format see */
     /* /usr/src/linux-2.2.17/net/ipv4/ip_fw.c */
   } else if (strstr(input, "IN=")) {
-    retval = flex_netfilter(input);
+    retval = flex_netfilter(input, linenum);
     /* For iptables/netfilter log format see */
     /* /usr/src/linux-2.4.0-test10/net/ipv4/netfilter/ipt_LOG.c */
+  } else if (strstr(input, "%SEC-6-IPACCESSLOG")) {
+    retval = flex_cisco(input, linenum);
   } else {
     if (opt.verbose == 2)
       fprintf(stderr, "_");
