@@ -1,4 +1,4 @@
-/* $Id: cisco_ios.l,v 1.10 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: cisco_ios.l,v 1.11 2002/08/20 21:17:44 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -63,7 +63,7 @@ void cisco_ios_parse_date(char *input, unsigned char mode)
   int retval, day, hour, minute, second, msec;
   char smonth[3];
 #ifdef IRIX
-    char tmp[SHOSTLEN];
+  char tmp[SHOSTLEN];
 #endif
 #ifdef LOGDOTS
   char *remove_dot;
@@ -71,11 +71,11 @@ void cisco_ios_parse_date(char *input, unsigned char mode)
 
   if (mode == CI_OPT_HOST) {
     retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-	   smonth, &day, &hour, &minute, &second,
+		    smonth, &day, &hour, &minute, &second,
 #ifndef IRIX
-	   opt.line->hostname);
+		    opt.line->hostname);
 #else
-	   tmp);
+		    tmp);
     if(retval != 6) return;
     if(tmp[2] == ':')
       xstrncpy(opt.line->hostname, tmp+3, SHOSTLEN);
@@ -93,8 +93,6 @@ void cisco_ios_parse_date(char *input, unsigned char mode)
     retval = sscanf(input, "%3s %2d %2d:%2d:%2d:",
 		    smonth, &day, &hour, &minute, &second);
     if(retval != 5) return;
-  } else {
-    return;
   }
 
   build_time(smonth, day, hour, minute, second);
@@ -109,14 +107,14 @@ void cisco_ios_parse_src(char *input, unsigned char mode)
   int retval;
 
   if (mode == CI_OPT_PORT) {
-    retval = sscanf(input, "list %" SSHORTLEN "s %" SSHORTLEN "s %5s %3d.%3d.%3d.%3d(%5d)",
+    retval = sscanf(input, "list %" SHORTLEN_S "s %" SHORTLEN_S "s %5s %3d.%3d.%3d.%3d(%5d)",
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,
 		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if(retval != 8) return;
   } else if (mode == CI_OPT_NONE) {
-    retval = sscanf(input, "list %" SSHORTLEN "s %" SSHORTLEN "s %8s %3d.%3d.%3d.%3d",
+    retval = sscanf(input, "list %" SHORTLEN_S "s %" SHORTLEN_S "s %8s %3d.%3d.%3d.%3d",
 		    opt.line->chainlabel,
 		    opt.line->branchname,
 		    proto,

@@ -1,4 +1,4 @@
-/* $Id: net.c,v 1.22 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: net.c,v 1.23 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,10 +48,20 @@ void secure_read(int file, char *data_out, int maxlen)
 void prepare_socket()
 {
   int retval, x;
+#ifndef HAVE_IPV6
   struct sockaddr_in sa;
   struct in_addr ina;
+#else
+  struct sockaddr_in6 sain6;
+  struct in6_addr in6a;
+  char nab[INET6_ADDRSTRLEN];
+#endif
 
+#ifndef HAVE_IPV6
   opt.sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+#else
+  opt.sock = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+#endif
   if (opt.sock == -1) {
     syslog(LOG_NOTICE, "socket: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
@@ -63,13 +73,35 @@ void prepare_socket()
     log_exit(EXIT_FAILURE);
   }
 
+#ifndef HAVE_IPV6
   ina.s_addr = inet_addr(opt.listenif);
   bzero(&sa, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_port = htons(opt.listenport);
   sa.sin_addr = ina;
+#else
+  retval = inet_pton(AF_INET6, opt.listenif, in6a.s6_addr);
+  if (retval != 1) {
+    char nnb[HOSTLEN];
+    snprintf(nnb, HOSTLEN, "::ffff:%s", opt.listenif);
+    retval = inet_pton(AF_INET6, nnb, in6a.s6_addr);
+    if (retval != 1) {
+      syslog(LOG_NOTICE, "inet_pton: Wrong address %s", opt.listenif);
+      log_exit(EXIT_FAILURE);
+    }
+  }
 
+  bzero(&sain6, sizeof(sain6));
+  sain6.sin6_family = AF_INET6;
+  sain6.sin6_port = htons(opt.listenport);
+  sain6.sin6_addr = in6a;
+#endif
+
+#ifndef HAVE_IPV6
   retval = bind(opt.sock, (struct sockaddr *)&sa, sizeof(sa));
+#else
+  retval = bind(opt.sock, (struct sockaddr *)&sain6, sizeof(sain6));
+#endif
   if (retval == -1) {
     syslog(LOG_NOTICE, "bind: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
@@ -81,7 +113,11 @@ void prepare_socket()
     log_exit(EXIT_FAILURE);
   }
 
+#ifndef HAVE_IPV6
   syslog(LOG_NOTICE, _("Listening on %s port %i"), inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
+#else
+  syslog(LOG_NOTICE, _("Listening on %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
+#endif
 }
 
 /*
@@ -196,23 +232,42 @@ void handshake()
 #else
   size_t socks;
 #endif
+#ifndef HAVE_IPV6
   struct sockaddr_in sac;
+#else
+  struct sockaddr_in6 sain6;
+  char nab[INET6_ADDRSTRLEN];
+#endif
   char buf[BUFSIZE], nows[TIMESIZE], password[PASSWORDSIZE], salt[2], *pnt;
   time_t now;
   struct conn_data *this;
   struct known_hosts *this_host;
   unsigned char auth = 0, color = 1;
+  int max = 0;
 
+#ifndef HAVE_IPV6
   socks = sizeof(struct sockaddr_in);
+#else
+  socks = sizeof(struct sockaddr_in6);
+#endif
 
+#ifndef HAVE_IPV6
   conn = accept(opt.sock, (struct sockaddr *)&sac, &socks);
+#else
+  conn = accept(opt.sock, (struct sockaddr *)&sain6, &socks);
+#endif
   if (conn == -1) {
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
     return;
   }
 
+#ifndef HAVE_IPV6
   if((opt.listento[0] != '\0') && (strncmp(opt.listento,inet_ntoa(sac.sin_addr),IPLEN) != 0)) {
     syslog(LOG_NOTICE, _("Rejected connect from unallowed ip %s port %i"), inet_ntoa(sac.sin_addr), ntohs(sac.sin_port));
+#else
+  if((opt.listento[0] != '\0') && (strncmp(opt.listento,inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN),IPLEN) != 0)) {
+    syslog(LOG_NOTICE, _("Rejected connect from unallowed ip %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
+#endif
     retval = close(conn);
     if (retval == -1) {
       syslog(LOG_NOTICE, "close: %s", strerror(errno));
@@ -221,7 +276,11 @@ void handshake()
   }
 
   if(opt.verbose)
+#ifndef HAVE_IPV6
     syslog(LOG_NOTICE, _("Connect from %s port %i"), inet_ntoa(sac.sin_addr), ntohs(sac.sin_port));
+#else
+    syslog(LOG_NOTICE, _("Connect from %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
+#endif
 
   secure_read(conn, buf, BUFSIZE);
   while(!(strncmp(buf, "", BUFSIZE) == 0)) {
@@ -307,6 +366,9 @@ void handshake()
     if(opt.least > 1) {
       fdprintf(conn, _("<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in the packet cache.<td></tr>\n"), opt.least);
     }
+    if(opt.max != 0) {
+      fdprintf(conn, _("<tr><td colspan=\"2\">Only the top %d entries are shown in the packet cache.<td></tr>\n"), opt.max);
+    }
 
     fdprintf(conn, "</table>\n");
 
@@ -317,9 +379,11 @@ void handshake()
     sort_data();
 
     this = first;
-    while(this != NULL) {
+    while((this != NULL) && (max < opt.max)) {
       time_t remaining;
 
+      if (opt.max != 0)
+	max++;
       if(this->count >= opt.least) {
 	strftime(nows, TIMESIZE, "%Y-%m-%d %H:%M:%S", localtime(&this->start_time));
 	fdprintf(conn, "<tr bgcolor=\"%s\" align=\"center\"><td>%d</td><td>%s</td>", (color == 1)?opt.rowcol2:opt.rowcol1, this->count, nows);

@@ -1,4 +1,4 @@
-/* $Id: win_xp.c,v 1.4 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: win_xp.c,v 1.5 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +68,7 @@ unsigned char win_xp(char *input, int linenum)
   else if(strncmp(sinputs, "ICMP", 4) == 0) opt.line->protocol = 1;
   else {
     if(opt.verbose)
-      fprintf(stderr, "win_xp parse error wenn reading proto in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "win_xp parse error while reading proto in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
 
@@ -82,7 +82,7 @@ unsigned char win_xp(char *input, int linenum)
     if(convert_ip(sinputs, &opt.line->shost) == IN_ADDR_ERROR) return PARSE_NO_HIT;
   } else {
     if(opt.verbose)
-      fprintf(stderr, "win_xp parse error wenn reading shost in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "win_xp parse error while reading shost in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
 
@@ -96,7 +96,7 @@ unsigned char win_xp(char *input, int linenum)
     if(convert_ip(sinputs, &opt.line->dhost) == IN_ADDR_ERROR) return PARSE_NO_HIT;
   } else {
     if(opt.verbose)
-      fprintf(stderr, "win_xp parse error wenn reading dhost in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "win_xp parse error while reading dhost in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
 
@@ -110,7 +110,7 @@ unsigned char win_xp(char *input, int linenum)
     opt.line->sport=atoi(sinputs);
   } else if (*sinputs == '-' && (opt.line->protocol == 6 || opt.line->protocol == 17)) {
     if(opt.verbose)
-      fprintf(stderr, "win_xp parse error wenn reading sport in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "win_xp parse error while reading sport in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
 
@@ -124,7 +124,7 @@ unsigned char win_xp(char *input, int linenum)
     opt.line->dport=atoi(sinputs);
   } else if (*sinputs == '-' && (opt.line->protocol == 6 || opt.line->protocol == 17)) {
     if(opt.verbose)
-      fprintf(stderr, "win_xp parse error wenn reading dport in line %d, ignoring.\n", linenum);
+      fprintf(stderr, "win_xp parse error while reading dport in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
 

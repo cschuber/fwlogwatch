@@ -1,4 +1,4 @@
-$Id: CREDITS,v 1.23 2002/05/15 22:24:44 bwess Exp $
+$Id: CREDITS,v 1.24 2002/08/20 21:17:44 bwess Exp $
 
 This program was written by
 Boris Wesslowski <Wesslowski@CERT.Uni-Stuttgart.DE>
@@ -40,7 +40,8 @@ sh00p <sh00p@dtmf.org>
 Neil McCalden <nm@advinfo.co.uk>
   for a first version of port exclusion support.
 
-Carl Wilhelm Soderstrom <chrome@real-time.com>
+Carl Wilhelm Soderstrom <chrome@real-time.com> and
+James Ralston <ralston@pobox.com>
   for improvements of the rpm spec file.
 
 Tobias Hunger <tobias@berlin-consortium.org>
@@ -69,7 +70,7 @@ Oden Eriksson <oden.eriksson@kvikkjokk.net>
 
 Xiaojun Yang <Xiaojun.Yang@RUS.Uni-Stuttgart.DE>
   for the simplified Chinese translation and doing a guided implementation
-  of the windows xp parser.
+  of the Windows XP and NetScreen parsers.
 
 Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>
   for the traditional Chinese translation.
@@ -82,3 +83,12 @@ Peter Bray
 
 Kimura Fuyuki <fuyuki@mj.0038.net>
   for FreeBSD portability fixes.
+
+Kyle Amon <amonk@backwatcher.com>
+  for contributing a first version of the PHP frontend.
+
+Bram Vandoren <bram@bram.be>
+  for contributing to output limiting.
+
+Mirko Zeibig <mirko@zeibig.net>
+  for contributing to the Elsa Lancom parser.

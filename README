@@ -1,4 +1,4 @@
-$Id: README,v 1.23 2002/05/15 22:24:44 bwess Exp $
+$Id: README,v 1.24 2002/08/20 21:17:44 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
@@ -18,8 +18,8 @@ FEATURES
 - General Features:
   - Can detect and process log entries in the following formats:
     Linux ipchains, Linux netfilter/iptables,
-    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX,
-    Windows XP firewall and the snort IDS.
+    Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX, NetScreen,
+    Windows XP firewall, Elsa Lancom router and the Snort IDS.
   - Entries can be parsed in combined log files, the parsers to be used
     can be selected.
   - Gzip-compressed logs are supported.
@@ -62,7 +62,7 @@ FEATURES
     new firewall rules.
   - Supports trusted hosts (anti-spoofing).
   - The current status of the program can be followed through a web
-    interface.
+    interface (supports IPv6).
 
 The commented configuration file supports and explains all options and will
 get you started quickly. Please read the man page for details on the
@@ -70,11 +70,14 @@ command line options.
 
 
 PARSER NOTES
-  Cisco PIX support focuses on denied packets and ignores all other kinds
-  of PIX log entries. PIX OS version 6 is not supported yet.
-  The ipfilter parser does not support logs with resolved service names
-  and tcp/udp entries without ports.
-  The snort parser does not analyze portscan entries yet.
+  - Cisco PIX support focuses on denied packets and ignores all other kinds
+    of PIX log entries. Basic PIX OS version 6 is available.
+  - The ipfilter parser does not support logs with resolved service names
+    and tcp/udp entries without ports.
+  - The Snort parser does not analyze portscan entries yet.
+  - The NetScreen parser does not recognize packet-filter-unrelated
+    entries and some icmp types which the NetScreen does not seem to
+    recognize itself...
 
 
 INSTALLATION
@@ -102,10 +105,10 @@ INSTALLATION
   fwlogwatch to create it's temporary files (only needed in report mode)
   in /tmp.
 
-- zlib/gettext
-  If you define HAVE_ZLIB and HAVE_GETTEXT fwlogwatch will be compiled with
-  zlib and gettext support. The output of fwlogwatch -V will contain an
-  overview of the compiler options used.
+- Zlib/Gettext/IPv6
+  If you define HAVE_ZLIB, HAVE_GETTEXT and HAVE_IPV6 fwlogwatch will be
+  compiled with zlib, gettext and IPv6 support. The output of fwlogwatch -V
+  will contain an overview of the compiler options used.
 
   You will need the zlib compression library version 1.0.9 or newer and
   it's header files to be able to use zlib support.
@@ -113,6 +116,9 @@ INSTALLATION
   To enable the internationalization support you will need to have the
   gettext package (sometimes with it's surroundings libtool, GNU m4,
   autoconf and automake) installed.
+
+  You need an operating system with a dual IPv4/IPv6 stack and headers with
+  IPv6 support to be able to use this protocol.
 
 - Linux
   For ipchains you will need at least kernel 2.2.10 (which you should have
@@ -164,15 +170,20 @@ CONFIGURATION AND EXAMPLES
 
 - If you want to use fwlogwatch as a CGI, e.g. to have a quick look at
   what happened in the last hour when you get a notification:
-  Copy the file fwlogsummary_small.cgi to a place where your web server
-  can execute it (fwlogwatch must be reachable and have enough
-  permissions to read the log file).
+  Copy the file fwlogsummary_small.cgi from the contrib directory to a
+  place where your web server can execute it (fwlogwatch must be reachable
+  and have enough permissions to read the log file).
 
 - A script for generation of 8 general summaries (fwlogsummary.cgi) is also
   included. You can use it as above or if you comment a few lines also on
   the command line or from cron. It will use the output directory
   /var/www/html/fwlogwatch as default. Look at the index.html file to
   select the level of detail you want.
+
+- Contrib also contains a web frontend written in PHP (fwlogwatch.php) to
+  apply fwlogwatch to selected files and test different options. Change the
+  header of the script to adapt it to your systemi (e.g. prefix of the log
+  file names, location of fwlogwatch).
 
 - An sample init file (for Red Hat Linux systems) for starting fwlogwatch
   in realtime response mode at system start is also included.

@@ -1,4 +1,4 @@
-/* $Id: compare.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: compare.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -324,7 +324,7 @@ void build_list()
   no_match: this = this->next;
   }
 
- add_entry();
+  add_entry();
 }
 
 int list_stats()
@@ -343,9 +343,10 @@ int list_stats()
 void show_list(FILE *fd)
 {
   struct conn_data *this;
+  int max = 0;
 
   this = first;
-  while (this != NULL) {
+  while ((this != NULL) && (opt.max == 0 || max < opt.max || opt.mode == INTERACTIVE_REPORT)) {
     if(this->count >= opt.least && (opt.mode != INTERACTIVE_REPORT || this->count > opt.threshold)) {
       if (opt.html) {
 	output_html(this, fd);
@@ -358,6 +359,8 @@ void show_list(FILE *fd)
 	output_plain(this, fd);
       }
     }
+    if (opt.max != 0)
+      max++;
     this = this->next;
   }
 }

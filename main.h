@@ -1,11 +1,11 @@
-/* $Id: main.h,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: main.h,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "0.8.1"
-#define COPYRIGHT "2002-05-15 Boris Wesslowski, RUS-CERT"
+#define VERSION "0.9"
+#define COPYRIGHT "2002-08-20 Boris Wesslowski, RUS-CERT"
 
 /* Paths */
 
@@ -26,10 +26,12 @@
 /* Data sizes */
 
 #define BUFSIZE 1024
+#define BUFSIZE_S "1024"
 #define FILESIZE 256
 #define TIMESIZE 40
 #define HOSTLEN 256
 #define SHOSTLEN 32
+#define SHOSTLEN_S "32"
 #define IPLEN 16
 #define EMAILSIZE 80
 #define REPORTLEN 52
@@ -45,10 +47,10 @@
 
 #ifndef SHORT_NAMES
 #define SHORTLEN 128
-#define SSHORTLEN "128"
+#define SHORTLEN_S "128"
 #else
 #define SHORTLEN 10
-#define SSHORTLEN "10"
+#define SHORTLEN_S "10"
 #endif
 
 /* Files */
@@ -89,6 +91,8 @@ enum {
 #define PARSER_CISCO_PIX 16
 #define PARSER_WIN_XP 32
 #define PARSER_SNORT 64
+#define PARSER_NETSCREEN 128
+#define PARSER_LANCOM 256
 
 enum {
   PARSE_OK,
@@ -162,11 +166,14 @@ enum {
 
 enum {
   CP_OPT_NONE,
-  CP_OPT_ITCP,
+  CP_OPT_HOST,
   CP_OPT_TCP,
+  CP_OPT_TCP_S,
   CP_OPT_UDP,
+  CP_OPT_UDP_S,
   CP_OPT_ICMP,
-  CP_OPT_TO
+  CP_OPT_DST,
+  CP_OPT_DST_S
 };
 
 /* ipfilter support */
@@ -201,6 +208,21 @@ enum {
 #define SNORT_OPT_SRC 1
 #define SNORT_OPT_DST 2
 #define SNORT_OPT_PORT 4
+
+/* netscreen support */
+
+#define NS_DATE 1
+#define NS_SRC 2
+#define NS_DST 4
+#define NS_SPORT 8
+#define NS_DPORT 16
+#define NS_BN 32
+#define NS_PROTO 64
+
+enum {
+  NETSCREEN_OPT_SRC,
+  NETSCREEN_OPT_DST
+};
 
 /* Sorting */
 
@@ -262,7 +284,11 @@ enum {
 #define FWLW_NOTIFY INSTALL_DIR "/sbin/fwlw_notify"
 #define FWLW_RESPOND INSTALL_DIR "/sbin/fwlw_respond"
 #define STATUS_TITLE _("fwlogwatch status")
+#ifndef HAVE_IPV6
 #define LISTENIF "127.0.0.1"
+#else
+#define LISTENIF "::1"
+#endif
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
 #define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
@@ -407,7 +433,7 @@ struct options {
 
   struct log_line *line;
   char format_sel[SHORTLEN];
-  unsigned char format;
+  unsigned int format;
   unsigned char parser;
   unsigned char repeated;
   int orig_count;
@@ -456,6 +482,7 @@ struct options {
 
   int threshold;
   int least;
+  int max;
   char sender[EMAILSIZE];
   char recipient[EMAILSIZE];
   char cc[EMAILSIZE];

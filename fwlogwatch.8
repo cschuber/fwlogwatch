@@ -1,5 +1,5 @@
-.\" $Id: fwlogwatch.8,v 1.23 2002/05/15 22:24:44 bwess Exp $
-.TH FWLOGWATCH 8 "16 March 2002" RUS-CERT
+.\" $Id: fwlogwatch.8,v 1.24 2002/08/20 21:17:44 bwess Exp $
+.TH FWLOGWATCH 8 "25 July 2002" RUS-CERT
 .SH NAME
 fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
 .SH SYNOPSIS
@@ -8,12 +8,13 @@ fwlogwatch \- a firewall log analyzer, report generator and realtime response ag
 .SH DESCRIPTION
 .B fwlogwatch
 produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
-ipfilter, Cisco IOS, Cisco PIX, Windows XP firewall and snort IDS log
-summary reports in plain text and HTML form and has a lot of options to
-analyze and display relevant patterns. It can produce customizable incident
-reports and send them to abuse contacts at offending sites or CERTs.
-Finally, it can also run as daemon (with web interface) doing realtime log
-monitoring and reporting anomalies or starting attack countermeasures.
+ipfilter, Cisco IOS, Cisco PIX, NetScreen, Windows XP firewall, Elsa Lancom
+router and Snort IDS log summary reports in plain text and HTML form and
+has a lot of options to analyze and display relevant patterns. It can
+produce customizable incident reports and send them to abuse contacts at
+offending sites or CERTs. Finally, it can also run as daemon (with web
+interface) doing realtime log monitoring and reporting anomalies or
+starting attack countermeasures.
 
 .SH "GENERAL OPTIONS"
 These options are independent from the main modes of operation.
@@ -50,6 +51,9 @@ from a log host) are no problem. Compressed files are supported (except in
 realtime response mode). The '-' sign may be used for reading from standard
 input (stdin). In realtime response mode the file needs to be specified with
 full path since the daemon is rooted in /.
+.IP \-M\ \fInumber\fR
+If you only want to see a fixed maximum amount of entries (e.g. the "top 20")
+this option will trim the output for you.
 .IP \-m\ \fIcount\fR
 When analyzing large amounts of data you usually aren't interested in entries
 that have a small count. You can hide entries below a certain threshold with
@@ -126,11 +130,15 @@ ipfilter,
 Cisco IOS,
 .I p
 Cisco PIX,
+.I e
+NetScreen,
 .I w
-Windows XP and
+Windows XP,
+.I l
+Elsa Lancom and
 .I s
-snort. The default is to use all parsers except the ones for Windows XP
-and snort logs.
+Snort. The default is to use all parsers except the ones for NetScreen,
+Windows XP, Elsa Lancom and Snort logs.
 .IP \-p
 Differentiate protocols. This is activated automatically if you
 differentiate source and/or destination ports.

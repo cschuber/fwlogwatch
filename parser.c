@@ -1,4 +1,4 @@
-/* $Id: parser.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: parser.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,8 @@
 #include "netfilter.h"
 #include "win_xp.h"
 #include "snort.h"
+#include "netscreen.h"
+#include "lancom.h"
 
 struct parser_options *excluded_first;
 extern struct options opt;
@@ -27,15 +29,26 @@ unsigned char parse_line(char *input, int linenum)
   char *pnt;
 
   pnt = strstr(input, " last message repeated ");
-  if ((opt.repeated == 1) && (pnt != NULL)) {
-    int repeated;
-
-    repeated = atoi(pnt+23);
-    opt.line->count = opt.orig_count * repeated;
-    build_list();
-    if (opt.verbose == 2)
-      fprintf(stderr, "r");
-    return PARSE_OK;
+  if (pnt != NULL) {
+    if (opt.repeated == 1) {
+      char month[3], time[8], name[SHOSTLEN], rest[BUFSIZE];
+      int day;
+      retval = sscanf(input, "%3s %2d %8s %" SHOSTLEN_S "s %" BUFSIZE_S "s", month, &day, time, name, rest);
+      if (retval == 5) {
+	if(strncmp(opt.line->hostname, name, SHOSTLEN) == 0) {
+	  int repeated;
+	  repeated = atoi(pnt+23);
+	  opt.line->count = opt.orig_count * repeated;
+	  build_list();
+	  if (opt.verbose == 2)
+	    fprintf(stderr, "r");
+	  return PARSE_OK;
+	}
+      }
+      if (opt.verbose == 2)
+	fprintf(stderr, "_");
+      return PARSE_NO_HIT;
+    }
   }
 
   if ((opt.format & PARSER_IPCHAINS) && (strstr(input, " kernel: Packet log: "))) {
@@ -53,12 +66,16 @@ unsigned char parse_line(char *input, int linenum)
     /* For ipfilter log format see the source */
     /* http://coombs.anu.edu.au/~avalon/ */
     retval = flex_ipfilter(input, linenum);
-  } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-2-"))) {
+  } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-"))) {
     /* For cisco log format see CCO */
     retval = flex_cisco_pix(input, linenum);
+  } else if ((opt.format & PARSER_NETSCREEN) && (strstr(input, " NetScreen "))) {
+    retval = flex_netscreen(input, linenum);
   } else if (opt.format & PARSER_WIN_XP){
     retval = win_xp(input, linenum);
-  } else if ((opt.format & PARSER_SNORT) && (strstr(input, " snort: "))) {
+  } else if ((opt.format & PARSER_LANCOM) && (strstr(input, " PACKET_ALERT: "))) {
+    retval = lancom(input, linenum);
+  } else if ((opt.format & PARSER_SNORT) && (strstr(input, " snort"))) {
     retval = flex_snort(input, linenum);
   } else {
     retval = PARSE_NO_HIT;
@@ -227,17 +244,23 @@ void select_parsers()
       case 'n':
 	opt.format = opt.format | PARSER_NETFILTER;
 	break;
+      case 'f':
+	opt.format = opt.format | PARSER_IPFILTER;
+	break;
       case 'c':
 	opt.format = opt.format | PARSER_CISCO_IOS;
 	break;
       case 'p':
 	opt.format = opt.format | PARSER_CISCO_PIX;
 	break;
-      case 'f':
-	opt.format = opt.format | PARSER_IPFILTER;
+      case 'e':
+	opt.format = opt.format | PARSER_NETSCREEN;
 	break;
       case 'w':
 	opt.format = opt.format | PARSER_WIN_XP;
+	break;
+      case 'l':
+	opt.format = opt.format | PARSER_LANCOM;
 	break;
       case 's':
 	opt.format = opt.format | PARSER_SNORT;

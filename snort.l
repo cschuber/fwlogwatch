@@ -1,4 +1,4 @@
-/* $Id: snort.l,v 1.2 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: snort.l,v 1.3 2002/08/20 21:17:44 bwess Exp $ */
 
 %option prefix="snort"
 %option outfile="snort.c"
@@ -35,6 +35,7 @@ PROTO	"TCP"|"UDP"|"ICMP"
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	snort_parse_date(snorttext);
 "snort: "									/* ignore */
+"snort["{NUMBER}"]: "								/* ignore */
 "["{NUMBER}":"{NUMBER}":"{DIGIT}"]"						/* ignore */
 {STRING3}									xstrncpy(opt.line->chainlabel, snorttext, SHORTLEN); opt.parser=opt.parser|SNORT_CHAIN;
 "[Classification: "{STRING2}"]"							snort_parse_branch(snorttext+17);

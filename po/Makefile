@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2002/05/15 22:24:44 bwess Exp $
+# $Id: Makefile,v 1.8 2002/08/20 21:17:45 bwess Exp $
 
 all:
 	msgfmt -v -o de.mo de.po

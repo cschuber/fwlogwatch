@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: main.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +34,7 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -d           differentiate destination ports\n"));
   printf(_("  -f <file>    specify input file (defaults to %s)\n"), INFILE);
   printf(_("  -m <count>   only show entries with at least so many incidents\n"));
+  printf(_("  -M <number>  only show this amount of entries\n"));
   printf(_("  -N           resolve service names\n"));
   printf(_("  -n           resolve host names\n"));
   printf(_("  -O <order>   define the sort order (see the man page for details)\n"));
@@ -96,28 +97,34 @@ void info()
   puts("You should have received a copy of the GNU General Public License");
   puts("along with this program; if not, write to the Free Software");
   puts("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA");
-  puts("");
+  puts("\n");
+  puts(_("You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."));
+  puts("\n");
   puts(_("Compile-time options of this version:"));
-  printf(_("short names support "));
+  printf(_("Short name limit "));
 #ifdef SHORT_NAMES
   puts(_("enabled"));
 #else
   puts(_("disabled"));
 #endif
-  printf(_("zlib support "));
+  printf(_("Zlib support "));
 #ifdef HAVE_ZLIB
   puts(_("enabled"));
 #else
   puts(_("disabled"));
 #endif
-  printf(_("gettext (i18n) support "));
+  printf(_("Gettext (i18n) support "));
 #ifdef HAVE_GETTEXT
   puts(_("enabled"));
 #else
   puts(_("disabled"));
 #endif
-  puts("");
-  puts(_("You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."));
+  printf(_("IPv6 support "));
+#ifdef HAVE_IPV6
+  puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
 
   exit(EXIT_SUCCESS);
 }
@@ -189,6 +196,7 @@ void init_options()
 
   opt.threshold = 0;
   opt.least = 0;
+  opt.max = 0;
   opt.sender[0] = '\0';
   opt.recipient[0] = '\0';
   opt.cc[0] = '\0';
@@ -235,7 +243,7 @@ int main(int argc, char **argv)
   textdomain(PACKAGE);
 #endif
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDef:F:hi:I:k:l:L:m:M:nNo:O:pP:RsStT:vVwWXyz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -299,6 +307,9 @@ int main(int argc, char **argv)
       break;
     case 'm':
       opt.least = atoi(optarg);
+      break;
+    case 'M':
+      opt.max = atoi(optarg);
       break;
     case 'n':
       opt.resolve = 1;

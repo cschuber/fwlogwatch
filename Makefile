@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.24 2002/05/15 22:24:44 bwess Exp $
+# $Id: Makefile,v 1.25 2002/08/20 21:17:44 bwess Exp $
 
 # Linux
 CC = gcc
-CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
+CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -DHAVE_IPV6 -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = #-g #-static -p
 LIBS = -lcrypt -lz #-lc_p
 
@@ -30,6 +30,7 @@ LIBS = -lcrypt -lz #-lc_p
 # analyze log formats with short list/chain/branch/interface names like
 # ipchains. You can also add -DLOGDOTS if your Cisco log host logs FQDNs
 # and you only want the hostnames in the output.
+# -DHAVE_IPV6 enables IPv6 support for the status web server.
 
 
 LEX = flex
@@ -43,8 +44,8 @@ INSTALL_DIR = /usr/local
 CONF_DIR = /etc
 LOCALE_DIR = /usr
 
-OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o \
-       main.o modes.o net.o netfilter.o output.o parser.o \
+OBJS = cisco_ios.o cisco_pix.o compare.o ipchains.o ipfilter.o lancom.o \
+       main.o modes.o net.o netfilter.o netscreen.o output.o parser.o \
        rcfile.o report.o resolve.o response.o snort.o utils.o \
        whois.o win_xp.o
 
@@ -55,14 +56,16 @@ cisco_pix.o:	main.h utils.h
 compare.o:	compare.h main.h output.h
 ipchains.o:	main.h utils.h
 ipfilter.o:	main.h utils.h
+lancom.o:	main.h utils.h
 main.o:		main.h modes.h parser.h rcfile.h
 modes.o:	compare.h main.h net.h output.h parser.h report.h \
 		response.h whois.h
 net.o:		main.h utils.h
 netfilter.o:	main.h utils.h
+netscreen.o:	main.h utils.h
 output.o:	main.h output.h resolve.h
 parser.o:	cisco_ios.h cisco_pix.h compare.h ipchains.h ipfilter.h \
-		main.h netfilter.h parser.h win_xp.h
+		main.h netfilter.h netscreen.h parser.h win_xp.h
 rcfile.o:	main.h parser.h rcfile.h
 report.o:	main.h output.h resolve.h response.h
 resolve.o:	main.h resolve.h

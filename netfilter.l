@@ -1,4 +1,4 @@
-/* $Id: netfilter.l,v 1.11 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: netfilter.l,v 1.12 2002/08/20 21:17:44 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -31,7 +31,7 @@ OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
 HEXDIGIT	[0-9a-fA-F]
 HEXNUM	"0x"{HEXDIGIT}+
-PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
+PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 
 %%
 
@@ -73,6 +73,9 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|{NUMBER}
 "OPT ("[0-9A-F]*")"	/* ignore */
 "SPI="{HEXNUM}		/* ignore */
 "GATEWAY="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	/* ignore */
+"TC="{NUMBER}		/* ignore */
+"HOPLIMIT="{NUMBER}	/* ignore */
+"FLOWLBL="{NUMBER}	/* ignore */
 "[".+"]"		/* ignore */
 [ ]+			/* ignore whitespace */
 [\n]			return 0;
@@ -146,6 +149,7 @@ void nf_parse_proto(char *input)
     else if(strncmp(input, "ICMP", 4) == 0) opt.line->protocol = 1;
     else if(strncmp(input, "ESP", 3) == 0) opt.line->protocol = 50;
     else if(strncmp(input, "AH", 2) == 0) opt.line->protocol = 51;
+    else if(strncmp(input, "ICMPv6", 6) == 0) opt.line->protocol = 58;
   }
 
   if (opt.line->protocol != 0)

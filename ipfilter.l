@@ -1,4 +1,4 @@
-/* $Id: ipfilter.l,v 1.11 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: ipfilter.l,v 1.12 2002/08/20 21:17:44 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -107,14 +107,14 @@ void ipf_parse_data(char *input, unsigned char mode)
   int retval;
 
   if (mode == IPF_OPT_COUNT) {
-    retval = sscanf(input, "%dx %" SSHORTLEN "s @%" SSHORTLEN "s %" SSHORTLEN "s",
+    retval = sscanf(input, "%dx %" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s",
 		    &opt.line->count,
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);
     if (retval != 4) return;
   } else {
-    retval = sscanf(input, "%" SSHORTLEN "s @%" SSHORTLEN "s %" SSHORTLEN "s",
+    retval = sscanf(input, "%" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s",
 		    opt.line->interface,
 		    opt.line->chainlabel,
 		    opt.line->branchname);

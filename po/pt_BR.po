@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
-"POT-Creation-Date: 2002-05-15 23:16+0200\n"
+"POT-Creation-Date: 2002-08-20 20:11+0200\n"
 "PO-Revision-Date: 2002-01-27 16:17+0100\n"
 "Last-Translator: Ivan F. Martinez <ivanfm@ecodigit.com.br>\n"
 "Language-Team: -\n"
@@ -91,206 +91,214 @@ msgstr ""
 "         -m <num>    mostra somente entradas com um minimo de ocorrencias\n"
 
 #: ../main.c:37
+msgid "  -M <number>  only show this amount of entries\n"
+msgstr ""
+
+#: ../main.c:38
 #, fuzzy
 msgid "  -N           resolve service names\n"
 msgstr "         -N          resolve nome de servico\n"
 
-#: ../main.c:38
+#: ../main.c:39
 #, fuzzy
 msgid "  -n           resolve host names\n"
 msgstr "         -n          resolve nome de hosts\n"
 
-#: ../main.c:39
+#: ../main.c:40
 #, fuzzy
 msgid "  -O <order>   define the sort order (see the man page for details)\n"
 msgstr ""
 "         -O <ordem>  define a ordem para ordenação (veja pagina man para "
 "detalhes)\n"
 
-#: ../main.c:40
+#: ../main.c:41
 #, fuzzy
 msgid "  -P <format>  use only parsers for specific formats\n"
 msgstr "         -P <formato> utiliza somente os formatos especificados\n"
 
-#: ../main.c:41
+#: ../main.c:42
 #, fuzzy
 msgid "  -p           differentiate protocols\n"
 msgstr "         -p          diferenciar protocolos\n"
 
-#: ../main.c:42
+#: ../main.c:43
 #, fuzzy
 msgid "  -s           differentiate source ports\n"
 msgstr "         -s          diferenciar portas de origem\n"
 
-#: ../main.c:43
+#: ../main.c:44
 #, fuzzy
 msgid "  -v           verbose, specify twice for more info\n"
 msgstr ""
 "         -v          detalhes, especifique duas vezes para mais informações\n"
 
-#: ../main.c:44
+#: ../main.c:45
 #, fuzzy
 msgid "  -y           differentiate TCP options\n"
 msgstr "         -y          diferenciar opções de TCP\n"
 
-#: ../main.c:47
+#: ../main.c:48
 msgid "Log summary mode (default):\n"
 msgstr "Modo sumario de log (padrão):\n"
 
-#: ../main.c:48
+#: ../main.c:49
 #, fuzzy
 msgid "  -b           show amount of data (sum of total packet lengths)\n"
 msgstr ""
 "         -b          mostra total de dados (soma dos tamanhos dos pacotes)\n"
 
-#: ../main.c:49
+#: ../main.c:50
 #, fuzzy
 msgid "  -e           show end times\n"
 msgstr "         -e          mostrar horario final\n"
 
-#: ../main.c:50
+#: ../main.c:51
 #, fuzzy
 msgid "  -l <time>    process recent events only (defaults to off)\n"
 msgstr ""
 "         -l <tempo>  processa eventos recentes somente (padrão : desligado)\n"
 
-#: ../main.c:51
+#: ../main.c:52
 #, fuzzy
 msgid "  -o <file>    specify output file\n"
 msgstr "         -o <arq.>   especifica arquivo de saida\n"
 
-#: ../main.c:52
+#: ../main.c:53
 #, fuzzy
 msgid "  -S           do not differentiate source IP addresses\n"
 msgstr "         -S          não diferencia endereços IP de origem\n"
 
-#: ../main.c:53
+#: ../main.c:54
 #, fuzzy
 msgid "  -t           show start times\n"
 msgstr "         -t          mostrar horario inicial\n"
 
-#: ../main.c:54
+#: ../main.c:55
 #, fuzzy
 msgid "  -W           activate whois lookups for source addresses\n"
 msgstr "         -W          activa verificação whois para endereços origem\n"
 
-#: ../main.c:55
+#: ../main.c:56
 #, fuzzy
 msgid "  -w           HTML output\n"
 msgstr "         -w          saída em HTML\n"
 
-#: ../main.c:56
+#: ../main.c:57
 #, fuzzy
 msgid "  -z           show time interval\n"
 msgstr "         -z          mostra intervalo de tempo\n"
 
-#: ../main.c:59
+#: ../main.c:60
 #, fuzzy
 msgid "Interactive report mode (summary mode extension):\n"
 msgstr "Modo de relatório interativo:\n"
 
-#: ../main.c:60
+#: ../main.c:61
 #, fuzzy
 msgid "  -i <count>   interactive mode with report threshold\n"
 msgstr "         -i <num>    modo interativo com limite minimo para ativação\n"
 
-#: ../main.c:61
+#: ../main.c:62
 #, fuzzy, c-format
 msgid "  -F <email>   report sender address (defaults to '%s')\n"
 msgstr "         -F <email>  email origem no envio do relatório\n"
 
-#: ../main.c:62
+#: ../main.c:63
 #, fuzzy
 msgid "  -T <email>   address of CERT or abuse contact to send report to\n"
 msgstr ""
 "         -T <email>  endereço do CERT ou contato de abuso para envio do "
 "relatório\n"
 
-#: ../main.c:63
+#: ../main.c:64
 #, fuzzy
 msgid "  -C <email>   carbon copy recipients\n"
 msgstr "         -C <email>  destinatarios para cópia\n"
 
-#: ../main.c:64
+#: ../main.c:65
 #, fuzzy, c-format
 msgid "  -I <file>    template file for report (defaults to %s)\n"
 msgstr "         -I <arq.>   arquivo modelo para relatório\n"
 
-#: ../main.c:67
+#: ../main.c:68
 msgid "Realtime response mode:\n"
 msgstr "Modo de resposta em tempo real:\n"
 
-#: ../main.c:68
+#: ../main.c:69
 #, fuzzy
 msgid "  -R           realtime response as daemon (default action: log only)\n"
 msgstr ""
 "         -R          modo de resposta em tempo real (ação padrão: somente "
 "registra)\n"
 
-#: ../main.c:69
+#: ../main.c:70
 #, fuzzy, c-format
 msgid "  -a <count>   alert threshold (defaults to %d entries)\n"
 msgstr "         -a <num>  limite de ativação (padrão : %d entradas)\n"
 
-#: ../main.c:70
+#: ../main.c:71
 #, fuzzy, c-format
 msgid "  -l <time>    forget events this old (defaults to %d hours)\n"
 msgstr ""
 "         -l <tempo>  esquece eventos após periodo (padrão : %d horas)\n"
 
-#: ../main.c:71
+#: ../main.c:72
 #, fuzzy
 msgid "  -k <IP/net>  add this IP address or net to the list of known hosts\n"
 msgstr "         -k <IP/rede> adiciona IP ou rede à lista de conhecidos\n"
 
-#: ../main.c:72
+#: ../main.c:73
 #, fuzzy
 msgid "  -A           invoke notification script if threshold is reached\n"
 msgstr "         -A          executa scripta de avisao ao chegar no limite\n"
 
-#: ../main.c:73
+#: ../main.c:74
 #, fuzzy
 msgid "  -B           invoke response action script (e.g. block host)\n"
 msgstr ""
 "         -B          executa script de resposta automatica (ex. bloqueia "
 "maquina)\n"
 
-#: ../main.c:74
+#: ../main.c:75
 #, fuzzy
 msgid "  -X           activate internal status information web server\n"
 msgstr "         -X          activa servidor web interno de informações\n"
 
-#: ../main.c:100
-msgid "Compile-time options of this version:"
-msgstr ""
-
 #: ../main.c:101
-msgid "short names support "
-msgstr ""
-
-#: ../main.c:103 ../main.c:109 ../main.c:115
-msgid "enabled"
-msgstr ""
-
-#: ../main.c:105 ../main.c:111 ../main.c:117
-msgid "disabled"
-msgstr ""
-
-#: ../main.c:107
-msgid "zlib support "
-msgstr ""
-
-#: ../main.c:113
-msgid "gettext (i18n) support "
-msgstr ""
-
-#: ../main.c:120
 #, fuzzy
 msgid "You can contact the author at <Wesslowski@CERT.Uni-Stuttgart.DE>."
 msgstr ""
 "Você pode contactar o autor via <Boris.Wesslowski@RUS.Uni-Stuttgart.DE>."
 
-#: ../main.c:416
+#: ../main.c:103
+msgid "Compile-time options of this version:"
+msgstr ""
+
+#: ../main.c:104
+msgid "Short name limit "
+msgstr ""
+
+#: ../main.c:106 ../main.c:112 ../main.c:118 ../main.c:124
+msgid "enabled"
+msgstr ""
+
+#: ../main.c:108 ../main.c:114 ../main.c:120 ../main.c:126
+msgid "disabled"
+msgstr ""
+
+#: ../main.c:110
+msgid "Zlib support "
+msgstr ""
+
+#: ../main.c:116
+msgid "Gettext (i18n) support "
+msgstr ""
+
+#: ../main.c:122
+msgid "IPv6 support "
+msgstr ""
+
+#: ../main.c:427
 msgid "Exiting\n"
 msgstr "Terminando\n"
 
@@ -307,7 +315,7 @@ msgstr "Abrindo arquivo de entrada '%s'\n"
 msgid "Processing\n"
 msgstr "Processando\n"
 
-#: ../modes.c:119 ../modes.c:314 ../modes.c:711 ../rcfile.c:446
+#: ../modes.c:119 ../modes.c:321 ../modes.c:718 ../rcfile.c:450
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "Fechando '%s'\n"
@@ -378,7 +386,7 @@ msgstr "%d entradas foram excluidas pela configuração.\n"
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "Primeiro pacote registrado: %s, ultimo: %s.\n"
 
-#: ../modes.c:248 ../modes.c:706
+#: ../modes.c:248 ../modes.c:713
 msgid "No valid time entries found.\n"
 msgstr "Nenhum registro de horario valido encontrado.\n"
 
@@ -407,7 +415,12 @@ msgstr "Todos registros são da mesma interface: \"%s\".\n"
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "Somente registros com contagem maior que %d são mostrados.\n"
 
-#: ../modes.c:292
+#: ../modes.c:290
+#, fuzzy, c-format
+msgid "Only the top %d entries are shown.\n"
+msgstr "Somente registros com contagem maior que %d são mostrados.\n"
+
+#: ../modes.c:299
 #, c-format
 msgid ""
 "Reporting threshold: %d\n"
@@ -416,175 +429,175 @@ msgstr ""
 "Limite minimo do relatório: %d\n"
 "\n"
 
-#: ../modes.c:334
+#: ../modes.c:341
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr "Aviso: arquivo pid existe,outro fwlogwatch pode estar rodando.\n"
 
-#: ../modes.c:348
+#: ../modes.c:355
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:350
+#: ../modes.c:357
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:373
+#: ../modes.c:380
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:375
+#: ../modes.c:382
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "SIGHUP recebido, reabrindo arquivo de log"
 
-#: ../modes.c:454
+#: ../modes.c:461
 msgid "SIGTERM caught, cleaning up"
 msgstr "SIGTERM recebido, fechando"
 
-#: ../modes.c:536
+#: ../modes.c:543
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "Iniciando (pid %d)"
 
-#: ../modes.c:597
+#: ../modes.c:604
 msgid "Alert threshold is one attempt"
 msgstr "Limite de alerta em uma tentativa"
 
-#: ../modes.c:599
+#: ../modes.c:606
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Limite de alerta : %d tentativas"
 
-#: ../modes.c:603
+#: ../modes.c:610
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "Eventos anteriores a %d segundo(s) são discartados"
 
-#: ../modes.c:606
+#: ../modes.c:613
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "Eventos anteriores a %d houra(s) são discartados"
 
-#: ../modes.c:610
+#: ../modes.c:617
 #, c-format
 msgid "Response mode: log%s%s"
 msgstr "Modo de resposta : registra%s%s"
 
-#: ../modes.c:611 ../net.c:304
+#: ../modes.c:618 ../net.c:363
 msgid ", notify"
 msgstr ", avisa"
 
-#: ../modes.c:612 ../net.c:305
+#: ../modes.c:619 ../net.c:364
 msgid ", respond"
 msgstr ", responde"
 
-#: ../modes.c:636
+#: ../modes.c:643
 msgid "Reading standard input\n"
 msgstr "Lendo entrada padrão(stdin)\n"
 
-#: ../modes.c:653
+#: ../modes.c:660
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "Lendo '%s'\n"
 
-#: ../modes.c:699
+#: ../modes.c:706
 #, c-format
 msgid "# of lines : %d\n"
 msgstr "no. de linhas : %d\n"
 
-#: ../modes.c:700
+#: ../modes.c:707
 #, c-format
 msgid "First entry: %s\n"
 msgstr "Primeiro registro: %s\n"
 
-#: ../modes.c:703
+#: ../modes.c:710
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "Ultimo registro : %s\n"
 
-#: ../net.c:84
+#: ../net.c:117 ../net.c:119
 #, c-format
 msgid "Listening on %s port %i"
 msgstr "Esperando conexões em %s porta %i"
 
-#: ../net.c:115
+#: ../net.c:151
 msgid "decode_base64: input string incomplete"
 msgstr "decode_base64: string de entrada incompleta"
 
-#: ../net.c:122
+#: ../net.c:158
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
 msgstr "decode_base64: caracter ilegal '%c' na string de entrada"
 
-#: ../net.c:160
+#: ../net.c:196
 #, fuzzy, c-format
 msgid "<tr bgcolor=\"%s\" align=\"center\"><th>count</th><th>added</th>"
 msgstr ""
 "<tr bgcolor=\"#%s\" align=\"center\"><td>Qtde.</td><td>Adic.</td><td>IP "
 "origem </td>"
 
-#: ../net.c:162 ../output.c:330
+#: ../net.c:198 ../output.c:330
 #, fuzzy
 msgid "<th>proto</th>"
 msgstr "<td>protocolo</td>"
 
-#: ../net.c:163 ../output.c:336
+#: ../net.c:199 ../output.c:336
 #, fuzzy
 msgid "<th>source</th>"
 msgstr "<td>origem</td>"
 
-#: ../net.c:165 ../net.c:174 ../output.c:338 ../output.c:352
+#: ../net.c:201 ../net.c:210 ../output.c:338 ../output.c:352
 #, fuzzy
 msgid "<th>hostname</th>"
 msgstr "<td>maquina</td>"
 
-#: ../net.c:167 ../net.c:177 ../output.c:344 ../output.c:356
+#: ../net.c:203 ../net.c:213 ../output.c:344 ../output.c:356
 #, fuzzy
 msgid "<th>port</th>"
 msgstr "<td>porta</td>"
 
-#: ../net.c:169 ../net.c:179 ../output.c:346 ../output.c:358
+#: ../net.c:205 ../net.c:215 ../output.c:346 ../output.c:358
 #, fuzzy
 msgid "<th>service</th>"
 msgstr "<td>serviço</td>"
 
-#: ../net.c:172 ../output.c:350
+#: ../net.c:208 ../output.c:350
 #, fuzzy
 msgid "<th>destination</th>"
 msgstr "<td>destino</td>"
 
-#: ../net.c:183 ../output.c:362
+#: ../net.c:219 ../output.c:362
 #, fuzzy
 msgid "<th>opts</th>"
 msgstr "<td>opções</td>"
 
-#: ../net.c:185
+#: ../net.c:221
 #, fuzzy
 msgid "<th>time remaining</th></tr>\n"
 msgstr "<td>Tempo restante</td></tr>\n"
 
-#: ../net.c:215
+#: ../net.c:266 ../net.c:269
 #, c-format
 msgid "Rejected connect from unallowed ip %s port %i"
 msgstr "Conexão recusada de endedeço não permitido : ip %s porta %i"
 
-#: ../net.c:224
+#: ../net.c:280 ../net.c:282
 #, c-format
 msgid "Connect from %s port %i"
 msgstr "Conexão de %s porta %i"
 
-#: ../net.c:246
+#: ../net.c:305
 #, c-format
 msgid "Authorization failed (%s)"
 msgstr "Falha na autorização (%s)"
 
-#: ../net.c:248
+#: ../net.c:307
 msgid "Authorization failed"
 msgstr "Falha na autorização"
 
-#: ../net.c:256
+#: ../net.c:315
 msgid ""
 "<body>\n"
 "<h1>Authorization Required</h1>\n"
@@ -596,16 +609,16 @@ msgstr ""
 "</body>\n"
 "</html>\n"
 
-#: ../net.c:283
+#: ../net.c:342
 msgid "<a href=\"/\">Reload</a><br>\n"
 msgstr "<a href=\"/\">Atualizar</a><br>\n"
 
-#: ../net.c:285
+#: ../net.c:344
 #, c-format
 msgid "(automatic refresh every %d seconds)<br>\n"
 msgstr "(atualização automatica a cada %d segundos)<br>\n"
 
-#: ../net.c:287
+#: ../net.c:346
 #, fuzzy
 msgid ""
 "</div>\n"
@@ -615,22 +628,22 @@ msgstr ""
 "</div>\n"
 "<h2>Informações Gerais</h2>\n"
 
-#: ../net.c:291
+#: ../net.c:350
 #, c-format
 msgid "<tr><td>Daemon start time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Horario de inicialização:</td><td>%s</td></tr>\n"
 
-#: ../net.c:295
+#: ../net.c:354
 #, c-format
 msgid "<tr><td>Current time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Horario atual:</td><td>%s</td></tr>\n"
 
-#: ../net.c:298
+#: ../net.c:357
 #, c-format
 msgid "<tr><td>Running time:</td><td>%s</td></tr>\n"
 msgstr "<tr><td>Tempo de execução:</td><td>%s</td></tr>\n"
 
-#: ../net.c:301
+#: ../net.c:360
 #, fuzzy, c-format
 msgid ""
 "<tr><td>Alert threshold:</td><td>%d entries</td></tr>\n"
@@ -639,36 +652,43 @@ msgstr ""
 "<tr><td>Limite de ativação:</td><td>%d entradas</td></tr>\n"
 "<tr><td>Tempo para descarte:</td><td>%d segundos</td></tr>\n"
 
-#: ../net.c:303
+#: ../net.c:362
 #, c-format
 msgid "<tr><td>Response mode:</td><td>log%s%s</td></tr>\n"
 msgstr "<tr><td>Modo de resposta:</td><td>registra%s%s</td></tr>\n"
 
-#: ../net.c:308
+#: ../net.c:367
 #, c-format
 msgid ""
 "<tr><td colspan=\"2\">Only entries with a count of at least %d are shown in "
 "the packet cache.<td></tr>\n"
 msgstr ""
 
-#: ../net.c:313
+#: ../net.c:370
+#, c-format
+msgid ""
+"<tr><td colspan=\"2\">Only the top %d entries are shown in the packet cache."
+"<td></tr>\n"
+msgstr ""
+
+#: ../net.c:375
 msgid "<h2>Packet cache</h2>\n"
 msgstr "<h2>Cache de pacotes</h2>\n"
 
-#: ../net.c:373
+#: ../net.c:437
 msgid "<h2>Host status</h2>\n"
 msgstr "<h2>Situação da maquina</h2>\n"
 
-#: ../net.c:396 ../net.c:403 ../net.c:405 ../net.c:407
+#: ../net.c:460 ../net.c:467 ../net.c:469 ../net.c:471
 msgid "<td>any</td>"
 msgstr "<td>qualquer</td>"
 
-#: ../net.c:401
+#: ../net.c:465
 #, fuzzy, c-format
 msgid "<td>%s/%d (known host/net)</td>"
 msgstr "<td>-</td><td>%s/%d (maquina/rede conhecida)</td>"
 
-#: ../net.c:462
+#: ../net.c:526
 msgid "Connection closed"
 msgstr "Coneão fechada"
 
@@ -749,7 +769,7 @@ msgstr "<td>bytes</td>"
 msgid "<th>whois information</th>"
 msgstr "<td>informação whois</td>"
 
-#: ../parser.c:246
+#: ../parser.c:269
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr "Tipo desconhecido: '%c'.\n"
@@ -764,17 +784,17 @@ msgstr ""
 msgid "Error in configuration file '%s' line %d, assuming 'true'\n"
 msgstr ""
 
-#: ../rcfile.c:405
+#: ../rcfile.c:409
 #, fuzzy, c-format
 msgid "Unrecognized option in configuration file '%s' line %d\n"
 msgstr "Opção desconhecida no arquivo rc: %s"
 
-#: ../rcfile.c:424
+#: ../rcfile.c:428
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr "%s não é um arquivo padrão, ignorando.\n"
 
-#: ../rcfile.c:432
+#: ../rcfile.c:436
 #, fuzzy, c-format
 msgid "Opening configuration file '%s'\n"
 msgstr "Abrindo arquivo de entrada '%s'\n"
@@ -1020,11 +1040,11 @@ msgstr "Verificando informação whios para %s\n"
 msgid "lookup failed: %s\n"
 msgstr "resolução falhou: %s\n"
 
-#: ../main.h:240
+#: ../main.h:262
 msgid "fwlogwatch summary"
 msgstr "Resumo do fwlogwatch"
 
-#: ../main.h:264
+#: ../main.h:286
 msgid "fwlogwatch status"
 msgstr "Situação do fwlogwatch"
 

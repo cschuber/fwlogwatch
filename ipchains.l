@@ -1,4 +1,4 @@
-/* $Id: ipchains.l,v 1.11 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: ipchains.l,v 1.12 2002/08/20 21:17:44 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
@@ -73,7 +73,7 @@ void ipchains_parse_data(char *input)
 {
   int retval;
 
-  retval = sscanf(input, "%" SSHORTLEN "s %" SSHORTLEN "s %" SSHORTLEN "s PROTO=%3d",
+  retval = sscanf(input, "%" SHORTLEN_S "s %" SHORTLEN_S "s %" SHORTLEN_S "s PROTO=%3d",
 		  opt.line->chainlabel,
 		  opt.line->branchname,
 		  opt.line->interface,
@@ -87,7 +87,7 @@ void ipchains_parse_rdata(char *input)
 {
   int retval, port;
 
-  retval = sscanf(input, "%" SSHORTLEN "s REDIRECT %5d %" SSHORTLEN "s PROTO=%3d",
+  retval = sscanf(input, "%" SHORTLEN_S "s REDIRECT %5d %" SHORTLEN_S "s PROTO=%3d",
 		  opt.line->chainlabel,
 		  &port,
 		  opt.line->interface,

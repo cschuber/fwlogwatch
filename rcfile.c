@@ -1,4 +1,4 @@
-/* $Id: rcfile.c,v 1.24 2002/05/15 22:24:44 bwess Exp $ */
+/* $Id: rcfile.c,v 1.25 2002/08/20 21:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -272,6 +272,10 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
   }
   if (strncasecmp(command, "at_least", 8) == 0) {
     opt.least = get_num_parameter(command+9, rcfile, linenum);
+    return;
+  }
+  if (strncasecmp(command, "maximum", 7) == 0) {
+    opt.max = get_num_parameter(command+8, rcfile, linenum);
     return;
   }
   if (strncasecmp(command, "whois_lookup", 12) == 0) {
