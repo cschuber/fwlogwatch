@@ -1,4 +1,9 @@
-$Id: ChangeLog,v 1.27 2004/04/25 18:56:18 bwess Exp $
+$Id: ChangeLog,v 1.28 2010/10/11 12:17:44 bwess Exp $
+
+Version 1.1 2006-04-17
+- Several parser modifications triggered by log submissions
+- Added GNU adns support
+- Various small fixes
 
 Version 1.0 2004-04-25
 - Made status page interactive

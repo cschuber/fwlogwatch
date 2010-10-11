@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: ipfw.h,v 1.1 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: ipfw.h,v 1.2 2010/10/11 12:17:44 bwess Exp $ */
 
 #ifndef _IPFW_H
 #define _IPFW_H

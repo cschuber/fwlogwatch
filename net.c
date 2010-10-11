@@ -1,14 +1,17 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: net.c,v 1.27 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: net.c,v 1.28 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 #ifndef SOLARIS
 #include <string.h>
 #else
 #include <strings.h>
+#include <limits.h>
 #endif
+
 #include <errno.h>
 #include <syslog.h>
 #include <sys/socket.h>
@@ -24,8 +27,11 @@
 #endif
 #endif
 
+#ifndef INT_MAX
+#include <limits.h>
+#endif
+
 #include "utils.h"
-#include "main.h"
 #include "output.h"
 #include "response.h"
 #include "resolve.h"
@@ -37,15 +43,17 @@ extern struct known_hosts *first_host;
 
 void secure_read(int file, char *data_out, int maxlen)
 {
-  int j = 0;
+  int j = 0, retval;
   signed char c;
 
-  read(file, &c, 1);
-  while (!(c == EOF || c == '\n') && (j < (maxlen - 1))) {
+  bzero(data_out, maxlen);
+  retval = read(file, &c, 1);
+  while ((retval != 0) && !(c == EOF || c == '\n') && (j < (maxlen - 1))) {
     data_out[j++] = c;
-    read(file, &c, 1);
+    retval = read(file, &c, 1);
   }
-  data_out[--j] = 0;
+  if (j>0)
+    data_out[--j] = 0;
 }
 
 void prepare_socket()
@@ -413,7 +421,12 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 
     table_header(conn, SORTING, NET_OPTS_PC);
 
-    sort_data();
+    sort_data(SORT_PC);
+
+#ifdef HAVE_ADNS
+    if(opt.resolve)
+      adns_preresolve(RES_ADNS_PC);
+#endif
 
     this = first;
     while((this != NULL) && ((opt.max == 0) || (max < opt.max)) && (opt.status != FD_ERROR)) {
@@ -474,7 +487,12 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
     color = 1;
     table_header(conn, SORTING, NO_NET_OPTS_PC);
 
-    sort_hs();
+    sort_data(SORT_HS);
+
+#ifdef HAVE_ADNS
+    if(opt.resolve)
+      adns_preresolve(RES_ADNS_HS);
+#endif
 
     this_host = first_host;
     while(this_host != NULL && (opt.status != FD_ERROR)) {

@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: response.h,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: response.h,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #ifndef _RESPONSE_H
 #define _RESPONSE_H
@@ -12,6 +12,6 @@ void check_script_perms(char *name);
 void modify_firewall(unsigned char action);
 void remove_old(unsigned char mode);
 void look_for_alert(void);
-void sort_hs(void);
+struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list);
 
 #endif

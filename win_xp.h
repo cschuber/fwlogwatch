@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: win_xp.h,v 1.9 2004/04/25 18:56:23 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: win_xp.h,v 1.10 2010/10/11 12:17:44 bwess Exp $ */
 
 #ifndef _WIN_XP_H
 #define _WIN_XP_H

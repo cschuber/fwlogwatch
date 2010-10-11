@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: response.c,v 1.29 2004/04/25 18:56:22 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: response.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -414,9 +414,4 @@ struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list) {
   default:
     return list;
   }
-}
-
-void sort_hs()
-{
-  first_host = fwlw_hs_mergesort(first_host);
 }

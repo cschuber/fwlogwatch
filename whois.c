@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: whois.c,v 1.13 2004/04/25 18:56:23 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: whois.c,v 1.14 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>

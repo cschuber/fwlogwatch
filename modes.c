@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: modes.c,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: modes.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +18,10 @@
 #include <zlib.h>
 #endif
 
-#include "main.h"
+#ifdef HAVE_ADNS
+#include <adns.h>
+#endif
+
 #include "parser.h"
 #include "output.h"
 #include "compare.h"
@@ -29,9 +32,17 @@
 #include "whois.h"
 #include "rcfile.h"
 
+#ifdef HAVE_ADNS
+#include "resolve.h"
+#endif
+
 extern struct options opt;
 extern struct conn_data *first;
 extern struct input_file *first_file;
+
+#ifdef HAVE_ADNS
+extern adns_state adns;
+#endif
 
 void common_input_loop(int *linenum, int *hitnum, int *errnum, int *oldnum, int *exnum)
 {
@@ -169,13 +180,13 @@ void mode_summary()
   if(first != NULL) {
     opt.sortfield = SORT_END_TIME;
     opt.sortmode = ORDER_DESCENDING;
-    first = fwlw_mergesort(first);
+    first = fwlw_pc_mergesort(first);
     if(opt.verbose == 2)
       fprintf(stderr, ".");
     strftime(last_entry, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&first->end_time));
     opt.sortfield = SORT_START_TIME;
     opt.sortmode = ORDER_ASCENDING;
-    first = fwlw_mergesort(first);
+    first = fwlw_pc_mergesort(first);
     if(opt.verbose == 2)
       fprintf(stderr, ".");
     strftime(first_entry, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&first->start_time));
@@ -183,7 +194,7 @@ void mode_summary()
     first_entry[0] = '\0';
   }
 
-  sort_data();
+  sort_data(SORT_PC);
 
   if (opt.verbose == 2)
     fprintf(stderr, "\n");
@@ -332,6 +343,20 @@ void mode_summary()
   if(opt.mode == INTERACTIVE_REPORT)
     fprintf(output, _("Reporting threshold: %d\n\n"), opt.threshold);
 
+#ifdef HAVE_ADNS
+  if(opt.resolve) {
+    if(opt.verbose)
+      fprintf(stderr, _("Resolving\n"));
+
+    retval = adns_init(&adns, adns_if_noenv, 0);
+    if(retval) {
+      perror("adns_init");
+      exit(EXIT_FAILURE);
+    }
+    adns_preresolve(RES_ADNS_PC);
+  }
+#endif
+
   if(opt.whois_lookup)
     whois_connect(RADB);
 
@@ -343,6 +368,11 @@ void mode_summary()
 
   if(opt.mode == INTERACTIVE_REPORT)
     report();
+
+#ifdef HAVE_ADNS
+  if(opt.resolve)
+    adns_finish(adns);
+#endif
 
   if (opt.html) {
     fprintf(output, "</table>\n");
@@ -590,8 +620,18 @@ void mode_rt_response()
     }
   }
 
-  if(opt.status)
+  if(opt.status) {
     prepare_socket();
+#ifdef HAVE_ADNS
+    if(opt.resolve) {
+      retval = adns_init(&adns, adns_if_noenv, 0);
+      if(retval) {
+	syslog(LOG_NOTICE, "adns_init: %s", strerror(errno));
+	log_exit(EXIT_FAILURE);
+      }
+    }
+#endif
+  }
 
   if((opt.ipchains_check == 1) && ((opt.format & PARSER_IPCHAINS) != 0))
     check_for_ipchains();

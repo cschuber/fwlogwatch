@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: net.h,v 1.27 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: net.h,v 1.28 2010/10/11 12:17:44 bwess Exp $ */
 
 #ifndef _NET_H
 #define _NET_H

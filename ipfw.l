@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: ipfw.l,v 1.1 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: ipfw.l,v 1.2 2010/10/11 12:17:44 bwess Exp $ */
 
 %option prefix="ipfw"
 %option outfile="ipfw.c"
@@ -34,7 +34,10 @@ PROTO	"TCP"|"UDP"
 
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	ipfw_parse_start(ipfwtext);
 " kernel: ipfw: "{NUMBER}	{ xstrncpy(opt.line->chainlabel, ipfwtext+15, SHORTLEN); opt.parser=opt.parser|IPFW_CHAIN; };
+" ipfw: "{NUMBER}		{ xstrncpy(opt.line->chainlabel, ipfwtext+7, SHORTLEN); opt.parser=opt.parser|IPFW_CHAIN; };
 "Deny"				{ xstrncpy(opt.line->branchname, ipfwtext, SHORTLEN); opt.parser=opt.parser|IPFW_BRANCH; };
+"Count"				{ xstrncpy(opt.line->branchname, ipfwtext, SHORTLEN); opt.parser=opt.parser|IPFW_BRANCH; };
+"Accept"			{ xstrncpy(opt.line->branchname, ipfwtext, SHORTLEN); opt.parser=opt.parser|IPFW_BRANCH; };
 {PROTO}				ipfw_parse_proto(ipfwtext, IPFW_OPT_NONE);
 "ICMP:"{NUMBER}"."{NUMBER}	ipfw_parse_proto(ipfwtext+5, IPFW_OPT_ICMP);
 {OCTET}"."{OCTET}"."{OCTET}"."{OCTET}[ ]{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}			ipfw_parse_ips(ipfwtext, IPFW_OPT_NONE);

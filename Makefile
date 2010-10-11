@@ -1,11 +1,11 @@
-# Copyright (C) 2000-2004 Boris Wesslowski
-# $Id: Makefile,v 1.29 2004/04/25 18:56:19 bwess Exp $
+# Copyright (C) 2000-2006 Boris Wesslowski
+# $Id: Makefile,v 1.30 2010/10/11 12:17:44 bwess Exp $
 
 # Linux
 CC = gcc
 CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = #-g #-static -p
-LIBS = -lcrypt -lz #-lc_p
+LIBS = -lcrypt -lz #-ladns #-lc_p
 
 # Solaris
 #LIBS = -lnsl -lsocket -lcrypt -lz
@@ -27,11 +27,12 @@ LIBS = -lcrypt -lz #-lc_p
 #CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall -I/usr/local/include
 #LIBS = -L/usr/local/lib -lcrypt -lz -lintl
 
-# You might want to add -DSHORT_NAMES to CFLAGS if you only intend to
-# analyze log formats with short list/chain/branch/interface names like
-# ipchains. You can also add -DLOGDOTS if your Cisco log host logs FQDNs
-# and you only want the hostnames in the output.
+# You might want to add -DSHORT_NAMES to CFLAGS if you only intend to analyze
+# log formats with short list/chain/branch/interface names like ipchains.
+# You can also add -DLOGDOTS if your Cisco log host logs FQDNs and you only
+# want the hostnames in the output.
 # -DHAVE_IPV6 enables IPv6 support for the status web server.
+# -DHAVE_ADNS enables support for asynchronous DNS lookups.
 
 
 LEX = flex

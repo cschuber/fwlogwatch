@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: ipfilter.l,v 1.16 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: ipfilter.l,v 1.17 2010/10/11 12:17:44 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
@@ -62,6 +62,7 @@ TARGET		[SpPbBnL]
 "frag "{NUMBER}"@"{NUMBER}							/* ignore */
 "icmp "{DIGIT}{1,2}"/"{DIGIT}{1,2}						sscanf(ipftext, "icmp %d/%d", &opt.line->sport, &opt.line->dport); opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
 "icmp echo/0"									opt.line->sport = 8; opt.line->dport = 0; opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
+"icmp echoreply/0"								opt.line->sport = 0; opt.line->dport = 0; opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
 "icmp sourcequench/0"								opt.line->sport = 4; opt.line->dport = 0; opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
 "icmp unreach/host"								opt.line->sport = 3; opt.line->dport = 1; opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
 "icmp unreach/port"								opt.line->sport = 3; opt.line->dport = 3; opt.parser=opt.parser|IPF_SRC_PORT|IPF_DST_PORT;
@@ -79,6 +80,7 @@ TARGET		[SpPbBnL]
 "K-F"										/* ignore */
 "IN"										/* ignore */
 "OUT"										/* ignore */
+"mbcast"									/* ignore */
 {NUMBER}[ ]{NUMBER}[ ]{NUMBER}" IN"						/* ignore */
 ({HEXDIGIT}{HEXDIGIT}[ ]?)+[ ]+[ -~]+						opt.parser=opt.parser|IPF_NO_HIT;
 [ \t]+		/* ignore whitespace */

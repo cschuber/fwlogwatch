@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: compare.c,v 1.29 2004/04/25 18:56:19 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: compare.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,9 +9,11 @@
 #include <arpa/inet.h>
 #include "compare.h"
 #include "output.h"
+#include "response.h"
 #include "utils.h"
 
 struct conn_data *first = NULL;
+extern struct known_hosts *first_host;
 extern struct options opt;
 
 void add_entry()
@@ -137,7 +139,7 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
   return cond;
 }
 
-struct conn_data *fwlw_mergesort(struct conn_data *list) {
+struct conn_data *fwlw_pc_mergesort(struct conn_data *list) {
   struct conn_data *p, *q, *e, *tail;
   int size, merges, psize, qsize, i;
 
@@ -186,7 +188,7 @@ struct conn_data *fwlw_mergesort(struct conn_data *list) {
   }
 }
 
-void sort_data()
+void sort_data(unsigned char mode)
 {
   unsigned char i = 0, error;
 
@@ -251,7 +253,11 @@ void sort_data()
 
     i++;
     if (error == 0) {
-      first = fwlw_mergesort(first);
+      if(mode == SORT_PC) {
+        first = fwlw_pc_mergesort(first);
+      } else {
+        first_host = fwlw_hs_mergesort(first_host);
+      }
       if (opt.verbose == 2)
 	fprintf(stderr, ".");
     }

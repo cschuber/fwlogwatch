@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: netfilter.l,v 1.16 2004/04/25 18:56:22 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.17 2010/10/11 12:17:44 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -16,7 +16,9 @@
 
 extern struct options opt;
 
+void nf_parse_start_hn(char *input);
 void nf_parse_start(char *input);
+void nf_parse_isostart_hn(char *input);
 void nf_parse_prefix(char *input, unsigned char mode);
 void nf_parse_ip(char *input, unsigned char mode);
 void nf_parse_proto(char *input);
@@ -24,8 +26,8 @@ void nf_parse_proto(char *input);
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
 STRING	[a-zA-Z][a-zA-Z0-9.-]*
-PREFIX	[ -OQ-~¡-ÿ]+|([ -OQ-~¡-ÿ]*P[ -GI-~¡-ÿ]*)|([ -OQ-~¡-ÿ]*PH[ -XZ-~¡-ÿ]*)|([ -OQ-~¡-ÿ]*PHY[ -RT-~¡-ÿ]*)
-LOGHOST	[0-9.a-zA-Z()_:-]*
+PREFIX	[ -~¡-ÿ]*([ -RT-~¡-ÿ]|[ -XZ-~¡-ÿ]"S")"IN="
+LOGHOST	[0-9.a-zA-Z()_:-]+
 DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
@@ -36,12 +38,19 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 
 %%
 
-{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start(nftext);
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start_hn(nftext);
+{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}	nf_parse_start(nftext);
+{DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start_hn(nftext+5);
+{DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}	nf_parse_start(nftext+5);
+{DIGIT}{4}:{DIGIT}{2}:{DIGIT}{2}-{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_isostart_hn(nftext);
 " kernel: IN="{STRING}?			nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
-" kernel: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
+" kernel: "{PREFIX}{STRING}?		nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
+" [kernel] IN="{STRING}?		nf_parse_prefix(nftext+13, NF_OPT_NOPREFIX);
+" [kernel] "{PREFIX}{STRING}?		nf_parse_prefix(nftext+10, NF_OPT_PREFIX);
 " klogd: IN="{STRING}?			nf_parse_prefix(nftext+11, NF_OPT_NOPREFIX);
-" klogd: "{PREFIX}"IN="{STRING}?	nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
-" "{PREFIX}"IN="{STRING}?		nf_parse_prefix(nftext+1, NF_OPT_PREFIX);
+" klogd: "{PREFIX}{STRING}?		nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
+" "{PREFIX}{STRING}?			nf_parse_prefix(nftext+1, NF_OPT_PREFIX);
+"IN="{STRING}?				nf_parse_prefix(nftext+3, NF_OPT_NOPREFIX);
 "OUT="{STRING}?		/* ignore */
 "PHYSIN="{STRING}?	/* ignore */
 "PHYSOUT="{STRING}?	/* ignore */
@@ -49,7 +58,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 "SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);
 "DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_DST);
 "LEN="{NUMBER}		opt.line->datalen = atoi(nftext+4);
-"TOS="{HEXNUM}		/* ignore */
+"TOS="({HEXNUM}|"00")	/* ignore */
 "PREC="{HEXNUM}		/* ignore */
 "TTL="{NUMBER}		/* ignore */
 "ID="{NUMBER}		/* ignore */
@@ -60,7 +69,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 "PROTO="{PROTO}		nf_parse_proto(nftext+6);
 "INCOMPLETE ["{NUMBER}" bytes]"	/* ignore */
 "TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.parser=opt.parser|NF_TYPE; }
-"CODE="{NUMBER}		/* ignore */
+"CODE="{NUMBER}		{ opt.line->dport = atoi(nftext+5); opt.parser=opt.parser|NF_CODE; }
 "SEQ="{NUMBER}		/* ignore */
 "ACK="{NUMBER}		/* ignore */
 "SPT="{PORT}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
@@ -90,7 +99,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 
 %%
 
-void nf_parse_start(char *input)
+void nf_parse_start_hn(char *input)
 {
   int retval, day, hour, minute, second;
   char smonth[3];
@@ -108,23 +117,69 @@ void nf_parse_start(char *input)
   opt.parser=opt.parser|NF_DATE;
 }
 
+void nf_parse_start(char *input)
+{
+  int retval, day, hour, minute, second;
+  char smonth[3];
+
+  retval = sscanf(input,
+		  "%3s %2d %2d:%2d:%2d",
+		  smonth, &day, &hour, &minute, &second);
+  if (retval != 5) {
+    return;
+  }
+
+  build_time(smonth, day, hour, minute, second);
+  xstrncpy(opt.line->hostname, "-", SHORTLEN);
+
+  opt.parser=opt.parser|NF_DATE;
+}
+
+void nf_parse_isostart_hn(char *input)
+{
+  int retval, year, month, day, hour, minute, second;
+  struct tm *t;
+
+  retval = sscanf(input,
+		  "%4d:%2d:%2d-%2d:%2d:%2d %32s",
+		  &year, &month, &day, &hour, &minute, &second,
+		  opt.line->hostname);
+  if (retval != 7) {
+    return;
+  }
+
+  t = xmalloc(sizeof(struct tm));
+  t->tm_year = year-1900;
+  t->tm_mon = month-1;
+  t->tm_mday = day;
+  t->tm_hour = hour;
+  t->tm_min = minute;
+  t->tm_sec = second;
+  t->tm_isdst = -1;
+  opt.line->time = mktime(t);
+  free(t);
+
+  opt.parser=opt.parser|NF_DATE;
+}
+
 void nf_parse_prefix(char *input, unsigned char mode)
 {
   size_t i=0;
 
   if(mode == NF_OPT_PREFIX) {
-    while (i < strlen(input)) {
-      if(input[i] == 'I') {
-	if (input[i+1] == 'N') {
-	  if (input[i+2] == '=') {
-	    input[i] = '\0';
+    i=strlen(input);
+    while (i > 0) {
+      if(input[i] == '=') {
+	if (input[i-1] == 'N') {
+	  if (input[i-2] == 'I') {
+	    input[i-2] = '\0';
 	    xstrncpy(opt.line->chainlabel, input, SHORTLEN);
-	    xstrncpy(opt.line->interface, input+i+3, SHORTLEN);
+	    xstrncpy(opt.line->interface, input+i+1, SHORTLEN);
 	    break;
 	  }
 	}
       }
-      i++;
+      i--;
     }
   } else {
     xstrncpy(opt.line->chainlabel, "-", SHORTLEN);
@@ -176,10 +231,10 @@ unsigned char flex_netfilter(char *input, int linenum)
   if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {
     return PARSE_OK;
   }
-  if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE))) {
+  if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE|NF_CODE))) {
     return PARSE_OK;
   }
-  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 47) || (opt.line->protocol == 50)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
+  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 41) || (opt.line->protocol == 47) || (opt.line->protocol == 50) || (opt.line->protocol == 54)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
     return PARSE_OK;
   }
   if(opt.verbose)

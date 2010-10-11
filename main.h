@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: main.h,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: main.h,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "1.0 2004/04/25"
+#define VERSION "1.1 2006/04/17"
 #define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
@@ -57,7 +57,11 @@
 
 /* Files */
 
+#ifndef SOLARIS
 #define INFILE "/var/log/messages"
+#else
+#define INFILE "/var/adm/messages"
+#endif
 #define RCFILE CONF_DIR "/fwlogwatch.config"
 
 enum {
@@ -136,6 +140,7 @@ enum {
 #define NF_SPT 32
 #define NF_DPT 64
 #define NF_TYPE 128
+#define NF_CODE 256
 
 enum {
   NF_OPT_NOPREFIX,
@@ -166,6 +171,7 @@ enum {
 #define CISCO_PIX_DATE 1
 #define CISCO_PIX_SRC 2
 #define CISCO_PIX_DST 4
+#define CISCO_PIX_NO_HIT 8
 
 enum {
   CP_OPT_NONE,
@@ -175,8 +181,10 @@ enum {
   CP_OPT_UDP,
   CP_OPT_UDP_S,
   CP_OPT_ICMP,
+  CP_OPT_ICMP_S,
   CP_OPT_DST,
-  CP_OPT_DST_S
+  CP_OPT_DST_S,
+  CP_OPT_DST_I
 };
 
 /* ipfilter support */
@@ -237,6 +245,7 @@ enum {
 #define NS_DPORT 16
 #define NS_BN 32
 #define NS_PROTO 64
+#define NS_NO_HIT 128
 
 enum {
   NETSCREEN_OPT_SRC,
@@ -333,7 +342,9 @@ enum {
   NO_NET_OPTS_PC,
   NET_OPTS_PC,
   NO_SORTING,
-  SORTING
+  SORTING,
+  SORT_PC,
+  SORT_HS
 };
 
 enum {
@@ -478,7 +489,7 @@ struct options {
   struct log_line *line;
   char format_sel[SHORTLEN];
   unsigned int format;
-  unsigned char parser;
+  unsigned int parser;
   unsigned char repeated;
   int orig_count;
 

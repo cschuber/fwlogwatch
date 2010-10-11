@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2004 Boris Wesslowski */
-/* $Id: main.c,v 1.29 2004/04/25 18:56:21 bwess Exp $ */
+/* Copyright (C) 2000-2006 Boris Wesslowski */
+/* $Id: main.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +85,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2004 Boris Wesslowski");
+  puts("Copyright (C) 2000-2006 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -124,6 +124,12 @@ void info()
 #endif
   printf(_("IPv6 support "));
 #ifdef HAVE_IPV6
+  puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
+  printf(_("GNU adns support "));
+#ifdef HAVE_ADNS
   puts(_("enabled"));
 #else
   puts(_("disabled"));
