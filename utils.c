@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: utils.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: utils.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,10 +32,10 @@ char *xstrncpy(char *dest, const char *src, size_t n)
 {
   char *r = dest;
 
-  if((n <= 0) || (dest == NULL)) {
+  if ((n <= 0) || (dest == NULL)) {
     return dest;
   }
-  if(src != NULL) {
+  if (src != NULL) {
     while ((--n != 0) && (*src != '\0')) {
       *dest++ = *src++;
     }
@@ -59,9 +59,9 @@ void *xmalloc(int size)
 
 void log_exit(unsigned char returncode)
 {
-  if(opt.pidfile[0] != '\0') {
-    if(unlink(opt.pidfile) == -1) {
-      if(opt.verbose)
+  if (opt.pidfile[0] != '\0') {
+    if (unlink(opt.pidfile) == -1) {
+      if (opt.verbose)
 	syslog(LOG_NOTICE, "unlink %s: %s", opt.pidfile, strerror(errno));
     }
   }
@@ -78,7 +78,7 @@ void run_command(char *buf)
     return;
   }
 
-  if(opt.verbose == 2) {
+  if (opt.verbose == 2) {
     syslog(LOG_NOTICE, _("Executing '%s'"), buf);
   }
 
@@ -165,7 +165,7 @@ void free_exclude_data()
   while (excluded_this != NULL) {
     excluded_first = excluded_this;
     excluded_this = excluded_this->next;
-    if(excluded_first->svalue != NULL)
+    if (excluded_first->svalue != NULL)
       free(excluded_first->svalue);
     free(excluded_first);
   }
@@ -194,8 +194,7 @@ void mode_error()
   fprintf(stderr, _("fwlogwatch error: mode collision, please check that you didn't specify\n"
 		    "   several modes on the command line or a second mode is active in the\n"
 		    "   configuration file.\n"
-		    "   Please use a separate configuration file for each mode or comment out all\n"
-		    "   entries in the default configuration and use command line parameters.\n"));
+		    "   Please use a separate configuration file for each mode or comment out all\n" "   entries in the default configuration and use command line parameters.\n"));
   exit(EXIT_FAILURE);
 }
 
@@ -204,7 +203,7 @@ void build_time(char *smonth, int day, int hour, int minute, int second)
   int month = 0, now, then;
   struct tm *t;
 
-  if(opt.mode != REALTIME_RESPONSE) {
+  if (opt.mode != REALTIME_RESPONSE) {
     t = localtime(&opt.now);
   } else {
     time_t rr_now;
@@ -212,26 +211,39 @@ void build_time(char *smonth, int day, int hour, int minute, int second)
     rr_now = time(NULL);
     t = localtime(&rr_now);
   }
-  now = (int)mktime(t);
-  if (strncmp(smonth, "Jan", 3) == 0) { month = 0; }
-  else if (strncmp(smonth, "Feb", 3) == 0) { month = 1; }
-  else if (strncmp(smonth, "Mar", 3) == 0) { month = 2; }
-  else if (strncmp(smonth, "Apr", 3) == 0) { month = 3; }
-  else if (strncmp(smonth, "May", 3) == 0) { month = 4; }
-  else if (strncmp(smonth, "Jun", 3) == 0) { month = 5; }
-  else if (strncmp(smonth, "Jul", 3) == 0) { month = 6; }
-  else if (strncmp(smonth, "Aug", 3) == 0) { month = 7; }
-  else if (strncmp(smonth, "Sep", 3) == 0) { month = 8; }
-  else if (strncmp(smonth, "Oct", 3) == 0) { month = 9; }
-  else if (strncmp(smonth, "Nov", 3) == 0) { month = 10; }
-  else if (strncmp(smonth, "Dec", 3) == 0) { month = 11; }
+  now = (int) mktime(t);
+  if (strncmp(smonth, "Jan", 3) == 0) {
+    month = 0;
+  } else if (strncmp(smonth, "Feb", 3) == 0) {
+    month = 1;
+  } else if (strncmp(smonth, "Mar", 3) == 0) {
+    month = 2;
+  } else if (strncmp(smonth, "Apr", 3) == 0) {
+    month = 3;
+  } else if (strncmp(smonth, "May", 3) == 0) {
+    month = 4;
+  } else if (strncmp(smonth, "Jun", 3) == 0) {
+    month = 5;
+  } else if (strncmp(smonth, "Jul", 3) == 0) {
+    month = 6;
+  } else if (strncmp(smonth, "Aug", 3) == 0) {
+    month = 7;
+  } else if (strncmp(smonth, "Sep", 3) == 0) {
+    month = 8;
+  } else if (strncmp(smonth, "Oct", 3) == 0) {
+    month = 9;
+  } else if (strncmp(smonth, "Nov", 3) == 0) {
+    month = 10;
+  } else if (strncmp(smonth, "Dec", 3) == 0) {
+    month = 11;
+  }
   t->tm_mon = month;
   t->tm_mday = day;
   t->tm_hour = hour;
   t->tm_min = minute;
   t->tm_sec = second;
   t->tm_isdst = -1;
-  then = (int)mktime(t);
+  then = (int) mktime(t);
   if (then > now)
     --t->tm_year;
 
@@ -277,7 +289,7 @@ unsigned long int parse_cidr(char *input)
 
   pnt = strstr(input, "/");
   if (pnt != NULL) {
-    n = atoi(pnt+1);
+    n = atoi(pnt + 1);
     if ((n < 0) || (n > 32)) {
       fprintf(stderr, _("Error in CIDR format: %s\n"), input);
       exit(EXIT_FAILURE);
@@ -296,7 +308,7 @@ void add_known_host(char *ip)
 
   host = xmalloc(sizeof(struct known_hosts));
   host->netmask.s_addr = parse_cidr(ip);
-  if(convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
+  if (convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
     fprintf(stderr, _("(known host)\n"));
     free(host);
     exit(EXIT_FAILURE);
@@ -332,7 +344,7 @@ void add_exclude_hpb(char *input, unsigned char mode)
   excluded_this = xmalloc(sizeof(struct parser_options));
   excluded_this->mode = mode;
   excluded_this->svalue = NULL;
-  if(mode & PARSER_MODE_HOST) {
+  if (mode & PARSER_MODE_HOST) {
     struct parser_options *excluded_test;
     excluded_this->netmask.s_addr = parse_cidr(input);
     if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
@@ -349,11 +361,11 @@ void add_exclude_hpb(char *input, unsigned char mode)
       }
       excluded_test = excluded_test->next;
     }
-  } else if(mode & PARSER_MODE_PORT) {
+  } else if (mode & PARSER_MODE_PORT) {
     excluded_this->value = atoi(input);
-  } else if(mode & (PARSER_MODE_CHAIN | PARSER_MODE_BRANCH)) {
-    excluded_this->svalue = xmalloc(strlen(input)+1);
-    xstrncpy(excluded_this->svalue, input, strlen(input)+1);
+  } else if (mode & (PARSER_MODE_CHAIN | PARSER_MODE_BRANCH)) {
+    excluded_this->svalue = xmalloc(strlen(input) + 1);
+    xstrncpy(excluded_this->svalue, input, strlen(input) + 1);
   }
   excluded_this->next = excluded_first;
   excluded_first = excluded_this;
@@ -363,7 +375,7 @@ void add_input_file(char *name)
 {
   struct input_file *file, *ptr;
 
-  if(!strncmp(name, "-", FILESIZE))
+  if (!strncmp(name, "-", FILESIZE))
     opt.std_in = 1;
 
   if (opt.std_in) {
@@ -372,10 +384,10 @@ void add_input_file(char *name)
   }
 
   file = xmalloc(sizeof(struct input_file));
-  file->name = xmalloc(strlen(name)+1);
+  file->name = xmalloc(strlen(name) + 1);
   file->next = NULL;
 
-  xstrncpy(file->name, name, strlen(name)+1);
+  xstrncpy(file->name, name, strlen(name) + 1);
 
   ptr = first_file;
   if (ptr == NULL) {
@@ -403,7 +415,7 @@ void free_input_file()
   first_file = NULL;
 }
 
-void generate_email_header(FILE *fd)
+void generate_email_header(FILE * fd)
 {
   time_t now;
   char stime[TIMESIZE];
@@ -413,13 +425,13 @@ void generate_email_header(FILE *fd)
 
   fprintf(fd, "From: %s\n", opt.sender);
   fprintf(fd, "To: %s\n", opt.recipient);
-  if(opt.cc[0] != '\0')
+  if (opt.cc[0] != '\0')
     fprintf(fd, "Cc: %s\n", opt.cc);
   fprintf(fd, "Subject: %s\n", opt.title);
   fprintf(fd, "X-Generator: %s %s (C) %s\n", PACKAGE, VERSION, COPYRIGHT);
-  if(opt.html) {
+  if (opt.html) {
     fprintf(fd, "Mime-Version: 1.0\n");
-    fprintf(fd, "Content-Type: text/html; charset=iso-8859-1\n");
+    fprintf(fd, "Content-Type: text/html; charset=utf-8\n");
     fprintf(fd, "Content-Disposition: inline; filename=\"fwlogwatch_summary-%s.html\"\n", stime);
   }
   fprintf(fd, "\n");
@@ -427,7 +439,7 @@ void generate_email_header(FILE *fd)
 
 void fdprintf(int fd, char *format, ...)
 {
-  if(opt.status != FD_ERROR) {
+  if (opt.status != FD_ERROR) {
     char buf[BUFSIZE];
     va_list argv;
     ssize_t retval;
@@ -436,7 +448,7 @@ void fdprintf(int fd, char *format, ...)
     vsnprintf(buf, BUFSIZE, format, argv);
     retval = write(fd, buf, strlen(buf));
     va_end(argv);
-    if(retval == -1) {
+    if (retval == -1) {
       syslog(LOG_NOTICE, "write: %s", strerror(errno));
       opt.status = FD_ERROR;
       return;

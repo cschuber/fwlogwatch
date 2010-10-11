@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: ipchains.l,v 1.17 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: ipchains.l,v 1.18 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="ipchains"
 %option outfile="ipchains.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -58,46 +58,39 @@ IPCHAINS	" kernel: Packet log: "
 void ipchains_parse_date(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
-  if(retval != 6) return;
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
+  if (retval != 6)
+    return;
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|IPCHAINS_DATE;
+  opt.parser = opt.parser | IPCHAINS_DATE;
 }
 
 void ipchains_parse_data(char *input)
 {
   int retval;
 
-  retval = sscanf(input, "%" SHORTLEN_S "s %" SHORTLEN_S "s %" SHORTLEN_S "s PROTO=%3d",
-		  opt.line->chainlabel,
-		  opt.line->branchname,
-		  opt.line->interface,
-		  &opt.line->protocol);
-  if(retval != 4) return;
+  retval = sscanf(input, "%" SHORTLEN_S "s %" SHORTLEN_S "s %" SHORTLEN_S "s PROTO=%3d", opt.line->chainlabel, opt.line->branchname, opt.line->interface, &opt.line->protocol);
+  if (retval != 4)
+    return;
 
-  opt.parser=opt.parser|IPCHAINS_DATA;
+  opt.parser = opt.parser | IPCHAINS_DATA;
 }
 
 void ipchains_parse_rdata(char *input)
 {
   int retval, port;
 
-  retval = sscanf(input, "%" SHORTLEN_S "s REDIRECT %5d %" SHORTLEN_S "s PROTO=%3d",
-		  opt.line->chainlabel,
-		  &port,
-		  opt.line->interface,
-		  &opt.line->protocol);
-  if(retval != 4) return;
+  retval = sscanf(input, "%" SHORTLEN_S "s REDIRECT %5d %" SHORTLEN_S "s PROTO=%3d", opt.line->chainlabel, &port, opt.line->interface, &opt.line->protocol);
+  if (retval != 4)
+    return;
 
   snprintf(opt.line->branchname, SHORTLEN, "RD %d", port);
 
-  opt.parser=opt.parser|IPCHAINS_DATA;
+  opt.parser = opt.parser | IPCHAINS_DATA;
 }
 
 void ipchains_parse_ips(char *input)
@@ -107,18 +100,19 @@ void ipchains_parse_ips(char *input)
   int retval;
   char ip[IPLEN];
 
-  retval = sscanf(input, "%3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d",
-		  &shost1, &shost2, &shost3, &shost4, &opt.line->sport,
-		  &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
-  if(retval != 10) return;
+  retval = sscanf(input, "%3d.%3d.%3d.%3d:%5d %3d.%3d.%3d.%3d:%5d", &shost1, &shost2, &shost3, &shost4, &opt.line->sport, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+  if (retval != 10)
+    return;
 
   snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-  if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
+  if (convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR)
+    return;
 
   snprintf(ip, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
-  if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
+  if (convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR)
+    return;
 
-  opt.parser=opt.parser|IPCHAINS_IPS;
+  opt.parser = opt.parser | IPCHAINS_IPS;
 }
 
 unsigned char flex_ipchains(char *input, int linenum)
@@ -131,12 +125,12 @@ unsigned char flex_ipchains(char *input, int linenum)
 
   opt.line->count = 1;
 
-  if (opt.parser == (IPCHAINS_DATE|IPCHAINS_DATA|IPCHAINS_IPS)) {
+  if (opt.parser == (IPCHAINS_DATE | IPCHAINS_DATA | IPCHAINS_IPS)) {
     return PARSE_OK;
   } else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "ipchains parse error in line %d, ignoring.\n", linenum);
-    if(opt.verbose == 2)
+    if (opt.verbose == 2)
       fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }

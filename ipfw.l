@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: ipfw.l,v 1.2 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: ipfw.l,v 1.3 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="ipfw"
 %option outfile="ipfw.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -53,19 +53,16 @@ PROTO	"TCP"|"UDP"
 void ipfw_parse_start(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input,
-		  "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
   if (retval != 6) {
     return;
   }
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|IPFW_DATE;
+  opt.parser = opt.parser | IPFW_DATE;
 }
 
 void ipfw_parse_proto(char *input, unsigned char mode)
@@ -73,10 +70,12 @@ void ipfw_parse_proto(char *input, unsigned char mode)
   int retval;
   char *pnt;
 
-  if(mode == IPFW_OPT_NONE) {
-    if(strncmp(input, "TCP", 3) == 0) opt.line->protocol = 6;
-    if(strncmp(input, "UDP", 3) == 0) opt.line->protocol = 17;
-  } else if(mode == IPFW_OPT_ICMP) {
+  if (mode == IPFW_OPT_NONE) {
+    if (strncmp(input, "TCP", 3) == 0)
+      opt.line->protocol = 6;
+    if (strncmp(input, "UDP", 3) == 0)
+      opt.line->protocol = 17;
+  } else if (mode == IPFW_OPT_ICMP) {
     opt.line->protocol = 1;
     pnt = strstr(input, ".");
     *pnt = ' ';
@@ -84,10 +83,10 @@ void ipfw_parse_proto(char *input, unsigned char mode)
     if (retval != 2) {
       return;
     }
-    opt.parser=opt.parser|IPFW_PORTS;
+    opt.parser = opt.parser | IPFW_PORTS;
   }
-  if(opt.line->protocol != 0) {
-    opt.parser=opt.parser|IPFW_PROTO;
+  if (opt.line->protocol != 0) {
+    opt.parser = opt.parser | IPFW_PROTO;
   }
 }
 
@@ -101,12 +100,11 @@ void ipfw_parse_ips(char *input, unsigned char mode)
     *pnt = ' ';
     pnt = strstr(input, ":");
     *pnt = ' ';
-    retval = sscanf(input, "%16s %5d %16s %5d",
-		    src, &opt.line->sport, dst, &opt.line->dport);
+    retval = sscanf(input, "%16s %5d %16s %5d", src, &opt.line->sport, dst, &opt.line->dport);
     if (retval != 4) {
       return;
     }
-    opt.parser=opt.parser|IPFW_PORTS;
+    opt.parser = opt.parser | IPFW_PORTS;
   } else if (mode == IPFW_OPT_NONE) {
     retval = sscanf(input, "%16s %16s", src, dst);
     if (retval != 2) {
@@ -114,9 +112,11 @@ void ipfw_parse_ips(char *input, unsigned char mode)
     }
   }
 
-  if(convert_ip(src, &opt.line->shost) == IN_ADDR_ERROR) return;
-  if(convert_ip(dst, &opt.line->dhost) == IN_ADDR_ERROR) return;
-  opt.parser=opt.parser|IPFW_IPS;
+  if (convert_ip(src, &opt.line->shost) == IN_ADDR_ERROR)
+    return;
+  if (convert_ip(dst, &opt.line->dhost) == IN_ADDR_ERROR)
+    return;
+  opt.parser = opt.parser | IPFW_IPS;
 }
 
 unsigned char flex_ipfw(char *input, int linenum)
@@ -129,12 +129,12 @@ unsigned char flex_ipfw(char *input, int linenum)
 
   opt.line->count = 1;
 
-  if (opt.parser == (IPFW_DATE|IPFW_CHAIN|IPFW_BRANCH|IPFW_PROTO|IPFW_IPS|IPFW_PORTS|IPFW_IF)) {
+  if (opt.parser == (IPFW_DATE | IPFW_CHAIN | IPFW_BRANCH | IPFW_PROTO | IPFW_IPS | IPFW_PORTS | IPFW_IF)) {
     return PARSE_OK;
   }
-  if(opt.verbose)
+  if (opt.verbose)
     fprintf(stderr, "ipfw parse error in line %d, ignoring.\n", linenum);
-  if(opt.verbose == 2)
+  if (opt.verbose == 2)
     fprintf(stderr, "input was: \"%s\"\n", input);
   return PARSE_WRONG_FORMAT;
 }

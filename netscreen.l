@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: netscreen.l,v 1.6 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: netscreen.l,v 1.7 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="ns"
 %option outfile="netscreen.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -81,33 +81,31 @@ PARAM	[A-Za-z0-9/:-]+(" ("[A-Za-z ]+")")?
 
 %%
 
-
 void ns_parse_date(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input,
-		  "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
   if (retval != 6) {
     return;
   }
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|NS_DATE;
+  opt.parser = opt.parser | NS_DATE;
 }
 
 void ns_parse_ip(char *input, unsigned char mode)
 {
   if (mode == NETSCREEN_OPT_SRC) {
-    if(convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|NS_SRC;
+    if (convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | NS_SRC;
   } else {
-    if(convert_ip(input, &opt.line->dhost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|NS_DST;
+    if (convert_ip(input, &opt.line->dhost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | NS_DST;
   }
 }
 
@@ -126,12 +124,12 @@ unsigned char flex_netscreen(char *input, int linenum)
   if (opt.parser & NS_NO_HIT)
     return PARSE_NO_HIT;
 
-  if (opt.parser == (NS_DATE|NS_SRC|NS_DST|NS_SPORT|NS_DPORT|NS_BN|NS_PROTO)) {
+  if (opt.parser == (NS_DATE | NS_SRC | NS_DST | NS_SPORT | NS_DPORT | NS_BN | NS_PROTO)) {
     return PARSE_OK;
   } else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "netscreen parse error in line %d, ignoring.\n", linenum);
-    if(opt.verbose == 2)
+    if (opt.verbose == 2)
       fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }

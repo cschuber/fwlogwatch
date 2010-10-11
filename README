@@ -1,10 +1,9 @@
-$Id: README,v 1.29 2010/10/11 12:17:44 bwess Exp $
+$Id: README,v 1.30 2010/10/11 12:28:33 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski originally for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
-lot of log formats and has many analysis options. It also features incident
-report and realtime response capabilities, an interactive web interface and
-internationalization.
+lot of log formats and has many analysis options. It also features realtime
+response capabilities and an interactive web interface.
 
 It is available at http://fwlogwatch.inside-security.de/
 
@@ -17,9 +16,8 @@ FEATURES
     - Solaris/BSD/Irix/HP-UX ipfilter
     - BSD ipfw
     - Cisco IOS
-    - Cisco PIX / FWSM
+    - Cisco PIX / FWSM / ASA
     - NetScreen
-    - Windows XP firewall
     - Elsa Lancom router
     - Snort IDS
   - Entries can be parsed from single, multiple and combined log files, the
@@ -43,15 +41,9 @@ FEATURES
     omitted and the host mentioned in the header of the summary if the log
     is from a single host, the same happens with chains, targets and
     interfaces).
-  - Output as plain text or HTML (W3C XHTML 1.1 with inline or linked CSS
-    level 2) with limit and sort options.
+  - Output as plain text or HTML (W3C XHTML 1.1 with inline or linked CSS)
+    with limit and sort options.
   - Can send summaries by email.
-- Interactive report mode:
-  - The integrated report generator fills in and presents a report that can
-    be sent to abuse contacts of attacking sites or computer emergency
-    response teams (CERTs).
-  - Supports templates and incident number generation.
-  - All fields can be adjusted as needed interactively.
 - Realtime response mode:
   - The program detaches and stays in background as a daemon.
   - For ipchains setups detection of necessary rules with logging turned on
@@ -74,28 +66,33 @@ command line options.
 
 
 PARSER NOTES
-  - Cisco PIX support focuses on denied packets and ignores all other kinds
-    of PIX log entries. Basic PIX OS version 6 support is available.
+  - Cisco PIX/ASA support focuses on denied packets, knows some permitted
+    packet log entries and ignores all other kinds of log entries. It
+    expects log entries as from a syslog host. If your PIX/ASA uses names
+    you can use the script pix-names.sh from the contrib direcory to
+    extract them from a saved PIX/ASA configuration and add them to your
+    hosts file, if fwlogwatch is not able to resolve the names it will
+    discard the corresponding log entries.
   - The ipfilter parser does not support logs with resolved service names
     and tcp/udp entries without ports.
-  - The Snort parser does not analyze portscan entries yet.
-  - The NetScreen parser does not recognize packet-filter-unrelated
-    entries and some icmp types which the NetScreen does not seem to
-    recognize itself...
+  - The Snort parser does not analyze portscan entries.
+  - The NetScreen parser does not recognize packet-filter-unrelated entries
+    and some icmp types which the NetScreen does not seem to recognize
+    itself...
 
 
 INSTALLATION
 - General
   The Makefile assumes you use Linux, to compile on Solaris, OpenBSD,
   FreeBSD or IRIX look for the corresponding lines at the top of the
-  Makefile. fwlogwatch may also be compiled and run on Windows with help
-  of cygwin. You may want to have a look at main.h if you want to change
-  some default values.
+  Makefile. fwlogwatch may also be compiled and run on Windows with help of
+  cygwin or mingw. You may want to have a look at main.h if you want to
+  change some default values.
 
-  A simple 'make' should be enough to obtain a working binary.
-  If your make (like the one on OpenBSD) thinks flex can only produce files
-  called lex.yy.c type make several times, after all parsers are generated
-  linking will work.
+  flex is required to build fwlogwatch. Besides that a simple 'make' should
+  be enough to obtain a working binary. If your make (like the one on
+  OpenBSD) thinks flex can only produce files called lex.yy.c type make
+  several times, after all parsers are generated linking will work.
 
   If you use the realtime response mode you will need to install fwlogwatch
   with superuser permissions for certain configurations. If all you need is
@@ -103,11 +100,7 @@ INSTALLATION
   you can use group permissions. You can also bind a nonprivileged port for
   the status server. 'make install' will install the binary (in
   /usr/local/sbin) and the man page, 'make install-config' will also
-  install a sample configuration file and template in /etc.
-
-  You can define the TMPDIR environment variable if you don't want
-  fwlogwatch to create it's temporary files (only needed in report mode)
-  in /tmp.
+  install a sample configuration file in /etc.
 
 - Zlib/Gettext/IPv6/GNU adns
   If you define HAVE_ZLIB, HAVE_GETTEXT, HAVE_IPV6 and HAVE_ADNS fwlogwatch
@@ -121,8 +114,8 @@ INSTALLATION
   gettext package (sometimes with it's surroundings libtool, GNU m4,
   autoconf and automake) installed.
 
-  You need an operating system with a dual IPv4/IPv6 stack and headers with
-  IPv6 support to be able to use this protocol.
+  You need an operating system with a IPv6 stack and headers with IPv6
+  support to be able to use this protocol.
 
   The GNU adns library and header files must be installed to build fwlogwatch
   with support for faster, asynchronous DNS lookups.
@@ -133,31 +126,36 @@ INSTALLATION
   log enough.
 
 
-BASICS (with examples for ipchains)
-- Create a packet filter with ACCEPT rules for all connections you need, as
-  tight as possible.
+BASICS (with examples for iptables)
+- You should use a whitelist (meaning your firewall only allows connections
+  that are explicitly permitted and should be as specific as possible), so
+  create a packet filter with ACCEPT rules for all connections you need.
 
-- Your default policies should be DENY:
+- Your default policies can be DROP if you want your firewall to block all
+  connections in case all rules are deleted:
 
-    ipchains -P input DENY
-    ipchains -P forward DENY
+    iptables -P INPUT DROP
+    iptables -P FORWARD DROP
 
-  although with ipchains they won't be needed since all prohibited traffic
-  will be intercepted by the following logging rules:
+  Otherwise you should add a DROP rule at the end of all chains:
 
-    ipchains -A input -l -j DENY
-    ipchains -A forward -l -j DENY
+    iptables -A INPUT -j DROP
+    iptables -A FORWARD -j DROP
 
-  so the last line in your input, forward and custom chains should be
+- Before those DROP rules (or the end of chains with DROP policy) you
+  should have a LOG rule with some descriptive text like the context and
+  chain name:
 
-    target     prot opt     source                destination           ports
-    DENY       all  ----l-  anywhere              anywhere              n/a
+    iptables -A INPUT -j LOG --log-prefix "fw input drop "
+    iptables -A FORWARD -j LOG --log-prefix "fw forward drop "
 
-- You can also specify rules for the output chain but you should use the
-  target REJECT (you/your users will notice faster what the problem is when
-  trying something the policy forbids).
+  So the last 2 lines in your INPUT, FORWARD and custom chains should be
 
-- If you have a persistent log spammer drop his packets by inserting a DENY
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 LOG        all  --  *      *       0.0.0.0/0            0.0.0.0/0           LOG flags 0 level 4 prefix `fw forward drop `
+    0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0
+
+- If you have a persistent log spammer drop his packets by inserting a DROP
   rule before the logging rule above (or use the block response mode).
 
 
@@ -165,14 +163,15 @@ CONFIGURATION AND EXAMPLES
 - You should make a configuration file for each function you want, look at
   the included sample file, it should be easy to adapt to your needs.
 
-- Example (the options are in the order they are mentioned in the text):
-  If you want very verbose generation of a HTML summary in the file 'log.html'
-  of all packet filter entries at most one day old representing at least two
-  connection attempts with output including start and end timestamps, time
-  intervals, resolved IP addresses and service names and with connections
-  separated by protocol, source and destination ports and TCP options using
-  the files that match the expression 'messages*.gz' as input you would use
-  the command
+- Command line example:
+  (The options are in the order they are mentioned in the text)
+  If you want very verbose generation of a HTML summary in the file
+  'log.html' of all packet filter entries at most one day old representing
+  at least two connection attempts with output including start and end
+  timestamps, time intervals, resolved IP addresses and service names and
+  with connections separated by protocol, source and destination ports and
+  TCP options using the files that match the expression "messages*.gz" as
+  input you would use the command
 
   fwlogwatch -v -v -w -o log.html -l 1d -m 2 -t -e -z -n -N -p -s -d -y messages*.gz
 
@@ -193,7 +192,7 @@ CONFIGURATION AND EXAMPLES
   header of the script to adapt it to your system (e.g. prefix of the log
   file names, location of fwlogwatch).
 
-- Sample init files (for Red Hat and SuSE Linux systems) to start
+- Sample init files (for Red Hat and openSUSE Linux systems) to start
   fwlogwatch in realtime response mode at system start are also included.
 
 - You might want to replace your /etc/services file by the one supplied
@@ -207,8 +206,6 @@ FEEDBACK
   If you find a bug or have an idea for a new feature please send an email
   to Boris Wesslowski <bw@inside-security.de>.
 
-  If you want to report a parser problem please specify which log format you
-  are trying to parse, the version of the log generator and fwlogwatch you
-  are using and provide a sample incuding log lines for which parsing fails.
-  You also can submit unrecognized entries at
+  If you want to report a parser problem or submit unrecognized entries
+  please use the unrecognized entry submission page:
   http://fwlogwatch.inside-security.de/unrecognized.php

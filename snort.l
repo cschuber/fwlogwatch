@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: snort.l,v 1.8 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: snort.l,v 1.9 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="snort"
 %option outfile="snort.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -57,16 +57,15 @@ PROTO	"TCP"|"UDP"|"ICMP"
 void snort_parse_date(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
-  if(retval != 6) return;
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
+  if (retval != 6)
+    return;
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|SNORT_DATE;
+  opt.parser = opt.parser | SNORT_DATE;
 }
 
 void snort_parse_branch(char *input)
@@ -76,7 +75,7 @@ void snort_parse_branch(char *input)
   ptr = strchr(input, ']');
   *ptr = '\0';
   xstrncpy(opt.line->branchname, input, SHORTLEN);
-  opt.parser=opt.parser|SNORT_BRANCH;
+  opt.parser = opt.parser | SNORT_BRANCH;
 }
 
 void snort_parse_ip(char *input, unsigned char mode)
@@ -87,34 +86,33 @@ void snort_parse_ip(char *input, unsigned char mode)
   if ((mode & SNORT_OPT_SRC) != 0) {
     char proto[8];
     if ((mode & SNORT_OPT_PORT) != 0) {
-      retval = sscanf(input, "%8s %3d.%3d.%3d.%3d:%5d",
-		      proto,
-		      &host1, &host2, &host3, &host4,
-		      &opt.line->sport);
-      if(retval != 6) return;
+      retval = sscanf(input, "%8s %3d.%3d.%3d.%3d:%5d", proto, &host1, &host2, &host3, &host4, &opt.line->sport);
+      if (retval != 6)
+	return;
     } else {
-      retval = sscanf(input, "%8s %3d.%3d.%3d.%3d",
-		      proto,
-		      &host1, &host2, &host3, &host4);
-      if(retval != 5) return;
+      retval = sscanf(input, "%8s %3d.%3d.%3d.%3d", proto, &host1, &host2, &host3, &host4);
+      if (retval != 5)
+	return;
     }
 
-    if(strncmp(proto, "TCP", 3) == 0) opt.line->protocol = 6;
-    else if(strncmp(proto, "UDP", 3) == 0) opt.line->protocol = 17;
-    else if(strncmp(proto, "ICMP", 4) == 0) opt.line->protocol = 1;
+    if (strncmp(proto, "TCP", 3) == 0)
+      opt.line->protocol = 6;
+    else if (strncmp(proto, "UDP", 3) == 0)
+      opt.line->protocol = 17;
+    else if (strncmp(proto, "ICMP", 4) == 0)
+      opt.line->protocol = 1;
 
     if (opt.line->protocol != 0)
-      opt.parser=opt.parser|SNORT_PROTO;
+      opt.parser = opt.parser | SNORT_PROTO;
   } else if ((mode & SNORT_OPT_DST) != 0) {
     if ((mode & SNORT_OPT_PORT) != 0) {
-      retval = sscanf(input, "-> %3d.%3d.%3d.%3d:%5d",
-		      &host1, &host2, &host3, &host4,
-		      &opt.line->sport);
-      if(retval != 5) return;
+      retval = sscanf(input, "-> %3d.%3d.%3d.%3d:%5d", &host1, &host2, &host3, &host4, &opt.line->sport);
+      if (retval != 5)
+	return;
     } else {
-      retval = sscanf(input, "-> %3d.%3d.%3d.%3d",
-		      &host1, &host2, &host3, &host4);
-      if(retval != 4) return;
+      retval = sscanf(input, "-> %3d.%3d.%3d.%3d", &host1, &host2, &host3, &host4);
+      if (retval != 4)
+	return;
     }
   } else {
     return;
@@ -123,11 +121,13 @@ void snort_parse_ip(char *input, unsigned char mode)
   snprintf(ip, IPLEN, "%d.%d.%d.%d", host1, host2, host3, host4);
 
   if ((mode & SNORT_OPT_SRC) != 0) {
-    if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|SNORT_SRC;
+    if (convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | SNORT_SRC;
   } else if ((mode & SNORT_OPT_DST) != 0) {
-    if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|SNORT_DST;
+    if (convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | SNORT_DST;
   }
 }
 
@@ -145,12 +145,12 @@ unsigned char flex_snort(char *input, int linenum)
   if (opt.parser & SNORT_NO_HIT)
     return PARSE_NO_HIT;
 
-  if (opt.parser == (SNORT_DATE|SNORT_CHAIN|SNORT_BRANCH|SNORT_PROTO|SNORT_SRC|SNORT_DST)) {
+  if (opt.parser == (SNORT_DATE | SNORT_CHAIN | SNORT_BRANCH | SNORT_PROTO | SNORT_SRC | SNORT_DST)) {
     return PARSE_OK;
   } else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "snort parse error in line %d, ignoring.\n", linenum);
-    if(opt.verbose == 2)
+    if (opt.verbose == 2)
       fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }

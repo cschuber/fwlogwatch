@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: main.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: main.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,12 +35,16 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -D           do not differentiate destination IP addresses\n"));
   printf(_("  -d           differentiate destination ports\n"));
   printf(_("  -E <format>  select or exclude hosts, ports, chains and targets\n"));
+  printf(_("               quick reference: -E[ie][hp][sd]<ip/number>\n"));
+  printf(_("                                -E[ie][cb]<name>\n"));
   printf(_("  -m <count>   only show entries with at least so many incidents\n"));
   printf(_("  -M <number>  only show this amount of entries\n"));
   printf(_("  -N           resolve service names\n"));
   printf(_("  -n           resolve host names\n"));
   printf(_("  -O <order>   define the sort order (see the man page for details)\n"));
-  printf(_("  -P <format>  use only parsers for specific formats\n"));
+  printf(_("  -P <format>  use parsers for specific formats (defaults to netfilter)\n"));
+  printf(_("               i: ipchains, n: netfilter, f: ipfilter, c: cisco ios\n"));
+  printf(_("               p: cisco pix, e: netscreen, l: lancom, s: snort, b: ipfw\n"));
   printf(_("  -p           differentiate protocols\n"));
   printf(_("  -s           differentiate source ports\n"));
   printf(_("  -U <title>   set report and status page title and email subject\n"));
@@ -51,6 +55,7 @@ void usage(char *me, unsigned char exitcode)
   printf(_("Log summary mode (default):\n"));
   printf(_("  -C <email>   carbon copy recipients\n"));
   printf(_("  -e           show end times\n"));
+  printf(_("  -F <email>   report sender address (defaults to '%s')\n"), opt.sender);
   printf(_("  -l <time>    process recent events only (defaults to off)\n"));
   printf(_("  -o <file>    specify output file\n"));
   printf(_("  -S           do not differentiate source IP addresses\n"));
@@ -61,17 +66,10 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -z           show time interval\n"));
   printf("\n");
 
-  printf(_("Interactive report mode (summary mode extension):\n"));
-  printf(_("  -i <count>   interactive mode with report threshold\n"));
-  printf(_("  -F <email>   report sender address (defaults to '%s')\n"), opt.sender);
-  printf(_("  -T <email>   address of CERT or abuse contact to send report to\n"));
-  printf(_("  -I <file>    template file for report (defaults to %s)\n"), TEMPLATE);
-  printf("\n");
-
   printf(_("Realtime response mode:\n"));
   printf(_("  -R           realtime response as daemon (default action: log only)\n"));
   printf(_("  -a <count>   alert threshold (defaults to %d entries)\n"), ALERT);
-  printf(_("  -l <time>    forget events this old (defaults to %d hours)\n"), FORGET/3600);
+  printf(_("  -l <time>    forget events this old (defaults to %d hours)\n"), FORGET / 3600);
   printf(_("  -k <IP/net>  add this IP address or net to the list of known hosts\n"));
   printf(_("  -A           invoke notification script if threshold is reached\n"));
   printf(_("  -B           invoke response action script (e.g. block host)\n"));
@@ -85,7 +83,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2006 Boris Wesslowski");
+  puts("Copyright (C) 2000-2010 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -141,7 +139,6 @@ void info()
 void init_options()
 {
   char *user, host[SHOSTLEN];
-  int retval;
 
   opt.mode = LOG_SUMMARY;
   opt.inputfd = NULL;
@@ -156,7 +153,7 @@ void init_options()
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
-  opt.format = PARSER_IPCHAINS|PARSER_NETFILTER|PARSER_CISCO_IOS|PARSER_CISCO_PIX|PARSER_IPFILTER|PARSER_IPFW;
+  opt.format = PARSER_NETFILTER;
   opt.parser = 0;
   opt.repeated = 0;
   opt.orig_count = 0;
@@ -208,7 +205,6 @@ void init_options()
   opt.sender[0] = '\0';
   opt.recipient[0] = '\0';
   opt.cc[0] = '\0';
-  xstrncpy(opt.templatefile, TEMPLATE, FILESIZE);
 
   opt.response = OPT_LOG;
   opt.ipchains_check = 0;
@@ -229,11 +225,9 @@ void init_options()
   opt.global_id = 0;
 
   user = getenv("USER");
-  if (user == NULL) {
+  if (user == NULL)
     return;
-  }
-  retval = gethostname(host, SHOSTLEN);
-  if (retval == -1) {
+  if (gethostname(host, SHOSTLEN) == -1) {
     perror("gethostname");
     return;
   }
@@ -248,8 +242,7 @@ int main(int argc, char **argv)
   init_options();
 
 #ifdef HAVE_GETTEXT
-  setlocale(LC_MESSAGES,"");
-  setlocale(LC_TIME,"");
+  setlocale(LC_ALL, "");
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
 #endif
@@ -285,58 +278,48 @@ int main(int argc, char **argv)
       opt.etimes = 1;
       break;
     case 'E':
-      if(optarg[0] == 'i') {
+      if (optarg[0] == 'i') {
 	parser_mode = PARSER_MODE_DEFAULT;
-      } else if(optarg[0] == 'e') {
+      } else if (optarg[0] == 'e') {
 	parser_mode = PARSER_MODE_NOT;
       } else {
 	fprintf(stderr, _("Illegal inclusion/exclusion pos. 1 (expected [ie]): %s\n"), optarg);
 	fprintf(stderr, _("Exiting\n"));
-	exit(EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
-      if(optarg[1] == 'h') {
+      if (optarg[1] == 'h') {
 	parser_mode = parser_mode | PARSER_MODE_HOST;
-      } else if(optarg[1] == 'p') {
+      } else if (optarg[1] == 'p') {
 	parser_mode = parser_mode | PARSER_MODE_PORT;
-      } else if(optarg[1] == 'c') {
+      } else if (optarg[1] == 'c') {
 	parser_mode = parser_mode | PARSER_MODE_CHAIN;
-        add_exclude_hpb(optarg+2, parser_mode);
+	add_exclude_hpb(optarg + 2, parser_mode);
 	break;
-      } else if(optarg[1] == 'b') {
+      } else if (optarg[1] == 'b') {
 	parser_mode = parser_mode | PARSER_MODE_BRANCH;
-        add_exclude_hpb(optarg+2, parser_mode);
+	add_exclude_hpb(optarg + 2, parser_mode);
 	break;
       } else {
 	fprintf(stderr, _("Illegal inclusion/exclusion pos. 2 (expected [hpcb]): %s\n"), optarg);
 	fprintf(stderr, _("Exiting\n"));
-	exit(EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
-      if(optarg[2] == 'd') {
+      if (optarg[2] == 'd') {
 	parser_mode = parser_mode | PARSER_MODE_DEFAULT;
-      } else if(optarg[2] == 's') {
+      } else if (optarg[2] == 's') {
 	parser_mode = parser_mode | PARSER_MODE_SRC;
       } else {
 	fprintf(stderr, _("Illegal inclusion/exclusion pos. 3 (expected [sd]): %s\n"), optarg);
 	fprintf(stderr, _("Exiting\n"));
-	exit(EXIT_FAILURE);
+	return EXIT_FAILURE;
       }
-      add_exclude_hpb(optarg+3, parser_mode);
+      add_exclude_hpb(optarg + 3, parser_mode);
       break;
     case 'F':
       xstrncpy(opt.sender, optarg, EMAILSIZE);
       break;
     case 'h':
       usage(argv[0], EXIT_SUCCESS);
-      break;
-    case 'i':
-      if ((opt.mode != LOG_SUMMARY) && (opt.mode != INTERACTIVE_REPORT)) {
-	mode_error();
-      }
-      opt.mode = INTERACTIVE_REPORT;
-      opt.threshold = atoi(optarg);
-      break;
-    case 'I':
-      xstrncpy(opt.templatefile, optarg, FILESIZE);
       break;
     case 'k':
       add_known_host(optarg);
@@ -345,9 +328,6 @@ int main(int argc, char **argv)
       opt.recent = parse_time(optarg);
       break;
     case 'L':
-      if ((opt.mode != LOG_SUMMARY) && (opt.mode != SHOW_LOG_TIMES)) {
-	mode_error();
-      }
       opt.mode = SHOW_LOG_TIMES;
       break;
     case 'm':
@@ -376,9 +356,6 @@ int main(int argc, char **argv)
       xstrncpy(opt.format_sel, optarg, SHORTLEN);
       break;
     case 'R':
-      if ((opt.mode != LOG_SUMMARY) && (opt.mode != REALTIME_RESPONSE)) {
-	mode_error();
-      }
       opt.mode = REALTIME_RESPONSE;
       break;
     case 's':
@@ -411,7 +388,7 @@ int main(int argc, char **argv)
     case 'X':
       opt.status = STATUS_OK;
       opt.listenport = atoi(optarg);
-      if((opt.listenport < 1) || (opt.listenport > 65535))
+      if ((opt.listenport < 1) || (opt.listenport > 65535))
 	opt.listenport = LISTENPORT;
       break;
     case 'y':
@@ -425,7 +402,7 @@ int main(int argc, char **argv)
     }
   }
 
-  if(!alt_rcfile) {
+  if (!alt_rcfile) {
     read_rcfile(opt.rcfile, MAY_NOT_EXIST);
   } else {
     read_rcfile(opt.rcfile, MUST_EXIST);
@@ -452,13 +429,6 @@ int main(int argc, char **argv)
   case LOG_SUMMARY:
     if (opt.title[0] == '\0')
       xstrncpy(opt.title, SUMMARY_TITLE, TITLESIZE);
-    mode_summary();
-    break;
-  case INTERACTIVE_REPORT:
-    if (opt.title[0] == '\0')
-      xstrncpy(opt.title, SUMMARY_TITLE, TITLESIZE);
-    if (opt.recipient[0] == '\0')
-      xstrncpy(opt.recipient, CERT, EMAILSIZE);
     mode_summary();
     break;
   case REALTIME_RESPONSE:

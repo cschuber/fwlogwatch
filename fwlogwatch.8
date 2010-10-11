@@ -1,21 +1,19 @@
-.\" Copyright (C) 2000-2006 Boris Wesslowski
-.\" $Id: fwlogwatch.8,v 1.29 2010/10/11 12:17:44 bwess Exp $
+.\" Copyright (C) 2000-2010 Boris Wesslowski
+.\" $Id: fwlogwatch.8,v 1.30 2010/10/11 12:28:33 bwess Exp $
 .TH FWLOGWATCH 8 "25 April 2004" IS
 .SH NAME
-fwlogwatch \- a firewall log analyzer, report generator and realtime response agent
+fwlogwatch \- a firewall log analyzer and realtime response agent
 .SH SYNOPSIS
 .B fwlogwatch
 .RI [ options ]\ [ input_files ]
 .SH DESCRIPTION
 .B fwlogwatch
 produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
-ipfilter, ipfw, Cisco IOS, Cisco PIX, NetScreen, Windows XP firewall, Elsa
-Lancom router and Snort IDS log summary reports in plain text and HTML form
-and has a lot of options to analyze and display relevant patterns. It can
-produce customizable incident reports and send them to abuse contacts at
-offending sites or CERTs. Finally, it can also run as daemon (with web
-interface) doing realtime log monitoring and reporting anomalies or
-starting attack countermeasures.
+ipfilter, ipfw, Cisco IOS, Cisco PIX/ASA, NetScreen, Elsa Lancom router and
+Snort IDS log summary reports in plain text and HTML form and has a lot of
+options to analyze and display relevant patterns. It also can run as daemon
+(with web interface) doing realtime log monitoring and reporting anomalies
+or starting attack countermeasures.
 
 .SH "GENERAL OPTIONS"
 These options are independent from the main modes of operation.
@@ -155,16 +153,14 @@ ipfw,
 .I c
 Cisco IOS,
 .I p
-Cisco PIX,
+Cisco PIX/ASA,
 .I e
 NetScreen,
-.I w
-Windows XP,
 .I l
 Elsa Lancom and
 .I s
 Snort. The default is to use all parsers except the ones for NetScreen,
-Windows XP, Elsa Lancom and Snort logs.
+Elsa Lancom and Snort logs.
 .IP \-p
 Differentiate protocols. This is activated automatically if you
 differentiate source and/or destination ports.
@@ -173,8 +169,7 @@ Differentiate source ports.
 .IP \-U\ \fItitle\fR
 Set
 .I title
-as title of the report and status page and as subject for reports sent by
-email.
+as title of the report and status page.
 .IP \-v
 Be verbose. You can specify it twice for more information.
 In very verbose mode while parsing the log file you will see "." for
@@ -213,28 +208,6 @@ Produce output in HTML format.
 Show time interval between start and end time of packet log entries. This
 is only available if there is more than one packet log entry with unique
 characteristics.
-.SH "INTERACTIVE REPORT MODE"
-The interactive report mode is a summary mode extension with the
-following additional options:
-.IP \-i\ \fIcount\fR
-Enter interactive report mode.
-.I count
-is the minimum number of log entries you want to start reporting at. A
-summary of the corresponding entries will be shown and a report generated
-for each one. The more of the options above you use the more fields of the
-report will be filled in.
-.IP \-F\ \fIemail\fR
-This is the address the email containing the report will be sent from.
-.IP \-T\ \fIemail\fR
-This is the email address of the abuse contact or CERT the report will be
-sent to.
-.IP \-C\ \fIemail\fR
-These email recipients will get a carbon copy of the report (e.g. for your
-archives).
-.IP \-I\ \fIfile\fR
-Template file for report (defaults to
-.B /etc/fwlogwatch.template
-).
 .SH "REALTIME RESPONSE MODE"
 .IP \-R
 Enter realtime response mode. This means: detach and run as daemon until
@@ -313,8 +286,6 @@ for years.
 .SH FILES
 .IP \fB/etc/fwlogwatch.config\fR
 Default configuration file.
-.IP \fB/etc/fwlogwatch.template\fR
-Default template for incident reports.
 .IP \fB/var/log/messages\fR
 Default input log file.
 .IP \fB/var/run/fwlogwatch.pid\fR

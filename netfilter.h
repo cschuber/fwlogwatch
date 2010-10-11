@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: netfilter.h,v 1.26 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: netfilter.h,v 1.27 2010/10/11 12:28:33 bwess Exp $ */
 
 #ifndef _NETFILTER_H
 #define _NETFILTER_H

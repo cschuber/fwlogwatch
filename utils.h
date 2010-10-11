@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: utils.h,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: utils.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -22,7 +22,7 @@ void add_known_host(char *ip);
 void add_exclude_hpb(char *input, unsigned char mode);
 void add_input_file(char *name);
 void free_input_file(void);
-void generate_email_header(FILE *fd);
+void generate_email_header(FILE * fd);
 void fdprintf(int fd, char *format, ...);
 
 #endif

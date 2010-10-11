@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: ipfilter.l,v 1.17 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: ipfilter.l,v 1.18 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="ipf"
 %option outfile="ipfilter.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -93,16 +93,15 @@ TARGET		[SpPbBnL]
 void ipf_parse_date(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
-  if (retval != 6) return;
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
+  if (retval != 6)
+    return;
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|IPF_DATE;
+  opt.parser = opt.parser | IPF_DATE;
 }
 
 void ipf_parse_data(char *input, unsigned char mode)
@@ -110,23 +109,18 @@ void ipf_parse_data(char *input, unsigned char mode)
   int retval;
 
   if (mode == IPF_OPT_COUNT) {
-    retval = sscanf(input, "%dx %" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s",
-		    &opt.line->count,
-		    opt.line->interface,
-		    opt.line->chainlabel,
-		    opt.line->branchname);
-    if (retval != 4) return;
+    retval = sscanf(input, "%dx %" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s", &opt.line->count, opt.line->interface, opt.line->chainlabel, opt.line->branchname);
+    if (retval != 4)
+      return;
   } else {
-    retval = sscanf(input, "%" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s",
-		    opt.line->interface,
-		    opt.line->chainlabel,
-		    opt.line->branchname);
-    if (retval != 3) return;
+    retval = sscanf(input, "%" SHORTLEN_S "s @%" SHORTLEN_S "s %" SHORTLEN_S "s", opt.line->interface, opt.line->chainlabel, opt.line->branchname);
+    if (retval != 3)
+      return;
 
     opt.line->count = 1;
   }
 
-  opt.parser=opt.parser|IPF_DATA;
+  opt.parser = opt.parser | IPF_DATA;
 }
 
 void ipf_parse_ips(char *input, unsigned char mode)
@@ -135,62 +129,67 @@ void ipf_parse_ips(char *input, unsigned char mode)
   int retval;
   char ip[IPLEN];
 
-  if (mode == (IPF_OPT_SRC|IPF_OPT_RES|IPF_OPT_RPORT) || mode == (IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_RPORT)) {
+  if (mode == (IPF_OPT_SRC | IPF_OPT_RES | IPF_OPT_RPORT) || mode == (IPF_OPT_DST | IPF_OPT_RES | IPF_OPT_RPORT)) {
     char name[255], *ptr, portname[32];
-    ptr = strchr(input, '['); *ptr = ' ';
-    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d],%32s",
-		    name, &host1, &host2, &host3, &host4, portname);
-    if(retval != 6) return;
-  } else if (mode == (IPF_OPT_SRC|IPF_OPT_RES|IPF_OPT_PORT) || mode == (IPF_OPT_DST|IPF_OPT_RES|IPF_OPT_PORT)) {
+    ptr = strchr(input, '[');
+    *ptr = ' ';
+    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d],%32s", name, &host1, &host2, &host3, &host4, portname);
+    if (retval != 6)
+      return;
+  } else if (mode == (IPF_OPT_SRC | IPF_OPT_RES | IPF_OPT_PORT) || mode == (IPF_OPT_DST | IPF_OPT_RES | IPF_OPT_PORT)) {
     char name[255], *ptr;
-    ptr = strchr(input, '['); *ptr = ' ';
-    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d],%5d",
-		    name, &host1, &host2, &host3, &host4, &port);
-    if(retval != 6) return;
-  } else if (mode == (IPF_OPT_SRC|IPF_OPT_RES) || mode == (IPF_OPT_DST|IPF_OPT_RES)) {
+    ptr = strchr(input, '[');
+    *ptr = ' ';
+    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d],%5d", name, &host1, &host2, &host3, &host4, &port);
+    if (retval != 6)
+      return;
+  } else if (mode == (IPF_OPT_SRC | IPF_OPT_RES) || mode == (IPF_OPT_DST | IPF_OPT_RES)) {
     char name[255], *ptr;
-    ptr = strchr(input, '['); *ptr = ' ';
-    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d]",
-		    name, &host1, &host2, &host3, &host4);
-    if(retval != 5) return;
-  } else if (mode == (IPF_OPT_SRC|IPF_OPT_RPORT) || mode == (IPF_OPT_DST|IPF_OPT_RPORT)) {
+    ptr = strchr(input, '[');
+    *ptr = ' ';
+    retval = sscanf(input, "%255s %3d.%3d.%3d.%3d]", name, &host1, &host2, &host3, &host4);
+    if (retval != 5)
+      return;
+  } else if (mode == (IPF_OPT_SRC | IPF_OPT_RPORT) || mode == (IPF_OPT_DST | IPF_OPT_RPORT)) {
     char portname[32];
-    retval = sscanf(input, "%3d.%3d.%3d.%3d,%32s",
-		    &host1, &host2, &host3, &host4, portname);
-    if(retval != 5) return;
-  } else if (mode == (IPF_OPT_SRC|IPF_OPT_PORT) || mode == (IPF_OPT_DST|IPF_OPT_PORT)) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d,%5d",
-		    &host1, &host2, &host3, &host4, &port);
-    if(retval != 5) return;
+    retval = sscanf(input, "%3d.%3d.%3d.%3d,%32s", &host1, &host2, &host3, &host4, portname);
+    if (retval != 5)
+      return;
+  } else if (mode == (IPF_OPT_SRC | IPF_OPT_PORT) || mode == (IPF_OPT_DST | IPF_OPT_PORT)) {
+    retval = sscanf(input, "%3d.%3d.%3d.%3d,%5d", &host1, &host2, &host3, &host4, &port);
+    if (retval != 5)
+      return;
   } else if (mode == IPF_OPT_SRC || mode == IPF_OPT_DST) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d",
-		    &host1, &host2, &host3, &host4);
-    if(retval != 4) return;
+    retval = sscanf(input, "%3d.%3d.%3d.%3d", &host1, &host2, &host3, &host4);
+    if (retval != 4)
+      return;
   } else {
     return;
   }
 
   snprintf(ip, IPLEN, "%d.%d.%d.%d", host1, host2, host3, host4);
-  if(mode & IPF_OPT_SRC) {
-    if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|IPF_SRC_IP;
-    if(mode & IPF_OPT_PORT) {
+  if (mode & IPF_OPT_SRC) {
+    if (convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | IPF_SRC_IP;
+    if (mode & IPF_OPT_PORT) {
       opt.line->sport = port;
-      opt.parser=opt.parser|IPF_SRC_PORT;
+      opt.parser = opt.parser | IPF_SRC_PORT;
     }
   } else {
-    if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|IPF_DST_IP;
-    if(mode & IPF_OPT_PORT) {
+    if (convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | IPF_DST_IP;
+    if (mode & IPF_OPT_PORT) {
       opt.line->dport = port;
-      opt.parser=opt.parser|IPF_DST_PORT;
+      opt.parser = opt.parser | IPF_DST_PORT;
     }
   }
 }
 
 void ipf_parse_proto(char *input)
 {
-  if(isdigit((int)input[0])) {
+  if (isdigit((int) input[0])) {
     opt.line->protocol = atoi(input);
   } else {
     struct protoent *proto;
@@ -201,22 +200,28 @@ void ipf_parse_proto(char *input)
   }
 
   if (opt.line->protocol != 0) {
-    opt.parser=opt.parser|IPF_PROTO;
+    opt.parser = opt.parser | IPF_PROTO;
   } else {
     fprintf(stderr, "Unknown protocol (not in /etc/protocols), ignoring: %s\n", input);
-    opt.parser=opt.parser|IPF_NO_HIT;
+    opt.parser = opt.parser | IPF_NO_HIT;
   }
 }
 
 void ipf_parse_flags(char *input)
 {
   while (*input != '\0') {
-    if(*input == 'S') opt.line->flags = opt.line->flags | TCP_SYN;
-    if(*input == 'A') opt.line->flags = opt.line->flags | TCP_ACK;
-    if(*input == 'F') opt.line->flags = opt.line->flags | TCP_FIN;
-    if(*input == 'R') opt.line->flags = opt.line->flags | TCP_RST;
-    if(*input == 'P') opt.line->flags = opt.line->flags | TCP_PSH;
-    if(*input == 'U') opt.line->flags = opt.line->flags | TCP_URG;
+    if (*input == 'S')
+      opt.line->flags = opt.line->flags | TCP_SYN;
+    if (*input == 'A')
+      opt.line->flags = opt.line->flags | TCP_ACK;
+    if (*input == 'F')
+      opt.line->flags = opt.line->flags | TCP_FIN;
+    if (*input == 'R')
+      opt.line->flags = opt.line->flags | TCP_RST;
+    if (*input == 'P')
+      opt.line->flags = opt.line->flags | TCP_PSH;
+    if (*input == 'U')
+      opt.line->flags = opt.line->flags | TCP_URG;
     input++;
   }
 }
@@ -232,12 +237,12 @@ unsigned char flex_ipfilter(char *input, int linenum)
   if (opt.parser & IPF_NO_HIT)
     return PARSE_NO_HIT;
 
-  if (opt.parser == (IPF_DATE|IPF_DATA|IPF_PROTO|IPF_SRC_IP|IPF_DST_IP|IPF_SRC_PORT|IPF_DST_PORT)) {
+  if (opt.parser == (IPF_DATE | IPF_DATA | IPF_PROTO | IPF_SRC_IP | IPF_DST_IP | IPF_SRC_PORT | IPF_DST_PORT)) {
     return PARSE_OK;
   } else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "ipfilter parse error in line %d, ignoring.\n", linenum);
-    if(opt.verbose == 2)
+    if (opt.verbose == 2)
       fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }

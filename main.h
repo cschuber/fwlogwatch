@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: main.h,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: main.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "1.1 2006/04/17"
+#define VERSION "1.2 2010/10/10"
 #define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
@@ -29,14 +29,13 @@
 #define BUFSIZE 1024
 #define BUFSIZE_S "1024"
 #define FILESIZE 256
-#define TIMESIZE 40
+#define TIMESIZE 64
 #define HOSTLEN 256
 #define SHOSTLEN 32
 #define SHOSTLEN_S "32"
 #define IPLEN 16
 #define IP6LEN 40
 #define EMAILSIZE 80
-#define REPORTLEN 52
 #define COLORSIZE 8
 #define MAXSORTSIZE 24
 #define USERSIZE 16
@@ -75,15 +74,14 @@ enum {
 };
 
 enum {
-  IGNORE_HASH,
-  COMMENT_HASH
+  HASH_IGNORE,
+  HASH_ENDS_INPUT
 };
 
 /* Modes */
 
 enum {
   LOG_SUMMARY,
-  INTERACTIVE_REPORT,
   REALTIME_RESPONSE,
   SHOW_LOG_TIMES
 };
@@ -95,7 +93,6 @@ enum {
 #define PARSER_CISCO_IOS 4
 #define PARSER_IPFILTER 8
 #define PARSER_CISCO_PIX 16
-#define PARSER_WIN_XP 32
 #define PARSER_SNORT 64
 #define PARSER_NETSCREEN 128
 #define PARSER_LANCOM 256
@@ -145,6 +142,7 @@ enum {
 enum {
   NF_OPT_NOPREFIX,
   NF_OPT_PREFIX,
+  NF_OPT_PREFIX_KTIME,
   NF_OPT_SRC,
   NF_OPT_DST
 };
@@ -178,12 +176,24 @@ enum {
   CP_OPT_HOST,
   CP_OPT_TCP,
   CP_OPT_TCP_S,
+  CP_OPT_TCP_S2,
+  CP_OPT_TCP_N,
+  CP_OPT_TCP_N2,
   CP_OPT_UDP,
   CP_OPT_UDP_S,
+  CP_OPT_UDP_S2,
+  CP_OPT_UDP_N,
+  CP_OPT_UDP_N2,
+  CP_OPT_UDP_NOPORT,
   CP_OPT_ICMP,
   CP_OPT_ICMP_S,
+  CP_OPT_ICMP_S2,
+  CP_OPT_ICMP_N2,
   CP_OPT_DST,
   CP_OPT_DST_S,
+  CP_OPT_DST_S2,
+  CP_OPT_DST_N,
+  CP_OPT_DST_N2,
   CP_OPT_DST_I
 };
 
@@ -289,21 +299,7 @@ enum {
 
 #define SUMMARY_TITLE _("fwlogwatch summary")
 #define SORTORDER "cd"
-
-/* Interactive report mode */
-
-#define CERT "[Insert address of abuse contact or CERT here]"
-#define TEMPLATE CONF_DIR "/fwlogwatch.template"
-#define FILENAME "fwlogwatchXXXXXX"
-#define INSERTREPORT "# insert report here"
-#define P_CAT "/bin/cat"
 #define P_SENDMAIL "/usr/sbin/sendmail"
-
-enum {
-  OPT_NONE,
-  OPT_GENERATOR,
-  OPT_MODIFY
-};
 
 /* Realtime response mode */
 
@@ -319,8 +315,8 @@ enum {
 #endif
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
-#define DEFAULT_PASSWORD "2fi4nEVVz0IXo" /* fwlogwat[ch]
-					    DES only supports 8 characters */
+#define DEFAULT_PASSWORD "2fi4nEVVz0IXo"	/* fwlogwat[ch]
+						   DES only supports 8 characters */
 
 #define OPT_LOG 1
 #define OPT_NOTIFY 2
@@ -370,7 +366,7 @@ struct log_line {
   char branchname[SHORTLEN];
   char interface[SHORTLEN];
   int protocol;
-  int datalen;
+  unsigned long int datalen;
   struct in_addr shost;
   int sport;
   struct in_addr dhost;
@@ -388,7 +384,7 @@ struct conn_data {
   char *branchname;
   char *interface;
   int protocol;
-  int datalen;
+  unsigned long int datalen;
   struct in_addr shost;
   int sport;
   struct in_addr dhost;
@@ -415,27 +411,6 @@ struct whois_entry {
   char *ip_descr;
   char *as_descr;
   struct whois_entry *next;
-};
-
-struct report_data {
-  char sender[EMAILSIZE];
-  char recipient[EMAILSIZE];
-  char cc[EMAILSIZE];
-  char subject[EMAILSIZE];
-  char shost[REPORTLEN];
-  char shostname[REPORTLEN];
-  char dhost[REPORTLEN];
-  char dhostname[REPORTLEN];
-  char count[REPORTLEN];
-  char t_start[REPORTLEN];
-  char t_end[REPORTLEN];
-  char timezone[REPORTLEN];
-  char duration[REPORTLEN];
-  char protocol[REPORTLEN];
-  char sport[REPORTLEN];
-  char dport[REPORTLEN];
-  char syn[REPORTLEN];
-  char tracking[REPORTLEN];
 };
 
 struct known_hosts {
@@ -541,7 +516,6 @@ struct options {
   char sender[EMAILSIZE];
   char recipient[EMAILSIZE];
   char cc[EMAILSIZE];
-  char templatefile[FILESIZE];
 
   unsigned char response;
   unsigned char ipchains_check;

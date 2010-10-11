@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: resolve.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: resolve.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ struct adns_entry {
 } *adnse_first = NULL;
 #endif
 
-char * resolve_protocol(int proto)
+char *resolve_protocol(int proto)
 {
   struct protoent *protoent;
 
@@ -49,7 +49,7 @@ char * resolve_protocol(int proto)
   }
 }
 
-char * resolve_service(int port, char *proto)
+char *resolve_service(int port, char *proto)
 {
   struct servent *servent;
   int p;
@@ -68,16 +68,16 @@ char * resolve_service(int port, char *proto)
 }
 
 #ifndef HAVE_ADNS
-char * resolve_hostname(struct in_addr ip)
+char *resolve_hostname(struct in_addr ip)
 {
   struct hostent *reverse, *forward;
   struct dns_cache *dns;
   char *pnt, fqdn[HOSTLEN];
 
   dns = dns_first;
-  while(dns != NULL) {
+  while (dns != NULL) {
     if (ip.s_addr == dns->ip.s_addr) {
-      if(opt.verbose) {
+      if (opt.verbose) {
 	fprintf(stderr, _("Resolving %s from cache\n"), inet_ntoa(ip));
       }
       return (dns->fqdn);
@@ -85,13 +85,13 @@ char * resolve_hostname(struct in_addr ip)
     dns = dns->next;
   }
 
-  if(opt.verbose)
+  if (opt.verbose)
     fprintf(stderr, _("Resolving %s\n"), inet_ntoa(ip));
 
-  reverse = gethostbyaddr((void *)&ip.s_addr, sizeof(struct in_addr), AF_INET);
+  reverse = gethostbyaddr((void *) &ip.s_addr, sizeof(struct in_addr), AF_INET);
 
-  if((reverse != NULL) && (reverse->h_name != NULL)) {
-    if ((unsigned int)reverse->h_length > sizeof(struct in_addr)) {
+  if ((reverse != NULL) && (reverse->h_name != NULL)) {
+    if ((unsigned int) reverse->h_length > sizeof(struct in_addr)) {
       fprintf(stderr, _("Wrong host name size\n"));
       reverse->h_length = sizeof(struct in_addr);
       reverse->h_name[reverse->h_length] = '\0';
@@ -99,7 +99,7 @@ char * resolve_hostname(struct in_addr ip)
 
     pnt = reverse->h_name;
     while (*pnt != '\0') {
-      if (isalnum((int)*pnt) || *pnt == '.' || *pnt == '-') {
+      if (isalnum((int) *pnt) || *pnt == '.' || *pnt == '-') {
 	pnt++;
 	continue;
       } else {
@@ -108,15 +108,15 @@ char * resolve_hostname(struct in_addr ip)
       }
     }
 
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, _("Resolving %s\n"), reverse->h_name);
 
     forward = gethostbyname(reverse->h_name);
     if ((forward != NULL) && (forward->h_addr_list[0]) != NULL) {
-      if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]), IPLEN) == 0) {
+      if (strncmp(inet_ntoa(ip), inet_ntoa(*(struct in_addr *) forward->h_addr_list[0]), IPLEN) == 0) {
 	xstrncpy(fqdn, reverse->h_name, HOSTLEN);
       } else {
-	snprintf(fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *)forward->h_addr_list[0]));
+	snprintf(fqdn, HOSTLEN, _("%s [forward lookup: %s]"), reverse->h_name, inet_ntoa(*(struct in_addr *) forward->h_addr_list[0]));
       }
     } else {
       snprintf(fqdn, HOSTLEN, _("%s [forward lookup failed]"), reverse->h_name);
@@ -127,8 +127,8 @@ char * resolve_hostname(struct in_addr ip)
 
   dns = xmalloc(sizeof(struct dns_cache));
   dns->ip.s_addr = ip.s_addr;
-  dns->fqdn = xmalloc(strlen(fqdn)+1);
-  xstrncpy(dns->fqdn, fqdn, strlen(fqdn)+1);
+  dns->fqdn = xmalloc(strlen(fqdn) + 1);
+  xstrncpy(dns->fqdn, fqdn, strlen(fqdn) + 1);
   dns->next = dns_first;
   dns_first = dns;
 
@@ -137,7 +137,7 @@ char * resolve_hostname(struct in_addr ip)
 
 #else
 
-char * resolve_hostname(struct in_addr ip)
+char *resolve_hostname(struct in_addr ip)
 {
   struct dns_cache *dns;
   struct adns_entry *adnse;
@@ -145,9 +145,9 @@ char * resolve_hostname(struct in_addr ip)
   char fqdn[HOSTLEN];
 
   dns = dns_first;
-  while(dns != NULL) {
+  while (dns != NULL) {
     if (ip.s_addr == dns->ip.s_addr) {
-      if(opt.verbose)
+      if (opt.verbose)
 	fprintf(stderr, _("Resolving %s from cache\n"), inet_ntoa(ip));
       return (dns->fqdn);
     }
@@ -155,17 +155,17 @@ char * resolve_hostname(struct in_addr ip)
   }
 
   adnse = adnse_first;
-  while(adnse != NULL) {
-    if(adnse->ip.s_addr == ip.s_addr) {
+  while (adnse != NULL) {
+    if (adnse->ip.s_addr == ip.s_addr) {
       errno = adns_wait(adns, &adnse->query, &answer, NULL);
-      if(!errno) {
-	if(opt.verbose)
+      if (!errno) {
+	if (opt.verbose)
 	  fprintf(stderr, _("Resolving %s from adns\n"), inet_ntoa(ip));
-	if(answer->status == adns_s_ok) {
+	if (answer->status == adns_s_ok) {
 	  xstrncpy(fqdn, *answer->rrs.str, HOSTLEN);
-	} else if(answer->status == adns_s_inconsistent) {
+	} else if (answer->status == adns_s_inconsistent) {
 	  xstrncpy(fqdn, _("[inconsistent forward lookup]"), HOSTLEN);
-	} else if(answer->status == adns_s_nxdomain) {
+	} else if (answer->status == adns_s_nxdomain) {
 	  xstrncpy(fqdn, "-", HOSTLEN);
 	} else {
 	  snprintf(fqdn, HOSTLEN, _("[adns status %d]"), answer->status);
@@ -173,8 +173,8 @@ char * resolve_hostname(struct in_addr ip)
 	free(answer);
 	dns = xmalloc(sizeof(struct dns_cache));
 	dns->ip.s_addr = ip.s_addr;
-	dns->fqdn = xmalloc(strlen(fqdn)+1);
-	xstrncpy(dns->fqdn, fqdn, strlen(fqdn)+1);
+	dns->fqdn = xmalloc(strlen(fqdn) + 1);
+	xstrncpy(dns->fqdn, fqdn, strlen(fqdn) + 1);
 	dns->next = dns_first;
 	dns_first = dns;
 	return (dns->fqdn);
@@ -199,11 +199,11 @@ void adns_list_add(struct in_addr ip)
   bzero(&sa, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_addr = adnse->ip;
-  adns_submit_reverse(adns, (struct sockaddr *)&sa, adns_r_ptr, 0, NULL, &adnse->query);
+  adns_submit_reverse(adns, (struct sockaddr *) &sa, adns_r_ptr, 0, NULL, &adnse->query);
   adnse->next = adnse_first;
   adnse_first = adnse;
 
-  if(opt.verbose == 2)
+  if (opt.verbose == 2)
     fprintf(stderr, _("Submitted %s to adns\n"), inet_ntoa(adnse->ip));
 }
 
@@ -214,51 +214,51 @@ void adns_check_entry(struct in_addr ip)
   unsigned char found = 0;
 
   dns = dns_first;
-  while(dns != NULL) {
+  while (dns != NULL) {
     if (ip.s_addr == dns->ip.s_addr) {
       found++;
       break;
     }
     dns = dns->next;
   }
-  if(!found) {
+  if (!found) {
     adnse = adnse_first;
-    while(adnse != NULL) {
-      if(ip.s_addr == adnse->ip.s_addr) {
+    while (adnse != NULL) {
+      if (ip.s_addr == adnse->ip.s_addr) {
 	found++;
 	break;
       }
       adnse = adnse->next;
     }
   }
-  if(!found)
+  if (!found)
     adns_list_add(ip);
 }
 
 void adns_preresolve(unsigned char mode)
 {
-  if(mode == RES_ADNS_PC) {
+  if (mode == RES_ADNS_PC) {
     int max = 0;
     struct conn_data *this;
     this = first;
-    while((this != NULL) && (opt.max == 0 || max < opt.max)) {
-      if(this->count >= opt.least) {
-        if(opt.src_ip)
+    while ((this != NULL) && (opt.max == 0 || max < opt.max)) {
+      if (this->count >= opt.least) {
+	if (opt.src_ip)
 	  adns_check_entry(this->shost);
-        if(opt.dst_ip)
+	if (opt.dst_ip)
 	  adns_check_entry(this->dhost);
       }
       if (opt.max != 0)
-        max++;
+	max++;
       this = this->next;
     }
-  } else if(mode == RES_ADNS_HS) {
+  } else if (mode == RES_ADNS_HS) {
     struct known_hosts *this_host;
     this_host = first_host;
-    while(this_host != NULL) {
-      if(opt.src_ip)
+    while (this_host != NULL) {
+      if (opt.src_ip)
 	adns_check_entry(this_host->shost);
-      if(opt.dst_ip)
+      if (opt.dst_ip)
 	adns_check_entry(this_host->dhost);
       this_host = this_host->next;
     }

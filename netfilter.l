@@ -1,12 +1,12 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: netfilter.l,v 1.17 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.18 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
@@ -43,17 +43,19 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start_hn(nftext+5);
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}	nf_parse_start(nftext+5);
 {DIGIT}{4}:{DIGIT}{2}:{DIGIT}{2}-{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_isostart_hn(nftext);
-" kernel: IN="{STRING}?			nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
-" kernel: "{PREFIX}{STRING}?		nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
-" [kernel] IN="{STRING}?		nf_parse_prefix(nftext+13, NF_OPT_NOPREFIX);
-" [kernel] "{PREFIX}{STRING}?		nf_parse_prefix(nftext+10, NF_OPT_PREFIX);
-" klogd: IN="{STRING}?			nf_parse_prefix(nftext+11, NF_OPT_NOPREFIX);
-" klogd: "{PREFIX}{STRING}?		nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
-" "{PREFIX}{STRING}?			nf_parse_prefix(nftext+1, NF_OPT_PREFIX);
-"IN="{STRING}?				nf_parse_prefix(nftext+3, NF_OPT_NOPREFIX);
+" kernel: ["{NUMBER}"."{DIGIT}{6}"]"{PREFIX}{STRING}?	nf_parse_prefix(nftext+18, NF_OPT_PREFIX_KTIME);
+" kernel: IN="{STRING}?					nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
+" kernel: "{PREFIX}{STRING}?				nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
+" [kernel] IN="{STRING}?				nf_parse_prefix(nftext+13, NF_OPT_NOPREFIX);
+" [kernel] "{PREFIX}{STRING}?				nf_parse_prefix(nftext+10, NF_OPT_PREFIX);
+" klogd: IN="{STRING}?					nf_parse_prefix(nftext+11, NF_OPT_NOPREFIX);
+" klogd: "{PREFIX}{STRING}?				nf_parse_prefix(nftext+8, NF_OPT_PREFIX);
+" "{PREFIX}{STRING}?					nf_parse_prefix(nftext+1, NF_OPT_PREFIX);
+"IN="{STRING}?						nf_parse_prefix(nftext+3, NF_OPT_NOPREFIX);
 "OUT="{STRING}?		/* ignore */
 "PHYSIN="{STRING}?	/* ignore */
 "PHYSOUT="{STRING}?	/* ignore */
+"MAC="(({HEXDIGIT}{HEXDIGIT}:){21}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
 "MAC="(({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
 "SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);
 "DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_DST);
@@ -71,6 +73,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 "TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.parser=opt.parser|NF_TYPE; }
 "CODE="{NUMBER}		{ opt.line->dport = atoi(nftext+5); opt.parser=opt.parser|NF_CODE; }
 "SEQ="{NUMBER}		/* ignore */
+"MARK="{HEXNUM}		/* ignore */
 "ACK="{NUMBER}		/* ignore */
 "SPT="{PORT}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
 "DPT="{PORT}		{ opt.line->dport = atoi(nftext+4); opt.parser=opt.parser|NF_DPT; }
@@ -92,6 +95,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 "HOPLIMIT="{NUMBER}	/* ignore */
 "FLOWLBL="{NUMBER}	/* ignore */
 "[".+"]"		/* ignore */
+"MTU="{NUMBER}		/* ignore */
 [ ]+			/* ignore whitespace */
 [\n]			return 0;
 {STRING}		if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", nftext);
@@ -102,29 +106,24 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 void nf_parse_start_hn(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input,
-		  "%3s %2d %2d:%2d:%2d %32s",
-		  smonth, &day, &hour, &minute, &second,
-		  opt.line->hostname);
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second, opt.line->hostname);
   if (retval != 6) {
     return;
   }
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|NF_DATE;
+  opt.parser = opt.parser | NF_DATE;
 }
 
 void nf_parse_start(char *input)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
-  retval = sscanf(input,
-		  "%3s %2d %2d:%2d:%2d",
-		  smonth, &day, &hour, &minute, &second);
+  retval = sscanf(input, "%3s %2d %2d:%2d:%2d", smonth, &day, &hour, &minute, &second);
   if (retval != 5) {
     return;
   }
@@ -132,7 +131,7 @@ void nf_parse_start(char *input)
   build_time(smonth, day, hour, minute, second);
   xstrncpy(opt.line->hostname, "-", SHORTLEN);
 
-  opt.parser=opt.parser|NF_DATE;
+  opt.parser = opt.parser | NF_DATE;
 }
 
 void nf_parse_isostart_hn(char *input)
@@ -140,17 +139,14 @@ void nf_parse_isostart_hn(char *input)
   int retval, year, month, day, hour, minute, second;
   struct tm *t;
 
-  retval = sscanf(input,
-		  "%4d:%2d:%2d-%2d:%2d:%2d %32s",
-		  &year, &month, &day, &hour, &minute, &second,
-		  opt.line->hostname);
+  retval = sscanf(input, "%4d:%2d:%2d-%2d:%2d:%2d %32s", &year, &month, &day, &hour, &minute, &second, opt.line->hostname);
   if (retval != 7) {
     return;
   }
 
   t = xmalloc(sizeof(struct tm));
-  t->tm_year = year-1900;
-  t->tm_mon = month-1;
+  t->tm_year = year - 1900;
+  t->tm_mon = month - 1;
   t->tm_mday = day;
   t->tm_hour = hour;
   t->tm_min = minute;
@@ -159,22 +155,29 @@ void nf_parse_isostart_hn(char *input)
   opt.line->time = mktime(t);
   free(t);
 
-  opt.parser=opt.parser|NF_DATE;
+  opt.parser = opt.parser | NF_DATE;
 }
 
 void nf_parse_prefix(char *input, unsigned char mode)
 {
-  size_t i=0;
+  size_t i = 0;
+  char *pnt;
 
-  if(mode == NF_OPT_PREFIX) {
-    i=strlen(input);
+  if (mode == NF_OPT_PREFIX_KTIME) {
+    pnt = strchr(input, ']');
+    pnt += 2;
+  } else {
+    pnt = input;
+  }
+  if (mode == NF_OPT_PREFIX || mode == NF_OPT_PREFIX_KTIME) {
+    i = strlen(pnt);
     while (i > 0) {
-      if(input[i] == '=') {
-	if (input[i-1] == 'N') {
-	  if (input[i-2] == 'I') {
-	    input[i-2] = '\0';
-	    xstrncpy(opt.line->chainlabel, input, SHORTLEN);
-	    xstrncpy(opt.line->interface, input+i+1, SHORTLEN);
+      if (pnt[i] == '=') {
+	if (pnt[i - 1] == 'N') {
+	  if (pnt[i - 2] == 'I') {
+	    pnt[i - 2] = '\0';
+	    xstrncpy(opt.line->chainlabel, pnt, SHORTLEN);
+	    xstrncpy(opt.line->interface, pnt + i + 1, SHORTLEN);
 	    break;
 	  }
 	}
@@ -183,38 +186,46 @@ void nf_parse_prefix(char *input, unsigned char mode)
     }
   } else {
     xstrncpy(opt.line->chainlabel, "-", SHORTLEN);
-    xstrncpy(opt.line->interface, input, SHORTLEN);
+    xstrncpy(opt.line->interface, pnt, SHORTLEN);
   }
 
-  opt.parser=opt.parser|NF_IN;
+  opt.parser = opt.parser | NF_IN;
 }
 
 void nf_parse_ip(char *input, unsigned char mode)
 {
   if (mode == NF_OPT_SRC) {
-    if(convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|NF_SRC;
+    if (convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | NF_SRC;
   } else {
-    if(convert_ip(input, &opt.line->dhost) == IN_ADDR_ERROR) return;
-    opt.parser=opt.parser|NF_DST;
+    if (convert_ip(input, &opt.line->dhost) == IN_ADDR_ERROR)
+      return;
+    opt.parser = opt.parser | NF_DST;
   }
 }
 
 void nf_parse_proto(char *input)
 {
-  if(isdigit((int)input[0])) {
+  if (isdigit((int) input[0])) {
     opt.line->protocol = atoi(input);
   } else {
-    if(strncmp(input, "TCP", 3) == 0) opt.line->protocol = 6;
-    else if(strncmp(input, "UDP", 3) == 0) opt.line->protocol = 17;
-    else if(strncmp(input, "ICMP", 4) == 0) opt.line->protocol = 1;
-    else if(strncmp(input, "ESP", 3) == 0) opt.line->protocol = 50;
-    else if(strncmp(input, "AH", 2) == 0) opt.line->protocol = 51;
-    else if(strncmp(input, "ICMPv6", 6) == 0) opt.line->protocol = 58;
+    if (strncmp(input, "TCP", 3) == 0)
+      opt.line->protocol = 6;
+    else if (strncmp(input, "UDP", 3) == 0)
+      opt.line->protocol = 17;
+    else if (strncmp(input, "ICMP", 4) == 0)
+      opt.line->protocol = 1;
+    else if (strncmp(input, "ESP", 3) == 0)
+      opt.line->protocol = 50;
+    else if (strncmp(input, "AH", 2) == 0)
+      opt.line->protocol = 51;
+    else if (strncmp(input, "ICMPv6", 6) == 0)
+      opt.line->protocol = 58;
   }
 
   if (opt.line->protocol != 0)
-    opt.parser=opt.parser|NF_PROTO;
+    opt.parser = opt.parser | NF_PROTO;
 }
 
 unsigned char flex_netfilter(char *input, int linenum)
@@ -228,18 +239,19 @@ unsigned char flex_netfilter(char *input, int linenum)
   xstrncpy(opt.line->branchname, "-", SHORTLEN);
   opt.line->count = 1;
 
-  if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_SPT|NF_DPT))) {
+  if (((opt.line->protocol == 6) || (opt.line->protocol == 17)) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST | NF_SPT | NF_DPT))) {
     return PARSE_OK;
   }
-  if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST|NF_TYPE|NF_CODE))) {
+  if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST | NF_TYPE | NF_CODE))) {
     return PARSE_OK;
   }
-  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 41) || (opt.line->protocol == 47) || (opt.line->protocol == 50) || (opt.line->protocol == 54)) && (opt.parser == (NF_DATE|NF_PROTO|NF_IN|NF_SRC|NF_DST))) {
+  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 41) || (opt.line->protocol == 46) || (opt.line->protocol == 47)
+       || (opt.line->protocol == 50) || (opt.line->protocol == 54) || (opt.line->protocol == 103)) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST))) {
     return PARSE_OK;
   }
-  if(opt.verbose)
+  if (opt.verbose)
     fprintf(stderr, "netfilter parse error in line %d, ignoring.\n", linenum);
-  if(opt.verbose == 2)
+  if (opt.verbose == 2)
     fprintf(stderr, "input was: \"%s\"\n", input);
   return PARSE_WRONG_FORMAT;
 }

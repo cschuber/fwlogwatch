@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: parser.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: parser.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +15,6 @@
 #include "ipfilter.h"
 #include "ipfw.h"
 #include "netfilter.h"
-#include "win_xp.h"
 #include "snort.h"
 #include "netscreen.h"
 #include "lancom.h"
@@ -31,14 +30,11 @@ unsigned char parse_line(char *input, int linenum)
   pnt = strstr(input, " last message repeated ");
   if (pnt != NULL) {
     if (opt.repeated == 1) {
-      char month[3], time[8], name[SHOSTLEN], rest[BUFSIZE];
-      int day;
-      retval = sscanf(input, "%3s %2d %8s %" SHOSTLEN_S "s %" BUFSIZE_S "s", month, &day, time, name, rest);
-      if (retval == 5) {
-	if(strncmp(opt.line->hostname, name, SHOSTLEN) == 0) {
-	  int repeated;
-	  repeated = atoi(pnt+23);
-	  opt.line->count = opt.orig_count * repeated;
+      char month[4], time[9], name[SHOSTLEN], rest[BUFSIZE];
+      unsigned int day;
+      if (sscanf(input, "%3s %u %8s %" SHOSTLEN_S "s %" BUFSIZE_S "s", month, &day, time, name, rest) == 5) {
+	if (strncmp(opt.line->hostname, name, SHOSTLEN) == 0) {
+	  opt.line->count = opt.orig_count * atoi(pnt + 23);
 	  build_list();
 	  if (opt.verbose == 2)
 	    fprintf(stderr, "r");
@@ -68,13 +64,11 @@ unsigned char parse_line(char *input, int linenum)
     retval = flex_ipfilter(input, linenum);
   } else if ((opt.format & PARSER_IPFW) && (strstr(input, " ipfw: "))) {
     retval = flex_ipfw(input, linenum);
-  } else if ((opt.format & PARSER_CISCO_PIX) && ((strstr(input, "%PIX-") || strstr(input, "%FWSM-")))) {
+  } else if ((opt.format & PARSER_CISCO_PIX) && (strstr(input, "%PIX-") || strstr(input, "%FWSM-") || strstr(input, "%ASA-"))) {
     /* For cisco log format see CCO */
     retval = flex_cisco_pix(input, linenum);
   } else if ((opt.format & PARSER_NETSCREEN) && (strstr(input, " NetScreen "))) {
     retval = flex_netscreen(input, linenum);
-  } else if (opt.format & PARSER_WIN_XP){
-    retval = win_xp(input, linenum);
   } else if ((opt.format & PARSER_LANCOM) && (strstr(input, " PACKET_ALERT: "))) {
     retval = lancom(input, linenum);
   } else if ((opt.format & PARSER_SNORT) && (strstr(input, " snort"))) {
@@ -89,9 +83,9 @@ unsigned char parse_line(char *input, int linenum)
     return PARSE_NO_HIT;
   }
 
-  if(opt.recent != 0) {
-    if((opt.now - opt.line->time) > opt.recent) {
-      if(opt.verbose == 2) {
+  if (opt.recent != 0) {
+    if ((opt.now - opt.line->time) > opt.recent) {
+      if (opt.verbose == 2) {
 	fprintf(stderr, "o");
       }
       return PARSE_TOO_OLD;
@@ -104,19 +98,19 @@ unsigned char parse_line(char *input, int linenum)
       unsigned char match = P_MATCH_NONE, include_rules_exist = 0;
 
       excluded_this = excluded_first;
-      while(excluded_this != NULL) {
-	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_HOST) != 0) {
-	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    if((opt.line->shost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
-	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+      while (excluded_this != NULL) {
+	if ((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_HOST) != 0) {
+	  if ((excluded_this->mode & PARSER_MODE_SRC) != 0) {
+	    if ((opt.line->shost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
+	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
 		match = P_MATCH_INC;
 	      }
 	    }
 	  } else {
-	    if((opt.line->dhost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
-	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	    if ((opt.line->dhost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
+	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
 		match = P_MATCH_INC;
@@ -124,18 +118,18 @@ unsigned char parse_line(char *input, int linenum)
 	    }
 	  }
 	}
-	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_PORT) != 0) {
-	  if((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    if((unsigned long int)opt.line->sport == excluded_this->value) {
-	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	if ((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_PORT) != 0) {
+	  if ((excluded_this->mode & PARSER_MODE_SRC) != 0) {
+	    if ((unsigned long int) opt.line->sport == excluded_this->value) {
+	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
 		match = P_MATCH_INC;
 	      }
 	    }
 	  } else {
-	    if((unsigned long int)opt.line->dport == excluded_this->value) {
-	      if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	    if ((unsigned long int) opt.line->dport == excluded_this->value) {
+	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
 		match = P_MATCH_INC;
@@ -143,18 +137,18 @@ unsigned char parse_line(char *input, int linenum)
 	    }
 	  }
 	}
-	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
-	  if(strcmp(opt.line->chainlabel, excluded_this->svalue) == 0) {
-	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	if ((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_CHAIN) != 0) {
+	  if (strcmp(opt.line->chainlabel, excluded_this->svalue) == 0) {
+	    if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
 	    } else {
 	      match = P_MATCH_INC;
 	    }
 	  }
 	}
-	if((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
-	  if(strcmp(opt.line->branchname, excluded_this->svalue) == 0) {
-	    if((excluded_this->mode & PARSER_MODE_NOT) != 0) {
+	if ((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_BRANCH) != 0) {
+	  if (strcmp(opt.line->branchname, excluded_this->svalue) == 0) {
+	    if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 	      match = P_MATCH_EXC;
 	    } else {
 	      match = P_MATCH_INC;
@@ -162,16 +156,16 @@ unsigned char parse_line(char *input, int linenum)
 	  }
 	}
 
-	if((include_rules_exist == 0) && (excluded_this->mode & PARSER_MODE_NOT) == 0)
+	if ((include_rules_exist == 0) && (excluded_this->mode & PARSER_MODE_NOT) == 0)
 	  include_rules_exist++;
 
 	excluded_this = excluded_this->next;
       }
 
-      if((match == P_MATCH_NONE) && (include_rules_exist))
+      if ((match == P_MATCH_NONE) && (include_rules_exist))
 	match = P_MATCH_EXC;
 
-      if(match == P_MATCH_EXC) {
+      if (match == P_MATCH_EXC) {
 	if (opt.verbose == 2)
 	  fprintf(stderr, "e");
 	return PARSE_EXCLUDED;
@@ -193,16 +187,16 @@ int parse_time(char *input)
 
   string = strdup(input);
   pnt = string;
-  while (isdigit((int)*pnt)) {
+  while (isdigit((int) *pnt)) {
     pnt++;
   }
   c = *pnt;
   if (c != '\0') {
     *pnt = '\0';
     seconds = atoi(string);
-    switch(c) {
+    switch (c) {
     case 'm':
-     seconds = seconds * 60;
+      seconds = seconds * 60;
       break;
     case 'h':
       seconds = seconds * 60 * 60;
@@ -255,9 +249,6 @@ void select_parsers()
 	break;
       case 'e':
 	opt.format = opt.format | PARSER_NETSCREEN;
-	break;
-      case 'w':
-	opt.format = opt.format | PARSER_WIN_XP;
 	break;
       case 'l':
 	opt.format = opt.format | PARSER_LANCOM;

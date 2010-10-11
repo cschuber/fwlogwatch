@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: lancom.c,v 1.6 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: lancom.c,v 1.7 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,15 +13,15 @@ extern struct options opt;
 
 unsigned char lancom(char *input, int linenum)
 {
-  char *sinputs=input, *sinpute;
+  char *sinputs = input, *sinpute;
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 
   init_line();
   xstrncpy(opt.line->interface, "-", SHORTLEN);
 
   /* Read time */
-  sinpute = sinputs+15;
+  sinpute = sinputs + 15;
   *sinpute = '\0';
   retval = sscanf(sinputs, "%3s %2d %2d:%2d:%2d", smonth, &day, &hour, &minute, &second);
   build_time(smonth, day, hour, minute, second);
@@ -51,8 +51,8 @@ unsigned char lancom(char *input, int linenum)
   sinputs = sinpute;
   sinpute = strchr(sinputs, ':');
   *sinpute = '\0';
-  if(convert_ip(sinputs, &opt.line->dhost) == IN_ADDR_ERROR) {
-    if(opt.verbose)
+  if (convert_ip(sinputs, &opt.line->dhost) == IN_ADDR_ERROR) {
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while reading dhost in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
@@ -63,7 +63,7 @@ unsigned char lancom(char *input, int linenum)
   sinpute = strchr(sinputs, ' ');
   retval = sscanf(sinputs, "%5d", &opt.line->dport);
   if (retval == 0) {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while reading dport in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
@@ -78,8 +78,8 @@ unsigned char lancom(char *input, int linenum)
   sinputs = sinpute;
   sinpute = strchr(sinputs, ':');
   *sinpute = '\0';
-  if(convert_ip(sinputs, &opt.line->shost) == IN_ADDR_ERROR) {
-    if(opt.verbose)
+  if (convert_ip(sinputs, &opt.line->shost) == IN_ADDR_ERROR) {
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while reading shost in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
@@ -91,7 +91,7 @@ unsigned char lancom(char *input, int linenum)
   *sinpute = '\0';
   retval = sscanf(sinputs, "%5d", &opt.line->sport);
   if (retval == 0) {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while reading sport in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
@@ -101,7 +101,7 @@ unsigned char lancom(char *input, int linenum)
   sinputs = sinpute;
   sinpute = strchr(sinputs, '(');
   if (sinpute == NULL) {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while looking for protocol in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }
@@ -109,10 +109,12 @@ unsigned char lancom(char *input, int linenum)
   sinputs = sinpute;
   sinpute = strchr(sinputs, ')');
   *sinpute = '\0';
-  if(strncmp(sinputs, "TCP", 3) == 0) opt.line->protocol = 6;
-  else if(strncmp(sinputs, "UDP", 3) == 0) opt.line->protocol = 17;
+  if (strncmp(sinputs, "TCP", 3) == 0)
+    opt.line->protocol = 6;
+  else if (strncmp(sinputs, "UDP", 3) == 0)
+    opt.line->protocol = 17;
   else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "lancom parse error while reading proto in line %d, ignoring.\n", linenum);
     return PARSE_WRONG_FORMAT;
   }

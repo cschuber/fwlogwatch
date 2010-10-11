@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: compare.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: compare.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,19 +24,19 @@ void add_entry()
 
   data->count = opt.line->count;
   data->start_time = opt.line->time;
-  if(opt.mode != REALTIME_RESPONSE) {
+  if (opt.mode != REALTIME_RESPONSE) {
     data->end_time = 0;
   } else {
     data->end_time = opt.line->time;
   }
-  data->hostname = xmalloc(strlen(opt.line->hostname)+1);
-  xstrncpy(data->hostname, opt.line->hostname, strlen(opt.line->hostname)+1);
-  data->chainlabel = xmalloc(strlen(opt.line->chainlabel)+1);
-  xstrncpy(data->chainlabel, opt.line->chainlabel, strlen(opt.line->chainlabel)+1);
-  data->branchname = xmalloc(strlen(opt.line->branchname)+1);
-  xstrncpy(data->branchname, opt.line->branchname, strlen(opt.line->branchname)+1);
-  data->interface = xmalloc(strlen(opt.line->interface)+1);
-  xstrncpy(data->interface, opt.line->interface, strlen(opt.line->interface)+1);
+  data->hostname = xmalloc(strlen(opt.line->hostname) + 1);
+  xstrncpy(data->hostname, opt.line->hostname, strlen(opt.line->hostname) + 1);
+  data->chainlabel = xmalloc(strlen(opt.line->chainlabel) + 1);
+  xstrncpy(data->chainlabel, opt.line->chainlabel, strlen(opt.line->chainlabel) + 1);
+  data->branchname = xmalloc(strlen(opt.line->branchname) + 1);
+  xstrncpy(data->branchname, opt.line->branchname, strlen(opt.line->branchname) + 1);
+  data->interface = xmalloc(strlen(opt.line->interface) + 1);
+  xstrncpy(data->interface, opt.line->interface, strlen(opt.line->interface) + 1);
   data->protocol = opt.line->protocol;
   data->datalen = opt.line->datalen;
   data->shost = opt.line->shost;
@@ -54,82 +54,104 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
 {
   unsigned char cond = 0;
 
-  switch(opt.sortfield) {
+  switch (opt.sortfield) {
   case SORT_COUNT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->count > op2->count) cond++;
+      if (op1->count > op2->count)
+	cond++;
     } else {
-      if (op1->count < op2->count) cond++;
+      if (op1->count < op2->count)
+	cond++;
     }
     break;
   case SORT_START_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->start_time > op2->start_time) cond++;
+      if (op1->start_time > op2->start_time)
+	cond++;
     } else {
-      if (op1->start_time < op2->start_time) cond++;
+      if (op1->start_time < op2->start_time)
+	cond++;
     }
     break;
   case SORT_END_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->end_time > op2->end_time) cond++;
+      if (op1->end_time > op2->end_time)
+	cond++;
     } else {
-      if (op1->end_time < op2->end_time) cond++;
+      if (op1->end_time < op2->end_time)
+	cond++;
     }
     break;
   case SORT_DELTA_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if ((op1->end_time - op1->start_time) > (op2->end_time - op2->start_time)) cond++;
+      if ((op1->end_time - op1->start_time) > (op2->end_time - op2->start_time))
+	cond++;
     } else {
-      if ((op1->end_time - op1->start_time) < (op2->end_time - op2->start_time)) cond++;
+      if ((op1->end_time - op1->start_time) < (op2->end_time - op2->start_time))
+	cond++;
     }
     break;
   case SORT_CHAINLABEL:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) > 0) cond++;
+      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) > 0)
+	cond++;
     } else {
-      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) < 0) cond++;
+      if (strncmp(op1->chainlabel, op2->chainlabel, SHORTLEN) < 0)
+	cond++;
     }
     break;
   case SORT_PROTOCOL:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->protocol > op2->protocol) cond++;
+      if (op1->protocol > op2->protocol)
+	cond++;
     } else {
-      if (op1->protocol < op2->protocol) cond++;
+      if (op1->protocol < op2->protocol)
+	cond++;
     }
     break;
   case SORT_DATALEN:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->datalen > op2->datalen) cond++;
+      if (op1->datalen > op2->datalen)
+	cond++;
     } else {
-      if (op1->datalen < op2->datalen) cond++;
+      if (op1->datalen < op2->datalen)
+	cond++;
     }
     break;
   case SORT_SOURCEHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr))
+	cond++;
     } else {
-      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr))
+	cond++;
     }
     break;
   case SORT_SOURCEPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->sport > op2->sport) cond++;
+      if (op1->sport > op2->sport)
+	cond++;
     } else {
-      if (op1->sport < op2->sport) cond++;
+      if (op1->sport < op2->sport)
+	cond++;
     }
     break;
   case SORT_DESTHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr))
+	cond++;
     } else {
-      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr))
+	cond++;
     }
     break;
   case SORT_DESTPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->dport > op2->dport) cond++;
+      if (op1->dport > op2->dport)
+	cond++;
     } else {
-      if (op1->dport < op2->dport) cond++;
+      if (op1->dport < op2->dport)
+	cond++;
     }
     break;
   default:
@@ -139,13 +161,14 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
   return cond;
 }
 
-struct conn_data *fwlw_pc_mergesort(struct conn_data *list) {
+struct conn_data *fwlw_pc_mergesort(struct conn_data *list)
+{
   struct conn_data *p, *q, *e, *tail;
   int size, merges, psize, qsize, i;
 
-  if(list != NULL) {
+  if (list != NULL) {
     size = 1;
-    while(1) {
+    while (1) {
       p = list;
       list = tail = NULL;
       merges = 0;
@@ -156,18 +179,27 @@ struct conn_data *fwlw_pc_mergesort(struct conn_data *list) {
 	for (i = 0; i < size; i++) {
 	  psize++;
 	  q = q->next;
-	  if (q == NULL) break;
+	  if (q == NULL)
+	    break;
 	}
 	qsize = size;
 	while (psize > 0 || ((qsize > 0) && (q != NULL))) {
 	  if (psize == 0) {
-	    e = q; q = q->next; qsize--;
+	    e = q;
+	    q = q->next;
+	    qsize--;
 	  } else if (qsize == 0 || (q == NULL)) {
-	    e = p; p = p->next; psize--;
-	  } else if (compare(p,q) <= 0) {
-	    e = p; p = p->next; psize--;
+	    e = p;
+	    p = p->next;
+	    psize--;
+	  } else if (compare(p, q) <= 0) {
+	    e = p;
+	    p = p->next;
+	    psize--;
 	  } else {
-	    e = q; q = q->next; qsize--;
+	    e = q;
+	    q = q->next;
+	    qsize--;
 	  }
 	  if (tail != NULL) {
 	    tail->next = e;
@@ -253,10 +285,10 @@ void sort_data(unsigned char mode)
 
     i++;
     if (error == 0) {
-      if(mode == SORT_PC) {
-        first = fwlw_pc_mergesort(first);
+      if (mode == SORT_PC) {
+	first = fwlw_pc_mergesort(first);
       } else {
-        first_host = fwlw_hs_mergesort(first_host);
+	first_host = fwlw_hs_mergesort(first_host);
       }
       if (opt.verbose == 2)
 	fprintf(stderr, ".");
@@ -279,7 +311,7 @@ void build_list()
     }
   }
 
-  if(opt.chains == 0) {
+  if (opt.chains == 0) {
     if (opt.chainlabel[0] != '\0') {
       if (strncmp(opt.chainlabel, opt.line->chainlabel, SHORTLEN) != 0) {
 	opt.chains = 1;
@@ -289,7 +321,7 @@ void build_list()
     }
   }
 
-  if(opt.branches == 0) {
+  if (opt.branches == 0) {
     if (opt.branchname[0] != '\0') {
       if (strncmp(opt.branchname, opt.line->branchname, SHORTLEN) != 0) {
 	opt.branches = 1;
@@ -311,22 +343,42 @@ void build_list()
 
   this = first;
   while (this != NULL) {
-    if ((opt.dst_ip) && (this->dhost.s_addr != opt.line->dhost.s_addr)) {goto no_match;}
-    if ((opt.src_ip) && (this->shost.s_addr != opt.line->shost.s_addr)) {goto no_match;}
-    if ((opt.dst_port) && (this->dport != opt.line->dport)) {goto no_match;}
-    if ((opt.src_port) && (this->sport != opt.line->sport)) {goto no_match;}
-    if ((opt.proto) && (this->protocol != opt.line->protocol)) {goto no_match;}
-    if ((opt.opts) && (this->flags != opt.line->flags)) {goto no_match;}
-    if (strcmp(this->interface, opt.line->interface) != 0) {goto no_match;}
-    if (strcmp(this->branchname, opt.line->branchname) != 0) {goto no_match;}
-    if (strcmp(this->chainlabel, opt.line->chainlabel) != 0) {goto no_match;}
-    if (strcmp(this->hostname, opt.line->hostname) != 0) {goto no_match;}
+    if ((opt.dst_ip) && (this->dhost.s_addr != opt.line->dhost.s_addr)) {
+      goto no_match;
+    }
+    if ((opt.src_ip) && (this->shost.s_addr != opt.line->shost.s_addr)) {
+      goto no_match;
+    }
+    if ((opt.dst_port) && (this->dport != opt.line->dport)) {
+      goto no_match;
+    }
+    if ((opt.src_port) && (this->sport != opt.line->sport)) {
+      goto no_match;
+    }
+    if ((opt.proto) && (this->protocol != opt.line->protocol)) {
+      goto no_match;
+    }
+    if ((opt.opts) && (this->flags != opt.line->flags)) {
+      goto no_match;
+    }
+    if (strcmp(this->interface, opt.line->interface) != 0) {
+      goto no_match;
+    }
+    if (strcmp(this->branchname, opt.line->branchname) != 0) {
+      goto no_match;
+    }
+    if (strcmp(this->chainlabel, opt.line->chainlabel) != 0) {
+      goto no_match;
+    }
+    if (strcmp(this->hostname, opt.line->hostname) != 0) {
+      goto no_match;
+    }
 
     this->datalen = this->datalen + opt.line->datalen;
     if (opt.line->time >= this->end_time) {
       this->end_time = opt.line->time;
     } else {
-      if(opt.verbose) {
+      if (opt.verbose) {
 	strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&this->end_time));
 	fprintf(stderr, _("Timewarp in log file (%s"), stime);
 	strftime(stime, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&opt.line->time));
@@ -337,7 +389,7 @@ void build_list()
     this->count += opt.line->count;
     return;
 
-  no_match: this = this->next;
+  no_match:this = this->next;
   }
 
   add_entry();
@@ -356,14 +408,14 @@ int list_stats()
   return count;
 }
 
-void show_list(FILE *fd)
+void show_list(FILE * fd)
 {
   struct conn_data *this;
   int max = 0;
 
   this = first;
-  while ((this != NULL) && (opt.max == 0 || max < opt.max || opt.mode == INTERACTIVE_REPORT)) {
-    if(this->count >= opt.least && (opt.mode != INTERACTIVE_REPORT || this->count > opt.threshold)) {
+  while ((this != NULL) && (opt.max == 0 || max < opt.max)) {
+    if (this->count >= opt.least && this->count > opt.threshold) {
       if (opt.html) {
 	output_html_entry(this, fd);
 	if (opt.html == 1) {

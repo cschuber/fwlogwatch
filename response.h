@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: response.h,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: response.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #ifndef _RESPONSE_H
 #define _RESPONSE_H
 
-#define IP_FW_F_PRN     0x0001 /* from <linux/ip_fw.h>,
-				  gcc segfaults if included */
+#define IP_FW_F_PRN     0x0001	/* from <linux/ip_fw.h>,
+				   gcc segfaults if included */
 
 void check_for_ipchains(void);
 void check_script_perms(char *name);

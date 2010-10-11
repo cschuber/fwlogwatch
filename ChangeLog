@@ -1,4 +1,10 @@
-$Id: ChangeLog,v 1.28 2010/10/11 12:17:44 bwess Exp $
+$Id: ChangeLog,v 1.29 2010/10/11 12:28:33 bwess Exp $
+
+Version 1.2 2010-10-10
+- Extended netfilter and Cisco PIX/ASA parsers
+- Removed interactive reporting mode
+- Removed Windows XP firewall log parser
+- Large amounts of fixes
 
 Version 1.1 2006-04-17
 - Several parser modifications triggered by log submissions

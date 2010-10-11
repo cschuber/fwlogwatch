@@ -1,45 +1,39 @@
-# Copyright (C) 2000-2006 Boris Wesslowski
-# $Id: fwlogwatch.spec,v 1.30 2010/10/11 12:17:44 bwess Exp $
+# Copyright (C) 2000-2010 Boris Wesslowski
+# $Id: fwlogwatch.spec,v 1.31 2010/10/11 12:28:33 bwess Exp $
 
 Name: fwlogwatch
-Version: 1.1
+Version: 1.2
 Release: 1
-Group: Applications/Utilities
-Packager: Boris Wesslowski <bw@inside-security.de>
-Vendor: Inside Security GmbH
+Group: Productivity/Networking/Security
+Vendor: Boris Wesslowski
 URL: http://fwlogwatch.inside-security.de/
 License: GPL
 Summary: Firewall log analyzer, report generator and realtime response agent
 Source: %{name}-%{version}.tar.gz
-Patch: %{name}-%{version}-paths.patch
 BuildRequires(build): flex
 BuildRoot: %_tmppath/%{name}-%{version}-buildroot
 
 %description
 fwlogwatch produces Linux ipchains, Linux netfilter/iptables,
-Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX, NetScreen,
-Windows XP firewall, Elsa Lancom router and Snort IDS log summary reports
-in plain text and HTML form and has a lot of options to analyze and display
-relevant patterns. It can produce customizable incident reports and send
-them to abuse contacts at offending sites or CERTs. Finally, it can also
-run as daemon (with web interface) doing realtime log monitoring and
+Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX/ASA, NetScreen, Elsa
+Lancom router and Snort IDS log summary reports in plain text and HTML form
+and has a lot of options to analyze and display relevant patterns. It also
+can run as daemon (with web interface) doing realtime log monitoring and
 reporting anomalies or starting attack countermeasures.
 
 %prep
 %setup
-%patch -p1
 
 %build
 %__make
 
 %install
-[ -n "${RPM_BUILD_ROOT}" ] && %__rm -rf "${RPM_BUILD_ROOT}"
 %__install -d "${RPM_BUILD_ROOT}%{_sbindir}"
 %__install -d "${RPM_BUILD_ROOT}%{_sysconfdir}/rc.d/init.d"
 %__install -d "${RPM_BUILD_ROOT}%{_mandir}/man8"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/de/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/ja/LC_MESSAGES"
-%__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/pt_BR/LC_MESSAGES"
+%__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/pt/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/sv/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/zh_CN/LC_MESSAGES"
 %__install -d "${RPM_BUILD_ROOT}%{_datadir}/locale/zh_TW/LC_MESSAGES"
@@ -52,13 +46,18 @@ reporting anomalies or starting attack countermeasures.
 [ -n "${RPM_BUILD_ROOT}" ] && %__rm -rf "${RPM_BUILD_ROOT}"
 ( cd "${RPM_BUILD_DIR}" && %__rm -rf "%{name}-%{version}" )
 
+%preun
+%stop_on_removal
+
+%postun
+%insserv_cleanup
+
 %files
 %defattr(-,root,root)
 %doc AUTHORS COPYING CREDITS ChangeLog README
 %doc contrib/fwlogsummary.cgi contrib/fwlogsummary_small.cgi
 %doc contrib/fwlogwatch.php
 %config(noreplace) %{_sysconfdir}/fwlogwatch.config
-%config(noreplace) %{_sysconfdir}/fwlogwatch.template
 %config(noreplace) %{_sysconfdir}/rc.d/init.d/fwlogwatch
 %config(noreplace) %{_sbindir}/fwlw_notify
 %config(noreplace) %{_sbindir}/fwlw_respond
@@ -66,7 +65,7 @@ reporting anomalies or starting attack countermeasures.
 %{_mandir}/man8/fwlogwatch.8.gz
 %lang(de) %{_datadir}/locale/de/LC_MESSAGES/fwlogwatch.mo
 %lang(ja) %{_datadir}/locale/ja/LC_MESSAGES/fwlogwatch.mo
-%lang(pt_BR) %{_datadir}/locale/pt_BR/LC_MESSAGES/fwlogwatch.mo
+%lang(pt) %{_datadir}/locale/pt/LC_MESSAGES/fwlogwatch.mo
 %lang(sv) %{_datadir}/locale/sv/LC_MESSAGES/fwlogwatch.mo
 %lang(zh_CN) %{_datadir}/locale/zh_CN/LC_MESSAGES/fwlogwatch.mo
 %lang(zh_TW) %{_datadir}/locale/zh_TW/LC_MESSAGES/fwlogwatch.mo

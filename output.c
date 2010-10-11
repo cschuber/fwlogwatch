@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: output.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: output.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -30,33 +30,57 @@ void output_timediff(time_t start, time_t end, char *td)
     return;
   }
 
-  part = diff / 86400; /* days */
+  part = diff / 86400;		/* days */
   snprintf(td, TIMESIZE, "%02d:", part);
   diff = diff % 86400;
 
-  part = diff / 3600; /* hours */
+  part = diff / 3600;		/* hours */
   snprintf(tmp, 4, "%02d:", part);
   strncat(td, tmp, 4);
   diff = diff % 3600;
 
-  part = diff / 60; /* minutes */
+  part = diff / 60;		/* minutes */
   snprintf(tmp, 4, "%02d:", part);
   strncat(td, tmp, 4);
 
-  part = diff % 60; /* seconds */
+  part = diff % 60;		/* seconds */
   snprintf(tmp, 3, "%02d", part);
   strncat(td, tmp, 3);
 }
 
 void output_tcp_opts(struct conn_data *input, char *buf)
 {
-  if ((input->flags & (TCP_ACK|TCP_FIN|TCP_RST|TCP_PSH|TCP_URG)) != 0) {
-    if (input->flags & TCP_SYN) { strcpy(buf, "s"); } else { strcpy (buf, "-"); }
-    if (input->flags & TCP_ACK) { strcat(buf, "a"); } else { strcat (buf, "-"); }
-    if (input->flags & TCP_FIN) { strcat(buf, "f"); } else { strcat (buf, "-"); }
-    if (input->flags & TCP_RST) { strcat(buf, "r"); } else { strcat (buf, "-"); }
-    if (input->flags & TCP_PSH) { strcat(buf, "p"); } else { strcat (buf, "-"); }
-    if (input->flags & TCP_URG) { strcat(buf, "u"); } else { strcat (buf, "-"); }
+  if ((input->flags & (TCP_ACK | TCP_FIN | TCP_RST | TCP_PSH | TCP_URG)) != 0) {
+    if (input->flags & TCP_SYN) {
+      strcpy(buf, "s");
+    } else {
+      strcpy(buf, "-");
+    }
+    if (input->flags & TCP_ACK) {
+      strcat(buf, "a");
+    } else {
+      strcat(buf, "-");
+    }
+    if (input->flags & TCP_FIN) {
+      strcat(buf, "f");
+    } else {
+      strcat(buf, "-");
+    }
+    if (input->flags & TCP_RST) {
+      strcat(buf, "r");
+    } else {
+      strcat(buf, "-");
+    }
+    if (input->flags & TCP_PSH) {
+      strcat(buf, "p");
+    } else {
+      strcat(buf, "-");
+    }
+    if (input->flags & TCP_URG) {
+      strcat(buf, "u");
+    } else {
+      strcat(buf, "-");
+    }
   } else {
     if (input->flags & TCP_SYN) {
       strcpy(buf, "SYN");
@@ -66,7 +90,7 @@ void output_tcp_opts(struct conn_data *input, char *buf)
   }
 }
 
-void output_html_entry(struct conn_data *input, FILE *fd)
+void output_html_entry(struct conn_data *input, FILE * fd)
 {
   char *proto = NULL, time[TIMESIZE], buf[HOSTLEN];
 
@@ -78,14 +102,14 @@ void output_html_entry(struct conn_data *input, FILE *fd)
 
   fprintf(fd, "%d", input->count);
 
-  if(opt.stimes) {
+  if (opt.stimes) {
     strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->start_time));
     fprintf(fd, "</td><td>%s", time);
   }
 
-  if(opt.etimes) {
+  if (opt.etimes) {
     fprintf(fd, "</td><td>");
-    if(input->end_time != 0) {
+    if (input->end_time != 0) {
       strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->end_time));
       fprintf(fd, "%s", time);
     } else {
@@ -93,36 +117,36 @@ void output_html_entry(struct conn_data *input, FILE *fd)
     }
   }
 
-  if(opt.duration) {
+  if (opt.duration) {
     output_timediff(input->start_time, input->end_time, time);
     fprintf(fd, "</td><td>%s", time);
   }
 
-  if(opt.loghost)
+  if (opt.loghost)
     fprintf(fd, "</td><td>%s", input->hostname);
 
-  if(opt.chains)
+  if (opt.chains)
     fprintf(fd, "</td><td>%s", input->chainlabel);
 
-  if(opt.branches)
+  if (opt.branches)
     fprintf(fd, "</td><td>%s", input->branchname);
 
-  if(opt.ifs)
+  if (opt.ifs)
     fprintf(fd, "</td><td>%s", input->interface);
 
-  if(opt.proto) {
+  if (opt.proto) {
     proto = resolve_protocol(input->protocol);
     fprintf(fd, "</td><td>%s", proto);
   }
 
   if (opt.datalen)
-    fprintf(fd, "</td><td>%d", input->datalen);
+    fprintf(fd, "</td><td>%lu", input->datalen);
 
   if (opt.src_ip) {
     fprintf(fd, "</td><td>%s", inet_ntoa(input->shost));
-    if(opt.resolve)
+    if (opt.resolve)
       fprintf(fd, "</td><td>%s", resolve_hostname(input->shost));
-    if(opt.whois_lookup) {
+    if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
       if (we != NULL) {
@@ -142,7 +166,7 @@ void output_html_entry(struct conn_data *input, FILE *fd)
 
   if (opt.dst_ip) {
     fprintf(fd, "</td><td>%s", inet_ntoa(input->dhost));
-    if(opt.resolve)
+    if (opt.resolve)
       fprintf(fd, "</td><td>%s", resolve_hostname(input->dhost));
   }
 
@@ -152,7 +176,7 @@ void output_html_entry(struct conn_data *input, FILE *fd)
       fprintf(fd, "</td><td>%s", resolve_service(input->dport, proto));
   }
 
-  if(opt.opts) {
+  if (opt.opts) {
     output_tcp_opts(input, buf);
     fprintf(fd, "</td><td>%s", buf);
   }
@@ -160,21 +184,21 @@ void output_html_entry(struct conn_data *input, FILE *fd)
   fprintf(fd, "</td></tr>\n");
 }
 
-void output_text_entry(struct conn_data *input, FILE *fd)
+void output_text_entry(struct conn_data *input, FILE * fd)
 {
   char *proto, time[TIMESIZE], buf[HOSTLEN];
   unsigned char first = 1;
 
-  if(opt.stimes) {
+  if (opt.stimes) {
     strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->start_time));
     fprintf(fd, "%s", time);
     first = 0;
   }
 
-  if(opt.etimes) {
-    if(!first)
+  if (opt.etimes) {
+    if (!first)
       fprintf(fd, _(" to "));
-    if(input->end_time != 0) {
+    if (input->end_time != 0) {
       strftime(time, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&input->end_time));
       fprintf(fd, "%s", time);
     } else {
@@ -183,64 +207,64 @@ void output_text_entry(struct conn_data *input, FILE *fd)
     first = 0;
   }
 
-  if(opt.duration) {
-    if(!first)
+  if (opt.duration) {
+    if (!first)
       fprintf(fd, " ");
     output_timediff(input->start_time, input->end_time, time);
     fprintf(fd, "%s", time);
     first = 0;
   }
 
-  if(opt.loghost) {
-    if(!first)
+  if (opt.loghost) {
+    if (!first)
       fprintf(fd, " ");
     fprintf(fd, "%s", input->hostname);
     first = 0;
   }
 
-  if(opt.chains) {
-    if(!first)
+  if (opt.chains) {
+    if (!first)
       fprintf(fd, " ");
     fprintf(fd, "%s", input->chainlabel);
     first = 0;
   }
 
-  if(opt.branches) {
-    if(!first)
+  if (opt.branches) {
+    if (!first)
       fprintf(fd, " ");
     fprintf(fd, "%s", input->branchname);
     first = 0;
   }
 
-  if(opt.ifs) {
-    if(!first)
+  if (opt.ifs) {
+    if (!first)
       fprintf(fd, " ");
     fprintf(fd, "%s", input->interface);
     first = 0;
   }
 
-  if(!first)
+  if (!first)
     fprintf(fd, " ");
   fprintf(fd, "%d", input->count);
 
   proto = resolve_protocol(input->protocol);
-  if(opt.proto)
+  if (opt.proto)
     fprintf(fd, " %s", proto);
 
-  if(input->count == 1) {
+  if (input->count == 1) {
     fprintf(fd, _(" packet"));
   } else {
     fprintf(fd, _(" packets"));
   }
 
   if (opt.datalen)
-    fprintf(fd, _(" (%d bytes)"), input->datalen);
+    fprintf(fd, _(" (%lu bytes)"), input->datalen);
 
   if (opt.src_ip) {
     fprintf(fd, _(" from %s"), inet_ntoa(input->shost));
-    if(opt.resolve)
+    if (opt.resolve)
       fprintf(fd, " (%s)", resolve_hostname(input->shost));
-    if(opt.whois_lookup) {
+    if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
       if (we != NULL) {
@@ -260,7 +284,7 @@ void output_text_entry(struct conn_data *input, FILE *fd)
 
   if (opt.dst_ip) {
     fprintf(fd, _(" to %s"), inet_ntoa(input->dhost));
-    if(opt.resolve) {
+    if (opt.resolve) {
       fprintf(fd, " (%s)", resolve_hostname(input->dhost));
     }
   }
@@ -271,52 +295,52 @@ void output_text_entry(struct conn_data *input, FILE *fd)
       fprintf(fd, " (%s)", resolve_service(input->dport, proto));
   }
 
-  if(opt.opts) {
-      output_tcp_opts(input, buf);
-      fprintf(fd, " %s", buf);
+  if (opt.opts) {
+    output_tcp_opts(input, buf);
+    fprintf(fd, " %s", buf);
   }
 
   fprintf(fd, "\n");
 }
 
-void output_html_table(FILE *fd)
+void output_html_table(FILE * fd)
 {
   fprintf(fd, "</p>\n");
   fprintf(fd, "<table cellspacing=\"1\" cellpadding=\"3\">\n");
   fprintf(fd, "<tr><th>#</th>");
 
-  if(opt.stimes)
+  if (opt.stimes)
     fprintf(fd, _("<th>start</th>"));
 
-  if(opt.etimes)
+  if (opt.etimes)
     fprintf(fd, _("<th>end</th>"));
 
-  if(opt.duration)
+  if (opt.duration)
     fprintf(fd, _("<th>interval</th>"));
 
-  if(opt.loghost)
+  if (opt.loghost)
     fprintf(fd, _("<th>loghost</th>"));
 
-  if(opt.chains)
+  if (opt.chains)
     fprintf(fd, _("<th>chain</th>"));
 
-  if(opt.branches)
+  if (opt.branches)
     fprintf(fd, _("<th>target</th>"));
 
-  if(opt.ifs)
+  if (opt.ifs)
     fprintf(fd, _("<th>interface</th>"));
 
-  if(opt.proto)
+  if (opt.proto)
     fprintf(fd, _("<th>proto</th>"));
 
-  if(opt.datalen)
+  if (opt.datalen)
     fprintf(fd, _("<th>bytes</th>"));
 
-  if(opt.src_ip) {
+  if (opt.src_ip) {
     fprintf(fd, _("<th>source</th>"));
-    if(opt.resolve)
+    if (opt.resolve)
       fprintf(fd, _("<th>hostname</th>"));
-    if(opt.whois_lookup)
+    if (opt.whois_lookup)
       fprintf(fd, _("<th>whois information</th>"));
   }
 
@@ -326,9 +350,9 @@ void output_html_table(FILE *fd)
       fprintf(fd, _("<th>service</th>"));
   }
 
-  if(opt.dst_ip) {
+  if (opt.dst_ip) {
     fprintf(fd, _("<th>destination</th>"));
-    if(opt.resolve)
+    if (opt.resolve)
       fprintf(fd, _("<th>hostname</th>"));
   }
 
@@ -344,18 +368,20 @@ void output_html_table(FILE *fd)
   fprintf(fd, "</tr>\n");
 }
 
-void output_html_header(int fd) {
+void output_html_header(int fd)
+{
   char nows[TIMESIZE];
   time_t now;
 
+  fdprintf(fd, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
   fdprintf(fd, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n");
+  fdprintf(fd, "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n");
   now = time(NULL);
   strftime(nows, TIMESIZE, _("%b %d %H:%M:%S"), localtime(&now));
-  fdprintf(fd, "<html>\n<head>\n<title>%s - %s</title>\n", opt.title, nows);
-  fdprintf(fd, "<meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\n");
+  fdprintf(fd, "<head>\n<title>%s - %s</title>\n", opt.title, nows);
   fdprintf(fd, "<meta http-equiv=\"pragma\" content=\"no-cache\" />\n");
   fdprintf(fd, "<meta http-equiv=\"expires\" content=\"0\" />\n");
-  if((opt.mode == REALTIME_RESPONSE) && (opt.refresh > 0)) {
+  if ((opt.mode == REALTIME_RESPONSE) && (opt.refresh > 0)) {
     fdprintf(fd, "<meta http-equiv=\"refresh\" content=\"%d\" />\n", opt.refresh);
   }
   if (opt.stylesheet[0] != '\0') {
@@ -371,7 +397,8 @@ void output_html_header(int fd) {
 	syslog(LOG_NOTICE, "fopen %s: %s", opt.stylesheet, strerror(errno));
       } else {
 	fdprintf(fd, "<style type=\"text/css\">\n<!--\n");
-	while (fgets(buf, BUFSIZE, cssfd)) fdprintf(fd, buf);
+	while (fgets(buf, BUFSIZE, cssfd))
+	  fdprintf(fd, buf);
 	fdprintf(fd, "-->\n</style>\n");
 	retval = fclose(cssfd);
 	if (retval == EOF)
@@ -415,10 +442,7 @@ void output_raw_data(struct conn_data *input)
 	   "%d\n",
 	   input->count, input->start_time, input->end_time,
 	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol,
-	   ntohl(input->shost.s_addr), input->sport,
-	   ntohl(input->dhost.s_addr), input->dport,
-	   input->flags);
+	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
 #else
     printf("%d;%ld;%ld;"
 	   "%s;%s;%s;"
@@ -428,10 +452,7 @@ void output_raw_data(struct conn_data *input)
 	   "%d\n",
 	   input->count, input->start_time, input->end_time,
 	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol,
-	   ntohl(input->shost.s_addr), input->sport,
-	   ntohl(input->dhost.s_addr), input->dport,
-	   input->flags);
+	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
 #endif
 #else
     printf("%d;%d;%d;"
@@ -442,10 +463,7 @@ void output_raw_data(struct conn_data *input)
 	   "%d\n",
 	   input->count, input->start_time, input->end_time,
 	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol,
-	   ntohl(input->shost.s_addr), input->sport,
-	   ntohl(input->dhost.s_addr), input->dport,
-	   input->flags);
+	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
 #endif
     this = this->next;
   }

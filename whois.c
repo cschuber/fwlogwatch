@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: whois.c,v 1.14 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: whois.c,v 1.15 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ int whois_get_type(char *type)
     *type = '\0';
   }
 
-  return(retval);
+  return (retval);
 }
 
 void whois_read_socket(char *buf, int len)
@@ -61,10 +61,10 @@ void whois_read_socket(char *buf, int len)
 
   bzero(buf, len);
   while (cnt < len) {
-    retval = read(opt.whois_sock, (char *)(buf+cnt), (len-cnt));
+    retval = read(opt.whois_sock, (char *) (buf + cnt), (len - cnt));
     cnt += retval;
   }
-  *(buf+len) = '\0';
+  *(buf + len) = '\0';
 #ifdef WHOIS_DEBUG
   fprintf(stderr, "--- WHOIS_DEBUG ---\n%s--- WHOIS_DEBUG ---\n", buf);
   fflush(stdout);
@@ -78,8 +78,8 @@ char *whois_read_data()
 
   while (1) {
     retval = whois_get_type(&type);
-    if(type == 'A') {
-      data = xmalloc(retval+1);
+    if (type == 'A') {
+      data = xmalloc(retval + 1);
       whois_read_socket(data, retval);
     } else {
       break;
@@ -95,7 +95,7 @@ char *whois_get_from_as(int asn)
 
   snprintf(cmdstr, WHOISCMDLEN, "!man,AS%d\n", asn);
   write(opt.whois_sock, cmdstr, strlen(cmdstr));
-  data = whois_read_data(opt.whois_sock);
+  data = whois_read_data();
 
   return (data);
 }
@@ -114,8 +114,8 @@ void whois_search_desc(struct whois_entry *we)
       desce = strchr(descs, '\n');
       if (desce != NULL)
 	*desce = '\0';
-      we->as_descr = xmalloc(strlen(descs)+1);
-      xstrncpy(we->as_descr, descs, strlen(descs)+1);
+      we->as_descr = xmalloc(strlen(descs) + 1);
+      xstrncpy(we->as_descr, descs, strlen(descs) + 1);
     }
     free(obj);
   }
@@ -132,7 +132,7 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 
   snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", inet_ntoa(ip));
   write(opt.whois_sock, cmdstr, strlen(cmdstr));
-  data = whois_read_data(opt.whois_sock);
+  data = whois_read_data();
 
   if (data != NULL) {
     descs = desce = data;
@@ -155,8 +155,8 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 	desce = strchr(descs, '\n');
 	if (desce != NULL)
 	  *desce = '\0';
-	we->ip_route = xmalloc(strlen(descs)+1);
-	xstrncpy(we->ip_route, descs, strlen(descs)+1);
+	we->ip_route = xmalloc(strlen(descs) + 1);
+	xstrncpy(we->ip_route, descs, strlen(descs) + 1);
 	descs = desce + 1;
       } else if ((we->ip_descr == NULL) && (strstr(descs, "descr:") == descs)) {
 	descs += 6;
@@ -165,8 +165,8 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 	desce = strchr(descs, '\n');
 	if (desce != NULL)
 	  *desce = '\0';
-	we->ip_descr = xmalloc(strlen(descs)+1);
-	xstrncpy(we->ip_descr, descs, strlen(descs)+1);
+	we->ip_descr = xmalloc(strlen(descs) + 1);
+	xstrncpy(we->ip_descr, descs, strlen(descs) + 1);
 	descs = desce + 1;
       } else {
 	descs++;
@@ -175,55 +175,55 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
     free(data);
   }
 
-  if(we->as_number > 0) {
-    if(we->ip_route == NULL) {
+  if (we->as_number > 0) {
+    if (we->ip_route == NULL) {
       we->ip_route = xmalloc(2);
       xstrncpy(we->ip_route, "-", 2);
     }
-    if(we->ip_descr == NULL) {
+    if (we->ip_descr == NULL) {
       we->ip_descr = xmalloc(2);
       xstrncpy(we->ip_descr, "-", 2);
     }
-    if(we->as_descr == NULL) {
+    if (we->as_descr == NULL) {
       we->as_descr = xmalloc(2);
       xstrncpy(we->as_descr, "-", 2);
     }
   }
 }
 
-struct whois_entry * whois(struct in_addr ip)
+struct whois_entry *whois(struct in_addr ip)
 {
   char adds[WHOISROUTELEN];
   struct in_addr net, addr;
   struct whois_entry *we;
   unsigned long int tmp_ip;
 
-  if(opt.whois_sock == -1)
+  if (opt.whois_sock == -1)
     return NULL;
 
   tmp_ip = ntohl(ip.s_addr);
-  if((tmp_ip == QUAD2IP(0,0,0,0))
-     || ((tmp_ip & PREFIX2MASK(8))  == QUAD2IP(127,0,0,0))
-     || ((tmp_ip & PREFIX2MASK(8))  == QUAD2IP(10,0,0,0))
-     || ((tmp_ip & PREFIX2MASK(12)) == QUAD2IP(172,16,0,0))
-     || ((tmp_ip & PREFIX2MASK(16)) == QUAD2IP(192,168,0,0))
-     || (tmp_ip == QUAD2IP(255,255,255,255)))
+  if ((tmp_ip == QUAD2IP(0, 0, 0, 0))
+      || ((tmp_ip & PREFIX2MASK(8)) == QUAD2IP(127, 0, 0, 0))
+      || ((tmp_ip & PREFIX2MASK(8)) == QUAD2IP(10, 0, 0, 0))
+      || ((tmp_ip & PREFIX2MASK(12)) == QUAD2IP(172, 16, 0, 0))
+      || ((tmp_ip & PREFIX2MASK(16)) == QUAD2IP(192, 168, 0, 0))
+      || (tmp_ip == QUAD2IP(255, 255, 255, 255)))
     return NULL;
 
   we = whois_first;
-  while(we != NULL) {
+  while (we != NULL) {
     xstrncpy(adds, we->ip_route, WHOISROUTELEN);
     net.s_addr = ip.s_addr & parse_cidr(adds);
     convert_ip(adds, &addr);
     if (addr.s_addr == net.s_addr) {
-      if(opt.verbose)
-        fprintf(stderr, _("Looking up whois info for %s from cache\n"), inet_ntoa(ip));
+      if (opt.verbose)
+	fprintf(stderr, _("Looking up whois info for %s from cache\n"), inet_ntoa(ip));
       return (we);
     }
     we = we->next;
   }
 
-  if(opt.verbose)
+  if (opt.verbose)
     fprintf(stderr, _("Looking up whois info for %s\n"), inet_ntoa(ip));
 
   we = xmalloc(sizeof(struct whois_entry));
@@ -231,9 +231,9 @@ struct whois_entry * whois(struct in_addr ip)
   if (we->as_number != 0) {
     we->next = whois_first;
     whois_first = we;
-    return(we);
+    return (we);
   } else {
-    return(NULL);
+    return (NULL);
   }
 }
 
@@ -275,7 +275,7 @@ void whois_close()
 
   write(opt.whois_sock, "q\n", 2);
   retval = close(opt.whois_sock);
-  if(retval == -1)
+  if (retval == -1)
     perror("close");
   opt.whois_sock = -1;
 }

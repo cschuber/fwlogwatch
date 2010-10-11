@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: response.c,v 1.30 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: response.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,12 +38,9 @@ void check_for_ipchains()
   }
 
   while (fgets(buf, BUFSIZE, fd)) {
-    retval = sscanf(buf, "%10s %36s %16s %6X %6X %5u %80s\n",
-		    chain, src_dst, interface,
-		    &fw_flg,
-		    &fw_invflg, &protocol, rest);
+    retval = sscanf(buf, "%10s %36s %16s %6X %6X %5u %80s\n", chain, src_dst, interface, &fw_flg, &fw_invflg, &protocol, rest);
     if (retval == 7) {
-      if(fw_flg & IP_FW_F_PRN) {
+      if (fw_flg & IP_FW_F_PRN) {
 	found++;
       }
     }
@@ -55,7 +52,7 @@ void check_for_ipchains()
   }
 
   if (found > 0) {
-    if(found == 1) {
+    if (found == 1) {
       syslog(LOG_NOTICE, _("One logging ipchains firewall rule defined"));
     } else {
       syslog(LOG_NOTICE, _("%u logging ipchains firewall rules defined"), found);
@@ -80,8 +77,8 @@ void check_script_perms(char *name)
     log_exit(EXIT_FAILURE);
   }
 
-  if((getuid() == 0) || (geteuid() == 0)) {
-    if ((buf->st_mode & (S_IWGRP|S_IWOTH)) != 0) {
+  if ((getuid() == 0) || (geteuid() == 0)) {
+    if ((buf->st_mode & (S_IWGRP | S_IWOTH)) != 0) {
       syslog(LOG_NOTICE, _("%s is group/world writable"), name);
       free(buf);
       log_exit(EXIT_FAILURE);
@@ -108,11 +105,11 @@ void react(unsigned char mode, struct known_hosts *this_host)
 {
   char buf[BUFSIZE], buf2[BUFSIZE];
 
-  if(mode == EX_NOTIFY) {
+  if (mode == EX_NOTIFY) {
     xstrncpy(buf, opt.notify_script, BUFSIZE);
   } else {
     xstrncpy(buf, opt.respond_script, BUFSIZE);
-    if(mode == EX_RESPOND_ADD) {
+    if (mode == EX_RESPOND_ADD) {
       strncat(buf, " add", BUFSIZE);
     } else {
       strncat(buf, " remove", BUFSIZE);
@@ -122,28 +119,28 @@ void react(unsigned char mode, struct known_hosts *this_host)
   snprintf(buf2, BUFSIZE, " %d %s", this_host->count, inet_ntoa(this_host->shost));
   strncat(buf, buf2, BUFSIZE);
 
-  if(opt.dst_ip) {
+  if (opt.dst_ip) {
     snprintf(buf2, BUFSIZE, " %s", inet_ntoa(this_host->dhost));
     strncat(buf, buf2, BUFSIZE);
   } else {
     strncat(buf, " -", BUFSIZE);
   }
 
-  if(opt.proto) {
+  if (opt.proto) {
     snprintf(buf2, BUFSIZE, " %d", this_host->protocol);
     strncat(buf, buf2, BUFSIZE);
   } else {
     strncat(buf, " -", BUFSIZE);
   }
 
-  if(opt.src_port) {
+  if (opt.src_port) {
     snprintf(buf2, BUFSIZE, " %d", this_host->sport);
     strncat(buf, buf2, BUFSIZE);
   } else {
     strncat(buf, " -", BUFSIZE);
   }
 
-  if(opt.dst_port) {
+  if (opt.dst_port) {
     snprintf(buf2, BUFSIZE, " %d", this_host->dport);
     strncat(buf, buf2, BUFSIZE);
   } else {
@@ -160,14 +157,14 @@ void remove_old(unsigned char mode)
 
   now = time(NULL);
 
-  if(mode & RESP_REMOVE_OPC) {
+  if (mode & RESP_REMOVE_OPC) {
     struct conn_data *prev, *this;
 
     prev = this = first;
     is_first = 1;
     while (this != NULL) {
       if ((now - this->end_time) >= opt.recent) {
-	if(opt.verbose == 2)
+	if (opt.verbose == 2)
 	  syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), inet_ntoa(this->shost));
 	if (is_first == 1) {
 	  prev = this->next;
@@ -194,7 +191,7 @@ void remove_old(unsigned char mode)
     }
   }
 
-  if(mode & RESP_REMOVE_OHS) {
+  if (mode & RESP_REMOVE_OHS) {
     struct known_hosts *prev_host, *this_host;
 
     prev_host = this_host = first_host;
@@ -223,18 +220,29 @@ void remove_old(unsigned char mode)
   }
 }
 
-struct known_hosts * is_known(struct conn_data *host)
+struct known_hosts *is_known(struct conn_data *host)
 {
   struct known_hosts *this_host;
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (this_host->shost.s_addr != (host->shost.s_addr & this_host->netmask.s_addr)) {goto no_match;}
-    if (this_host->time == 0) return this_host;
-    if ((opt.dst_ip) && (this_host->dhost.s_addr != host->dhost.s_addr)) {goto no_match;}
-    if ((opt.dst_port) && (this_host->dport != host->dport)) {goto no_match;}
-    if ((opt.src_port) && (this_host->sport != host->sport)) {goto no_match;}
-    if ((opt.proto) && (this_host->protocol != host->protocol)) {goto no_match;}
+    if (this_host->shost.s_addr != (host->shost.s_addr & this_host->netmask.s_addr)) {
+      goto no_match;
+    }
+    if (this_host->time == 0)
+      return this_host;
+    if ((opt.dst_ip) && (this_host->dhost.s_addr != host->dhost.s_addr)) {
+      goto no_match;
+    }
+    if ((opt.dst_port) && (this_host->dport != host->dport)) {
+      goto no_match;
+    }
+    if ((opt.src_port) && (this_host->sport != host->sport)) {
+      goto no_match;
+    }
+    if ((opt.proto) && (this_host->protocol != host->protocol)) {
+      goto no_match;
+    }
     break;
   no_match:
     this_host = this_host->next;
@@ -266,9 +274,9 @@ void look_for_alert()
 	this_host->next = first_host;
 	first_host = this_host;
 	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this_host->count, inet_ntoa(this_host->shost));
-	if(opt.response & OPT_NOTIFY)
+	if (opt.response & OPT_NOTIFY)
 	  react(EX_NOTIFY, this_host);
-	if(opt.response & OPT_RESPOND)
+	if (opt.response & OPT_RESPOND)
 	  react(EX_RESPOND_ADD, this_host);
       } else {
 	this_host->count = this_host->count + ((this->count / opt.threshold) * opt.threshold);
@@ -276,14 +284,14 @@ void look_for_alert()
 	  this_host->time = time(NULL);
       }
       this->count = (this->count % opt.threshold);
-      if(this->count == 0) {
+      if (this->count == 0) {
 	this->end_time = 1;
 	modified = 1;
       }
     }
     this = this->next;
   }
-  if(modified)
+  if (modified)
     remove_old(RESP_REMOVE_OPC);
 }
 
@@ -292,73 +300,90 @@ unsigned char hs_compare(struct known_hosts *op1, struct known_hosts *op2)
   unsigned char cond = 0;
   time_t now;
 
-  switch(opt.sortfield) {
+  switch (opt.sortfield) {
   case SORT_COUNT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->count > op2->count) cond++;
+      if (op1->count > op2->count)
+	cond++;
     } else {
-      if (op1->count < op2->count) cond++;
+      if (op1->count < op2->count)
+	cond++;
     }
     break;
   case SORT_START_TIME:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->time > op2->time) cond++;
+      if (op1->time > op2->time)
+	cond++;
     } else {
-      if (op1->time < op2->time) cond++;
+      if (op1->time < op2->time)
+	cond++;
     }
     break;
   case SORT_END_TIME:
     now = time(NULL);
     if (opt.sortmode == ORDER_ASCENDING) {
-      if ((now - op1->time) < (now - op2->time)) cond++;
+      if ((now - op1->time) < (now - op2->time))
+	cond++;
     } else {
-      if ((now - op1->time) > (now - op2->time)) cond++;
+      if ((now - op1->time) > (now - op2->time))
+	cond++;
     }
     break;
   case SORT_PROTOCOL:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->protocol > op2->protocol) cond++;
+      if (op1->protocol > op2->protocol)
+	cond++;
     } else {
-      if (op1->protocol < op2->protocol) cond++;
+      if (op1->protocol < op2->protocol)
+	cond++;
     }
     break;
   case SORT_SOURCEHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr))
+	cond++;
     } else {
-      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr)) cond++;
+      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr))
+	cond++;
     }
     break;
   case SORT_SOURCEPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->sport > op2->sport) cond++;
+      if (op1->sport > op2->sport)
+	cond++;
     } else {
-      if (op1->sport < op2->sport) cond++;
+      if (op1->sport < op2->sport)
+	cond++;
     }
     break;
   case SORT_DESTHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr))
+	cond++;
     } else {
-      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr)) cond++;
+      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr))
+	cond++;
     }
     break;
   case SORT_DESTPORT:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (op1->dport > op2->dport) cond++;
+      if (op1->dport > op2->dport)
+	cond++;
     } else {
-      if (op1->dport < op2->dport) cond++;
+      if (op1->dport < op2->dport)
+	cond++;
     }
   }
 
   return cond;
 }
 
-struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list) {
+struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list)
+{
   struct known_hosts *p, *q, *e, *tail;
   int size, merges, psize, qsize, i;
 
-  switch(opt.sortfield) {
+  switch (opt.sortfield) {
   case SORT_COUNT:
   case SORT_START_TIME:
   case SORT_END_TIME:
@@ -367,9 +392,9 @@ struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list) {
   case SORT_SOURCEPORT:
   case SORT_DESTHOST:
   case SORT_DESTPORT:
-    if(list != NULL) {
+    if (list != NULL) {
       size = 1;
-      while(1) {
+      while (1) {
 	p = list;
 	list = tail = NULL;
 	merges = 0;
@@ -380,18 +405,27 @@ struct known_hosts *fwlw_hs_mergesort(struct known_hosts *list) {
 	  for (i = 0; i < size; i++) {
 	    psize++;
 	    q = q->next;
-	    if (q == NULL) break;
+	    if (q == NULL)
+	      break;
 	  }
 	  qsize = size;
 	  while (psize > 0 || ((qsize > 0) && (q != NULL))) {
 	    if (psize == 0) {
-	      e = q; q = q->next; qsize--;
+	      e = q;
+	      q = q->next;
+	      qsize--;
 	    } else if (qsize == 0 || (q == NULL)) {
-	      e = p; p = p->next; psize--;
-	    } else if (hs_compare(p,q) <= 0) {
-	      e = p; p = p->next; psize--;
+	      e = p;
+	      p = p->next;
+	      psize--;
+	    } else if (hs_compare(p, q) <= 0) {
+	      e = p;
+	      p = p->next;
+	      psize--;
 	    } else {
-	      e = q; q = q->next; qsize--;
+	      e = q;
+	      q = q->next;
+	      qsize--;
 	    }
 	    if (tail != NULL) {
 	      tail->next = e;

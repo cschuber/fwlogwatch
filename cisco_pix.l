@@ -1,16 +1,17 @@
-/* Copyright (C) 2000-2006 Boris Wesslowski */
-/* $Id: cisco_pix.l,v 1.16 2010/10/11 12:17:44 bwess Exp $ */
+/* Copyright (C) 2000-2010 Boris Wesslowski */
+/* $Id: cisco_pix.l,v 1.17 2010/10/11 12:28:33 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
 %option noyywrap
 
 %{
-#define YY_NO_UNPUT
+#define YY_NO_INPUT
 
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <netdb.h>
 #include "main.h"
 #include "utils.h"
 
@@ -29,11 +30,17 @@ DIGIT	[0-9]
 NUMBER	{DIGIT}+
 OCTET	{DIGIT}{1,3}
 PORT	{DIGIT}{1,5}
+HEXDIGIT	[0-9a-fA-F]
+HEXNUMBER	"0x"{HEXDIGIT}+
 IP	{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}
 IPPORT	{IP}"/"{PORT}
 ZONEIP	{STRING}":"{IP}
+ZONENAME	{STRING}":"{STRING}
 ZONEIPPORT	{STRING}":"{IP}"/"{PORT}
-SYSID	("%PIX"|"%FWSM")"-"[1-7]"-"[0-9]{6}":"
+ZONEIPPORT2	{STRING}"/"{IP}"("{PORT}")"
+ZONENAMEPORT	{STRING}":"{STRING}"/"{PORT}
+ZONENAMEPORT2	{STRING}"/"{STRING}"("{PORT}")"
+SYSID	("%PIX"|"%FWSM"|"%ASA")"-"[1-7]"-"[0-9]{6}":"
 
 %%
 
@@ -45,16 +52,21 @@ SYSID	("%PIX"|"%FWSM")"-"[1-7]"-"[0-9]{6}":"
 " Deny TCP (no connection) from "{IPPORT}					cisco_pix_parse_src(cisco_pixtext+31, CP_OPT_TCP);
 " Deny inbound UDP from "{IPPORT}						cisco_pix_parse_src(cisco_pixtext+23, CP_OPT_UDP);
 " Deny udp src "{ZONEIPPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_UDP_S);
+" Deny udp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_UDP_N);
 " Deny tcp src "{ZONEIPPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_TCP_S);
+" Deny tcp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_TCP_N);
 " Deny icmp src "{ZONEIP}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_ICMP_S);
 " Deny inbound icmp src "{ZONEIP}						cisco_pix_parse_src(cisco_pixtext+23, CP_OPT_ICMP_S);
 " Deny inbound tcp src "{ZONEIPPORT}						cisco_pix_parse_src(cisco_pixtext+22, CP_OPT_TCP_S);
 " Deny inbound (No xlate) tcp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+33, CP_OPT_TCP_S);
 " Deny inbound (No xlate) udp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+33, CP_OPT_UDP_S);
 " Deny inbound (No xlate) icmp src "{ZONEIP}					cisco_pix_parse_src(cisco_pixtext+34, CP_OPT_ICMP_S);
+" Deny UDP reverse path check from "{IP}					cisco_pix_parse_src(cisco_pixtext+34, CP_OPT_UDP_NOPORT);
 {IP}" attempted to ping "							cisco_pix_parse_src(cisco_pixtext, CP_OPT_ICMP);
 "to "{IPPORT}									cisco_pix_parse_dst(cisco_pixtext+3, CP_OPT_DST);
+"to "{IP}									cisco_pix_parse_dst(cisco_pixtext+3, CP_OPT_NONE);
 "dst "{ZONEIPPORT}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_S);
+"dst "{ZONENAMEPORT}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_N);
 "dst "{ZONEIP}" (type "{PORT}", code "{PORT}")"					cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_I);
 {IP}										cisco_pix_parse_dst(cisco_pixtext, CP_OPT_NONE);
 "flags"										/* ignore */
@@ -68,16 +80,30 @@ SYSID	("%PIX"|"%FWSM")"-"[1-7]"-"[0-9]{6}":"
 "by access-group \""{STRING}"\""						cisco_pix_parse_group(cisco_pixtext+17);
 "due to DNS "("Query"|"Response")						/* ignore */
 "("{IP}")"									/* ignore */
+" access-list "{STRING}								xstrncpy(opt.line->chainlabel, cisco_pixtext+13, SHORTLEN);
+" permitted tcp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_TCP_S2);
+" permitted udp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_UDP_S2);
+" permitted icmp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+16, CP_OPT_ICMP_S2);
+" permitted tcp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_TCP_N2);
+" permitted udp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_UDP_N2);
+" permitted icmp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+16, CP_OPT_ICMP_N2);
+" -> "{ZONEIPPORT2}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_S2);
+" -> "{ZONENAMEPORT2}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_N2);
+"hit-cnt "{NUMBER}								/* ignore */
+" first hit"									/* ignore */
+" "{NUMBER}"-second interval"							/* ignore */
 " Built dynamic "("TCP"|"UDP"|"ICMP")" translation from "{ZONEIPPORT}" to "{ZONEIPPORT}	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Built "("inbound"|"outbound")" "("TCP"|"UDP")" connection "{NUMBER}" for "{ZONEIPPORT}" ("{IPPORT}") to "{ZONEIPPORT}" ("{IPPORT}")"	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Built static translation from "{ZONEIP}" to "{ZONEIP}				opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Built local-host "{ZONEIP}							opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Teardown dynamic "("TCP"|"UDP"|"ICMP")" translation from "{ZONEIPPORT}" to "{ZONEIPPORT}" duration "[0-9:]+	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Teardown "("TCP"|"UDP")" connection "{NUMBER}" for "{ZONEIPPORT}" to "{ZONEIPPORT}" duration "[0-9:]+" bytes "{NUMBER}(" TCP "("Reset-"("I"|"O")|"FINs")|" "("SYN"|"FIN")" Timeout")?	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" No translation group found for icmp src "({ZONEIP}|{ZONENAME})" dst "({ZONEIP}|{ZONENAME})" (type "{PORT}", code "{PORT}")"	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " Teardown local-host "{ZONEIP}" duration "[0-9:]+				opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 {IP}" Accessed URL ".+								opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " IGRP request discarded from "{IP}" to "{ZONEIP}				opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 {NUMBER}" in use, "{NUMBER}" most used"						opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+"["{HEXNUMBER}", "{HEXNUMBER}"]"						/* ignore */
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
 {STRING}	if(opt.verbose) fprintf(stderr, "Unrecognized token: %s\n", cisco_pixtext);
@@ -88,7 +114,7 @@ SYSID	("%PIX"|"%FWSM")"-"[1-7]"-"[0-9]{6}":"
 void cisco_pix_parse_date(char *input, unsigned char mode)
 {
   int retval, day, hour, minute, second;
-  char smonth[3];
+  char smonth[4];
 #ifdef IRIX
   char tmp[SHOSTLEN];
 #endif
@@ -97,113 +123,236 @@ void cisco_pix_parse_date(char *input, unsigned char mode)
 #endif
 
   if (mode == CP_OPT_HOST) {
-    retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s",
-		    smonth, &day, &hour, &minute, &second,
+    retval = sscanf(input, "%3s %2d %2d:%2d:%2d %32s", smonth, &day, &hour, &minute, &second,
 #ifndef IRIX
 		    opt.line->hostname);
 #else
 		    tmp);
-    if(retval != 6) return;
-    if(tmp[2] == ':')
-      xstrncpy(opt.line->hostname, tmp+3, SHOSTLEN);
+    if (retval != 6)
+      return;
+    if (tmp[2] == ':')
+      xstrncpy(opt.line->hostname, tmp + 3, SHOSTLEN);
 #endif
 #ifdef LOGDOTS
     remove_dot = strstr(opt.line->hostname, ".");
-    if(remove_dot != NULL)
+    if (remove_dot != NULL)
       *remove_dot = '\0';
 #endif
   } else if (mode == CP_OPT_NONE) {
     int year;
-    retval = sscanf(input, "%3s %2d %4d %2d:%2d:%2d",
-		    smonth, &day, &year, &hour, &minute, &second);
-    if(retval != 6) return;
+    retval = sscanf(input, "%3s %2d %4d %2d:%2d:%2d", smonth, &day, &year, &hour, &minute, &second);
+    if (retval != 6)
+      return;
   }
 
   build_time(smonth, day, hour, minute, second);
 
-  opt.parser=opt.parser|CISCO_PIX_DATE;
+  opt.parser = opt.parser | CISCO_PIX_DATE;
 }
 
 void cisco_pix_parse_src(char *input, unsigned char mode)
 {
-  char ip[IPLEN];
+  char ip[IPLEN], resolved = 0;
   int shost1, shost2, shost3, shost4;
   int retval;
 
   if ((mode == CP_OPT_TCP) || (mode == CP_OPT_UDP)) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d/%5d",
-		    &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
+    retval = sscanf(input, "%3d.%3d.%3d.%3d/%5d", &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if (mode == CP_OPT_TCP)
       opt.line->protocol = 6;
     else
       opt.line->protocol = 17;
-    if(retval != 5) return;
+    if (retval != 5)
+      return;
   } else if ((mode == CP_OPT_TCP_S) || (mode == CP_OPT_UDP_S)) {
     char buf[BUFSIZE], *pnt;
     pnt = strstr(input, ":");
     *pnt = ' ';
-    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d/%5d",
-		    buf, &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d/%5d", buf, &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
     if (mode == CP_OPT_TCP_S)
       opt.line->protocol = 6;
     else
       opt.line->protocol = 17;
-    if(retval != 6) return;
+    if (retval != 6)
+      return;
+  } else if ((mode == CP_OPT_TCP_S2) || (mode == CP_OPT_UDP_S2) || (mode == CP_OPT_ICMP_S2)) {
+    char buf[BUFSIZE], *pnt;
+    xstrncpy(opt.line->branchname, "permitted", SHORTLEN);
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d(%5d)", buf, &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
+    if (mode == CP_OPT_TCP_S2)
+      opt.line->protocol = 6;
+    else if (mode == CP_OPT_UDP_S2)
+      opt.line->protocol = 17;
+    else
+      opt.line->protocol = 1;
+    if (retval != 6)
+      return;
+  } else if ((mode == CP_OPT_TCP_N) || (mode == CP_OPT_UDP_N)) {
+    char buf[BUFSIZE], *pnt;
+    struct hostent *he;
+    pnt = strstr(input, ":");
+    *pnt = ' ';
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->sport);
+    if (mode == CP_OPT_TCP_N)
+      opt.line->protocol = 6;
+    else
+      opt.line->protocol = 17;
+    if (retval != 2)
+      return;
+    he = gethostbyname(buf);
+    if (he != NULL) {
+      opt.line->shost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+      resolved = 1;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, "cisco_pix host '%s' could not be resolved, ignoring.\n", buf);
+      return;
+    }
+  } else if ((mode == CP_OPT_TCP_N2) || (mode == CP_OPT_UDP_N2) || (mode == CP_OPT_ICMP_N2)) {
+    char buf[BUFSIZE], *pnt;
+    struct hostent *he;
+    xstrncpy(opt.line->branchname, "permitted", SHORTLEN);
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    pnt = strstr(input, "(");
+    *pnt = ' ';
+    pnt = strstr(input, ")");
+    *pnt = 0;
+    retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->sport);
+    if (mode == CP_OPT_TCP_N2)
+      opt.line->protocol = 6;
+    else if (mode == CP_OPT_UDP_N2)
+      opt.line->protocol = 17;
+    else
+      opt.line->protocol = 1;
+    if (retval != 2)
+      return;
+    he = gethostbyname(buf);
+    if (he != NULL) {
+      opt.line->shost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+      resolved = 1;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, "cisco_pix host '%s' could not be resolved, ignoring.\n", buf);
+      return;
+    }
   } else if (mode == CP_OPT_ICMP_S) {
     char buf[BUFSIZE], *pnt;
     pnt = strstr(input, ":");
     *pnt = ' ';
-    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d",
-                    buf, &shost1, &shost2, &shost3, &shost4);
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d", buf, &shost1, &shost2, &shost3, &shost4);
     opt.line->protocol = 1;
-    if(retval != 5) return;
+    if (retval != 5)
+      return;
   } else if (mode == CP_OPT_ICMP) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d attempted to ping",
-		    &shost1, &shost2, &shost3, &shost4);
+    retval = sscanf(input, "%3d.%3d.%3d.%3d attempted to ping", &shost1, &shost2, &shost3, &shost4);
     opt.line->protocol = 1;
-    if(retval != 4) return;
+    if (retval != 4)
+      return;
+  } else if (mode == CP_OPT_UDP_NOPORT) {
+    retval = sscanf(input, "%3d.%3d.%3d.%3d", &shost1, &shost2, &shost3, &shost4);
+    opt.line->protocol = 17;
+    if (retval != 4)
+      return;
   }
 
-  snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
-  if(convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR) return;
+  if (resolved == 0) {
+    snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);
+    if (convert_ip(ip, &opt.line->shost) == IN_ADDR_ERROR)
+      return;
+  }
 
-  opt.parser=opt.parser|CISCO_PIX_SRC;
+  opt.parser = opt.parser | CISCO_PIX_SRC;
 }
 
 void cisco_pix_parse_dst(char *input, unsigned char mode)
 {
-  char ip[IPLEN];
+  char ip[IPLEN], resolved = 0;
   int dhost1, dhost2, dhost3, dhost4;
   int retval;
 
   if (mode == CP_OPT_DST) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d/%5d",
-		    &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
-    if(retval != 5) return;
+    retval = sscanf(input, "%3d.%3d.%3d.%3d/%5d", &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+    if (retval != 5)
+      return;
   } else if (mode == CP_OPT_DST_S) {
     char buf[BUFSIZE], *pnt;
     pnt = strstr(input, ":");
     *pnt = ' ';
-    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d/%5d",
-		    buf, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
-    if(retval != 6) return;
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d/%5d", buf, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+    if (retval != 6)
+      return;
+  } else if (mode == CP_OPT_DST_S2) {
+    char buf[BUFSIZE], *pnt;
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d(%5d)", buf, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->dport);
+    if (retval != 6)
+      return;
+  } else if (mode == CP_OPT_DST_N) {
+    char buf[BUFSIZE], *pnt;
+    struct hostent *he;
+    pnt = strstr(input, ":");
+    *pnt = ' ';
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->dport);
+    if (retval != 2)
+      return;
+    he = gethostbyname(buf);
+    if (he != NULL) {
+      opt.line->dhost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+      resolved = 1;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, "cisco_pix host '%s' could not be resolved, ignoring.\n", buf);
+      return;
+    }
+  } else if (mode == CP_OPT_DST_N2) {
+    char buf[BUFSIZE], *pnt;
+    struct hostent *he;
+    pnt = strstr(input, "/");
+    *pnt = ' ';
+    pnt = strstr(input, "(");
+    *pnt = ' ';
+    pnt = strstr(input, ")");
+    *pnt = 0;
+    retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->dport);
+    if (retval != 2)
+      return;
+    he = gethostbyname(buf);
+    if (he != NULL) {
+      opt.line->dhost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+      resolved = 1;
+    } else {
+      if (opt.verbose)
+	fprintf(stderr, "cisco_pix host '%s' could not be resolved, ignoring.\n", buf);
+      return;
+    }
   } else if (mode == CP_OPT_DST_I) {
     char buf[BUFSIZE], *pnt;
     pnt = strstr(input, ":");
     *pnt = ' ';
-    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d (type %5d, code %5d)",
-                    buf, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->sport, &opt.line->dport);
-    if(retval != 7) return;
+    retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d (type %5d, code %5d)", buf, &dhost1, &dhost2, &dhost3, &dhost4, &opt.line->sport, &opt.line->dport);
+    if (retval != 7)
+      return;
   } else if (mode == CP_OPT_NONE) {
-    retval = sscanf(input, "%3d.%3d.%3d.%3d",
-		    &dhost1, &dhost2, &dhost3, &dhost4);
-    if(retval != 4) return;
+    retval = sscanf(input, "%3d.%3d.%3d.%3d", &dhost1, &dhost2, &dhost3, &dhost4);
+    if (retval != 4)
+      return;
   }
 
-  snprintf(ip, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
-  if(convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR) return;
+  if (resolved == 0) {
+    snprintf(ip, IPLEN, "%d.%d.%d.%d", dhost1, dhost2, dhost3, dhost4);
+    if (convert_ip(ip, &opt.line->dhost) == IN_ADDR_ERROR)
+      return;
+  }
 
-  opt.parser=opt.parser|CISCO_PIX_DST;
+  opt.parser = opt.parser | CISCO_PIX_DST;
 }
 
 void cisco_pix_parse_group(char *input)
@@ -233,12 +382,12 @@ unsigned char flex_cisco_pix(char *input, int linenum)
   if (opt.parser & CISCO_PIX_NO_HIT)
     return PARSE_NO_HIT;
 
-  if (opt.parser == (CISCO_PIX_DATE|CISCO_PIX_SRC|CISCO_PIX_DST)) {
+  if (opt.parser == (CISCO_PIX_DATE | CISCO_PIX_SRC | CISCO_PIX_DST)) {
     return PARSE_OK;
   } else {
-    if(opt.verbose)
+    if (opt.verbose)
       fprintf(stderr, "cisco_pix parse error in line %d, ignoring.\n", linenum);
-    if(opt.verbose == 2)
+    if (opt.verbose == 2)
       fprintf(stderr, "input was: \"%s\"\n", input);
     return PARSE_WRONG_FORMAT;
   }
