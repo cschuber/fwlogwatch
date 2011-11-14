@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: compare.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: compare.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,10 +120,10 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
     break;
   case SORT_SOURCEHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr))
+      if (compare_ipv6(&op1->shost, &op2->shost) == -1)
 	cond++;
     } else {
-      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr))
+      if (compare_ipv6(&op1->shost, &op2->shost) == 1)
 	cond++;
     }
     break;
@@ -138,10 +138,10 @@ unsigned char compare(struct conn_data *op1, struct conn_data *op2)
     break;
   case SORT_DESTHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr))
+      if (compare_ipv6(&op1->dhost, &op2->dhost) == -1)
 	cond++;
     } else {
-      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr))
+      if (compare_ipv6(&op1->dhost, &op2->dhost) == 1)
 	cond++;
     }
     break;
@@ -343,10 +343,10 @@ void build_list()
 
   this = first;
   while (this != NULL) {
-    if ((opt.dst_ip) && (this->dhost.s_addr != opt.line->dhost.s_addr)) {
+    if ((opt.dst_ip) && (compare_ipv6_equal(&this->dhost, &opt.line->dhost) != 0)) {
       goto no_match;
     }
-    if ((opt.src_ip) && (this->shost.s_addr != opt.line->shost.s_addr)) {
+    if ((opt.src_ip) && (compare_ipv6_equal(&this->shost, &opt.line->shost) != 0)) {
       goto no_match;
     }
     if ((opt.dst_port) && (this->dport != opt.line->dport)) {

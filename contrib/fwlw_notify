@@ -1,6 +1,6 @@
 #!/bin/sh
-# Copyright (C) 2000-2010 Boris Wesslowski
-# $Id: fwlw_notify,v 1.15 2010/10/11 12:28:34 bwess Exp $
+# Copyright (C) 2000-2011 Boris Wesslowski
+# $Id: fwlw_notify,v 1.16 2011/11/14 12:53:52 bwess Exp $
 # fwlogwatch realtime notification script
 
 # You can invoke a custom action through this script when fwlogwatch

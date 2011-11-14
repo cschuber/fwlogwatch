@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: rcfile.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: rcfile.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +11,7 @@
 #include "main.h"
 #include "parser.h"
 #include "utils.h"
+#include "resolve.h"
 
 extern struct options opt;
 
@@ -104,7 +105,7 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
 
   if (strncasecmp(command, "include_file", 12) == 0) {
     xstrncpy(opt.rcfile, get_one_parameter(command + 13, HASH_ENDS_INPUT), FILESIZE);
-    read_rcfile(opt.rcfile, MUST_EXIST);
+    read_rcfile(opt.rcfile, MUST_EXIST, RCFILE_CF);
   }
 
   /* Global options */
@@ -117,6 +118,8 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
     opt.sresolve = get_yes_or_no(command + 17, rcfile, linenum);
   } else if (strncasecmp(command, "input", 5) == 0) {
     add_input_file(get_one_parameter(command + 6, HASH_ENDS_INPUT));
+  } else if (strncasecmp(command, "dns_cache", 9) == 0) {
+    xstrncpy(opt.rcfile_dns, get_one_parameter(command + 10, HASH_ENDS_INPUT), FILESIZE);
   }
 
   /* Evaluation options */
@@ -258,7 +261,7 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
   } else if (strncasecmp(command, "listen_port", 11) == 0) {
     opt.listenport = get_num_parameter(command + 12, rcfile, linenum);
   } else if (strncasecmp(command, "listen_to", 9) == 0) {
-    xstrncpy(opt.listento, get_one_parameter(command + 10, HASH_ENDS_INPUT), IPLEN);
+    xstrncpy(opt.listento, get_one_parameter(command + 10, HASH_ENDS_INPUT), IP6LEN);
   } else if (strncasecmp(command, "status_user", 11) == 0) {
     xstrncpy(opt.user, get_one_parameter(command + 12, HASH_ENDS_INPUT), USERSIZE);
   } else if (strncasecmp(command, "status_password", 15) == 0) {
@@ -282,7 +285,54 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
   free(command);
 }
 
-unsigned char read_rcfile(char *rcfile, unsigned char must_exist)
+void parse_dns_cache(char *input, char *rcfile, int linenum)
+{
+  char *p, *p1, *p2;
+  struct in6_addr addr;
+
+  while (*input == ' ' || *input == '\t')
+    ++input;
+
+  if (*input == '#' || *input == '\n')
+    return;
+
+  p1 = strchr(input, ' ');
+  p2 = strchr(input, '\t');
+  if (p1 != NULL && p2 != NULL) {
+    if (p1 < p2)
+      p = p1;
+    else
+      p = p2;
+  } else if (p1 != NULL || p2 != NULL) {
+    if (p1 != NULL)
+      p = p1;
+    else
+      p = p2;
+  } else {
+    goto unrecognized;
+  }
+  *p = 0;
+  p++;
+  if (convert_ip(input, &addr) == IN_ADDR_OK) {
+    while (*p == ' ' || *p == '\t')
+      p++;
+    p1 = strchr(p, ' ');
+    if (p1 != NULL)
+      *p1 = 0;
+    p1 = strchr(p, '\t');
+    if (p1 != NULL)
+      *p1 = 0;
+    p1 = strchr(p, '\n');
+    if (p1 != NULL)
+      *p1 = 0;
+    init_dns_cache(&addr, p);
+    return;
+  }
+unrecognized:
+  fprintf(stderr, _("Unrecognized entry in DNS cache file '%s' line %d\n"), rcfile, linenum);
+}
+
+unsigned char read_rcfile(char *rcfile, unsigned char must_exist, unsigned char type)
 {
   char buf[BUFSIZE], *name;
   FILE *fd;
@@ -303,8 +353,13 @@ unsigned char read_rcfile(char *rcfile, unsigned char must_exist)
 
   name = strdup(rcfile);
 
-  if (opt.verbose)
-    fprintf(stderr, _("Opening configuration file '%s'\n"), name);
+  if (opt.verbose) {
+    if (type == RCFILE_DNS) {
+      fprintf(stderr, _("Opening DNS cache file '%s'\n"), name);
+    } else {
+      fprintf(stderr, _("Opening configuration file '%s'\n"), name);
+    }
+  }
 
   fd = fopen(name, "r");
   if (fd == NULL) {
@@ -313,7 +368,10 @@ unsigned char read_rcfile(char *rcfile, unsigned char must_exist)
   }
 
   while (fgets(buf, BUFSIZE, fd)) {
-    parse_rcfile(buf, name, linenum);
+    if (type == RCFILE_CF)
+      parse_rcfile(buf, name, linenum);
+    else
+      parse_dns_cache(buf, name, linenum);
     linenum++;
   }
 

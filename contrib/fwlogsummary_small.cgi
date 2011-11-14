@@ -1,6 +1,6 @@
 #!/bin/sh
-# Copyright (C) 2000-2010 Boris Wesslowski
-# $Id: fwlogsummary_small.cgi,v 1.16 2010/10/11 12:28:34 bwess Exp $
+# Copyright (C) 2000-2011 Boris Wesslowski
+# $Id: fwlogsummary_small.cgi,v 1.17 2011/11/14 12:53:52 bwess Exp $
 
 echo "Content-Type: text/html"
 echo

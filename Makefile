@@ -1,18 +1,24 @@
-# Copyright (C) 2000-2010 Boris Wesslowski
-# $Id: Makefile,v 1.31 2010/10/11 12:28:33 bwess Exp $
+# Copyright (C) 2000-2011 Boris Wesslowski
+# $Id: Makefile,v 1.32 2011/11/14 12:53:52 bwess Exp $
 
 # You might want to add -DSHORT_NAMES to CFLAGS if you only intend to analyze
 # log formats with short list/chain/branch/interface names like ipchains.
 # You can also add -DLOGDOTS if your Cisco log host logs FQDNs and you only
-# want the hostnames in the output.
-# -DHAVE_IPV6 enables IPv6 support for the status web server.
+# want the host names in the output.
+# -DHAVE_ZLIB enables support for gzip compressed files.
+# -DHAVE_GETTEXT enables localization support.
 # -DHAVE_ADNS enables support for asynchronous DNS lookups.
 
 # Linux
 CC = gcc
 CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
-LDFLAGS = #-g #-static -p
+LDFLAGS = -s #-g #-static -p
 LIBS = -lcrypt -lz #-ladns #-lc_p
+
+# Mac OS X
+#CC = gcc
+#CFLAGS = -DHAVE_ZLIB -pipe -O2 -Wall
+#LIBS = -lz
 
 # Solaris
 #LIBS = -lnsl -lsocket -lcrypt -lz
@@ -39,7 +45,7 @@ LEX = flex
 LFLAGS = -B --nounput #-f #-p -p -d
 
 INSTALL = install
-INSTALL_PROGRAM = $(INSTALL) -s -m 0755
+INSTALL_PROGRAM = $(INSTALL) -m 0755
 INSTALL_SCRIPT = $(INSTALL) -m 0755
 INSTALL_DATA = $(INSTALL) -m 0644
 INSTALL_DIR = /usr/local

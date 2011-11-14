@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: lancom.c,v 1.7 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: lancom.c,v 1.8 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +24,11 @@ unsigned char lancom(char *input, int linenum)
   sinpute = sinputs + 15;
   *sinpute = '\0';
   retval = sscanf(sinputs, "%3s %2d %2d:%2d:%2d", smonth, &day, &hour, &minute, &second);
+  if (retval != 5) {
+    if (opt.verbose)
+      fprintf(stderr, "lancom parse error while reading dhost in line %d, ignoring.\n", linenum);
+    return PARSE_WRONG_FORMAT;
+  }
   build_time(smonth, day, hour, minute, second);
 
   /* Read loghost */

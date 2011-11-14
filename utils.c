@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: utils.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: utils.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -181,9 +181,9 @@ void init_line()
   opt.line->interface[0] = '\0';
   opt.line->protocol = 0;
   opt.line->datalen = 0;
-  opt.line->shost.s_addr = 0;
+  memset(&opt.line->shost, 0, sizeof(struct in6_addr));
   opt.line->sport = 0;
-  opt.line->dhost.s_addr = 0;
+  memset(&opt.line->dhost, 0, sizeof(struct in6_addr));
   opt.line->dport = 0;
   opt.line->flags = 0;
   opt.line->count = 0;
@@ -250,75 +250,167 @@ void build_time(char *smonth, int day, int hour, int minute, int second)
   opt.line->time = mktime(t);
 }
 
-unsigned char convert_ip(char *ip, struct in_addr *addr)
+char compare_ipv6(struct in6_addr *ip1, struct in6_addr *ip2)
 {
-#ifndef SOLARIS
+  int i;
+  for (i = 0; i < 16; i++) {
+    if (ip1->s6_addr[i] != ip2->s6_addr[i]) {
+      if (ip1->s6_addr[i] < ip2->s6_addr[i]) {
+	return -1;
+      } else {
+	return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+char compare_ipv6_equal(struct in6_addr *ip1, struct in6_addr *ip2)
+{
+  if (ip1->s6_addr32[0] == ip2->s6_addr32[0]
+      && ip1->s6_addr32[1] == ip2->s6_addr32[1]
+      && ip1->s6_addr32[2] == ip2->s6_addr32[2]
+      && ip1->s6_addr32[3] == ip2->s6_addr32[3])
+    return 0;
+  return 1;
+}
+
+unsigned char isV4mappedV6addr(struct in6_addr *ip)
+{
+  int i;
+  for (i = 0; i < 10; i++) {
+    if (ip->s6_addr[i] != 0)
+      return 0;
+  }
+  for (i = 10; i < 12; i++) {
+    if (ip->s6_addr[i] != 0xff)
+      return 0;
+  }
+  return 1;
+}
+
+char *my_inet_ntop(struct in6_addr *ip)
+{
+  const char *rp;
+  if (isV4mappedV6addr(ip)) {
+    rp = inet_ntop(AF_INET, ip->s6_addr + 12, opt.ntop, INET_ADDRSTRLEN);
+  } else {
+    rp = inet_ntop(AF_INET6, ip->s6_addr, opt.ntop, INET6_ADDRSTRLEN);
+  }
+  if (rp == NULL) {
+    snprintf(opt.ntop, INET6_ADDRSTRLEN, _("[error]"));
+  }
+  return opt.ntop;
+}
+
+unsigned char convert_ip(char *ip, struct in6_addr *addr)
+{
   int retval;
 
-  retval = inet_aton(ip, addr);
-  if (retval == 0) {
-#else
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
-  addr->s_addr = inet_addr(ip);
-  if (addr->s_addr == INADDR_NONE) {
-#endif
-    if (opt.verbose)
-      fprintf(stderr, _("IP address error: %s\n"), ip);
-    return IN_ADDR_ERROR;
+  retval = inet_pton(AF_INET6, ip, addr->s6_addr);
+  if (retval != 1) {
+    char nnb[HOSTLEN];
+    snprintf(nnb, HOSTLEN, "::ffff:%s", ip);
+    retval = inet_pton(AF_INET6, nnb, addr->s6_addr);
+    if (retval != 1) {
+      if (opt.verbose)
+	fprintf(stderr, _("IP address error: %s\n"), ip);
+      return IN_ADDR_ERROR;
+    }
   }
   return IN_ADDR_OK;
 }
 
-unsigned long int parse_cidr(char *input)
+void parse_cidr(char *input, struct in6_addr *in6_addr)
 {
   char *pnt;
-  int n;
-  unsigned long int netmask[33] = {
-    0x0,
-    0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
-    0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
-    0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
-    0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
-    0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
-    0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
-    0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
-    0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
-  };
+  int n, s, x, y, z;
+  struct in6_addr ip;
 
   pnt = strstr(input, "/");
   if (pnt != NULL) {
     n = atoi(pnt + 1);
-    if ((n < 0) || (n > 32)) {
+    *pnt = '\0';
+  } else {
+    n = 128;
+  }
+
+  memset(in6_addr, 0, sizeof(struct in6_addr));
+  convert_ip(input, &ip);
+  if (isV4mappedV6addr(&ip)) {
+    if ((pnt != NULL) && ((n < 0) || (n > 32))) {
       fprintf(stderr, _("Error in CIDR format: %s\n"), input);
       exit(EXIT_FAILURE);
     }
-    *pnt = '\0';
+    in6_addr->s6_addr[10] = 0xff;
+    in6_addr->s6_addr[11] = 0xff;
+    s = 96;
+    y = 12;
+    if (pnt != NULL)
+      n += 96;
   } else {
-    n = 32;
+    if ((n < 0) || (n > 128)) {
+      fprintf(stderr, _("Error in CIDR format: %s\n"), input);
+      exit(EXIT_FAILURE);
+    }
+    y = s = 0;
   }
 
-  return ntohl(netmask[n]);
+  z = 0;
+  for (x = s; x < n; x++) {
+    in6_addr->s6_addr[y] = in6_addr->s6_addr[y] | (1 << (7 - z));
+    z++;
+    if (z == 8) {
+      z = 0;
+      y++;
+    }
+  }
+}
+
+int convert_mask(struct in6_addr *in6_addr)
+{
+  int s, n, x, y, z;
+
+  if (isV4mappedV6addr(in6_addr)) {
+    s = 96;
+    y = 12;
+  } else {
+    y = s = 0;
+  }
+
+  n = z = 0;
+  for (x = s; x < 128; x++) {
+    if ((in6_addr->s6_addr[y] & (1 << (7 - z))) == 0)
+      break;
+    n++;
+    z++;
+    if (z == 8) {
+      z = 0;
+      y++;
+    }
+  }
+  return n;
 }
 
 void add_known_host(char *ip)
 {
   struct known_hosts *host, *test_host;
+  int i;
 
   host = xmalloc(sizeof(struct known_hosts));
-  host->netmask.s_addr = parse_cidr(ip);
+  parse_cidr(ip, &host->netmask);
   if (convert_ip(ip, &host->shost) == IN_ADDR_ERROR) {
     fprintf(stderr, _("(known host)\n"));
     free(host);
     exit(EXIT_FAILURE);
   }
 
-  host->shost.s_addr = host->shost.s_addr & host->netmask.s_addr;
+  for (i = 0; i < 16; i++)
+    host->shost.s6_addr[i] = host->shost.s6_addr[i] & host->netmask.s6_addr[i];
 
   test_host = first_host;
   while (test_host != NULL) {
-    if (test_host->shost.s_addr == host->shost.s_addr) {
+    if (compare_ipv6_equal(&test_host->shost, &host->shost) == 0) {
       free(host);
       return;
     }
@@ -328,7 +420,7 @@ void add_known_host(char *ip)
   host->time = 0;
   host->count = 0;
   host->protocol = 0;
-  host->dhost.s_addr = 0;
+  memset(&host->dhost, 0, sizeof(struct in6_addr));
   host->sport = 0;
   host->dport = 0;
   host->id = opt.global_id++;
@@ -339,23 +431,24 @@ void add_known_host(char *ip)
 void add_exclude_hpb(char *input, unsigned char mode)
 {
   struct parser_options *excluded_this;
-  struct in_addr ip;
+  struct in6_addr ip;
+  int i;
 
   excluded_this = xmalloc(sizeof(struct parser_options));
   excluded_this->mode = mode;
-  excluded_this->svalue = NULL;
   if (mode & PARSER_MODE_HOST) {
     struct parser_options *excluded_test;
-    excluded_this->netmask.s_addr = parse_cidr(input);
+    parse_cidr(input, &excluded_this->netmask);
     if (convert_ip(input, &ip) == IN_ADDR_ERROR) {
       fprintf(stderr, _("(excluded host)\n"));
       free(excluded_this);
       exit(EXIT_FAILURE);
     }
-    excluded_this->value = ip.s_addr & excluded_this->netmask.s_addr;
+    for (i = 0; i < 16; i++)
+      excluded_this->host.s6_addr[i] = ip.s6_addr[i] & excluded_this->netmask.s6_addr[i];
     excluded_test = excluded_first;
     while (excluded_test != NULL) {
-      if (excluded_test->value == excluded_this->value) {
+      if (compare_ipv6_equal(&excluded_test->host, &excluded_this->host) == 0) {
 	free(excluded_this);
 	return;
       }

@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: whois.c,v 1.15 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: whois.c,v 1.16 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,8 +19,8 @@
 #include "main.h"
 #include "utils.h"
 
-#define QUAD2IP(a,b,c,d) ((a)<<24 | (b)<<16 | (c<<8) | (d))
-#define PREFIX2MASK(n) (~0UL<<(32-(n)))
+#define QUAD2IP(a,b,c,d) ((a) | (b)<<8 | (c<<16) | (d)<<24)
+#define PREFIX2MASK(n) (~0U>>(32-(n)))
 
 struct whois_entry *whois_first = NULL;
 extern struct options opt;
@@ -121,7 +121,7 @@ void whois_search_desc(struct whois_entry *we)
   }
 }
 
-void whois_from_ip(struct in_addr ip, struct whois_entry *we)
+void whois_from_ip(struct in6_addr ip, struct whois_entry *we)
 {
   char cmdstr[WHOISCMDLEN], *data, *descs, *desce;
 
@@ -130,12 +130,12 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
   we->ip_descr = NULL;
   we->as_descr = NULL;
 
-  snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", inet_ntoa(ip));
+  snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", my_inet_ntop(&ip));
   write(opt.whois_sock, cmdstr, strlen(cmdstr));
   data = whois_read_data();
 
   if (data != NULL) {
-    descs = desce = data;
+    descs = data;
     while (*descs != '\0') {
       if ((we->as_number == 0) && (strstr(descs, "origin:") == descs)) {
 	descs += 7;
@@ -148,8 +148,8 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
 	we->as_number = atoi(descs);
 	whois_search_desc(we);
 	descs = desce + 1;
-      } else if ((we->ip_route == NULL) && (strstr(descs, "route:") == descs)) {
-	descs += 6;
+      } else if ((we->ip_route == NULL) && ((strstr(descs, "route:") == descs) || (strstr(descs, "route6:") == descs))) {
+	descs += 7;
 	while ((*descs == ' ') || (*descs == '\t'))
 	  descs++;
 	desce = strchr(descs, '\n');
@@ -191,40 +191,46 @@ void whois_from_ip(struct in_addr ip, struct whois_entry *we)
   }
 }
 
-struct whois_entry *whois(struct in_addr ip)
+struct whois_entry *whois(struct in6_addr ip)
 {
-  char adds[WHOISROUTELEN];
-  struct in_addr net, addr;
+  char saddrt[WHOISROUTELEN];
+  struct in6_addr in6_mask, in6_addrt, in6_net;
   struct whois_entry *we;
-  unsigned long int tmp_ip;
+  int i;
 
   if (opt.whois_sock == -1)
     return NULL;
 
-  tmp_ip = ntohl(ip.s_addr);
-  if ((tmp_ip == QUAD2IP(0, 0, 0, 0))
-      || ((tmp_ip & PREFIX2MASK(8)) == QUAD2IP(127, 0, 0, 0))
-      || ((tmp_ip & PREFIX2MASK(8)) == QUAD2IP(10, 0, 0, 0))
-      || ((tmp_ip & PREFIX2MASK(12)) == QUAD2IP(172, 16, 0, 0))
-      || ((tmp_ip & PREFIX2MASK(16)) == QUAD2IP(192, 168, 0, 0))
-      || (tmp_ip == QUAD2IP(255, 255, 255, 255)))
-    return NULL;
+  if (isV4mappedV6addr(&ip)) {
+    if ((ip.s6_addr32[3] == QUAD2IP(0, 0, 0, 0))
+	|| ((ip.s6_addr32[3] & PREFIX2MASK(8)) == QUAD2IP(127, 0, 0, 0))
+	|| ((ip.s6_addr32[3] & PREFIX2MASK(8)) == QUAD2IP(10, 0, 0, 0))
+	|| ((ip.s6_addr32[3] & PREFIX2MASK(12)) == QUAD2IP(172, 16, 0, 0))
+	|| ((ip.s6_addr32[3] & PREFIX2MASK(16)) == QUAD2IP(192, 168, 0, 0))
+	|| (ip.s6_addr32[3] == QUAD2IP(255, 255, 255, 255)))
+      return NULL;
+  } else {
+    if ((ip.s6_addr[0] & 0xE0) != 0x20)
+      return NULL;
+  }
 
   we = whois_first;
   while (we != NULL) {
-    xstrncpy(adds, we->ip_route, WHOISROUTELEN);
-    net.s_addr = ip.s_addr & parse_cidr(adds);
-    convert_ip(adds, &addr);
-    if (addr.s_addr == net.s_addr) {
+    xstrncpy(saddrt, we->ip_route, WHOISROUTELEN);
+    parse_cidr(saddrt, &in6_mask);
+    for (i = 0; i < 16; i++)
+      in6_addrt.s6_addr[i] = ip.s6_addr[i] & in6_mask.s6_addr[i];
+    convert_ip(saddrt, &in6_net);
+    if (compare_ipv6_equal(&in6_addrt, &in6_net) == 0) {
       if (opt.verbose)
-	fprintf(stderr, _("Looking up whois info for %s from cache\n"), inet_ntoa(ip));
+	fprintf(stderr, _("Looking up whois info for %s(/%d) from cache\n"), my_inet_ntop(&ip), convert_mask(&in6_mask));
       return (we);
     }
     we = we->next;
   }
 
   if (opt.verbose)
-    fprintf(stderr, _("Looking up whois info for %s\n"), inet_ntoa(ip));
+    fprintf(stderr, _("Looking up whois info for %s\n"), my_inet_ntop(&ip));
 
   we = xmalloc(sizeof(struct whois_entry));
   whois_from_ip(ip, we);

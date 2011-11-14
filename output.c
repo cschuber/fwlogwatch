@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: output.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: output.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -143,9 +143,9 @@ void output_html_entry(struct conn_data *input, FILE * fd)
     fprintf(fd, "</td><td>%lu", input->datalen);
 
   if (opt.src_ip) {
-    fprintf(fd, "</td><td>%s", inet_ntoa(input->shost));
+    fprintf(fd, "</td><td>%s", my_inet_ntop(&input->shost));
     if (opt.resolve)
-      fprintf(fd, "</td><td>%s", resolve_hostname(input->shost));
+      fprintf(fd, "</td><td>%s", resolve_address(input->shost));
     if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
@@ -165,9 +165,9 @@ void output_html_entry(struct conn_data *input, FILE * fd)
   }
 
   if (opt.dst_ip) {
-    fprintf(fd, "</td><td>%s", inet_ntoa(input->dhost));
+    fprintf(fd, "</td><td>%s", my_inet_ntop(&input->dhost));
     if (opt.resolve)
-      fprintf(fd, "</td><td>%s", resolve_hostname(input->dhost));
+      fprintf(fd, "</td><td>%s", resolve_address(input->dhost));
   }
 
   if (opt.dst_port) {
@@ -261,9 +261,9 @@ void output_text_entry(struct conn_data *input, FILE * fd)
     fprintf(fd, _(" (%lu bytes)"), input->datalen);
 
   if (opt.src_ip) {
-    fprintf(fd, _(" from %s"), inet_ntoa(input->shost));
+    fprintf(fd, _(" from %s"), my_inet_ntop(&input->shost));
     if (opt.resolve)
-      fprintf(fd, " (%s)", resolve_hostname(input->shost));
+      fprintf(fd, " (%s)", resolve_address(input->shost));
     if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
@@ -283,9 +283,9 @@ void output_text_entry(struct conn_data *input, FILE * fd)
   }
 
   if (opt.dst_ip) {
-    fprintf(fd, _(" to %s"), inet_ntoa(input->dhost));
+    fprintf(fd, _(" to %s"), my_inet_ntop(&input->dhost));
     if (opt.resolve) {
-      fprintf(fd, " (%s)", resolve_hostname(input->dhost));
+      fprintf(fd, " (%s)", resolve_address(input->dhost));
     }
   }
 
@@ -424,47 +424,4 @@ void output_html_footer(int fd)
 {
   fdprintf(fd, "<p class=\"copyright\"><a href=\"http://fwlogwatch.inside-security.de/\">%s</a> %s &copy; %s</p>\n", PACKAGE, VERSION, COPYRIGHT);
   fdprintf(fd, "</body>\n</html>\n");
-}
-
-void output_raw_data(struct conn_data *input)
-{
-  struct conn_data *this;
-
-  this = first;
-  while (this != NULL) {
-#ifndef __OpenBSD__
-#ifndef __FreeBSD__
-    printf("%d;%ld;%ld;"
-	   "%s;%s;%s;"
-	   "%s;%d;"
-	   "%u;%d;"
-	   "%u;%d;"
-	   "%d\n",
-	   input->count, input->start_time, input->end_time,
-	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
-#else
-    printf("%d;%ld;%ld;"
-	   "%s;%s;%s;"
-	   "%s;%d;"
-	   "%ld;%d;"
-	   "%ld;%d;"
-	   "%d\n",
-	   input->count, input->start_time, input->end_time,
-	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
-#endif
-#else
-    printf("%d;%d;%d;"
-	   "%s;%s;%s;"
-	   "%s;%d;"
-	   "%u;%d;"
-	   "%u;%d;"
-	   "%d\n",
-	   input->count, input->start_time, input->end_time,
-	   input->hostname, input->chainlabel, input->branchname,
-	   input->interface, input->protocol, ntohl(input->shost.s_addr), input->sport, ntohl(input->dhost.s_addr), input->dport, input->flags);
-#endif
-    this = this->next;
-  }
 }

@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: snort.l,v 1.9 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: snort.l,v 1.10 2011/11/14 12:53:52 bwess Exp $ */
 
 %option prefix="snort"
 %option outfile="snort.c"

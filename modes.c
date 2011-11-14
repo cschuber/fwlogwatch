@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: modes.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: modes.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +60,6 @@ void common_input_loop(int *linenum, int *hitnum, int *errnum, int *oldnum, int 
 
   while (retval) {
     *linenum += 1;
-    hit = PARSE_NO_HIT;
     hit = parse_line(buf, *linenum);
     opt.repeated = 0;
     switch (hit) {
@@ -356,7 +355,7 @@ void mode_summary()
     if (opt.verbose)
       fprintf(stderr, _("Resolving\n"));
 
-    retval = adns_init(&adns, adns_if_noenv, 0);
+    retval = adns_init(&adns, adns_if_none, 0);
     if (retval) {
       perror("adns_init");
       exit(EXIT_FAILURE);
@@ -426,10 +425,17 @@ void check_pidfile()
 void mode_rt_response_reread_conf()
 {
   free_exclude_data();
-  if (read_rcfile(opt.rcfile, MAY_NOT_EXIST) == EXIT_SUCCESS) {
+  if (read_rcfile(opt.rcfile, MAY_NOT_EXIST, RCFILE_CF) == EXIT_SUCCESS) {
     syslog(LOG_NOTICE, _("SIGHUP caught, reread configuration file %s"), opt.rcfile);
   } else {
     syslog(LOG_NOTICE, _("SIGHUP caught, unable to reread configuration file %s"), opt.rcfile);
+  }
+  if (opt.rcfile_dns[0] != '\0') {
+    if (read_rcfile(opt.rcfile_dns, MAY_NOT_EXIST, RCFILE_DNS) == EXIT_SUCCESS) {
+      syslog(LOG_NOTICE, _("Reread DNS cache file %s"), opt.rcfile_dns);
+    } else {
+      syslog(LOG_NOTICE, _("Unable to reread DNS cache file %s"), opt.rcfile_dns);
+    }
   }
   signal(SIGHUP, mode_rt_response_reread_conf);
 }
@@ -629,7 +635,7 @@ void mode_rt_response()
     prepare_socket();
 #ifdef HAVE_ADNS
     if (opt.resolve) {
-      retval = adns_init(&adns, adns_if_noenv, 0);
+      retval = adns_init(&adns, adns_if_none, 0);
       if (retval) {
 	syslog(LOG_NOTICE, "adns_init: %s", strerror(errno));
 	log_exit(EXIT_FAILURE);

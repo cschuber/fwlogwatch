@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: response.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: response.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -110,41 +110,41 @@ void react(unsigned char mode, struct known_hosts *this_host)
   } else {
     xstrncpy(buf, opt.respond_script, BUFSIZE);
     if (mode == EX_RESPOND_ADD) {
-      strncat(buf, " add", BUFSIZE);
+      strncat(buf, " add", BUFSIZE - strlen(buf) - 1);
     } else {
-      strncat(buf, " remove", BUFSIZE);
+      strncat(buf, " remove", BUFSIZE - strlen(buf) - 1);
     }
   }
 
-  snprintf(buf2, BUFSIZE, " %d %s", this_host->count, inet_ntoa(this_host->shost));
-  strncat(buf, buf2, BUFSIZE);
+  snprintf(buf2, BUFSIZE, " %d %s", this_host->count, my_inet_ntop(&this_host->shost));
+  strncat(buf, buf2, BUFSIZE - strlen(buf) - 1);
 
   if (opt.dst_ip) {
-    snprintf(buf2, BUFSIZE, " %s", inet_ntoa(this_host->dhost));
-    strncat(buf, buf2, BUFSIZE);
+    snprintf(buf2, BUFSIZE, " %s", my_inet_ntop(&this_host->dhost));
+    strncat(buf, buf2, BUFSIZE - strlen(buf) - 1);
   } else {
-    strncat(buf, " -", BUFSIZE);
+    strncat(buf, " -", BUFSIZE - strlen(buf) - 1);
   }
 
   if (opt.proto) {
     snprintf(buf2, BUFSIZE, " %d", this_host->protocol);
-    strncat(buf, buf2, BUFSIZE);
+    strncat(buf, buf2, BUFSIZE - strlen(buf) - 1);
   } else {
-    strncat(buf, " -", BUFSIZE);
+    strncat(buf, " -", BUFSIZE - strlen(buf) - 1);
   }
 
   if (opt.src_port) {
     snprintf(buf2, BUFSIZE, " %d", this_host->sport);
-    strncat(buf, buf2, BUFSIZE);
+    strncat(buf, buf2, BUFSIZE - strlen(buf) - 1);
   } else {
-    strncat(buf, " -", BUFSIZE);
+    strncat(buf, " -", BUFSIZE - strlen(buf) - 1);
   }
 
   if (opt.dst_port) {
     snprintf(buf2, BUFSIZE, " %d", this_host->dport);
-    strncat(buf, buf2, BUFSIZE);
+    strncat(buf, buf2, BUFSIZE - strlen(buf) - 1);
   } else {
-    strncat(buf, " -", BUFSIZE);
+    strncat(buf, " -", BUFSIZE - strlen(buf) - 1);
   }
 
   run_command(buf);
@@ -165,7 +165,7 @@ void remove_old(unsigned char mode)
     while (this != NULL) {
       if ((now - this->end_time) >= opt.recent) {
 	if (opt.verbose == 2)
-	  syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), inet_ntoa(this->shost));
+	  syslog(LOG_NOTICE, _("Deleting packet cache entry (%s)"), my_inet_ntop(&this->shost));
 	if (is_first == 1) {
 	  prev = this->next;
 	  free(this->hostname);
@@ -199,7 +199,7 @@ void remove_old(unsigned char mode)
     while (this_host != NULL) {
       if ((this_host->time != 0) && ((now - this_host->time) >= opt.recent)) {
 	if (opt.verbose == 2)
-	  syslog(LOG_NOTICE, _("Deleting host status entry (%s)"), inet_ntoa(this_host->shost));
+	  syslog(LOG_NOTICE, _("Deleting host status entry (%s)"), my_inet_ntop(&this_host->shost));
 	if (opt.response & OPT_RESPOND)
 	  react(EX_RESPOND_REMOVE, this_host);
 	if (is_first == 1) {
@@ -223,15 +223,19 @@ void remove_old(unsigned char mode)
 struct known_hosts *is_known(struct conn_data *host)
 {
   struct known_hosts *this_host;
+  int i;
+  struct in6_addr testhost;
 
   this_host = first_host;
   while (this_host != NULL) {
-    if (this_host->shost.s_addr != (host->shost.s_addr & this_host->netmask.s_addr)) {
+    for (i = 0; i < 16; i++)
+      testhost.s6_addr[i] = host->shost.s6_addr[i] & this_host->netmask.s6_addr[i];
+    if (memcmp(&this_host->shost, &testhost, sizeof(struct in6_addr)) != 0) {
       goto no_match;
     }
     if (this_host->time == 0)
       return this_host;
-    if ((opt.dst_ip) && (this_host->dhost.s_addr != host->dhost.s_addr)) {
+    if ((opt.dst_ip) && (compare_ipv6_equal(&this_host->dhost, &host->dhost) != 0)) {
       goto no_match;
     }
     if ((opt.dst_port) && (this_host->dport != host->dport)) {
@@ -265,7 +269,7 @@ void look_for_alert()
 	this_host->time = time(NULL);
 	this_host->count = (this->count / opt.threshold) * opt.threshold;
 	this_host->shost = this->shost;
-	this_host->netmask.s_addr = 0xFFFFFFFF;
+	memset(&this_host->netmask, 0xff, sizeof(struct in6_addr));
 	this_host->protocol = this->protocol;
 	this_host->dhost = this->dhost;
 	this_host->sport = this->sport;
@@ -273,7 +277,7 @@ void look_for_alert()
 	this_host->id = opt.global_id++;
 	this_host->next = first_host;
 	first_host = this_host;
-	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this_host->count, inet_ntoa(this_host->shost));
+	syslog(LOG_NOTICE, _("ALERT: %d attempts from %s"), this_host->count, my_inet_ntop(&this_host->shost));
 	if (opt.response & OPT_NOTIFY)
 	  react(EX_NOTIFY, this_host);
 	if (opt.response & OPT_RESPOND)
@@ -340,10 +344,10 @@ unsigned char hs_compare(struct known_hosts *op1, struct known_hosts *op2)
     break;
   case SORT_SOURCEHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->shost.s_addr) > ntohl(op2->shost.s_addr))
+      if (compare_ipv6(&op1->shost, &op2->shost) == -1)
 	cond++;
     } else {
-      if (ntohl(op1->shost.s_addr) < ntohl(op2->shost.s_addr))
+      if (compare_ipv6(&op1->shost, &op2->shost) == 1)
 	cond++;
     }
     break;
@@ -358,10 +362,10 @@ unsigned char hs_compare(struct known_hosts *op1, struct known_hosts *op2)
     break;
   case SORT_DESTHOST:
     if (opt.sortmode == ORDER_ASCENDING) {
-      if (ntohl(op1->dhost.s_addr) > ntohl(op2->dhost.s_addr))
+      if (compare_ipv6(&op1->dhost, &op2->dhost) == -1)
 	cond++;
     } else {
-      if (ntohl(op1->dhost.s_addr) < ntohl(op2->dhost.s_addr))
+      if (compare_ipv6(&op1->dhost, &op2->dhost) == 1)
 	cond++;
     }
     break;

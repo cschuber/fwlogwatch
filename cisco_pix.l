@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: cisco_pix.l,v 1.17 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: cisco_pix.l,v 1.18 2011/11/14 12:53:52 bwess Exp $ */
 
 %option prefix="cisco_pix"
 %option outfile="cisco_pix.c"
@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include "main.h"
 #include "utils.h"
+#include "resolve.h"
 
 extern struct options opt;
 
@@ -49,20 +50,23 @@ SYSID	("%PIX"|"%FWSM"|"%ASA")"-"[1-7]"-"[0-9]{6}":"
 {MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{4}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}(":")?	cisco_pix_parse_date(cisco_pixtext, CP_OPT_NONE);
 {LOGHOST}[ ]+": "								/* ignore */
 " Inbound TCP connection denied from "{IPPORT}					cisco_pix_parse_src(cisco_pixtext+36, CP_OPT_TCP);
-" Deny TCP (no connection) from "{IPPORT}					cisco_pix_parse_src(cisco_pixtext+31, CP_OPT_TCP);
-" Deny inbound UDP from "{IPPORT}						cisco_pix_parse_src(cisco_pixtext+23, CP_OPT_UDP);
-" Deny udp src "{ZONEIPPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_UDP_S);
-" Deny udp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_UDP_N);
-" Deny tcp src "{ZONEIPPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_TCP_S);
-" Deny tcp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+14, CP_OPT_TCP_N);
-" Deny icmp src "{ZONEIP}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_ICMP_S);
-" Deny inbound icmp src "{ZONEIP}						cisco_pix_parse_src(cisco_pixtext+23, CP_OPT_ICMP_S);
-" Deny inbound tcp src "{ZONEIPPORT}						cisco_pix_parse_src(cisco_pixtext+22, CP_OPT_TCP_S);
-" Deny inbound (No xlate) tcp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+33, CP_OPT_TCP_S);
-" Deny inbound (No xlate) udp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+33, CP_OPT_UDP_S);
-" Deny inbound (No xlate) icmp src "{ZONEIP}					cisco_pix_parse_src(cisco_pixtext+34, CP_OPT_ICMP_S);
-" Deny UDP reverse path check from "{IP}					cisco_pix_parse_src(cisco_pixtext+34, CP_OPT_UDP_NOPORT);
+" TCP access denied by ACL from "{IPPORT}					cisco_pix_parse_src(cisco_pixtext+31, CP_OPT_TCP);
+" Deny"										xstrncpy(opt.line->branchname, "Deny", SHORTLEN);
+" TCP (no connection) from "{IPPORT}						cisco_pix_parse_src(cisco_pixtext+26, CP_OPT_TCP);
+" inbound UDP from "{IPPORT}							cisco_pix_parse_src(cisco_pixtext+18, CP_OPT_UDP);
+" udp src "{ZONEIPPORT}								cisco_pix_parse_src(cisco_pixtext+9, CP_OPT_UDP_S);
+" udp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+9, CP_OPT_UDP_N);
+" tcp src "{ZONEIPPORT}								cisco_pix_parse_src(cisco_pixtext+9, CP_OPT_TCP_S);
+" tcp src "{ZONENAMEPORT}							cisco_pix_parse_src(cisco_pixtext+9, CP_OPT_TCP_N);
+" icmp src "{ZONEIP}								cisco_pix_parse_src(cisco_pixtext+10, CP_OPT_ICMP_S);
+" inbound icmp src "{ZONEIP}							cisco_pix_parse_src(cisco_pixtext+18, CP_OPT_ICMP_S);
+" inbound tcp src "{ZONEIPPORT}							cisco_pix_parse_src(cisco_pixtext+17, CP_OPT_TCP_S);
+" inbound (No xlate) tcp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+28, CP_OPT_TCP_S);
+" inbound (No xlate) udp src "{ZONEIPPORT}					cisco_pix_parse_src(cisco_pixtext+28, CP_OPT_UDP_S);
+" inbound (No xlate) icmp src "{ZONEIP}						cisco_pix_parse_src(cisco_pixtext+29, CP_OPT_ICMP_S);
+" UDP reverse path check from "{IP}						cisco_pix_parse_src(cisco_pixtext+29, CP_OPT_UDP_NOPORT);
 {IP}" attempted to ping "							cisco_pix_parse_src(cisco_pixtext, CP_OPT_ICMP);
+"to "{ZONEIPPORT}								cisco_pix_parse_dst(cisco_pixtext+3, CP_OPT_DST_S);
 "to "{IPPORT}									cisco_pix_parse_dst(cisco_pixtext+3, CP_OPT_DST);
 "to "{IP}									cisco_pix_parse_dst(cisco_pixtext+3, CP_OPT_NONE);
 "dst "{ZONEIPPORT}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_S);
@@ -81,12 +85,14 @@ SYSID	("%PIX"|"%FWSM"|"%ASA")"-"[1-7]"-"[0-9]{6}":"
 "due to DNS "("Query"|"Response")						/* ignore */
 "("{IP}")"									/* ignore */
 " access-list "{STRING}								xstrncpy(opt.line->chainlabel, cisco_pixtext+13, SHORTLEN);
-" permitted tcp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_TCP_S2);
-" permitted udp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_UDP_S2);
-" permitted icmp "{ZONEIPPORT2}							cisco_pix_parse_src(cisco_pixtext+16, CP_OPT_ICMP_S2);
-" permitted tcp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_TCP_N2);
-" permitted udp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+15, CP_OPT_UDP_N2);
-" permitted icmp "{ZONENAMEPORT2}						cisco_pix_parse_src(cisco_pixtext+16, CP_OPT_ICMP_N2);
+" permitted"									xstrncpy(opt.line->branchname, "permitted", SHORTLEN);
+" denied"									xstrncpy(opt.line->branchname, "denied", SHORTLEN);
+" tcp "{ZONEIPPORT2}								cisco_pix_parse_src(cisco_pixtext+5, CP_OPT_TCP_S2);
+" udp "{ZONEIPPORT2}								cisco_pix_parse_src(cisco_pixtext+5, CP_OPT_UDP_S2);
+" icmp "{ZONEIPPORT2}								cisco_pix_parse_src(cisco_pixtext+6, CP_OPT_ICMP_S2);
+" tcp "{ZONENAMEPORT2}								cisco_pix_parse_src(cisco_pixtext+5, CP_OPT_TCP_N2);
+" udp "{ZONENAMEPORT2}								cisco_pix_parse_src(cisco_pixtext+5, CP_OPT_UDP_N2);
+" icmp "{ZONENAMEPORT2}								cisco_pix_parse_src(cisco_pixtext+6, CP_OPT_ICMP_N2);
 " -> "{ZONEIPPORT2}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_S2);
 " -> "{ZONENAMEPORT2}								cisco_pix_parse_dst(cisco_pixtext+4, CP_OPT_DST_N2);
 "hit-cnt "{NUMBER}								/* ignore */
@@ -103,6 +109,13 @@ SYSID	("%PIX"|"%FWSM"|"%ASA")"-"[1-7]"-"[0-9]{6}":"
 {IP}" Accessed URL ".+								opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 " IGRP request discarded from "{IP}" to "{ZONEIP}				opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 {NUMBER}" in use, "{NUMBER}" most used"						opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" No matching connection for ICMP error message: icmp src "({ZONEIP}|{ZONENAME})" dst "({ZONEIP}|{ZONENAME})" (type "{NUMBER}", code "{NUMBER}") on "{STRING}" interface.  Original IP payload: "(("udp"|"tcp"|"icmp"|"protocol "{NUMBER})" src "({IPPORT}|{STRING}"/"{PORT}|{IP}|{STRING})" dst "({IPPORT}|{STRING}"/"{PORT}|{IP}|{STRING})|"<unknown>")(" (type "{NUMBER}", code "{NUMBER}")")?"."	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" [".*"] drop rate-"{DIGIT}" exceeded. Current burst rate is "{NUMBER}" per second, max configured rate is "{NUMBER}"; Current average rate is "{NUMBER}" per second, max configured rate is "{NUMBER}"; Cumulative total count is "{NUMBER}	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" Begin configuration: "({IP}|{STRING})" reading from http [POST]"		opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" Group = "{STRING}", Username = "{STRING}", IP = "({IP}|{STRING})", ".*	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" Bad TCP hdr length (hdrlen=".*						opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" User '"{STRING}"', running '"("CLI"|"N/A")"' from IP "({IP}|{STRING})", executed '".*"'"	opt.parser=opt.parser|CISCO_PIX_NO_HIT;
+" User '"{STRING}"' executed the '".*"' command."				opt.parser=opt.parser|CISCO_PIX_NO_HIT;
 "["{HEXNUMBER}", "{HEXNUMBER}"]"						/* ignore */
 [ ]+		/* ignore whitespace */
 [\n]		/* ignore */
@@ -177,7 +190,6 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
       return;
   } else if ((mode == CP_OPT_TCP_S2) || (mode == CP_OPT_UDP_S2) || (mode == CP_OPT_ICMP_S2)) {
     char buf[BUFSIZE], *pnt;
-    xstrncpy(opt.line->branchname, "permitted", SHORTLEN);
     pnt = strstr(input, "/");
     *pnt = ' ';
     retval = sscanf(input, "%" BUFSIZE_S "s %3d.%3d.%3d.%3d(%5d)", buf, &shost1, &shost2, &shost3, &shost4, &opt.line->sport);
@@ -191,7 +203,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
       return;
   } else if ((mode == CP_OPT_TCP_N) || (mode == CP_OPT_UDP_N)) {
     char buf[BUFSIZE], *pnt;
-    struct hostent *he;
+    struct in6_addr *ip;
     pnt = strstr(input, ":");
     *pnt = ' ';
     pnt = strstr(input, "/");
@@ -203,9 +215,9 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
       opt.line->protocol = 17;
     if (retval != 2)
       return;
-    he = gethostbyname(buf);
-    if (he != NULL) {
-      opt.line->shost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+    ip = resolve_hostname_from_cache(buf);
+    if (ip != NULL) {
+      memcpy(&opt.line->shost, ip, sizeof(struct in6_addr));
       resolved = 1;
     } else {
       if (opt.verbose)
@@ -214,8 +226,7 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
     }
   } else if ((mode == CP_OPT_TCP_N2) || (mode == CP_OPT_UDP_N2) || (mode == CP_OPT_ICMP_N2)) {
     char buf[BUFSIZE], *pnt;
-    struct hostent *he;
-    xstrncpy(opt.line->branchname, "permitted", SHORTLEN);
+    struct in6_addr *ip;
     pnt = strstr(input, "/");
     *pnt = ' ';
     pnt = strstr(input, "(");
@@ -231,9 +242,9 @@ void cisco_pix_parse_src(char *input, unsigned char mode)
       opt.line->protocol = 1;
     if (retval != 2)
       return;
-    he = gethostbyname(buf);
-    if (he != NULL) {
-      opt.line->shost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+    ip = resolve_hostname_from_cache(buf);
+    if (ip != NULL) {
+      memcpy(&opt.line->shost, ip, sizeof(struct in6_addr));
       resolved = 1;
     } else {
       if (opt.verbose)
@@ -295,7 +306,7 @@ void cisco_pix_parse_dst(char *input, unsigned char mode)
       return;
   } else if (mode == CP_OPT_DST_N) {
     char buf[BUFSIZE], *pnt;
-    struct hostent *he;
+    struct in6_addr *ip;
     pnt = strstr(input, ":");
     *pnt = ' ';
     pnt = strstr(input, "/");
@@ -303,9 +314,9 @@ void cisco_pix_parse_dst(char *input, unsigned char mode)
     retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->dport);
     if (retval != 2)
       return;
-    he = gethostbyname(buf);
-    if (he != NULL) {
-      opt.line->dhost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+    ip = resolve_hostname_from_cache(buf);
+    if (ip != NULL) {
+      memcpy(&opt.line->dhost, ip, sizeof(struct in6_addr));
       resolved = 1;
     } else {
       if (opt.verbose)
@@ -314,7 +325,7 @@ void cisco_pix_parse_dst(char *input, unsigned char mode)
     }
   } else if (mode == CP_OPT_DST_N2) {
     char buf[BUFSIZE], *pnt;
-    struct hostent *he;
+    struct in6_addr *ip;
     pnt = strstr(input, "/");
     *pnt = ' ';
     pnt = strstr(input, "(");
@@ -324,9 +335,9 @@ void cisco_pix_parse_dst(char *input, unsigned char mode)
     retval = sscanf(input, "%*s %" BUFSIZE_S "s %5d", buf, &opt.line->dport);
     if (retval != 2)
       return;
-    he = gethostbyname(buf);
-    if (he != NULL) {
-      opt.line->dhost.s_addr = ((struct in_addr *) he->h_addr_list[0])->s_addr;
+    ip = resolve_hostname_from_cache(buf);
+    if (ip != NULL) {
+      memcpy(&opt.line->dhost, ip, sizeof(struct in6_addr));
       resolved = 1;
     } else {
       if (opt.verbose)
@@ -372,7 +383,7 @@ unsigned char flex_cisco_pix(char *input, int linenum)
 
   xstrncpy(opt.line->interface, "-", SHORTLEN);
   xstrncpy(opt.line->chainlabel, "-", SHORTLEN);
-  xstrncpy(opt.line->branchname, "Deny", SHORTLEN);
+  xstrncpy(opt.line->branchname, "-", SHORTLEN);
   opt.line->count = 1;
 
   cisco_pix_scan_string(input);

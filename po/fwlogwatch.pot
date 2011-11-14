@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-06 13:58+0200\n"
+"POT-Creation-Date: 2011-11-11 13:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,8 +37,8 @@ msgstr ""
 msgid "Error in sort string, direction expected, ignoring.\n"
 msgstr ""
 
-#: ../compare.c:382 ../compare.c:384 ../modes.c:196 ../modes.c:203
-#: ../modes.c:813 ../modes.c:815 ../output.c:106 ../output.c:113
+#: ../compare.c:382 ../compare.c:384 ../modes.c:195 ../modes.c:202
+#: ../modes.c:819 ../modes.c:821 ../output.c:106 ../output.c:113
 #: ../output.c:193 ../output.c:202 ../output.c:380
 msgid "%b %d %H:%M:%S"
 msgstr ""
@@ -114,7 +115,7 @@ msgstr ""
 
 #: ../main.c:40
 #, c-format
-msgid "  -m <count>   only show entries with at least so many incidents\n"
+msgid "  -i <file>    initialize DNS cache with entries from file\n"
 msgstr ""
 
 #: ../main.c:41
@@ -124,698 +125,713 @@ msgstr ""
 
 #: ../main.c:42
 #, c-format
-msgid "  -N           resolve service names\n"
+msgid "  -m <count>   only show entries with at least so many incidents\n"
 msgstr ""
 
 #: ../main.c:43
 #, c-format
-msgid "  -n           resolve host names\n"
+msgid "  -N           resolve service names\n"
 msgstr ""
 
 #: ../main.c:44
 #, c-format
-msgid "  -O <order>   define the sort order (see the man page for details)\n"
+msgid "  -n           resolve host names\n"
 msgstr ""
 
 #: ../main.c:45
+#, c-format
+msgid "  -O <order>   define the sort order (see the man page for details)\n"
+msgstr ""
+
+#: ../main.c:46
 #, c-format
 msgid ""
 "  -P <format>  use parsers for specific formats (defaults to netfilter)\n"
 msgstr ""
 
-#: ../main.c:46
+#: ../main.c:47
 #, c-format
 msgid "               i: ipchains, n: netfilter, f: ipfilter, c: cisco ios\n"
 msgstr ""
 
-#: ../main.c:47
+#: ../main.c:48
 #, c-format
 msgid ""
 "               p: cisco pix, e: netscreen, l: lancom, s: snort, b: ipfw\n"
 msgstr ""
 
-#: ../main.c:48
+#: ../main.c:49
 #, c-format
 msgid "  -p           differentiate protocols\n"
 msgstr ""
 
-#: ../main.c:49
+#: ../main.c:50
 #, c-format
 msgid "  -s           differentiate source ports\n"
 msgstr ""
 
-#: ../main.c:50
+#: ../main.c:51
 #, c-format
 msgid "  -U <title>   set report and status page title and email subject\n"
 msgstr ""
 
-#: ../main.c:51
+#: ../main.c:52
 #, c-format
 msgid "  -v           verbose, specify twice for more info\n"
 msgstr ""
 
-#: ../main.c:52
+#: ../main.c:53
 #, c-format
 msgid "  -y           differentiate TCP options\n"
 msgstr ""
 
-#: ../main.c:55
+#: ../main.c:56
 #, c-format
 msgid "Log summary mode (default):\n"
 msgstr ""
 
-#: ../main.c:56
+#: ../main.c:57
 #, c-format
 msgid "  -C <email>   carbon copy recipients\n"
 msgstr ""
 
-#: ../main.c:57
+#: ../main.c:58
 #, c-format
 msgid "  -e           show end times\n"
 msgstr ""
 
-#: ../main.c:58
+#: ../main.c:59
 #, c-format
 msgid "  -F <email>   report sender address (defaults to '%s')\n"
 msgstr ""
 
-#: ../main.c:59
+#: ../main.c:60
 #, c-format
 msgid "  -l <time>    process recent events only (defaults to off)\n"
 msgstr ""
 
-#: ../main.c:60
+#: ../main.c:61
 #, c-format
 msgid "  -o <file>    specify output file\n"
 msgstr ""
 
-#: ../main.c:61
+#: ../main.c:62
 #, c-format
 msgid "  -S           do not differentiate source IP addresses\n"
 msgstr ""
 
-#: ../main.c:62
+#: ../main.c:63
 #, c-format
 msgid "  -T <email>   send report by email to this address\n"
 msgstr ""
 
-#: ../main.c:63
+#: ../main.c:64
 #, c-format
 msgid "  -t           show start times\n"
 msgstr ""
 
-#: ../main.c:64
+#: ../main.c:65
 #, c-format
 msgid "  -W           activate whois lookups for source addresses\n"
 msgstr ""
 
-#: ../main.c:65
+#: ../main.c:66
 #, c-format
 msgid "  -w           HTML output\n"
 msgstr ""
 
-#: ../main.c:66
+#: ../main.c:67
 #, c-format
 msgid "  -z           show time interval\n"
 msgstr ""
 
-#: ../main.c:69
+#: ../main.c:70
 #, c-format
 msgid "Realtime response mode:\n"
 msgstr ""
 
-#: ../main.c:70
+#: ../main.c:71
 #, c-format
 msgid "  -R           realtime response as daemon (default action: log only)\n"
 msgstr ""
 
-#: ../main.c:71
+#: ../main.c:72
 #, c-format
 msgid "  -a <count>   alert threshold (defaults to %d entries)\n"
 msgstr ""
 
-#: ../main.c:72
+#: ../main.c:73
 #, c-format
 msgid "  -l <time>    forget events this old (defaults to %d hours)\n"
 msgstr ""
 
-#: ../main.c:73
+#: ../main.c:74
 #, c-format
 msgid "  -k <IP/net>  add this IP address or net to the list of known hosts\n"
 msgstr ""
 
-#: ../main.c:74
+#: ../main.c:75
 #, c-format
 msgid "  -A           invoke notification script if threshold is reached\n"
 msgstr ""
 
-#: ../main.c:75
+#: ../main.c:76
 #, c-format
 msgid "  -B           invoke response action script (e.g. block host)\n"
 msgstr ""
 
-#: ../main.c:76
+#: ../main.c:77
 #, c-format
 msgid "  -X <port>    activate internal status information web server\n"
 msgstr ""
 
-#: ../main.c:102
+#: ../main.c:103
 msgid "You can contact the author at <bw@inside-security.de>."
 msgstr ""
 
-#: ../main.c:104
+#: ../main.c:105
 msgid "Compile-time options of this version:"
 msgstr ""
 
-#: ../main.c:105
+#: ../main.c:106
 #, c-format
 msgid "Short name limit "
 msgstr ""
 
-#: ../main.c:107 ../main.c:113 ../main.c:119 ../main.c:125 ../main.c:131
+#: ../main.c:108 ../main.c:114 ../main.c:120 ../main.c:126
 msgid "enabled"
 msgstr ""
 
-#: ../main.c:109 ../main.c:115 ../main.c:121 ../main.c:127 ../main.c:133
+#: ../main.c:110 ../main.c:116 ../main.c:122 ../main.c:128
 msgid "disabled"
 msgstr ""
 
-#: ../main.c:111
+#: ../main.c:112
 #, c-format
 msgid "Zlib support "
 msgstr ""
 
-#: ../main.c:117
+#: ../main.c:118
 #, c-format
 msgid "Gettext (i18n) support "
 msgstr ""
 
-#: ../main.c:123
-#, c-format
-msgid "IPv6 support "
-msgstr ""
-
-#: ../main.c:129
+#: ../main.c:124
 #, c-format
 msgid "GNU adns support "
 msgstr ""
 
-#: ../main.c:287
+#: ../main.c:282
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 1 (expected [ie]): %s\n"
 msgstr ""
 
-#: ../main.c:288 ../main.c:305 ../main.c:314 ../main.c:452
+#: ../main.c:283 ../main.c:300 ../main.c:309 ../main.c:453
 #, c-format
 msgid "Exiting\n"
 msgstr ""
 
-#: ../main.c:304
+#: ../main.c:299
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 2 (expected [hpcb]): %s\n"
 msgstr ""
 
-#: ../main.c:313
+#: ../main.c:308
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 3 (expected [sd]): %s\n"
 msgstr ""
 
-#: ../modes.c:109
+#: ../modes.c:108
 #, c-format
 msgid "Using stdin as input\n"
 msgstr ""
 
-#: ../modes.c:115
+#: ../modes.c:114
 #, c-format
 msgid "Opening input file '%s'\n"
 msgstr ""
 
-#: ../modes.c:133
+#: ../modes.c:132
 #, c-format
 msgid "Processing\n"
 msgstr ""
 
-#: ../modes.c:140
+#: ../modes.c:139
 #, c-format
 msgid "Unrecognized entries or tokens can be submitted at\n"
 msgstr ""
 
-#: ../modes.c:149 ../modes.c:396 ../modes.c:782 ../rcfile.c:321
+#: ../modes.c:148 ../modes.c:395 ../modes.c:788 ../rcfile.c:379
 #, c-format
 msgid "Closing '%s'\n"
 msgstr ""
 
-#: ../modes.c:178
+#: ../modes.c:177
 #, c-format
 msgid "Sorting data\n"
 msgstr ""
 
-#: ../modes.c:215
+#: ../modes.c:214
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr ""
 
-#: ../modes.c:226
+#: ../modes.c:225
 #, c-format
 msgid "Sending\n"
 msgstr ""
 
-#: ../modes.c:249 ../net.c:364 ../net.c:367
+#: ../modes.c:248 ../net.c:341 ../net.c:344
 msgid "%A %B %d %H:%M:%S %Z %Y"
 msgstr ""
 
-#: ../modes.c:250
+#: ../modes.c:249
 #, c-format
 msgid "Generated %s by "
 msgstr ""
 
-#: ../modes.c:260
+#: ../modes.c:259
 #, c-format
 msgid "an unknown user.\n"
 msgstr ""
 
-#: ../modes.c:268
+#: ../modes.c:267
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr ""
 
-#: ../modes.c:271
+#: ../modes.c:270
 #, c-format
 msgid "(and %d malformed) "
 msgstr ""
 
-#: ../modes.c:274
+#: ../modes.c:273
 #, c-format
 msgid "of %d entries in the file \"%s\" are packet logs, "
 msgstr ""
 
-#: ../modes.c:276
+#: ../modes.c:275
 #, c-format
 msgid "of %d entries in standard input are packet logs, "
 msgstr ""
 
-#: ../modes.c:278
+#: ../modes.c:277
 #, c-format
 msgid "of %d entries in %d input files are packet logs, "
 msgstr ""
 
-#: ../modes.c:282
+#: ../modes.c:281
 #, c-format
 msgid "one has unique characteristics.\n"
 msgstr ""
 
-#: ../modes.c:284
+#: ../modes.c:283
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr ""
 
-#: ../modes.c:292
+#: ../modes.c:291
 #, c-format
 msgid "One entry was excluded by configuration.\n"
 msgstr ""
 
-#: ../modes.c:294
+#: ../modes.c:293
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr ""
 
-#: ../modes.c:302
+#: ../modes.c:301
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr ""
 
-#: ../modes.c:304 ../modes.c:811
+#: ../modes.c:303 ../modes.c:817
 #, c-format
 msgid "No valid time entries found.\n"
 msgstr ""
 
-#: ../modes.c:311
+#: ../modes.c:310
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:318
+#: ../modes.c:317
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:325
+#: ../modes.c:324
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:332
+#: ../modes.c:331
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr ""
 
-#: ../modes.c:339
+#: ../modes.c:338
 #, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr ""
 
-#: ../modes.c:346
+#: ../modes.c:345
 #, c-format
 msgid "Only the top %d entries are shown.\n"
 msgstr ""
 
-#: ../modes.c:357
+#: ../modes.c:356
 #, c-format
 msgid "Resolving\n"
 msgstr ""
 
-#: ../modes.c:416
+#: ../modes.c:415
 #, c-format
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr ""
 
-#: ../modes.c:430
+#: ../modes.c:429
 #, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr ""
 
-#: ../modes.c:432
+#: ../modes.c:431
 #, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr ""
 
-#: ../modes.c:455
+#: ../modes.c:435
+#, c-format
+msgid "Reread DNS cache file %s"
+msgstr ""
+
+#: ../modes.c:437
+#, c-format
+msgid "Unable to reread DNS cache file %s"
+msgstr ""
+
+#: ../modes.c:461
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:457
+#: ../modes.c:463
 #, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr ""
 
-#: ../modes.c:529
+#: ../modes.c:535
 msgid "SIGTERM caught, cleaning up"
 msgstr ""
 
-#: ../modes.c:611
+#: ../modes.c:617
 #, c-format
 msgid "Starting (pid %d)"
 msgstr ""
 
-#: ../modes.c:661
+#: ../modes.c:667
 msgid "User to run as was not found"
 msgstr ""
 
-#: ../modes.c:676
+#: ../modes.c:682
 #, c-format
 msgid "Changed uid from %d to %d, gid from %d to %d"
 msgstr ""
 
-#: ../modes.c:678
+#: ../modes.c:684
 #, c-format
 msgid "Running with uid %d, gid %d"
 msgstr ""
 
-#: ../modes.c:682
-msgid "Alert threshold is one attempt"
-msgstr ""
-
-#: ../modes.c:684
-#, c-format
-msgid "Alert threshold is %d attempts"
-msgstr ""
-
 #: ../modes.c:688
-#, c-format
-msgid "Events older than %d second(s) are discarded"
+msgid "Alert threshold is one attempt"
 msgstr ""
 
 #: ../modes.c:690
 #, c-format
+msgid "Alert threshold is %d attempts"
+msgstr ""
+
+#: ../modes.c:694
+#, c-format
+msgid "Events older than %d second(s) are discarded"
+msgstr ""
+
+#: ../modes.c:696
+#, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr ""
 
-#: ../modes.c:693
+#: ../modes.c:699
 #, c-format
 msgid "Response mode: Log%s%s"
 msgstr ""
 
-#: ../modes.c:693 ../net.c:373
+#: ../modes.c:699 ../net.c:350
 msgid ", notify"
 msgstr ""
 
-#: ../modes.c:693 ../net.c:373
+#: ../modes.c:699 ../net.c:350
 msgid ", respond"
 msgstr ""
 
-#: ../modes.c:724
+#: ../modes.c:730
 #, c-format
 msgid "Reading standard input\n"
 msgstr ""
 
-#: ../modes.c:742
+#: ../modes.c:748
 #, c-format
 msgid "Reading '%s'\n"
 msgstr ""
 
-#: ../modes.c:808
+#: ../modes.c:814
 #, c-format
 msgid "Number of files: %d\n"
 msgstr ""
 
-#: ../modes.c:809
+#: ../modes.c:815
 #, c-format
 msgid "Number of lines: %d\n"
 msgstr ""
 
-#: ../modes.c:814
+#: ../modes.c:820
 #, c-format
 msgid "First entry: %s\n"
 msgstr ""
 
-#: ../modes.c:816
+#: ../modes.c:822
 #, c-format
 msgid "Last entry : %s\n"
 msgstr ""
 
-#: ../modes.c:818
+#: ../modes.c:824
 #, c-format
 msgid "Difference : %s\n"
 msgstr ""
 
-#: ../net.c:130 ../net.c:132
+#: ../net.c:106
 #, c-format
 msgid "Listening on %s port %i"
 msgstr ""
 
-#: ../net.c:172
+#: ../net.c:109
+#, c-format
+msgid "Connections are only allowed from %s"
+msgstr ""
+
+#: ../net.c:149
 msgid "decode_base64: input string incomplete"
 msgstr ""
 
-#: ../net.c:179
+#: ../net.c:156
 #, c-format
 msgid "decode_base64: illegal character '%c' in input string"
 msgstr ""
 
-#: ../net.c:214
+#: ../net.c:191
 msgid "count"
 msgstr ""
 
-#: ../net.c:215
+#: ../net.c:192
 msgid "added"
 msgstr ""
 
-#: ../net.c:217
+#: ../net.c:194
 msgid "proto"
 msgstr ""
 
-#: ../net.c:219
+#: ../net.c:196
 msgid "bytes"
 msgstr ""
 
-#: ../net.c:220
+#: ../net.c:197
 msgid "source"
 msgstr ""
 
-#: ../net.c:222 ../net.c:231
+#: ../net.c:199 ../net.c:208
 msgid "hostname"
 msgstr ""
 
-#: ../net.c:224 ../net.c:234
+#: ../net.c:201 ../net.c:211
 msgid "port"
 msgstr ""
 
-#: ../net.c:226 ../net.c:236
+#: ../net.c:203 ../net.c:213
 msgid "service"
 msgstr ""
 
-#: ../net.c:229
+#: ../net.c:206
 msgid "destination"
 msgstr ""
 
-#: ../net.c:239
+#: ../net.c:216
 msgid "opts"
 msgstr ""
 
-#: ../net.c:240
+#: ../net.c:217
 msgid "time remaining"
 msgstr ""
 
-#: ../net.c:241
+#: ../net.c:218
 msgid "action"
 msgstr ""
 
-#: ../net.c:293 ../net.c:295 ../net.c:360
+#: ../net.c:270 ../net.c:272 ../net.c:337
 msgid "Information"
 msgstr ""
 
-#: ../net.c:299 ../net.c:301 ../net.c:398
+#: ../net.c:276 ../net.c:278 ../net.c:375
 msgid "Options"
 msgstr ""
 
-#: ../net.c:305 ../net.c:307 ../net.c:426
+#: ../net.c:282 ../net.c:284 ../net.c:403
 msgid "Packet cache"
 msgstr ""
 
-#: ../net.c:311 ../net.c:313 ../net.c:495
+#: ../net.c:288 ../net.c:290 ../net.c:472
 msgid "Host status"
 msgstr ""
 
-#: ../net.c:316
+#: ../net.c:293
 msgid "Reload"
 msgstr ""
 
-#: ../net.c:365
+#: ../net.c:342
 msgid "Daemon start time"
 msgstr ""
 
-#: ../net.c:368
+#: ../net.c:345
 msgid "Current time"
 msgstr ""
 
-#: ../net.c:371
+#: ../net.c:348
 msgid "Running time"
 msgstr ""
 
-#: ../net.c:373
+#: ../net.c:350
 msgid "Log"
 msgstr ""
 
-#: ../net.c:374
+#: ../net.c:351
 msgid "Response mode"
 msgstr ""
 
-#: ../net.c:376
+#: ../net.c:353
 msgid "Lines seen"
 msgstr ""
 
-#: ../net.c:377
+#: ../net.c:354
 msgid "Hits"
 msgstr ""
 
-#: ../net.c:378
+#: ../net.c:355
 msgid "Old/excluded/malformed"
 msgstr ""
 
-#: ../net.c:385
+#: ../net.c:362
 msgid "Entries in packet cache"
 msgstr ""
 
-#: ../net.c:392
+#: ../net.c:369
 msgid "Entries in host status"
 msgstr ""
 
-#: ../net.c:400
+#: ../net.c:377
 msgid "Parameter"
 msgstr ""
 
-#: ../net.c:402
+#: ../net.c:379
 msgid "Decrease"
 msgstr ""
 
-#: ../net.c:404
+#: ../net.c:381
 msgid "Current"
 msgstr ""
 
-#: ../net.c:406
+#: ../net.c:383
 msgid "Increase"
 msgstr ""
 
-#: ../net.c:408
+#: ../net.c:385
 msgid "Alert threshold"
 msgstr ""
 
-#: ../net.c:410
+#: ../net.c:387
 msgid "Discard timeout"
 msgstr ""
 
-#: ../net.c:411
+#: ../net.c:388
 msgid "Minimum count in packet cache"
 msgstr ""
 
-#: ../net.c:413 ../net.c:415
+#: ../net.c:390 ../net.c:392
 msgid "Top amount of entries in packet cache"
 msgstr ""
 
-#: ../net.c:418 ../net.c:420
+#: ../net.c:395 ../net.c:397
 msgid "Refresh time"
 msgstr ""
 
-#: ../net.c:442 ../net.c:565
+#: ../net.c:419 ../net.c:528
 msgid "%Y/%m/%d %H:%M:%S"
 msgstr ""
 
-#: ../net.c:479 ../net.c:595
+#: ../net.c:456 ../net.c:558
 msgid "drop"
 msgstr ""
 
-#: ../net.c:481
+#: ../net.c:458
 msgid "escalate"
 msgstr ""
 
-#: ../net.c:527 ../net.c:546 ../net.c:552 ../net.c:558
+#: ../net.c:493 ../net.c:509 ../net.c:515 ../net.c:521
 msgid "<td>any</td>"
 msgstr ""
 
-#: ../net.c:540
+#: ../net.c:503
 msgid "<td>(known host)</td>"
 msgstr ""
 
-#: ../net.c:542
+#: ../net.c:505
 msgid "<td>(known net)</td>"
 msgstr ""
 
-#: ../net.c:654 ../net.c:657
+#: ../net.c:605
 #, c-format
-msgid "Rejected connect from unallowed ip %s port %i"
+msgid "Rejected connection from unallowed IP address %s port %i"
 msgstr ""
 
-#: ../net.c:668 ../net.c:670
+#: ../net.c:614
 #, c-format
 msgid "Connect from %s port %i"
 msgstr ""
 
-#: ../net.c:734
+#: ../net.c:677
 msgid "Authorization failed"
 msgstr ""
 
-#: ../net.c:737
+#: ../net.c:680
 msgid "Authorization required"
 msgstr ""
 
-#: ../net.c:814
+#: ../net.c:757
 msgid "Bad request"
 msgstr ""
 
-#: ../net.c:819
+#: ../net.c:762
 msgid "Redirect"
 msgstr ""
 
-#: ../net.c:819
+#: ../net.c:762
 msgid "You should be redirected to the <a href=\"/\">root directory</a>"
 msgstr ""
 
-#: ../net.c:831
+#: ../net.c:774
 #, c-format
 msgid "Requested function: %s"
 msgstr ""
 
-#: ../net.c:834
+#: ../net.c:777
 msgid "Connection closed"
 msgstr ""
 
@@ -934,32 +950,42 @@ msgstr ""
 msgid "<th>opts</th>"
 msgstr ""
 
-#: ../parser.c:263
+#: ../parser.c:270
 #, c-format
 msgid "Unknown parser: '%c'.\n"
 msgstr ""
 
-#: ../rcfile.c:57
+#: ../rcfile.c:58
 #, c-format
 msgid "Error in configuration file '%s' line %d: not a number\n"
 msgstr ""
 
-#: ../rcfile.c:86
+#: ../rcfile.c:87
 #, c-format
 msgid "Error in configuration file '%s' line %d, assuming 'true'\n"
 msgstr ""
 
-#: ../rcfile.c:278
+#: ../rcfile.c:281
 #, c-format
 msgid "Unrecognized option in configuration file '%s' line %d\n"
 msgstr ""
 
-#: ../rcfile.c:299
+#: ../rcfile.c:332
+#, c-format
+msgid "Unrecognized entry in DNS cache file '%s' line %d\n"
+msgstr ""
+
+#: ../rcfile.c:349
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr ""
 
-#: ../rcfile.c:307
+#: ../rcfile.c:358
+#, c-format
+msgid "Opening DNS cache file '%s'\n"
+msgstr ""
+
+#: ../rcfile.c:360
 #, c-format
 msgid "Opening configuration file '%s'\n"
 msgstr ""
@@ -969,24 +995,17 @@ msgstr ""
 msgid "port mismatch: %d != %d\n"
 msgstr ""
 
-#: ../resolve.c:81 ../resolve.c:151
-#, c-format
-msgid "Resolving %s from cache\n"
+#: ../resolve.c:99 ../resolve.c:175
+msgid "[timeout]"
 msgstr ""
 
-#: ../resolve.c:89 ../resolve.c:112
+#: ../resolve.c:101 ../resolve.c:177
+msgid "[server failure]"
+msgstr ""
+
+#: ../resolve.c:111 ../resolve.c:216
 #, c-format
 msgid "Resolving %s\n"
-msgstr ""
-
-#: ../resolve.c:95
-#, c-format
-msgid "Wrong host name size\n"
-msgstr ""
-
-#: ../resolve.c:119
-#, c-format
-msgid "%s [forward lookup: %s]"
 msgstr ""
 
 #: ../resolve.c:122
@@ -994,25 +1013,46 @@ msgstr ""
 msgid "%s [forward lookup failed]"
 msgstr ""
 
-#: ../resolve.c:163
+#: ../resolve.c:134
 #, c-format
-msgid "Resolving %s from adns\n"
+msgid " [v4 forward lookup: %s]"
 msgstr ""
 
-#: ../resolve.c:167
-msgid "[inconsistent forward lookup]"
+#: ../resolve.c:141
+#, c-format
+msgid " [v6 forward lookup: %s]"
 msgstr ""
 
-#: ../resolve.c:171
+#: ../resolve.c:183
 #, c-format
 msgid "[adns status %d]"
 msgstr ""
 
-#: ../resolve.c:189
-msgid "DNS cache error"
+#: ../resolve.c:195
+msgid "[adns error]"
 msgstr ""
 
-#: ../resolve.c:207
+#: ../resolve.c:209 ../resolve.c:357
+#, c-format
+msgid "Resolving %s from cache\n"
+msgstr ""
+
+#: ../resolve.c:221
+#, c-format
+msgid "Resolving %s from adns\n"
+msgstr ""
+
+#: ../resolve.c:243
+#, c-format
+msgid "IP address %s is already in DNS cache\n"
+msgstr ""
+
+#: ../resolve.c:249
+#, c-format
+msgid "Adding IP address '%s' with host name '%s' to DNS cache\n"
+msgstr ""
+
+#: ../resolve.c:286
 #, c-format
 msgid "Submitted %s to adns\n"
 msgstr ""
@@ -1045,7 +1085,7 @@ msgstr ""
 msgid "Deleting host status entry (%s)"
 msgstr ""
 
-#: ../response.c:276
+#: ../response.c:280
 #, c-format
 msgid "ALERT: %d attempts from %s"
 msgstr ""
@@ -1081,45 +1121,50 @@ msgid ""
 "   entries in the default configuration and use command line parameters.\n"
 msgstr ""
 
-#: ../utils.c:268
+#: ../utils.c:301
+#, c-format
+msgid "[error]"
+msgstr ""
+
+#: ../utils.c:317
 #, c-format
 msgid "IP address error: %s\n"
 msgstr ""
 
-#: ../utils.c:294
+#: ../utils.c:342 ../utils.c:353
 #, c-format
 msgid "Error in CIDR format: %s\n"
 msgstr ""
 
-#: ../utils.c:312
+#: ../utils.c:403
 #, c-format
 msgid "(known host)\n"
 msgstr ""
 
-#: ../utils.c:351
+#: ../utils.c:443
 #, c-format
 msgid "(excluded host)\n"
 msgstr ""
 
-#: ../whois.c:220
+#: ../whois.c:226
 #, c-format
-msgid "Looking up whois info for %s from cache\n"
+msgid "Looking up whois info for %s(/%d) from cache\n"
 msgstr ""
 
-#: ../whois.c:227
+#: ../whois.c:233
 #, c-format
 msgid "Looking up whois info for %s\n"
 msgstr ""
 
-#: ../whois.c:248
+#: ../whois.c:254
 #, c-format
 msgid "lookup failed: %s\n"
 msgstr ""
 
-#: ../main.h:300
+#: ../main.h:308
 msgid "fwlogwatch summary"
 msgstr ""
 
-#: ../main.h:310
+#: ../main.h:318
 msgid "fwlogwatch status"
 msgstr ""

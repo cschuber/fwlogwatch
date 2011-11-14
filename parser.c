@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: parser.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: parser.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,16 +8,17 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "compare.h"
 #include "cisco_ios.h"
 #include "cisco_pix.h"
+#include "compare.h"
 #include "ipchains.h"
 #include "ipfilter.h"
 #include "ipfw.h"
-#include "netfilter.h"
-#include "snort.h"
-#include "netscreen.h"
 #include "lancom.h"
+#include "netfilter.h"
+#include "netscreen.h"
+#include "snort.h"
+#include "utils.h"
 
 struct parser_options *excluded_first;
 extern struct options opt;
@@ -100,8 +101,12 @@ unsigned char parse_line(char *input, int linenum)
       excluded_this = excluded_first;
       while (excluded_this != NULL) {
 	if ((match != P_MATCH_EXC) && (excluded_this->mode & PARSER_MODE_HOST) != 0) {
+	  struct in6_addr testhost;
+	  int i;
 	  if ((excluded_this->mode & PARSER_MODE_SRC) != 0) {
-	    if ((opt.line->shost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
+	    for (i = 0; i < 16; i++)
+	      testhost.s6_addr[i] = opt.line->shost.s6_addr[i] & excluded_this->netmask.s6_addr[i];
+	    if (compare_ipv6_equal(&testhost, &excluded_this->host) == 0) {
 	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {
@@ -109,7 +114,9 @@ unsigned char parse_line(char *input, int linenum)
 	      }
 	    }
 	  } else {
-	    if ((opt.line->dhost.s_addr & excluded_this->netmask.s_addr) == excluded_this->value) {
+	    for (i = 0; i < 16; i++)
+	      testhost.s6_addr[i] = opt.line->dhost.s6_addr[i] & excluded_this->netmask.s6_addr[i];
+	    if (compare_ipv6_equal(&testhost, &excluded_this->host) == 0) {
 	      if ((excluded_this->mode & PARSER_MODE_NOT) != 0) {
 		match = P_MATCH_EXC;
 	      } else {

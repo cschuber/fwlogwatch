@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: net.c,v 1.29 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: net.c,v 1.30 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,10 +19,12 @@
 #include <arpa/inet.h>
 #include <signal.h>
 
+#ifndef __APPLE__
 #ifndef __OpenBSD__
 #ifndef __FreeBSD__
 #ifndef __NetBSD__
 #include <crypt.h>
+#endif
 #endif
 #endif
 #endif
@@ -36,6 +38,7 @@
 #include "response.h"
 #include "resolve.h"
 #include "compare.h"
+#include "utils.h"
 
 extern struct options opt;
 extern struct conn_data *first;
@@ -59,20 +62,10 @@ void secure_read(int file, char *data_out, int maxlen)
 void prepare_socket()
 {
   int retval, x;
-#ifndef HAVE_IPV6
-  struct sockaddr_in sa;
-  struct in_addr ina;
-#else
   struct sockaddr_in6 sain6;
   struct in6_addr in6a;
-  char nab[INET6_ADDRSTRLEN];
-#endif
 
-#ifndef HAVE_IPV6
-  opt.sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-#else
   opt.sock = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
-#endif
   if (opt.sock == -1) {
     syslog(LOG_NOTICE, "socket: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
@@ -83,17 +76,6 @@ void prepare_socket()
     syslog(LOG_NOTICE, "setsockopt: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
   }
-#ifndef HAVE_IPV6
-  ina.s_addr = inet_addr(opt.listenif);
-  if (ina.s_addr == -1) {
-    syslog(LOG_NOTICE, "inet_addr: Bad address %s", opt.listenif);
-    log_exit(EXIT_FAILURE);
-  }
-  bzero(&sa, sizeof(sa));
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons(opt.listenport);
-  sa.sin_addr = ina;
-#else
   retval = inet_pton(AF_INET6, opt.listenif, in6a.s6_addr);
   if (retval != 1) {
     char nnb[HOSTLEN];
@@ -109,13 +91,8 @@ void prepare_socket()
   sain6.sin6_family = AF_INET6;
   sain6.sin6_port = htons(opt.listenport);
   sain6.sin6_addr = in6a;
-#endif
 
-#ifndef HAVE_IPV6
-  retval = bind(opt.sock, (struct sockaddr *) &sa, sizeof(sa));
-#else
   retval = bind(opt.sock, (struct sockaddr *) &sain6, sizeof(sain6));
-#endif
   if (retval == -1) {
     syslog(LOG_NOTICE, "bind: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
@@ -126,11 +103,11 @@ void prepare_socket()
     syslog(LOG_NOTICE, "listen: %s", strerror(errno));
     log_exit(EXIT_FAILURE);
   }
-#ifndef HAVE_IPV6
-  syslog(LOG_NOTICE, _("Listening on %s port %i"), inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
-#else
-  syslog(LOG_NOTICE, _("Listening on %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
-#endif
+  syslog(LOG_NOTICE, _("Listening on %s port %i"), my_inet_ntop(&sain6.sin6_addr), ntohs(sain6.sin6_port));
+
+  if (opt.listento[0] != '\0') {
+    syslog(LOG_NOTICE, _("Connections are only allowed from %s"), opt.listento);
+  }
 }
 
 /*
@@ -447,9 +424,9 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	if (opt.datalen) {
 	  fdprintf(conn, "<td>%lu</td>", this->datalen);
 	}
-	fdprintf(conn, "<td>%s</td>", inet_ntoa(this->shost));
+	fdprintf(conn, "<td>%s</td>", my_inet_ntop(&this->shost));
 	if (opt.resolve) {
-	  fdprintf(conn, "<td>%s</td>", resolve_hostname(this->shost));
+	  fdprintf(conn, "<td>%s</td>", resolve_address(this->shost));
 	}
 	if (opt.src_port) {
 	  fdprintf(conn, "<td>%d</td>", this->sport);
@@ -458,9 +435,9 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	  }
 	}
 	if (opt.dst_ip) {
-	  fdprintf(conn, "<td>%s</td>", inet_ntoa(this->dhost));
+	  fdprintf(conn, "<td>%s</td>", my_inet_ntop(&this->dhost));
 	  if (opt.resolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_hostname(this->dhost));
+	    fdprintf(conn, "<td>%s</td>", resolve_address(this->dhost));
 	  }
 	}
 	if (opt.dst_port) {
@@ -510,33 +487,19 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 
       if (this_host->time == 0) {
 	int mask;
-	unsigned long int netmask[33] = {
-	  0x0,
-	  0x80000000, 0xC0000000, 0xE0000000, 0xF0000000,
-	  0xF8000000, 0xFC000000, 0xFE000000, 0xFF000000,
-	  0xFF800000, 0xFFC00000, 0xFFE00000, 0xFFF00000,
-	  0xFFF80000, 0xFFFC0000, 0xFFFE0000, 0xFFFF0000,
-	  0xFFFF8000, 0xFFFFC000, 0xFFFFE000, 0xFFFFF000,
-	  0xFFFFF800, 0xFFFFFC00, 0xFFFFFE00, 0xFFFFFF00,
-	  0xFFFFFF80, 0xFFFFFFC0, 0xFFFFFFE0, 0xFFFFFFF0,
-	  0xFFFFFFF8, 0xFFFFFFFC, 0xFFFFFFFE, 0xFFFFFFFF
-	};
 
 	fdprintf(conn, "<td>-</td>");
 	if (opt.proto) {
 	  fdprintf(conn, _("<td>any</td>"));
 	}
-	for (mask = 0; mask < 32; mask++) {
-	  if (ntohl(netmask[mask]) == this_host->netmask.s_addr)
-	    break;
-	}
-	if (mask == 32) {
-	  fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->shost));
+	mask = convert_mask(&this_host->netmask);
+	if ((mask == 128) || ((isV4mappedV6addr(&this_host->shost)) && (mask == 32))) {
+	  fdprintf(conn, "<td>%s</td>", my_inet_ntop(&this_host->shost));
 	} else {
-	  fdprintf(conn, "<td>%s/%d</td>", inet_ntoa(this_host->shost), mask);
+	  fdprintf(conn, "<td>%s/%d</td>", my_inet_ntop(&this_host->shost), mask);
 	}
 	if (opt.resolve) {
-	  if (mask == 32) {
+	  if ((mask == 128) || ((isV4mappedV6addr(&this_host->shost)) && (mask == 32))) {
 	    fdprintf(conn, _("<td>(known host)</td>"));
 	  } else {
 	    fdprintf(conn, _("<td>(known net)</td>"));
@@ -567,9 +530,9 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	if (opt.proto) {
 	  fdprintf(conn, "<td>%s</td>", resolve_protocol(this_host->protocol));
 	}
-	fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->shost));
+	fdprintf(conn, "<td>%s</td>", my_inet_ntop(&this_host->shost));
 	if (opt.resolve) {
-	  fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->shost));
+	  fdprintf(conn, "<td>%s</td>", resolve_address(this_host->shost));
 	}
 	if (opt.src_port) {
 	  fdprintf(conn, "<td>%d</td>", this_host->sport);
@@ -578,9 +541,9 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	  }
 	}
 	if (opt.dst_ip) {
-	  fdprintf(conn, "<td>%s</td>", inet_ntoa(this_host->dhost));
+	  fdprintf(conn, "<td>%s</td>", my_inet_ntop(&this_host->dhost));
 	  if (opt.resolve) {
-	    fdprintf(conn, "<td>%s</td>", resolve_hostname(this_host->dhost));
+	    fdprintf(conn, "<td>%s</td>", resolve_address(this_host->dhost));
 	  }
 	}
 	if (opt.dst_port) {
@@ -623,39 +586,23 @@ void handshake(int linenum, int hitnum, int ignored)
 #else
   size_t socks;
 #endif
-#ifndef HAVE_IPV6
-  struct sockaddr_in sac;
-#else
   struct sockaddr_in6 sain6;
   char nab[INET6_ADDRSTRLEN];
-#endif
   char buf[BUFSIZE], password[PASSWORDSIZE], salt[3], *pnt, command[9] = "", option1 = 'm', option2 = 'm';
   unsigned char auth = 0;
 
-#ifndef HAVE_IPV6
-  socks = sizeof(struct sockaddr_in);
-#else
   socks = sizeof(struct sockaddr_in6);
-#endif
 
-#ifndef HAVE_IPV6
-  conn = accept(opt.sock, (struct sockaddr *) &sac, &socks);
-#else
   conn = accept(opt.sock, (struct sockaddr *) &sain6, &socks);
-#endif
   if (conn == -1) {
     syslog(LOG_NOTICE, "accept: %s", strerror(errno));
     return;
   }
   opt.status = STATUS_OK;
 
-#ifndef HAVE_IPV6
-  if ((opt.listento[0] != '\0') && (strncmp(opt.listento, inet_ntoa(sac.sin_addr), IPLEN) != 0)) {
-    syslog(LOG_NOTICE, _("Rejected connect from unallowed ip %s port %i"), inet_ntoa(sac.sin_addr), ntohs(sac.sin_port));
-#else
-  if ((opt.listento[0] != '\0') && (strncmp(opt.listento, inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), IPLEN) != 0)) {
-    syslog(LOG_NOTICE, _("Rejected connect from unallowed ip %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
-#endif
+  if ((opt.listento[0] != '\0')
+      && (strncmp(opt.listento, inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), IP6LEN) != 0)) {
+    syslog(LOG_NOTICE, _("Rejected connection from unallowed IP address %s port %i"), my_inet_ntop(&sain6.sin6_addr), ntohs(sain6.sin6_port));
     retval = close(conn);
     if (retval == -1) {
       syslog(LOG_NOTICE, "close: %s", strerror(errno));
@@ -664,11 +611,7 @@ void handshake(int linenum, int hitnum, int ignored)
   }
 
   if (opt.verbose)
-#ifndef HAVE_IPV6
-    syslog(LOG_NOTICE, _("Connect from %s port %i"), inet_ntoa(sac.sin_addr), ntohs(sac.sin_port));
-#else
     syslog(LOG_NOTICE, _("Connect from %s port %i"), inet_ntop(AF_INET6, &sain6.sin6_addr, nab, INET6_ADDRSTRLEN), ntohs(sain6.sin6_port));
-#endif
 
   secure_read(conn, buf, BUFSIZE);
   while (!(strncmp(buf, "", BUFSIZE) == 0)) {

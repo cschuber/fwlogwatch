@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: main.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: main.h,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "1.2 2010/10/10"
+#define VERSION "1.3 2011/11/11"
 #define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
@@ -31,6 +31,7 @@
 #define FILESIZE 256
 #define TIMESIZE 64
 #define HOSTLEN 256
+#define HOSTLEN_M1_S "255"
 #define SHOSTLEN 32
 #define SHOSTLEN_S "32"
 #define IPLEN 16
@@ -112,6 +113,11 @@ enum {
   IN_ADDR_ERROR
 };
 
+enum {
+  RCFILE_CF,
+  RCFILE_DNS
+};
+
 /* TCP flags */
 
 #define TCP_SYN 1
@@ -144,7 +150,9 @@ enum {
   NF_OPT_PREFIX,
   NF_OPT_PREFIX_KTIME,
   NF_OPT_SRC,
-  NF_OPT_DST
+  NF_OPT_DST,
+  NF_OPT_SRC6,
+  NF_OPT_DST6
 };
 
 /* cisco ios support */
@@ -308,11 +316,7 @@ enum {
 #define FWLW_NOTIFY INSTALL_DIR "/sbin/fwlw_notify"
 #define FWLW_RESPOND INSTALL_DIR "/sbin/fwlw_respond"
 #define STATUS_TITLE _("fwlogwatch status")
-#ifndef HAVE_IPV6
-#define LISTENIF "127.0.0.1"
-#else
 #define LISTENIF "::1"
-#endif
 #define LISTENPORT 888
 #define DEFAULT_USER "admin"
 #define DEFAULT_PASSWORD "2fi4nEVVz0IXo"	/* fwlogwat[ch]
@@ -367,9 +371,9 @@ struct log_line {
   char interface[SHORTLEN];
   int protocol;
   unsigned long int datalen;
-  struct in_addr shost;
+  struct in6_addr shost;
   int sport;
-  struct in_addr dhost;
+  struct in6_addr dhost;
   int dport;
   unsigned char flags;
   int count;
@@ -385,9 +389,9 @@ struct conn_data {
   char *interface;
   int protocol;
   unsigned long int datalen;
-  struct in_addr shost;
+  struct in6_addr shost;
   int sport;
-  struct in_addr dhost;
+  struct in6_addr dhost;
   int dport;
   unsigned char flags;
   int id;
@@ -400,7 +404,7 @@ struct input_file {
 };
 
 struct dns_cache {
-  struct in_addr ip;
+  struct in6_addr ip;
   char *fqdn;
   struct dns_cache *next;
 };
@@ -416,9 +420,9 @@ struct whois_entry {
 struct known_hosts {
   time_t time;
   int count;
-  struct in_addr shost;
-  struct in_addr netmask;
-  struct in_addr dhost;
+  struct in6_addr shost;
+  struct in6_addr netmask;
+  struct in6_addr dhost;
   int protocol;
   int sport;
   int dport;
@@ -428,8 +432,9 @@ struct known_hosts {
 
 struct parser_options {
   unsigned char mode;
+  struct in6_addr host;
+  struct in6_addr netmask;
   unsigned long int value;
-  struct in_addr netmask;
   char *svalue;
   struct parser_options *next;
 };
@@ -460,6 +465,7 @@ struct options {
   int whois_sock;
   int filecount;
   char rcfile[FILESIZE];
+  char rcfile_dns[FILESIZE];
 
   struct log_line *line;
   char format_sel[SHORTLEN];
@@ -527,13 +533,15 @@ struct options {
   unsigned char stateful_start;
   int sock;
   char listenif[IP6LEN];
+  char listento[IP6LEN];
   int listenport;
-  char listento[IPLEN];
   char user[USERSIZE];
   char password[PASSWORDSIZE];
   int refresh;
   unsigned char webpage;
   int global_id;
+
+  char ntop[INET6_ADDRSTRLEN];
 };
 
 #endif

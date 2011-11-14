@@ -1,8 +1,8 @@
-# Copyright (C) 2000-2010 Boris Wesslowski
-# $Id: fwlogwatch.spec,v 1.31 2010/10/11 12:28:33 bwess Exp $
+# Copyright (C) 2000-2011 Boris Wesslowski
+# $Id: fwlogwatch.spec,v 1.32 2011/11/14 12:53:52 bwess Exp $
 
 Name: fwlogwatch
-Version: 1.2
+Version: 1.3
 Release: 1
 Group: Productivity/Networking/Security
 Vendor: Boris Wesslowski
@@ -15,7 +15,7 @@ BuildRoot: %_tmppath/%{name}-%{version}-buildroot
 
 %description
 fwlogwatch produces Linux ipchains, Linux netfilter/iptables,
-Solaris/BSD/Irix/HP-UX ipfilter, Cisco IOS, Cisco PIX/ASA, NetScreen, Elsa
+Solaris/BSD/IRIX/HP-UX ipfilter, Cisco IOS, Cisco PIX/ASA, NetScreen, Elsa
 Lancom router and Snort IDS log summary reports in plain text and HTML form
 and has a lot of options to analyze and display relevant patterns. It also
 can run as daemon (with web interface) doing realtime log monitoring and

@@ -1,14 +1,17 @@
-.\" Copyright (C) 2000-2010 Boris Wesslowski
-.\" $Id: fwlogwatch.8,v 1.30 2010/10/11 12:28:33 bwess Exp $
-.TH FWLOGWATCH 8 "25 April 2004" IS
+.\" Copyright (C) 2000-2011 Boris Wesslowski
+.\" $Id: fwlogwatch.8,v 1.31 2011/11/14 12:53:52 bwess Exp $
+.TH FWLOGWATCH 8 "November 11, 2011" "Boris Wesslowski"
+
 .SH NAME
 fwlogwatch \- a firewall log analyzer and realtime response agent
+
 .SH SYNOPSIS
 .B fwlogwatch
 .RI [ options ]\ [ input_files ]
+
 .SH DESCRIPTION
 .B fwlogwatch
-produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/Irix/HP-UX
+produces Linux ipchains, Linux netfilter/iptables, Solaris/BSD/IRIX/HP-UX
 ipfilter, ipfw, Cisco IOS, Cisco PIX/ASA, NetScreen, Elsa Lancom router and
 Snort IDS log summary reports in plain text and HTML form and has a lot of
 options to analyze and display relevant patterns. It also can run as daemon
@@ -27,6 +30,7 @@ will show the time of the first and last entry overall.
 .IP \-V
 Show version and copyright information and the options used to compile
 fwlogwatch.
+
 .SH "GLOBAL OPTIONS"
 The global options for all modes are:
 .IP \-b
@@ -73,6 +77,12 @@ destination port 25 you would use
 and to exclude entries which have the class C network 192.168.1.0 as source
 or belong to the chain INPUT:
 .B -Eehs192.168.1.0/24 -EecINPUT
+.IP \-i\ \fIfile\fR
+If your logs contain private IP addresses that are not resolvable through
+DNS but you want reports with meaningful host names or you have any other
+reason to influence the host names in reports you can initialize the DNS
+cache with your own list of IP/name pairs. The file should be in the same
+format as /etc/hosts and will not be modified.
 .IP \-M\ \fInumber\fR
 If you only want to see a fixed maximum amount of entries (e.g. the "top 20")
 this option will trim the output for you.
@@ -81,12 +91,15 @@ When analyzing large amounts of data you usually aren't interested in entries
 that have a small count. You can hide entries below a certain threshold with
 this option.
 .IP \-N
-Enable service lookups. Port numbers will be looked up in /etc/services.
+Enable service lookups. The service name for a specific port number and
+protocol will be looked up in /etc/services.
 .IP \-n
 Enable DNS lookups. Host names will be resolved (reverse and forward lookup
-with a warning if they don't match). This makes summary generation very
-slow if a lot of different hosts appear in the log file. Resolved host names
-are cached.
+with a warning if they don't match). If this makes summary generation very
+slow (this happens when a lot of different hosts appear in the log file)
+you should use a version of fwlogwatch compiled with GNU adns support.
+Resolved host names are cached in memory for as long as fwlogwatch is
+running, the DNS cache can be initialized with the -i option.
 .IP \-O\ \fIorder\fR
 This is the sort order of the summary and packet cache. Since entries often
 are equal in certain fields you can sort by several fields one after another
@@ -180,11 +193,17 @@ too old and "_" for entries that are not packet filter logs.
 Differentiate TCP options. All packets with a SYN are listed separately,
 other TCP flags are shown in full format if they are available (ipchains
 does not log them, netfilter and ipfilter do, Cisco IOS doesn't even log SYNs).
+
 .SH "LOG SUMMARY MODE"
 This are additional options that are only available in log summary mode:
+.IP \-C\ \fIemail\fR
+A carbon copy of the summary will be sent by email to this address.
 .IP \-e
-Show timestamp of last packet logged. End times are only available if
-there is more than one packet log entry with unique characteristics.
+Show timestamp of the last packet logged for this entry. End times are only
+available if there is more than one packet log entry with unique
+characteristics.
+.IP \-F\ \fIemail\fR
+Set the sender address of the email.
 .IP \-l\ \fItime\fR
 Process recent events only. See
 .B TIME FORMAT
@@ -198,23 +217,24 @@ The summary will be sent by email to this address. If HTML output is
 selected the report will be embedded as attachment so HTML-aware mail
 clients can show it directly.
 .IP \-t
-Show timestamp of first packet logged.
+Show timestamp of the first packet logged for this entry.
 .IP \-W
 Look up information about the source addresses in the whois database. This
 is slow, please don't stress the registry with too many queries.
 .IP \-w
-Produce output in HTML format.
+Produce output in HTML format (XHTML 1.1 with CSS).
 .IP \-z
 Show time interval between start and end time of packet log entries. This
 is only available if there is more than one packet log entry with unique
 characteristics.
+
 .SH "REALTIME RESPONSE MODE"
 .IP \-R
 Enter realtime response mode. This means: detach and run as daemon until
 the TERM signal (kill) is received. The HUP signal forces a reload of the
-configuration file, the USR1 signal forces fwlogwatch to reopen and read the
-input file from the beginning (useful e.g. for log rotation). All output
-can be followed in the system log.
+configuration file, the USR1 signal forces fwlogwatch to reopen and read
+the input file from the beginning (useful e.g. for log rotation). All
+output can be followed in the system log.
 .IP \-a\ \fIcount\fR
 Alert threshold. Notify or start countermeasures if this limit is reached.
 Defaults to 5.
@@ -233,13 +253,10 @@ your own ones as you see fit.
 .IP \-B
 The response script is invoked when the threshold is reached. Using the
 example script fwlw_respond this will block the attacking host with a new
-firewall rule. A new chain for
-.B fwlogwatch
-actions is inserted in the input chain and block rules added as needed.
-The chain and its content is removed if
-.B fwlogwatch
-is terminated normally. The example scripts contain actions for ipchains
-and netfilter, you can modify them or add others as you like.
+firewall rule. A new chain for fwlogwatch actions is inserted in the input
+chain and block rules added as needed. The chain and its content is removed
+if fwlogwatch is terminated normally. The example scripts contain actions
+for ipchains and netfilter, you can modify them or add others as you like.
 .IP \-X\ \fIport\fR
 Activate the internal web server to monitor and control the current status
 of the daemon. It listens on the specified
@@ -251,6 +268,7 @@ and the default password is
 .B fwlogwat
 (since DES can only encrypt 8 characters). All options related to the
 status web server can be changed in the configuration file.
+
 .SH "INPUT FILES"
 You can specify one or more input files (if none is given it defaults to
 .B /var/log/messages
@@ -260,6 +278,7 @@ realtime response mode where they don't make sense anyway). The '-' sign
 may be used for reading from standard input (stdin). In realtime response
 mode the file needs to be specified with an absolute path since the daemon
 uses the file system root (/) as working directory.
+
 .SH "TIME FORMAT"
 Time is specified as
 .B nx
@@ -283,6 +302,7 @@ for weeks,
 for months and
 .I y
 for years.
+
 .SH FILES
 .IP \fB/etc/fwlogwatch.config\fR
 Default configuration file.
@@ -291,6 +311,7 @@ Default input log file.
 .IP \fB/var/run/fwlogwatch.pid\fR
 Default PID file generated by the daemon in realtime response mode if
 configured to do so.
+
 .SH "FEATURES ONLY IN CONFIGURATION FILE"
 The following features are only available in the configuration file and not
 on the command line, they are presented and explained in more detail in the
@@ -299,25 +320,23 @@ sample configuration file.
 The colors of the HTML output and status page can be customized, an
 external cascading stylesheet can be referenced.
 .IP Realtime\ response\ options
-Verification of ipchains rules, PID file handling, the user
-.B fwlogwatch
+Verification of ipchains rules, PID file handling, the user fwlogwatch
 should run as, the location of the notification and response scripts, which
 address the status web server listens on, which host can connect, the
 refresh interval of the status page and the admin name and password can be
 configured.
+
 .SH SECURITY
-Since
-.B fwlogwatch
-is a security tool special care was taken to make it secure. You can and
-should run it with user permissions for most functions, you can make it
-setgid for a group
-.B /var/log/messages
-is in if all you need is to be able to read this file. Only the realtime
-response mode with activated ipchains rule analysis needs superuser
-permissions but you might also need them to write the PID file, for actions
-in the response script and for binding the default status port. However, you
-can configure fwlogwatch to drop root privileges as soon as possible after
-allocating these resources (the notification and response scripts will still
-be executed with user privileges and log rotation might not work).
+Since fwlogwatch is a security tool special care was taken to make it
+secure. You can and should run it with user permissions for most functions,
+you can make it setgid for a group /var/log/messages is in if all you need
+is to be able to read this file. Only the realtime response mode with
+activated ipchains rule analysis needs superuser permissions but you might
+also need them to write the PID file, for actions in the response script
+and for binding the default status port. However, you can configure
+fwlogwatch to drop root privileges as soon as possible after allocating
+these resources (the notification and response scripts will still be
+executed with user privileges and log rotation might not work).
+
 .SH AUTHOR
 Boris Wesslowski <bw@inside-security.de>

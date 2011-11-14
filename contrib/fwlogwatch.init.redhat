@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogwatch.init.redhat,v 1.15 2010/10/11 12:28:34 bwess Exp $
+# $Id: fwlogwatch.init.redhat,v 1.16 2011/11/14 12:53:52 bwess Exp $
 #
 # Init file for fwlogwatch on redhat linux systems
 #
@@ -24,7 +24,7 @@ PID_FILE=/var/run/fwlogwatch.pid
 start()
 {
 	echo -n $"Starting $prog:"
-	initlog -c "$FWLOGWATCH -R -A -X 888 -Pn" && success || failure
+	$FWLOGWATCH -R -A -X 888 && success || failure
 	RETVAL=$?
 	[ "$RETVAL" = 0 ] && touch /var/lock/subsys/fwlogwatch
 	echo

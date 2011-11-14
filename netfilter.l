@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: netfilter.l,v 1.18 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.19 2011/11/14 12:53:52 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -35,6 +35,7 @@ PORT	{DIGIT}{1,5}
 HEXDIGIT	[0-9a-fA-F]
 HEXNUM	"0x"{HEXDIGIT}+
 PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
+IPV6ADDR	([0-9a-f]{4}":"){7}[0-9a-f]{4}
 
 %%
 
@@ -43,7 +44,7 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start_hn(nftext+5);
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}	nf_parse_start(nftext+5);
 {DIGIT}{4}:{DIGIT}{2}:{DIGIT}{2}-{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_isostart_hn(nftext);
-" kernel: ["{NUMBER}"."{DIGIT}{6}"]"{PREFIX}{STRING}?	nf_parse_prefix(nftext+18, NF_OPT_PREFIX_KTIME);
+" kernel: ["[ ]{0,4}{NUMBER}"."{DIGIT}{6}"]"{PREFIX}{STRING}?	nf_parse_prefix(nftext+18, NF_OPT_PREFIX_KTIME);
 " kernel: IN="{STRING}?					nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
 " kernel: "{PREFIX}{STRING}?				nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
 " [kernel] IN="{STRING}?				nf_parse_prefix(nftext+13, NF_OPT_NOPREFIX);
@@ -59,6 +60,8 @@ PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
 "MAC="(({HEXDIGIT}{HEXDIGIT}:){13}{HEXDIGIT}{HEXDIGIT})?	/* ignore */
 "SRC="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_SRC);
 "DST="{OCTET}"."{OCTET}"."{OCTET}"."{OCTET}	nf_parse_ip(nftext+4, NF_OPT_DST);
+"SRC="{IPV6ADDR}	nf_parse_ip(nftext+4, NF_OPT_SRC6);
+"DST="{IPV6ADDR}	nf_parse_ip(nftext+4, NF_OPT_DST6);
 "LEN="{NUMBER}		opt.line->datalen = atoi(nftext+4);
 "TOS="({HEXNUM}|"00")	/* ignore */
 "PREC="{HEXNUM}		/* ignore */
@@ -194,7 +197,7 @@ void nf_parse_prefix(char *input, unsigned char mode)
 
 void nf_parse_ip(char *input, unsigned char mode)
 {
-  if (mode == NF_OPT_SRC) {
+  if ((mode == NF_OPT_SRC) || (mode == NF_OPT_SRC6)) {
     if (convert_ip(input, &opt.line->shost) == IN_ADDR_ERROR)
       return;
     opt.parser = opt.parser | NF_SRC;

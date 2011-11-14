@@ -1,4 +1,11 @@
-$Id: ChangeLog,v 1.29 2010/10/11 12:28:33 bwess Exp $
+$Id: ChangeLog,v 1.30 2011/11/14 12:53:52 bwess Exp $
+
+Version 1.3 2011-11-11
+- Added general IPv6 support, currently only the netfilter parser and dns
+  cache make use of it
+- Added DNS cache initialization with a hosts file
+- Extended Cisco PIX/ASA parser, it also uses the dns cache now
+- Various small fixes
 
 Version 1.2 2010-10-10
 - Extended netfilter and Cisco PIX/ASA parsers

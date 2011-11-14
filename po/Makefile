@@ -1,5 +1,5 @@
-# Copyright (C) 2000-2010 Boris Wesslowski
-# $Id: Makefile,v 1.14 2010/10/11 12:28:34 bwess Exp $
+# Copyright (C) 2000-2011 Boris Wesslowski
+# $Id: Makefile,v 1.15 2011/11/14 12:53:52 bwess Exp $
 
 all:
 	msgfmt -v -o de.mo de.po

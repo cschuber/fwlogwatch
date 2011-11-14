@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: compare.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: compare.h,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #ifndef _COMPARE_H
 #define _COMPARE_H

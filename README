@@ -1,4 +1,4 @@
-$Id: README,v 1.30 2010/10/11 12:28:33 bwess Exp $
+$Id: README,v 1.31 2011/11/14 12:53:52 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski originally for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
@@ -13,10 +13,10 @@ FEATURES
   - Can detect and process log entries in the following formats:
     - Linux ipchains
     - Linux netfilter/iptables
-    - Solaris/BSD/Irix/HP-UX ipfilter
+    - Solaris/BSD/IRIX/HP-UX ipfilter
     - BSD ipfw
     - Cisco IOS
-    - Cisco PIX / FWSM / ASA
+    - Cisco PIX/FWSM/ASA
     - NetScreen
     - Elsa Lancom router
     - Snort IDS
@@ -34,6 +34,8 @@ FEATURES
     or excluded as needed.
   - Support for internationalization (available in english, german,
     portuguese, simplified and traditional chinese, swedish and japanese).
+  - Supports IPv6 (currently only the netfilter parser and dns cache make
+    use of it).
 - Log summary mode:
   - A lot of options to find and display relevant patterns in connection
     attempts.
@@ -58,7 +60,7 @@ FEATURES
     firewall rules.
   - Supports trusted hosts (anti-spoofing).
   - The current status of the program can be followed and controlled
-    through a web interface (supports IPv6).
+    through a web interface.
 
 The commented configuration file supports and explains all options and will
 get you started quickly. Please read the man page for details on the
@@ -69,9 +71,10 @@ PARSER NOTES
   - Cisco PIX/ASA support focuses on denied packets, knows some permitted
     packet log entries and ignores all other kinds of log entries. It
     expects log entries as from a syslog host. If your PIX/ASA uses names
-    you can use the script pix-names.sh from the contrib direcory to
-    extract them from a saved PIX/ASA configuration and add them to your
-    hosts file, if fwlogwatch is not able to resolve the names it will
+    or objects in the log you can use the script asa-hosts.sh from the
+    contrib directory to extract them from a saved PIX/ASA configuration
+    and format them as a hosts file, which you can use to initialize the
+    dns cache. If fwlogwatch is not able to resolve the names it will
     discard the corresponding log entries.
   - The ipfilter parser does not support logs with resolved service names
     and tcp/udp entries without ports.
@@ -83,11 +86,11 @@ PARSER NOTES
 
 INSTALLATION
 - General
-  The Makefile assumes you use Linux, to compile on Solaris, OpenBSD,
-  FreeBSD or IRIX look for the corresponding lines at the top of the
-  Makefile. fwlogwatch may also be compiled and run on Windows with help of
-  cygwin or mingw. You may want to have a look at main.h if you want to
-  change some default values.
+  The Makefile assumes you use Linux, to compile on Mac OS X, Solaris,
+  OpenBSD, FreeBSD or IRIX look for the corresponding lines at the top of
+  the Makefile. fwlogwatch may also be compiled and run on Windows with
+  help of cygwin or mingw. You may want to have a look at main.h if you
+  want to change some default values.
 
   flex is required to build fwlogwatch. Besides that a simple 'make' should
   be enough to obtain a working binary. If your make (like the one on
@@ -102,10 +105,10 @@ INSTALLATION
   /usr/local/sbin) and the man page, 'make install-config' will also
   install a sample configuration file in /etc.
 
-- Zlib/Gettext/IPv6/GNU adns
-  If you define HAVE_ZLIB, HAVE_GETTEXT, HAVE_IPV6 and HAVE_ADNS fwlogwatch
-  will be compiled with zlib, gettext, IPv6 and adns support. The output of
-  fwlogwatch -V will contain an overview of the compiler options used.
+- Zlib/Gettext/GNU adns
+  If you define HAVE_ZLIB, HAVE_GETTEXT and HAVE_ADNS fwlogwatch will be
+  compiled with zlib, gettext and adns support. The output of fwlogwatch -V
+  will contain an overview of the compiler options used.
 
   You will need the zlib compression library version 1.0.9 or newer and
   it's header files to be able to use zlib support.
@@ -113,9 +116,6 @@ INSTALLATION
   To enable the internationalization support you will need to have the
   gettext package (sometimes with it's surroundings libtool, GNU m4,
   autoconf and automake) installed.
-
-  You need an operating system with a IPv6 stack and headers with IPv6
-  support to be able to use this protocol.
 
   The GNU adns library and header files must be installed to build fwlogwatch
   with support for faster, asynchronous DNS lookups.

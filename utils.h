@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: utils.h,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: utils.h,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -16,8 +16,13 @@ void free_exclude_data(void);
 void init_line(void);
 void mode_error(void);
 void build_time(char *smonth, int day, int hour, int minute, int second);
-unsigned char convert_ip(char *ip, struct in_addr *addr);
-unsigned long int parse_cidr(char *input);
+char compare_ipv6(struct in6_addr *ip1, struct in6_addr *ip2);
+char compare_ipv6_equal(struct in6_addr *ip1, struct in6_addr *ip2);
+unsigned char isV4mappedV6addr(struct in6_addr *ip);
+char *my_inet_ntop(struct in6_addr *ip);
+unsigned char convert_ip(char *ip, struct in6_addr *addr);
+void parse_cidr(char *input, struct in6_addr *in6_addr);
+int convert_mask(struct in6_addr *in6_addr);
 void add_known_host(char *ip);
 void add_exclude_hpb(char *input, unsigned char mode);
 void add_input_file(char *name);

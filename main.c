@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2010 Boris Wesslowski */
-/* $Id: main.c,v 1.31 2010/10/11 12:28:33 bwess Exp $ */
+/* Copyright (C) 2000-2011 Boris Wesslowski */
+/* $Id: main.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,8 +37,9 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -E <format>  select or exclude hosts, ports, chains and targets\n"));
   printf(_("               quick reference: -E[ie][hp][sd]<ip/number>\n"));
   printf(_("                                -E[ie][cb]<name>\n"));
-  printf(_("  -m <count>   only show entries with at least so many incidents\n"));
+  printf(_("  -i <file>    initialize DNS cache with entries from file\n"));
   printf(_("  -M <number>  only show this amount of entries\n"));
+  printf(_("  -m <count>   only show entries with at least so many incidents\n"));
   printf(_("  -N           resolve service names\n"));
   printf(_("  -n           resolve host names\n"));
   printf(_("  -O <order>   define the sort order (see the man page for details)\n"));
@@ -83,7 +84,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2010 Boris Wesslowski");
+  puts("Copyright (C) 2000-2011 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -120,12 +121,6 @@ void info()
 #else
   puts(_("disabled"));
 #endif
-  printf(_("IPv6 support "));
-#ifdef HAVE_IPV6
-  puts(_("enabled"));
-#else
-  puts(_("disabled"));
-#endif
   printf(_("GNU adns support "));
 #ifdef HAVE_ADNS
   puts(_("enabled"));
@@ -150,6 +145,7 @@ void init_options()
   opt.whois_lookup = 0;
   opt.whois_sock = -1;
   xstrncpy(opt.rcfile, RCFILE, FILESIZE);
+  opt.rcfile_dns[0] = '\0';
 
   opt.line = NULL;
   opt.format_sel[0] = '\0';
@@ -321,6 +317,9 @@ int main(int argc, char **argv)
     case 'h':
       usage(argv[0], EXIT_SUCCESS);
       break;
+    case 'i':
+      xstrncpy(opt.rcfile_dns, optarg, FILESIZE);
+      break;
     case 'k':
       add_known_host(optarg);
       break;
@@ -403,10 +402,13 @@ int main(int argc, char **argv)
   }
 
   if (!alt_rcfile) {
-    read_rcfile(opt.rcfile, MAY_NOT_EXIST);
+    read_rcfile(opt.rcfile, MAY_NOT_EXIST, RCFILE_CF);
   } else {
-    read_rcfile(opt.rcfile, MUST_EXIST);
+    read_rcfile(opt.rcfile, MUST_EXIST, RCFILE_CF);
   }
+
+  if (opt.rcfile_dns[0] != '\0')
+    read_rcfile(opt.rcfile_dns, MUST_EXIST, RCFILE_DNS);
 
   while (optind < argc)
     add_input_file(argv[optind++]);
