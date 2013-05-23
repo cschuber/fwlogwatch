@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: cisco_ios.h,v 1.18 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: cisco_ios.h,v 1.19 2013/05/23 15:04:14 bwess Exp $ */
 
 #ifndef _CISCO_IOS_H
 #define _CISCO_IOS_H

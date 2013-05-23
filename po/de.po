@@ -1,12 +1,12 @@
 # German translation of fwlogwatch messages
-# Copyright (C) 2000-2011 Boris Wesslowski
+# Copyright (C) 2000-2013 Boris Wesslowski
 # This file is distributed under the same license as the fwlogwatch package.
 msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-11 13:29+0100\n"
-"PO-Revision-Date: 2011-11-11 13:46+0100\n"
+"POT-Creation-Date: 2013-05-23 15:04+0200\n"
+"PO-Revision-Date: 2013-05-23 15:15+0200\n"
 "Last-Translator: Boris Wesslowski <bw@inside-security.de>\n"
 "Language-Team: -\n"
 "Language: \n"
@@ -36,8 +36,8 @@ msgstr ""
 msgid "Error in sort string, direction expected, ignoring.\n"
 msgstr "Fehler in der Sortierreihenfolge, Richtung erwartet, wird ignoriert.\n"
 
-#: ../compare.c:382 ../compare.c:384 ../modes.c:195 ../modes.c:202
-#: ../modes.c:819 ../modes.c:821 ../output.c:106 ../output.c:113
+#: ../compare.c:382 ../compare.c:384 ../modes.c:193 ../modes.c:200
+#: ../modes.c:815 ../modes.c:817 ../output.c:106 ../output.c:113
 #: ../output.c:193 ../output.c:202 ../output.c:380
 msgid "%b %d %H:%M:%S"
 msgstr "%b %d %H:%M:%S"
@@ -361,263 +361,263 @@ msgstr "Die Daten werden von der Standardeingabe gelesen\n"
 msgid "Opening input file '%s'\n"
 msgstr "Die Eingabedatei '%s' wird geöffnet\n"
 
-#: ../modes.c:132
+#: ../modes.c:130
 #, c-format
 msgid "Processing\n"
 msgstr "Verarbeitung\n"
 
-#: ../modes.c:139
+#: ../modes.c:137
 #, c-format
 msgid "Unrecognized entries or tokens can be submitted at\n"
 msgstr "Unerkannte Einträge können unter folgender URL eingereicht werden:\n"
 
-#: ../modes.c:148 ../modes.c:395 ../modes.c:788 ../rcfile.c:379
+#: ../modes.c:146 ../modes.c:393 ../modes.c:784 ../rcfile.c:379
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "'%s' wird geschlossen\n"
 
-#: ../modes.c:177
+#: ../modes.c:175
 #, c-format
 msgid "Sorting data\n"
 msgstr "Daten werden sortiert\n"
 
-#: ../modes.c:214
+#: ../modes.c:212
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr "Die Ausgabedatei '%s' wird geöffnet\n"
 
-#: ../modes.c:225
+#: ../modes.c:223
 #, c-format
 msgid "Sending\n"
 msgstr "Wird versandt\n"
 
-#: ../modes.c:248 ../net.c:341 ../net.c:344
+#: ../modes.c:246 ../net.c:341 ../net.c:344
 msgid "%A %B %d %H:%M:%S %Z %Y"
 msgstr "%A, %d. %B %H:%M:%S %Z %Y"
 
-#: ../modes.c:249
+#: ../modes.c:247
 #, c-format
 msgid "Generated %s by "
 msgstr "Erzeugt am %s von "
 
-#: ../modes.c:259
+#: ../modes.c:257
 #, c-format
 msgid "an unknown user.\n"
 msgstr "einem unbekannten Benutzer.\n"
 
-#: ../modes.c:267
+#: ../modes.c:265
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(und %d älter als %d Sekunden) "
 
-#: ../modes.c:270
+#: ../modes.c:268
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(und %d fehlerhaft) "
 
-#: ../modes.c:273
+#: ../modes.c:271
 #, c-format
 msgid "of %d entries in the file \"%s\" are packet logs, "
 msgstr "von %d Einträgen in der Datei \"%s\" sind Paketfiltereinträge, "
 
-#: ../modes.c:275
+#: ../modes.c:273
 #, c-format
 msgid "of %d entries in standard input are packet logs, "
 msgstr "von %d Einträgen aus der Standardeingabe sind Paketfiltereinträge, "
 
-#: ../modes.c:277
+#: ../modes.c:275
 #, c-format
 msgid "of %d entries in %d input files are packet logs, "
 msgstr "von %d Einträgen in %d Dateien sind Paketfiltereinträge, "
 
-#: ../modes.c:281
+#: ../modes.c:279
 #, c-format
 msgid "one has unique characteristics.\n"
 msgstr "einer ist eindeutig.\n"
 
-#: ../modes.c:283
+#: ../modes.c:281
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d sind eindeutig.\n"
 
-#: ../modes.c:291
+#: ../modes.c:289
 #, c-format
 msgid "One entry was excluded by configuration.\n"
 msgstr "Ein Eintrag wurde von der Konfiguration ausgeschlossen.\n"
 
-#: ../modes.c:293
+#: ../modes.c:291
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d Einträge wurden von der Konfiguration ausgeschlossen.\n"
 
-#: ../modes.c:301
+#: ../modes.c:299
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "Erster Paketfiltereintrag: %s, letzter: %s.\n"
 
-#: ../modes.c:303 ../modes.c:817
+#: ../modes.c:301 ../modes.c:813
 #, c-format
 msgid "No valid time entries found.\n"
 msgstr "Keine gültigen Zeiteinträge gefunden.\n"
 
-#: ../modes.c:310
+#: ../modes.c:308
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "Alle Einträge wurden vom diesem Rechner geloggt: \"%s\".\n"
 
-#: ../modes.c:317
+#: ../modes.c:315
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "Alle Einträge kommen von der selben Kette: \"%s\".\n"
 
-#: ../modes.c:324
+#: ../modes.c:322
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "Alle Einträge haben das selbe Ziel: \"%s\".\n"
 
-#: ../modes.c:331
+#: ../modes.c:329
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "Alle Einträge kommen von der selben Schnittstelle: \"%s\".\n"
 
-#: ../modes.c:338
+#: ../modes.c:336
 #, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "Nur Einträge mit mindestens %d Treffern werden gezeigt.\n"
 
-#: ../modes.c:345
+#: ../modes.c:343
 #, c-format
 msgid "Only the top %d entries are shown.\n"
 msgstr "Nur die ersten %d Einträge werden gezeigt.\n"
 
-#: ../modes.c:356
+#: ../modes.c:354
 #, c-format
 msgid "Resolving\n"
 msgstr "Auflösung\n"
 
-#: ../modes.c:415
+#: ../modes.c:413
 #, c-format
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr ""
 "Warnung: pid-Datei existiert, fwlogwatch wird evtl. schon ausgeführt.\n"
 
-#: ../modes.c:429
+#: ../modes.c:427
 #, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "SIGHUP abgefangen, Konfigurationsdatei %s wird neu eingelesen"
 
-#: ../modes.c:431
+#: ../modes.c:429
 #, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr ""
 "SIGHUP abgefangen, Konfigurationsdatei %s konnte nicht neu eingelesen werden"
 
-#: ../modes.c:435
+#: ../modes.c:433
 #, c-format
 msgid "Reread DNS cache file %s"
 msgstr "Die DNS-Cache-Datei %s wird neu eingelesen"
 
-#: ../modes.c:437
+#: ../modes.c:435
 #, c-format
 msgid "Unable to reread DNS cache file %s"
 msgstr "Die DNS-Cache-Datei %s konnte nicht neu eingelesen werden"
 
-#: ../modes.c:461
+#: ../modes.c:459
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 "SIGUSR1 abgefangen, die Standardeingabe wird benutzt, neu öffnen nicht nötig"
 
-#: ../modes.c:463
+#: ../modes.c:461
 #, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "SIGUSR1 abgefangen, Logdatei %s wird neu geöffnet"
 
-#: ../modes.c:535
+#: ../modes.c:533
 msgid "SIGTERM caught, cleaning up"
 msgstr "SIGTERM abgefangen, Speicher wird aufgeräumt"
 
-#: ../modes.c:617
+#: ../modes.c:615
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "Programmstart (pid %d)"
 
-#: ../modes.c:667
+#: ../modes.c:665
 msgid "User to run as was not found"
 msgstr "Der Benutzer dessen ID benutzt werden soll wurde nicht gefunden"
 
-#: ../modes.c:682
+#: ../modes.c:680
 #, c-format
 msgid "Changed uid from %d to %d, gid from %d to %d"
 msgstr "Benutzer-ID gewechselt von %d zu %d, Gruppen-ID von %d zu %d"
 
-#: ../modes.c:684
+#: ../modes.c:682
 #, c-format
 msgid "Running with uid %d, gid %d"
 msgstr "Prozess läuft mit uid %d, gid %d"
 
-#: ../modes.c:688
+#: ../modes.c:686
 msgid "Alert threshold is one attempt"
 msgstr "Alarmschwelle ist ein Versuch"
 
-#: ../modes.c:690
+#: ../modes.c:688
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Alarmschwelle ist %d Versuche"
 
-#: ../modes.c:694
+#: ../modes.c:692
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "Ereignisse die älter als %d Sekunde(n) sind werden verworfen"
 
-#: ../modes.c:696
+#: ../modes.c:694
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "Ereignisse die älter als %d Stunde(n) sind werden verworfen"
 
-#: ../modes.c:699
+#: ../modes.c:697
 #, c-format
 msgid "Response mode: Log%s%s"
 msgstr "Antwortmodus: loggen%s%s"
 
-#: ../modes.c:699 ../net.c:350
+#: ../modes.c:697 ../net.c:350
 msgid ", notify"
 msgstr ", benachrichtigen"
 
-#: ../modes.c:699 ../net.c:350
+#: ../modes.c:697 ../net.c:350
 msgid ", respond"
 msgstr ", antworten"
 
-#: ../modes.c:730
+#: ../modes.c:728
 #, c-format
 msgid "Reading standard input\n"
 msgstr "Die Standardeingabe wird gelesen\n"
 
-#: ../modes.c:748
+#: ../modes.c:744
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "Die Datei '%s' wird gelesen\n"
 
-#: ../modes.c:814
+#: ../modes.c:810
 #, c-format
 msgid "Number of files: %d\n"
 msgstr "Anzahl der Dateien: %d\n"
 
-#: ../modes.c:815
+#: ../modes.c:811
 #, c-format
 msgid "Number of lines: %d\n"
 msgstr "Anzahl der Zeilen: %d\n"
 
-#: ../modes.c:820
+#: ../modes.c:816
 #, c-format
 msgid "First entry: %s\n"
 msgstr "Erster Eintrag: %s\n"
 
-#: ../modes.c:822
+#: ../modes.c:818
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "Letzter Eintrag: %s\n"
 
-#: ../modes.c:824
+#: ../modes.c:820
 #, c-format
 msgid "Difference : %s\n"
 msgstr "Differenz : %s\n"
@@ -1010,15 +1010,15 @@ msgstr "Die Konfigurationsdatei '%s' wird geöffnet\n"
 msgid "port mismatch: %d != %d\n"
 msgstr "Port-Versatz: %d != %d\n"
 
-#: ../resolve.c:99 ../resolve.c:175
+#: ../resolve.c:99 ../resolve.c:172
 msgid "[timeout]"
 msgstr "[Zeitüberschreitung]"
 
-#: ../resolve.c:101 ../resolve.c:177
+#: ../resolve.c:101 ../resolve.c:174
 msgid "[server failure]"
 msgstr "[Server-Fehler]"
 
-#: ../resolve.c:111 ../resolve.c:216
+#: ../resolve.c:111 ../resolve.c:213
 #, c-format
 msgid "Resolving %s\n"
 msgstr "Auflösung von %s\n"
@@ -1028,46 +1028,46 @@ msgstr "Auflösung von %s\n"
 msgid "%s [forward lookup failed]"
 msgstr "%s [Vorwärts-Suche fehlgeschlagen]"
 
-#: ../resolve.c:134
+#: ../resolve.c:131
 #, c-format
 msgid " [v4 forward lookup: %s]"
 msgstr " [IPv4 Vorwärts-Suche: %s]"
 
-#: ../resolve.c:141
+#: ../resolve.c:138
 #, c-format
 msgid " [v6 forward lookup: %s]"
 msgstr " [IPv6 Vorwärts-Suche: %s]"
 
-#: ../resolve.c:183
+#: ../resolve.c:180
 #, c-format
 msgid "[adns status %d]"
 msgstr "[adns-Status %d]"
 
-#: ../resolve.c:195
+#: ../resolve.c:192
 msgid "[adns error]"
 msgstr "[adns-Fehler]"
 
-#: ../resolve.c:209 ../resolve.c:357
+#: ../resolve.c:206 ../resolve.c:354
 #, c-format
 msgid "Resolving %s from cache\n"
 msgstr "Auflösung von %s aus dem Cache\n"
 
-#: ../resolve.c:221
+#: ../resolve.c:218
 #, c-format
 msgid "Resolving %s from adns\n"
 msgstr "Auflösung von %s mit adns\n"
 
-#: ../resolve.c:243
+#: ../resolve.c:240
 #, c-format
 msgid "IP address %s is already in DNS cache\n"
 msgstr "Die IP-Adresse %s ist bereits im DNS-Cache\n"
 
-#: ../resolve.c:249
+#: ../resolve.c:246
 #, c-format
 msgid "Adding IP address '%s' with host name '%s' to DNS cache\n"
 msgstr "IP-Adresse '%s' mit Hostname '%s' wird dem DNS-Cache hinzugefügt\n"
 
-#: ../resolve.c:286
+#: ../resolve.c:283
 #, c-format
 msgid "Submitted %s to adns\n"
 msgstr "%s an adns übergeben\n"
@@ -1186,10 +1186,10 @@ msgstr "Suche der whois-Information für %s\n"
 msgid "lookup failed: %s\n"
 msgstr "Suche fehlgeschlagen: %s\n"
 
-#: ../main.h:308
+#: ../main.h:314
 msgid "fwlogwatch summary"
 msgstr "fwlogwatch-Zusammenfassung"
 
-#: ../main.h:318
+#: ../main.h:324
 msgid "fwlogwatch status"
 msgstr "Zustand von fwlogwatch"

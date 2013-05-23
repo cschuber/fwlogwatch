@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: modes.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: modes.c,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +54,7 @@ void common_input_loop(int *linenum, int *hitnum, int *errnum, int *oldnum, int 
     retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
   } else {
-    retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+    retval = (gzgets(opt.gzinputfd, buf, BUFSIZE) != Z_NULL);
   }
 #endif
 
@@ -84,7 +84,7 @@ void common_input_loop(int *linenum, int *hitnum, int *errnum, int *oldnum, int 
       retval = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
     } else {
-      retval = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+      retval = (gzgets(opt.gzinputfd, buf, BUFSIZE) != Z_NULL);
     }
 #endif
   }
@@ -114,14 +114,12 @@ void mode_summary()
 	fprintf(stderr, _("Opening input file '%s'\n"), input);
 
 #ifdef HAVE_ZLIB
-      opt.inputfd = gzopen(input, "rb");
-#else
-      opt.inputfd = fopen(input, "r");
-#endif
-      if (opt.inputfd == NULL) {
-#ifdef HAVE_ZLIB
+      opt.gzinputfd = gzopen(input, "rb");
+      if (opt.gzinputfd == NULL) {
 	fprintf(stderr, "gzopen %s: %s\n", input, strerror(errno));
 #else
+      opt.inputfd = fopen(input, "r");
+      if (opt.inputfd == NULL) {
 	fprintf(stderr, "fopen %s: %s\n", input, strerror(errno));
 #endif
 	exit(EXIT_FAILURE);
@@ -152,10 +150,10 @@ void mode_summary()
       if (retval == EOF) {
 	perror("fclose");
 #else
-      retval = gzclose(opt.inputfd);
+      retval = gzclose(opt.gzinputfd);
       if (retval != 0) {
 	if (retval != Z_ERRNO) {
-	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.inputfd, &retval));
+	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.gzinputfd, &retval));
 	} else {
 	  perror("gzclose");
 	}
@@ -731,14 +729,12 @@ void mode_show_log_times()
     } else {
       input = file->name;
 #ifdef HAVE_ZLIB
-      opt.inputfd = gzopen(input, "rb");
-#else
-      opt.inputfd = fopen(input, "r");
-#endif
-      if (opt.inputfd == NULL) {
-#ifdef HAVE_ZLIB
+      opt.gzinputfd = gzopen(input, "rb");
+      if (opt.gzinputfd == NULL) {
 	fprintf(stderr, "gzopen %s: %s\n", input, strerror(errno));
 #else
+      opt.inputfd = fopen(input, "r");
+      if (opt.inputfd == NULL) {
 	fprintf(stderr, "fopen %s: %s\n", input, strerror(errno));
 #endif
 	exit(EXIT_FAILURE);
@@ -754,7 +750,7 @@ void mode_show_log_times()
       loop = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
     } else {
-      loop = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+      loop = (gzgets(opt.gzinputfd, buf, BUFSIZE) != Z_NULL);
     }
 #endif
 
@@ -776,7 +772,7 @@ void mode_show_log_times()
 	loop = (fgets(buf, BUFSIZE, opt.inputfd) != NULL);
 #ifdef HAVE_ZLIB
       } else {
-	loop = (gzgets(opt.inputfd, buf, BUFSIZE) != Z_NULL);
+	loop = (gzgets(opt.gzinputfd, buf, BUFSIZE) != Z_NULL);
       }
 #endif
     }
@@ -792,10 +788,10 @@ void mode_show_log_times()
       if (retval == EOF) {
 	perror("fclose");
 #else
-      retval = gzclose(opt.inputfd);
+      retval = gzclose(opt.gzinputfd);
       if (retval != 0) {
 	if (retval != Z_ERRNO) {
-	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.inputfd, &retval));
+	  fprintf(stderr, "gzclose %s: %s\n", input, gzerror(opt.gzinputfd, &retval));
 	} else {
 	  perror("gzclose");
 	}

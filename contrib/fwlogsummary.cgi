@@ -1,6 +1,6 @@
 #!/bin/sh
-# Copyright (C) 2000-2011 Boris Wesslowski
-# $Id: fwlogsummary.cgi,v 1.31 2011/11/14 12:53:52 bwess Exp $
+# Copyright (C) 2000-2013 Boris Wesslowski
+# $Id: fwlogsummary.cgi,v 1.32 2013/05/23 15:04:15 bwess Exp $
 
 # This script generates 8 fwlogwatch html summaries in a directory visible
 # to your web server.

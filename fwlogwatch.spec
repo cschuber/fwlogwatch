@@ -1,16 +1,17 @@
-# Copyright (C) 2000-2011 Boris Wesslowski
-# $Id: fwlogwatch.spec,v 1.32 2011/11/14 12:53:52 bwess Exp $
+# Copyright (C) 2000-2013 Boris Wesslowski
+# $Id: fwlogwatch.spec,v 1.33 2013/05/23 15:04:14 bwess Exp $
 
 Name: fwlogwatch
-Version: 1.3
+Version: 1.4
 Release: 1
 Group: Productivity/Networking/Security
 Vendor: Boris Wesslowski
 URL: http://fwlogwatch.inside-security.de/
 License: GPL
 Summary: Firewall log analyzer, report generator and realtime response agent
+#Source: http://fwlogwatch.inside-security.de/sw/%{name}-%{version}.tar.gz
 Source: %{name}-%{version}.tar.gz
-BuildRequires(build): flex
+BuildRequires: flex
 BuildRoot: %_tmppath/%{name}-%{version}-buildroot
 
 %description

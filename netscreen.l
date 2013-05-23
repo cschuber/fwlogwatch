@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: netscreen.l,v 1.8 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: netscreen.l,v 1.9 2013/05/23 15:04:15 bwess Exp $ */
 
 %option prefix="ns"
 %option outfile="netscreen.c"

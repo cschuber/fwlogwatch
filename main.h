@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: main.h,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: main.h,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "1.3 2011/11/11"
+#define VERSION "1.4 2013-05-23"
 #define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
@@ -63,6 +63,12 @@
 #define INFILE "/var/adm/messages"
 #endif
 #define RCFILE CONF_DIR "/fwlogwatch.config"
+
+/* Includes */
+
+#ifdef HAVE_ZLIB
+#include <zlib.h>
+#endif
 
 enum {
   MAY_NOT_EXIST,
@@ -456,6 +462,9 @@ enum {
 struct options {
   unsigned char mode;
   FILE *inputfd;
+#ifdef HAVE_ZLIB
+  gzFile gzinputfd;
+#endif
   unsigned char std_in;
 
   unsigned char verbose;

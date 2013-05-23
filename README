@@ -1,4 +1,4 @@
-$Id: README,v 1.31 2011/11/14 12:53:52 bwess Exp $
+$Id: README,v 1.32 2013/05/23 15:04:14 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski originally for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
@@ -34,8 +34,8 @@ FEATURES
     or excluded as needed.
   - Support for internationalization (available in english, german,
     portuguese, simplified and traditional chinese, swedish and japanese).
-  - Supports IPv6 (currently only the netfilter parser and dns cache make
-    use of it).
+  - Supports IPv6 (currently only the netfilter parser, dns cache and web
+    interface make use of it).
 - Log summary mode:
   - A lot of options to find and display relevant patterns in connection
     attempts.

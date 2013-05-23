@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: resolve.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: resolve.c,v 1.33 2013/05/23 15:04:15 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,17 +124,14 @@ char *resolve_address_sync(struct in6_addr ip)
       } else {
 	snprintf(fqdn, HOSTLEN, "%s", hbuf);
 	for (rp = res; rp != NULL; rp = rp->ai_next) {
-	  if (rp->ai_family == AF_INET) {
-	    char s1[HOSTLEN], s2[HOSTLEN];
+	  if (rp->ai_family == AF_INET && isV4mappedV6addr(&ip)) {
 	    struct sockaddr_in *sin;
 	    sin = (void *) rp->ai_addr;
-	    snprintf(s1, HOSTLEN, "%s", inet_ntop(rp->ai_family, &sin->sin_addr, dst, HOSTLEN));
-	    snprintf(s2, HOSTLEN, "%s", my_inet_ntop((struct in6_addr *) ip.s6_addr));
-	    if (strncmp(s1, s2, HOSTLEN) != 0) {
+	    if (ip.s6_addr32[3] != sin->sin_addr.s_addr) {
 	      snprintf(dst2, HOSTLEN, _(" [v4 forward lookup: %s]"), inet_ntop(rp->ai_family, &sin->sin_addr, dst, HOSTLEN));
 	      strncat(fqdn, dst2, HOSTLEN - strlen(fqdn) - 1);
 	    }
-	  } else if (rp->ai_family == AF_INET6) {
+	  } else if (rp->ai_family == AF_INET6 && !isV4mappedV6addr(&ip)) {
 	    struct sockaddr_in6 *sin6;
 	    sin6 = (void *) rp->ai_addr;
 	    if (compare_ipv6_equal(&ip, &sin6->sin6_addr) != 0) {

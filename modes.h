@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: modes.h,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: modes.h,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
 
 #ifndef _MODES_H
 #define _MODES_H

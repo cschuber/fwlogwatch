@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: cisco_ios.l,v 1.18 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: cisco_ios.l,v 1.19 2013/05/23 15:04:14 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"
@@ -94,6 +94,8 @@ void cisco_ios_parse_date(char *input, unsigned char mode)
     retval = sscanf(input, "%3s %2d %2d:%2d:%2d:", smonth, &day, &hour, &minute, &second);
     if (retval != 5)
       return;
+  } else {
+    exit(EXIT_FAILURE);
   }
 
   build_time(smonth, day, hour, minute, second);
@@ -118,6 +120,8 @@ void cisco_ios_parse_src(char *input, unsigned char mode)
       return;
   } else if (mode == CI_OPT_MISSING) {
     return;
+  } else {
+    exit(EXIT_FAILURE);
   }
 
   snprintf(ip, IPLEN, "%d.%d.%d.%d", shost1, shost2, shost3, shost4);

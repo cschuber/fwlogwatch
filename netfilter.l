@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: netfilter.l,v 1.19 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.20 2013/05/23 15:04:15 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -19,6 +19,7 @@ extern struct options opt;
 void nf_parse_start_hn(char *input);
 void nf_parse_start(char *input);
 void nf_parse_isostart_hn(char *input);
+void nf_parse_rfc5424start_hn(char *input);
 void nf_parse_prefix(char *input, unsigned char mode);
 void nf_parse_ip(char *input, unsigned char mode);
 void nf_parse_proto(char *input);
@@ -35,7 +36,7 @@ PORT	{DIGIT}{1,5}
 HEXDIGIT	[0-9a-fA-F]
 HEXNUM	"0x"{HEXDIGIT}+
 PROTO	"TCP"|"UDP"|"ICMP"|"ESP"|"AH"|"ICMPv6"|{NUMBER}
-IPV6ADDR	([0-9a-f]{4}":"){7}[0-9a-f]{4}
+IPV6ADDR	([0-9a-f]{1,4}":"+){1,7}[0-9a-f]{1,4}
 
 %%
 
@@ -44,6 +45,7 @@ IPV6ADDR	([0-9a-f]{4}":"){7}[0-9a-f]{4}
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_start_hn(nftext+5);
 {DIGIT}{4}[ ]{MONTH}[ ]{1,2}{DIGIT}{1,2}[ ]{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}	nf_parse_start(nftext+5);
 {DIGIT}{4}:{DIGIT}{2}:{DIGIT}{2}-{DIGIT}{2}:{DIGIT}{2}:{DIGIT}{2}[ ]{LOGHOST}	nf_parse_isostart_hn(nftext);
+{DIGIT}{4}"-"{DIGIT}{2}"-"{DIGIT}{2}"T"{DIGIT}{2}":"{DIGIT}{2}":"{DIGIT}{2}"."{DIGIT}{6}("+"|"-"){DIGIT}{2}":"{DIGIT}{2}[ ]{LOGHOST}	nf_parse_rfc5424start_hn(nftext);
 " kernel: ["[ ]{0,4}{NUMBER}"."{DIGIT}{6}"]"{PREFIX}{STRING}?	nf_parse_prefix(nftext+18, NF_OPT_PREFIX_KTIME);
 " kernel: IN="{STRING}?					nf_parse_prefix(nftext+12, NF_OPT_NOPREFIX);
 " kernel: "{PREFIX}{STRING}?				nf_parse_prefix(nftext+9, NF_OPT_PREFIX);
@@ -75,8 +77,10 @@ IPV6ADDR	([0-9a-f]{4}":"){7}[0-9a-f]{4}
 "INCOMPLETE ["{NUMBER}" bytes]"	/* ignore */
 "TYPE="{NUMBER}		{ opt.line->sport = atoi(nftext+5); opt.parser=opt.parser|NF_TYPE; }
 "CODE="{NUMBER}		{ opt.line->dport = atoi(nftext+5); opt.parser=opt.parser|NF_CODE; }
+"PARAMETER="{NUMBER}	/* ignore */
 "SEQ="{NUMBER}		/* ignore */
 "MARK="{HEXNUM}		/* ignore */
+"MARK=0"		/* ignore */
 "ACK="{NUMBER}		/* ignore */
 "SPT="{PORT}		{ opt.line->sport = atoi(nftext+4); opt.parser=opt.parser|NF_SPT; }
 "DPT="{PORT}		{ opt.line->dport = atoi(nftext+4); opt.parser=opt.parser|NF_DPT; }
@@ -144,6 +148,30 @@ void nf_parse_isostart_hn(char *input)
 
   retval = sscanf(input, "%4d:%2d:%2d-%2d:%2d:%2d %32s", &year, &month, &day, &hour, &minute, &second, opt.line->hostname);
   if (retval != 7) {
+    return;
+  }
+
+  t = xmalloc(sizeof(struct tm));
+  t->tm_year = year - 1900;
+  t->tm_mon = month - 1;
+  t->tm_mday = day;
+  t->tm_hour = hour;
+  t->tm_min = minute;
+  t->tm_sec = second;
+  t->tm_isdst = -1;
+  opt.line->time = mktime(t);
+  free(t);
+
+  opt.parser = opt.parser | NF_DATE;
+}
+
+void nf_parse_rfc5424start_hn(char *input)
+{
+  int retval, year, month, day, hour, minute, second, fraction, tz_hour, tz_minute;
+  struct tm *t;
+
+  retval = sscanf(input, "%4d-%2d-%2dT%2d:%2d:%2d.%6d%3d:%2d %32s", &year, &month, &day, &hour, &minute, &second, &fraction, &tz_hour, &tz_minute, opt.line->hostname);
+  if (retval != 10) {
     return;
   }
 

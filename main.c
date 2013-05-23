@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2011 Boris Wesslowski */
-/* $Id: main.c,v 1.32 2011/11/14 12:53:52 bwess Exp $ */
+/* Copyright (C) 2000-2013 Boris Wesslowski */
+/* $Id: main.c,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +84,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2011 Boris Wesslowski");
+  puts("Copyright (C) 2000-2013 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");

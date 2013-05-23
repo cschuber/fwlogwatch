@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-11 13:29+0100\n"
+"POT-Creation-Date: 2013-05-23 15:04+0200\n"
 "PO-Revision-Date: 2002-03-06 00:00+0900\n"
 "Last-Translator: Takashi Kobayashi <kobayasi@res.kutc.kansai-u.ac.jp>\n"
 "Language-Team: -\n"
@@ -34,8 +34,8 @@ msgid "Error in sort string, direction expected, ignoring.\n"
 msgstr ""
 "ソート文字列 '%c' で間違いがあります。方向が期待されています。無視します。\n"
 
-#: ../compare.c:382 ../compare.c:384 ../modes.c:195 ../modes.c:202
-#: ../modes.c:819 ../modes.c:821 ../output.c:106 ../output.c:113
+#: ../compare.c:382 ../compare.c:384 ../modes.c:193 ../modes.c:200
+#: ../modes.c:815 ../modes.c:817 ../output.c:106 ../output.c:113
 #: ../output.c:193 ../output.c:202 ../output.c:380
 msgid "%b %d %H:%M:%S"
 msgstr ""
@@ -373,262 +373,262 @@ msgstr "入力に標準入力を使います\n"
 msgid "Opening input file '%s'\n"
 msgstr "入力ファイル '%s' を開いています\n"
 
-#: ../modes.c:132
+#: ../modes.c:130
 #, c-format
 msgid "Processing\n"
 msgstr "処理中\n"
 
-#: ../modes.c:139
+#: ../modes.c:137
 #, c-format
 msgid "Unrecognized entries or tokens can be submitted at\n"
 msgstr ""
 
-#: ../modes.c:148 ../modes.c:395 ../modes.c:788 ../rcfile.c:379
+#: ../modes.c:146 ../modes.c:393 ../modes.c:784 ../rcfile.c:379
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "'%s' を閉じています\n"
 
-#: ../modes.c:177
+#: ../modes.c:175
 #, c-format
 msgid "Sorting data\n"
 msgstr "データの並べ変え中\n"
 
-#: ../modes.c:214
+#: ../modes.c:212
 #, c-format
 msgid "Opening output file '%s'\n"
 msgstr "出力ファイル '%s' を開いています\n"
 
-#: ../modes.c:225
+#: ../modes.c:223
 #, fuzzy, c-format
 msgid "Sending\n"
 msgstr "送信中...\n"
 
-#: ../modes.c:248 ../net.c:341 ../net.c:344
+#: ../modes.c:246 ../net.c:341 ../net.c:344
 msgid "%A %B %d %H:%M:%S %Z %Y"
 msgstr ""
 
-#: ../modes.c:249
+#: ../modes.c:247
 #, c-format
 msgid "Generated %s by "
 msgstr "作成日: %s, 作成者: "
 
-#: ../modes.c:259
+#: ../modes.c:257
 #, c-format
 msgid "an unknown user.\n"
 msgstr "an unknown user.\n"
 
-#: ../modes.c:267
+#: ../modes.c:265
 #, c-format
 msgid "(and %d older than %d seconds) "
 msgstr "(and %d older than %d seconds) "
 
-#: ../modes.c:270
+#: ../modes.c:268
 #, c-format
 msgid "(and %d malformed) "
 msgstr "(and %d malformed) "
 
-#: ../modes.c:273
+#: ../modes.c:271
 #, fuzzy, c-format
 msgid "of %d entries in the file \"%s\" are packet logs, "
 msgstr "of %d entries in the file "
 
-#: ../modes.c:275
+#: ../modes.c:273
 #, c-format
 msgid "of %d entries in standard input are packet logs, "
 msgstr ""
 
-#: ../modes.c:277
+#: ../modes.c:275
 #, fuzzy, c-format
 msgid "of %d entries in %d input files are packet logs, "
 msgstr "of %d entries in the file "
 
-#: ../modes.c:281
+#: ../modes.c:279
 #, c-format
 msgid "one has unique characteristics.\n"
 msgstr "one has unique characteristics.\n"
 
-#: ../modes.c:283
+#: ../modes.c:281
 #, c-format
 msgid "%d have unique characteristics.\n"
 msgstr "%d have unique characteristics.\n"
 
-#: ../modes.c:291
+#: ../modes.c:289
 #, c-format
 msgid "One entry was excluded by configuration.\n"
 msgstr "１つのエントリが設定によって除外されました。\n"
 
-#: ../modes.c:293
+#: ../modes.c:291
 #, c-format
 msgid "%d entries were excluded by configuration.\n"
 msgstr "%d エントリが設定によって除外されました。\n"
 
-#: ../modes.c:301
+#: ../modes.c:299
 #, c-format
 msgid "First packet log entry: %s, last: %s.\n"
 msgstr "最初のパケットログエントリ: %s, 最後: %s\n"
 
-#: ../modes.c:303 ../modes.c:817
+#: ../modes.c:301 ../modes.c:813
 #, c-format
 msgid "No valid time entries found.\n"
 msgstr "有効な時刻エントリが見つかりませんでした。\n"
 
-#: ../modes.c:310
+#: ../modes.c:308
 #, c-format
 msgid "All entries were logged by the same host: \"%s\".\n"
 msgstr "すべてのエントリが同じホスト \"%s\" でログされました。\n"
 
-#: ../modes.c:317
+#: ../modes.c:315
 #, c-format
 msgid "All entries are from the same chain: \"%s\".\n"
 msgstr "すべてのエントリが同じチェイン \"%s\" から来ています。\n"
 
-#: ../modes.c:324
+#: ../modes.c:322
 #, c-format
 msgid "All entries have the same target: \"%s\".\n"
 msgstr "すべてのエントリが同じターゲット \"%s\" を持っています。\n"
 
-#: ../modes.c:331
+#: ../modes.c:329
 #, c-format
 msgid "All entries are from the same interface: \"%s\".\n"
 msgstr "すべてのエントリが同じインターフェイス \"%s\" から来ています。\n"
 
-#: ../modes.c:338
+#: ../modes.c:336
 #, fuzzy, c-format
 msgid "Only entries with a count of at least %d are shown.\n"
 msgstr "%d 以上の回数のエントリだけを表示しています。\n"
 
-#: ../modes.c:345
+#: ../modes.c:343
 #, fuzzy, c-format
 msgid "Only the top %d entries are shown.\n"
 msgstr "%d 以上の回数のエントリだけを表示しています。\n"
 
-#: ../modes.c:356
+#: ../modes.c:354
 #, fuzzy, c-format
 msgid "Resolving\n"
 msgstr "%s を解決しています\n"
 
-#: ../modes.c:415
+#: ../modes.c:413
 #, c-format
 msgid "Warning: pidfile exists, another fwlogwatch might be running.\n"
 msgstr ""
 "Warning: pidfile が存在しています。他の fwlogwatch が動いているかも知れませ"
 "ん。\n"
 
-#: ../modes.c:429
+#: ../modes.c:427
 #, fuzzy, c-format
 msgid "SIGHUP caught, reread configuration file %s"
 msgstr "SIGHUP を受け取りましたので，ログファイルを再び開いています"
 
-#: ../modes.c:431
+#: ../modes.c:429
 #, fuzzy, c-format
 msgid "SIGHUP caught, unable to reread configuration file %s"
 msgstr "SIGHUP を受け取りましたので，ログファイルを再び開いています"
 
-#: ../modes.c:435
+#: ../modes.c:433
 #, c-format
 msgid "Reread DNS cache file %s"
 msgstr ""
 
-#: ../modes.c:437
+#: ../modes.c:435
 #, fuzzy, c-format
 msgid "Unable to reread DNS cache file %s"
 msgstr "SIGHUP を受け取りましたので，ログファイルを再び開いています"
 
-#: ../modes.c:461
+#: ../modes.c:459
 msgid "SIGUSR1 caught, reading input from stdin, no need to reopen log file"
 msgstr ""
 
-#: ../modes.c:463
+#: ../modes.c:461
 #, fuzzy, c-format
 msgid "SIGUSR1 caught, reopening log file %s"
 msgstr "SIGHUP を受け取りましたので，ログファイルを再び開いています"
 
-#: ../modes.c:535
+#: ../modes.c:533
 msgid "SIGTERM caught, cleaning up"
 msgstr "SIGTERM を受け取りましたので，掃除しています"
 
-#: ../modes.c:617
+#: ../modes.c:615
 #, c-format
 msgid "Starting (pid %d)"
 msgstr "開始しています (pid %d)"
 
-#: ../modes.c:667
+#: ../modes.c:665
 msgid "User to run as was not found"
 msgstr ""
 
-#: ../modes.c:682
+#: ../modes.c:680
 #, c-format
 msgid "Changed uid from %d to %d, gid from %d to %d"
 msgstr ""
 
-#: ../modes.c:684
+#: ../modes.c:682
 #, c-format
 msgid "Running with uid %d, gid %d"
 msgstr ""
 
-#: ../modes.c:688
+#: ../modes.c:686
 msgid "Alert threshold is one attempt"
 msgstr "Alert threshold is one attempt"
 
-#: ../modes.c:690
+#: ../modes.c:688
 #, c-format
 msgid "Alert threshold is %d attempts"
 msgstr "Alert threshold is %d attempts"
 
-#: ../modes.c:694
+#: ../modes.c:692
 #, c-format
 msgid "Events older than %d second(s) are discarded"
 msgstr "%d 秒より古いイベントが破棄されます"
 
-#: ../modes.c:696
+#: ../modes.c:694
 #, c-format
 msgid "Events older than %d hour(s) are discarded"
 msgstr "%d 時間より古いイベントが破棄されます"
 
-#: ../modes.c:699
+#: ../modes.c:697
 #, fuzzy, c-format
 msgid "Response mode: Log%s%s"
 msgstr "応答モード: log%s%s"
 
-#: ../modes.c:699 ../net.c:350
+#: ../modes.c:697 ../net.c:350
 msgid ", notify"
 msgstr ", 通知"
 
-#: ../modes.c:699 ../net.c:350
+#: ../modes.c:697 ../net.c:350
 msgid ", respond"
 msgstr ", 応答"
 
-#: ../modes.c:730
+#: ../modes.c:728
 #, c-format
 msgid "Reading standard input\n"
 msgstr "標準入力を読みとっています\n"
 
-#: ../modes.c:748
+#: ../modes.c:744
 #, c-format
 msgid "Reading '%s'\n"
 msgstr "'%s' を読みとっています\n"
 
-#: ../modes.c:814
+#: ../modes.c:810
 #, fuzzy, c-format
 msgid "Number of files: %d\n"
 msgstr "Number of logged attempts: %s\n"
 
-#: ../modes.c:815
+#: ../modes.c:811
 #, fuzzy, c-format
 msgid "Number of lines: %d\n"
 msgstr "行数: %d\n"
 
-#: ../modes.c:820
+#: ../modes.c:816
 #, c-format
 msgid "First entry: %s\n"
 msgstr "最初のエントリ: %s\n"
 
-#: ../modes.c:822
+#: ../modes.c:818
 #, c-format
 msgid "Last entry : %s\n"
 msgstr "最後のエントリ: %s\n"
 
-#: ../modes.c:824
+#: ../modes.c:820
 #, c-format
 msgid "Difference : %s\n"
 msgstr ""
@@ -1031,15 +1031,15 @@ msgstr "入力ファイル '%s' を開いています\n"
 msgid "port mismatch: %d != %d\n"
 msgstr "ポートが一致しません: %d != %d\n"
 
-#: ../resolve.c:99 ../resolve.c:175
+#: ../resolve.c:99 ../resolve.c:172
 msgid "[timeout]"
 msgstr ""
 
-#: ../resolve.c:101 ../resolve.c:177
+#: ../resolve.c:101 ../resolve.c:174
 msgid "[server failure]"
 msgstr ""
 
-#: ../resolve.c:111 ../resolve.c:216
+#: ../resolve.c:111 ../resolve.c:213
 #, c-format
 msgid "Resolving %s\n"
 msgstr "%s を解決しています\n"
@@ -1049,46 +1049,46 @@ msgstr "%s を解決しています\n"
 msgid "%s [forward lookup failed]"
 msgstr "%s [前向き検索失敗]"
 
-#: ../resolve.c:134
+#: ../resolve.c:131
 #, fuzzy, c-format
 msgid " [v4 forward lookup: %s]"
 msgstr "%s [前向き検索: %s]"
 
-#: ../resolve.c:141
+#: ../resolve.c:138
 #, fuzzy, c-format
 msgid " [v6 forward lookup: %s]"
 msgstr "%s [前向き検索: %s]"
 
-#: ../resolve.c:183
+#: ../resolve.c:180
 #, c-format
 msgid "[adns status %d]"
 msgstr ""
 
-#: ../resolve.c:195
+#: ../resolve.c:192
 msgid "[adns error]"
 msgstr ""
 
-#: ../resolve.c:209 ../resolve.c:357
+#: ../resolve.c:206 ../resolve.c:354
 #, c-format
 msgid "Resolving %s from cache\n"
 msgstr "キャッシュから %s を解決しています\n"
 
-#: ../resolve.c:221
+#: ../resolve.c:218
 #, fuzzy, c-format
 msgid "Resolving %s from adns\n"
 msgstr "キャッシュから %s を解決しています\n"
 
-#: ../resolve.c:243
+#: ../resolve.c:240
 #, c-format
 msgid "IP address %s is already in DNS cache\n"
 msgstr ""
 
-#: ../resolve.c:249
+#: ../resolve.c:246
 #, c-format
 msgid "Adding IP address '%s' with host name '%s' to DNS cache\n"
 msgstr ""
 
-#: ../resolve.c:286
+#: ../resolve.c:283
 #, c-format
 msgid "Submitted %s to adns\n"
 msgstr ""
@@ -1207,11 +1207,11 @@ msgstr "%s の whois 情報を検索しています\n"
 msgid "lookup failed: %s\n"
 msgstr "検索に失敗: %s\n"
 
-#: ../main.h:308
+#: ../main.h:314
 msgid "fwlogwatch summary"
 msgstr "fwlogwatch の一覧"
 
-#: ../main.h:318
+#: ../main.h:324
 msgid "fwlogwatch status"
 msgstr "fwlogwatch の状態"
 
