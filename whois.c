@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: whois.c,v 1.17 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: whois.c,v 1.18 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,15 +27,23 @@ extern struct options opt;
 
 int whois_get_type(char *type)
 {
-  int cnt = 0, retval = -1;
+  int cnt = 0, retval = -1, r;
   char buffer[WHOISCMDLEN];
   signed char c;
 
-  read(opt.whois_sock, &c, 1);
+  r = read(opt.whois_sock, &c, 1);
+  if (r == -1) {
+    perror("read");
+    return -1;
+  }
   while ((c != '\n') && (c != EOF) && (cnt < WHOISCMDLEN)) {
     buffer[cnt] = c;
     cnt++;
-    read(opt.whois_sock, &c, 1);
+    r = read(opt.whois_sock, &c, 1);
+    if (r == -1) {
+      perror("read");
+      return -1;
+    }
   }
   buffer[cnt] = '\0';
 
@@ -52,7 +60,7 @@ int whois_get_type(char *type)
     *type = '\0';
   }
 
-  return (retval);
+  return retval;
 }
 
 void whois_read_socket(char *buf, int len)
@@ -62,6 +70,10 @@ void whois_read_socket(char *buf, int len)
   bzero(buf, len);
   while (cnt < len) {
     retval = read(opt.whois_sock, (char *) (buf + cnt), (len - cnt));
+    if (retval == -1) {
+      perror("read");
+      return;
+    }
     cnt += retval;
   }
   *(buf + len) = '\0';
@@ -86,18 +98,21 @@ char *whois_read_data()
     }
   }
 
-  return (data);
+  return data;
 }
 
 char *whois_get_from_as(int asn)
 {
   char cmdstr[WHOISCMDLEN], *data;
+  int r;
 
-  snprintf(cmdstr, WHOISCMDLEN, "!man,AS%d\n", asn);
-  write(opt.whois_sock, cmdstr, strlen(cmdstr));
+  snprintf(cmdstr, WHOISCMDLEN, "!maut-num,as%d\n", asn);
+  r = write(opt.whois_sock, cmdstr, strlen(cmdstr));
+  if (r == -1)
+    perror("write");
   data = whois_read_data();
 
-  return (data);
+  return data;
 }
 
 void whois_search_desc(struct whois_entry *we)
@@ -124,14 +139,33 @@ void whois_search_desc(struct whois_entry *we)
 void whois_from_ip(struct in6_addr ip, struct whois_entry *we)
 {
   char cmdstr[WHOISCMDLEN], *data, *descs, *desce;
+  int r;
 
   we->as_number = 0;
   we->ip_route = NULL;
   we->ip_descr = NULL;
   we->as_descr = NULL;
 
-  snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", my_inet_ntop(&ip));
-  write(opt.whois_sock, cmdstr, strlen(cmdstr));
+  if (isV4mappedV6addr(&ip)) {
+    snprintf(cmdstr, WHOISCMDLEN, "!r%s/32,l\n", my_inet_ntop(&ip));
+  } else {
+    if(ip.s6_addr[0] == 0x20 && ip.s6_addr[1] == 0x02) {
+      /* 6to4, 2002::/16 */
+      snprintf(cmdstr, WHOISCMDLEN, "!r%d.%d.%d.%d/32,l\n", ip.s6_addr[2], ip.s6_addr[3], ip.s6_addr[4], ip.s6_addr[5]);
+    } else if(ip.s6_addr[0] == 0x20 && ip.s6_addr[1] == 0x01 && ip.s6_addr[2] == 0x00 && ip.s6_addr[3] == 0x00) {
+      /* Teredo, 2001:0000::/32 */
+      snprintf(cmdstr, WHOISCMDLEN, "!r%d.%d.%d.%d/32,l\n", ip.s6_addr[4], ip.s6_addr[5], ip.s6_addr[6], ip.s6_addr[7]);
+    } else {
+      snprintf(cmdstr, WHOISCMDLEN, "!r%s/128,l\n", my_inet_ntop(&ip));
+    }
+  }
+#ifdef WHOIS_DEBUG
+  fprintf(stderr, "WHOIS_DEBUG: sending \"%s\"\n", cmdstr);
+  fflush(stdout);
+#endif
+  r = write(opt.whois_sock, cmdstr, strlen(cmdstr));
+  if (r == -1)
+    perror("write");
   data = whois_read_data();
 
   if (data != NULL) {
@@ -224,7 +258,7 @@ struct whois_entry *whois(struct in6_addr ip)
     if (compare_ipv6_equal(&in6_addrt, &in6_net) == 0) {
       if (opt.verbose)
 	fprintf(stderr, _("Looking up whois info for %s(/%d) from cache\n"), my_inet_ntop(&ip), convert_mask(&in6_mask));
-      return (we);
+      return we;
     }
     we = we->next;
   }
@@ -237,9 +271,9 @@ struct whois_entry *whois(struct in6_addr ip)
   if (we->as_number != 0) {
     we->next = whois_first;
     whois_first = we;
-    return (we);
+    return we;
   } else {
-    return (NULL);
+    return NULL;
   }
 }
 
@@ -247,7 +281,7 @@ void whois_connect(const char *whois_server)
 {
   struct hostent *he;
   struct sockaddr_in sin;
-  int sock, retval;
+  int sock, retval, r;
 
   he = gethostbyname(whois_server);
   if (he == NULL) {
@@ -271,7 +305,9 @@ void whois_connect(const char *whois_server)
     exit(EXIT_FAILURE);
   }
 
-  write(sock, "!!\n", 3);
+  r = write(sock, "!!\n", 3);
+  if (r == -1)
+    perror("write");
   opt.whois_sock = sock;
 }
 
@@ -279,7 +315,9 @@ void whois_close()
 {
   int retval;
 
-  write(opt.whois_sock, "q\n", 2);
+  retval = write(opt.whois_sock, "!q\n", 3);
+  if (retval == -1)
+    perror("write");
   retval = close(opt.whois_sock);
   if (retval == -1)
     perror("close");

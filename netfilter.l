@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: netfilter.l,v 1.20 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: netfilter.l,v 1.21 2016/02/19 16:09:27 bwess Exp $ */
 
 %option prefix="nf"
 %option outfile="netfilter.c"
@@ -26,7 +26,7 @@ void nf_parse_proto(char *input);
 %}
 
 MONTH	"Jan"|"Feb"|"Mar"|"Apr"|"May"|"Jun"|"Jul"|"Aug"|"Sep"|"Oct"|"Nov"|"Dec"
-STRING	[a-zA-Z][a-zA-Z0-9.-]*
+STRING	[a-zA-Z][a-zA-Z0-9._-]*
 PREFIX	[ -~¡-ÿ]*([ -RT-~¡-ÿ]|[ -XZ-~¡-ÿ]"S")"IN="
 LOGHOST	[0-9.a-zA-Z()_:-]+
 DIGIT	[0-9]
@@ -276,8 +276,7 @@ unsigned char flex_netfilter(char *input, int linenum)
   if ((opt.line->protocol == 1) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST | NF_TYPE | NF_CODE))) {
     return PARSE_OK;
   }
-  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 41) || (opt.line->protocol == 46) || (opt.line->protocol == 47)
-       || (opt.line->protocol == 50) || (opt.line->protocol == 54) || (opt.line->protocol == 103)) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST))) {
+  if (((opt.line->protocol == 2) || (opt.line->protocol == 9) || (opt.line->protocol == 41) || (opt.line->protocol == 46) || (opt.line->protocol == 47) || (opt.line->protocol == 50) || (opt.line->protocol == 54) || (opt.line->protocol == 103) || (opt.line->protocol == 139)) && (opt.parser == (NF_DATE | NF_PROTO | NF_IN | NF_SRC | NF_DST))) {
     return PARSE_OK;
   }
   if (opt.verbose)

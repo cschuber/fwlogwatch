@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: snort.h,v 1.11 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: snort.h,v 1.12 2016/02/19 16:09:27 bwess Exp $ */
 
 #ifndef _SNORT_H
 #define _SNORT_H

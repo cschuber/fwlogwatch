@@ -1,11 +1,11 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: main.h,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: main.h,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
 #define PACKAGE "fwlogwatch"
-#define VERSION "1.4 2013-05-23"
+#define VERSION "1.5 2016-02-19"
 #define COPYRIGHT "Boris Wesslowski"
 
 /* Paths */
@@ -41,7 +41,7 @@
 #define MAXSORTSIZE 24
 #define USERSIZE 16
 #define PASSWORDSIZE 76
-#define WHOISCMDLEN 32
+#define WHOISCMDLEN 64
 #define WHOISDESCLEN 64
 #define WHOISROUTELEN 20
 #define TITLESIZE 64
@@ -68,6 +68,10 @@
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>
+#endif
+
+#ifdef HAVE_GEOIP
+#include <GeoIP.h>
 #endif
 
 enum {
@@ -339,6 +343,12 @@ enum {
 #define RESP_REMOVE_OPC 1
 #define RESP_REMOVE_OHS 2
 
+/* GeoIP */
+
+#define GEOIP_DB_V4 "/var/lib/GeoIP/GeoIP.dat"
+#define GEOIP_DB_V6 "/var/lib/GeoIP/GeoIPv6.dat"
+
+
 enum {
   FW_START,
   FW_STOP
@@ -551,6 +561,14 @@ struct options {
   int global_id;
 
   char ntop[INET6_ADDRSTRLEN];
+
+#ifdef HAVE_GEOIP
+  unsigned char geoip;
+  GeoIP *geoip_v4;
+  GeoIP *geoip_v6;
+  char geoip_db_v4[FILESIZE];
+  char geoip_db_v6[FILESIZE];
+#endif
 };
 
 #endif

@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: fwlogwatch.init.suse,v 1.5 2013/05/23 15:04:15 bwess Exp $
+# $Id: fwlogwatch.init.suse,v 1.6 2016/02/19 16:09:27 bwess Exp $
 #
 # /etc/init.d/fwlogwatch
 #

@@ -1,5 +1,5 @@
-# Copyright (C) 2000-2013 Boris Wesslowski
-# $Id: Makefile,v 1.33 2013/05/23 15:04:14 bwess Exp $
+# Copyright (C) 2000-2016 Boris Wesslowski
+# $Id: Makefile,v 1.34 2016/02/19 16:09:27 bwess Exp $
 
 # You might want to add -DSHORT_NAMES to CFLAGS if you only intend to analyze
 # log formats with short list/chain/branch/interface names like ipchains.
@@ -8,12 +8,13 @@
 # -DHAVE_ZLIB enables support for gzip compressed files.
 # -DHAVE_GETTEXT enables localization support.
 # -DHAVE_ADNS enables support for asynchronous DNS lookups.
+# -DHAVE_GEOIP enables support for GeoIP database lookups.
 
 # Linux
 CC = gcc
 CFLAGS = -DHAVE_ZLIB -DHAVE_GETTEXT -pipe -O2 -Wall #-pedantic -Wpointer-arith #-g #-p
 LDFLAGS = -s #-g #-static -p
-LIBS = -lcrypt -lz #-ladns #-lc_p
+LIBS = -lcrypt -lz #-ladns -lGeoIP #-lc_p
 
 # Mac OS X
 #CC = gcc

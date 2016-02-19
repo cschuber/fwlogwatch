@@ -1,5 +1,5 @@
-.\" Copyright (C) 2000-2013 Boris Wesslowski
-.\" $Id: fwlogwatch.8,v 1.32 2013/05/23 15:04:14 bwess Exp $
+.\" Copyright (C) 2000-2016 Boris Wesslowski
+.\" $Id: fwlogwatch.8,v 1.33 2016/02/19 16:09:27 bwess Exp $
 .TH FWLOGWATCH 8 "November 11, 2011" "Boris Wesslowski"
 
 .SH NAME
@@ -77,6 +77,10 @@ destination port 25 you would use
 and to exclude entries which have the class C network 192.168.1.0 as source
 or belong to the chain INPUT:
 .B -Eehs192.168.1.0/24 -EecINPUT
+.IP \-g
+Enable GeoIP lookups. The country an IP address probably is in will be
+looked up in MaxMind's GeoIP database. The default location of the IPv4 and
+IPv6 database files can be overridden in the configuration file.
 .IP \-i\ \fIfile\fR
 If your logs contain private IP addresses that are not resolvable through
 DNS but you want reports with meaningful host names or you have any other

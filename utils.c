@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: utils.c,v 1.33 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: utils.c,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -549,3 +549,21 @@ void fdprintf(int fd, char *format, ...)
     fflush(NULL);
   }
 }
+
+#ifdef HAVE_GEOIP
+const char *geoip_lookup(struct in6_addr *ip)
+{
+  const char *country;
+
+  if (isV4mappedV6addr(ip)) {
+    country = GeoIP_country_name_by_addr(opt.geoip_v4, my_inet_ntop(ip));
+  } else {
+    country = GeoIP_country_name_by_addr_v6(opt.geoip_v6, my_inet_ntop(ip));
+  }
+  if (country == NULL) {
+    return ("-");
+  } else {
+    return (country);
+  }
+}
+#endif

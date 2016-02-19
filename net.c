@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: net.c,v 1.31 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: net.c,v 1.32 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,6 +197,10 @@ void table_header(int conn, unsigned char mode, unsigned char opts)
   put_entry(conn, _("source"), 'S', mode);
   if (opt.resolve)
     put_entry(conn, _("hostname"), 0, mode);
+#ifdef HAVE_GEOIP
+  if (opt.geoip)
+    put_entry(conn, _("geoip"), 0, mode);
+#endif
   if (opt.src_port) {
     put_entry(conn, _("port"), 's', mode);
     if (opt.sresolve)
@@ -206,6 +210,10 @@ void table_header(int conn, unsigned char mode, unsigned char opts)
     put_entry(conn, _("destination"), 'D', mode);
     if (opt.resolve)
       put_entry(conn, _("hostname"), 0, mode);
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      put_entry(conn, _("geoip"), 0, mode);
+#endif
   }
   if (opt.dst_port) {
     put_entry(conn, _("port"), 'd', mode);
@@ -428,6 +436,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	if (opt.resolve) {
 	  fdprintf(conn, "<td>%s</td>", resolve_address(this->shost));
 	}
+#ifdef HAVE_GEOIP
+	if (opt.geoip) {
+	  fdprintf(conn, "<td>%s</td>", geoip_lookup(&this->shost));
+	}
+#endif
 	if (opt.src_port) {
 	  fdprintf(conn, "<td>%d</td>", this->sport);
 	  if (opt.sresolve) {
@@ -439,6 +452,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	  if (opt.resolve) {
 	    fdprintf(conn, "<td>%s</td>", resolve_address(this->dhost));
 	  }
+#ifdef HAVE_GEOIP
+	  if (opt.geoip) {
+	    fdprintf(conn, "<td>%s</td>", geoip_lookup(&this->dhost));
+	  }
+#endif
 	}
 	if (opt.dst_port) {
 	  fdprintf(conn, "<td>%d</td>", this->dport);
@@ -505,6 +523,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	    fdprintf(conn, _("<td>(known net)</td>"));
 	  }
 	}
+#ifdef HAVE_GEOIP
+	if (opt.geoip) {
+	  fdprintf(conn, "<td>-</td>");
+	}
+#endif
 	if (opt.src_port) {
 	  fdprintf(conn, _("<td>any</td>"));
 	  if (opt.sresolve) {
@@ -516,6 +539,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	  if (opt.resolve) {
 	    fdprintf(conn, "<td>-</td>");
 	  }
+#ifdef HAVE_GEOIP
+	  if (opt.geoip) {
+	    fdprintf(conn, "<td>-</td>");
+	  }
+#endif
 	}
 	if (opt.dst_port) {
 	  fdprintf(conn, _("<td>any</td>"));
@@ -534,6 +562,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	if (opt.resolve) {
 	  fdprintf(conn, "<td>%s</td>", resolve_address(this_host->shost));
 	}
+#ifdef HAVE_GEOIP
+	if (opt.geoip) {
+	  fdprintf(conn, "<td>%s</td>", geoip_lookup(&this_host->shost));
+	}
+#endif
 	if (opt.src_port) {
 	  fdprintf(conn, "<td>%d</td>", this_host->sport);
 	  if (opt.sresolve) {
@@ -545,6 +578,11 @@ void show_status(int conn, int linenum, int hitnum, int ignored)
 	  if (opt.resolve) {
 	    fdprintf(conn, "<td>%s</td>", resolve_address(this_host->dhost));
 	  }
+#ifdef HAVE_GEOIP
+	  if (opt.geoip) {
+	    fdprintf(conn, "<td>%s</td>", geoip_lookup(&this_host->dhost));
+	  }
+#endif
 	}
 	if (opt.dst_port) {
 	  fdprintf(conn, "<td>%d</td>", this_host->dport);

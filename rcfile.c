@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: rcfile.c,v 1.33 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: rcfile.c,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,6 +185,18 @@ void parse_rcfile(char *input, char *rcfile, int linenum)
   } else if (strncasecmp(command, "rowcolor2", 9) == 0) {
     xstrncpy(opt.rowcol2, get_one_parameter(command + 10, HASH_IGNORE), COLORSIZE);
   }
+#ifdef HAVE_GEOIP
+
+  /* Global options */
+
+  else if (strncasecmp(command, "geoip_lookup", 12) == 0) {
+    opt.geoip = get_yes_or_no(command + 13, rcfile, linenum);
+  } else if (strncasecmp(command, "geoip_db_v4", 11) == 0) {
+    xstrncpy(opt.geoip_db_v4, get_one_parameter(command + 12, HASH_ENDS_INPUT), FILESIZE);
+  } else if (strncasecmp(command, "geoip_db_v6", 11) == 0) {
+    xstrncpy(opt.geoip_db_v6, get_one_parameter(command + 12, HASH_ENDS_INPUT), FILESIZE);
+  }
+#endif
 
   /* Log summary mode */
 

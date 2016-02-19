@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: output.c,v 1.33 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: output.c,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <string.h>
@@ -146,6 +146,10 @@ void output_html_entry(struct conn_data *input, FILE * fd)
     fprintf(fd, "</td><td>%s", my_inet_ntop(&input->shost));
     if (opt.resolve)
       fprintf(fd, "</td><td>%s", resolve_address(input->shost));
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, "</td><td>%s", geoip_lookup(&input->shost));
+#endif
     if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
@@ -168,6 +172,10 @@ void output_html_entry(struct conn_data *input, FILE * fd)
     fprintf(fd, "</td><td>%s", my_inet_ntop(&input->dhost));
     if (opt.resolve)
       fprintf(fd, "</td><td>%s", resolve_address(input->dhost));
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, "</td><td>%s", geoip_lookup(&input->dhost));
+#endif
   }
 
   if (opt.dst_port) {
@@ -264,6 +272,10 @@ void output_text_entry(struct conn_data *input, FILE * fd)
     fprintf(fd, _(" from %s"), my_inet_ntop(&input->shost));
     if (opt.resolve)
       fprintf(fd, " (%s)", resolve_address(input->shost));
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, " [%s]", geoip_lookup(&input->shost));
+#endif
     if (opt.whois_lookup) {
       struct whois_entry *we;
       we = whois(input->shost);
@@ -287,6 +299,10 @@ void output_text_entry(struct conn_data *input, FILE * fd)
     if (opt.resolve) {
       fprintf(fd, " (%s)", resolve_address(input->dhost));
     }
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, " [%s]", geoip_lookup(&input->dhost));
+#endif
   }
 
   if (opt.dst_port) {
@@ -340,6 +356,10 @@ void output_html_table(FILE * fd)
     fprintf(fd, _("<th>source</th>"));
     if (opt.resolve)
       fprintf(fd, _("<th>hostname</th>"));
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, _("<th>geoip</th>"));
+#endif
     if (opt.whois_lookup)
       fprintf(fd, _("<th>whois information</th>"));
   }
@@ -354,6 +374,10 @@ void output_html_table(FILE * fd)
     fprintf(fd, _("<th>destination</th>"));
     if (opt.resolve)
       fprintf(fd, _("<th>hostname</th>"));
+#ifdef HAVE_GEOIP
+    if (opt.geoip)
+      fprintf(fd, _("<th>geoip</th>"));
+#endif
   }
 
   if (opt.dst_port) {

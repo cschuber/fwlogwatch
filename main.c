@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: main.c,v 1.33 2013/05/23 15:04:14 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: main.c,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,6 +37,9 @@ void usage(char *me, unsigned char exitcode)
   printf(_("  -E <format>  select or exclude hosts, ports, chains and targets\n"));
   printf(_("               quick reference: -E[ie][hp][sd]<ip/number>\n"));
   printf(_("                                -E[ie][cb]<name>\n"));
+#ifdef HAVE_GEOIP
+  printf(_("  -g           look up addresses in GeoIP database\n"));
+#endif
   printf(_("  -i <file>    initialize DNS cache with entries from file\n"));
   printf(_("  -M <number>  only show this amount of entries\n"));
   printf(_("  -m <count>   only show entries with at least so many incidents\n"));
@@ -84,7 +87,7 @@ void info()
 {
   /* GNU standards compatible program info */
   printf("%s %s\n", PACKAGE, VERSION);
-  puts("Copyright (C) 2000-2013 Boris Wesslowski");
+  puts("Copyright (C) 2000-2016 Boris Wesslowski");
   puts("");
   puts("This program is free software; you can redistribute it and/or modify");
   puts("it under the terms of the GNU General Public License as published by");
@@ -124,6 +127,14 @@ void info()
   printf(_("GNU adns support "));
 #ifdef HAVE_ADNS
   puts(_("enabled"));
+#else
+  puts(_("disabled"));
+#endif
+  printf(_("GeoIP support "));
+#ifdef HAVE_GEOIP
+  puts(_("enabled"));
+  puts("");
+  puts("This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com.");
 #else
   puts(_("disabled"));
 #endif
@@ -228,6 +239,14 @@ void init_options()
     return;
   }
   snprintf(opt.sender, EMAILSIZE, "%s@%s", user, host);
+
+#ifdef HAVE_GEOIP
+  opt.geoip = 0;
+  opt.geoip_v4 = NULL;
+  opt.geoip_v6 = NULL;
+  xstrncpy(opt.geoip_db_v4, GEOIP_DB_V4, FILESIZE);
+  xstrncpy(opt.geoip_db_v6, GEOIP_DB_V6, FILESIZE);
+#endif
 }
 
 int main(int argc, char **argv)
@@ -243,7 +262,7 @@ int main(int argc, char **argv)
   textdomain(PACKAGE);
 #endif
 
-  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeE:F:hi:I:k:l:Lm:M:nNo:O:pP:RsStT:U:vVwWX:yz")) != EOF) {
+  while ((iopt = getopt(argc, argv, "a:AbBc:C:dDeE:F:ghi:I:k:l:Lm:M:nNo:O:pP:RsStT:U:vVwWX:yz")) != EOF) {
     switch (iopt) {
     case 'a':
       opt.threshold = atoi(optarg);
@@ -313,6 +332,15 @@ int main(int argc, char **argv)
       break;
     case 'F':
       xstrncpy(opt.sender, optarg, EMAILSIZE);
+      break;
+    case 'g':
+#ifdef HAVE_GEOIP
+      opt.geoip = 1;
+#else
+      fprintf(stderr, _("GeoIP requested but not supported by this version\n"));
+      fprintf(stderr, _("Exiting\n"));
+      return EXIT_FAILURE;
+#endif
       break;
     case 'h':
       usage(argv[0], EXIT_SUCCESS);
@@ -409,6 +437,29 @@ int main(int argc, char **argv)
 
   if (opt.rcfile_dns[0] != '\0')
     read_rcfile(opt.rcfile_dns, MUST_EXIST, RCFILE_DNS);
+
+#ifdef HAVE_GEOIP
+  if (opt.geoip) {
+    opt.geoip_v4 = GeoIP_open_type(GEOIP_COUNTRY_EDITION, GEOIP_STANDARD);
+    if (opt.geoip_v4 == NULL) {
+      opt.geoip_v4 = GeoIP_open(opt.geoip_db_v4, GEOIP_STANDARD);
+      if (opt.geoip_v4 == NULL) {
+	fprintf(stderr, _("Error opening GeoIP IPv4 database\n"));
+	fprintf(stderr, _("Exiting\n"));
+	return EXIT_FAILURE;
+      }
+    }
+    opt.geoip_v6 = GeoIP_open_type(GEOIP_COUNTRY_EDITION_V6, GEOIP_STANDARD);
+    if (opt.geoip_v6 == NULL) {
+      opt.geoip_v6 = GeoIP_open(opt.geoip_db_v6, GEOIP_STANDARD);
+      if (opt.geoip_v6 == NULL) {
+	fprintf(stderr, _("Error opening GeoIP IPv6 database\n"));
+	fprintf(stderr, _("Exiting\n"));
+	return EXIT_FAILURE;
+      }
+    }
+  }
+#endif
 
   while (optind < argc)
     add_input_file(argv[optind++]);

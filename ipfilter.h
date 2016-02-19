@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: ipfilter.h,v 1.21 2013/05/23 15:04:14 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: ipfilter.h,v 1.22 2016/02/19 16:09:27 bwess Exp $ */
 
 #ifndef _IPFILTER_H
 #define _IPFILTER_H

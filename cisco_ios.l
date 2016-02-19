@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: cisco_ios.l,v 1.19 2013/05/23 15:04:14 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: cisco_ios.l,v 1.20 2016/02/19 16:09:27 bwess Exp $ */
 
 %option prefix="cisco_ios"
 %option outfile="cisco_ios.c"

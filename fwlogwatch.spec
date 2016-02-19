@@ -1,8 +1,8 @@
-# Copyright (C) 2000-2013 Boris Wesslowski
-# $Id: fwlogwatch.spec,v 1.33 2013/05/23 15:04:14 bwess Exp $
+# Copyright (C) 2000-2016 Boris Wesslowski
+# $Id: fwlogwatch.spec,v 1.34 2016/02/19 16:09:27 bwess Exp $
 
 Name: fwlogwatch
-Version: 1.4
+Version: 1.5
 Release: 1
 Group: Productivity/Networking/Security
 Vendor: Boris Wesslowski

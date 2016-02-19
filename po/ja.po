@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fwlogwatch 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-23 15:04+0200\n"
+"POT-Creation-Date: 2016-02-19 15:52+0100\n"
 "PO-Revision-Date: 2002-03-06 00:00+0900\n"
 "Last-Translator: Takashi Kobayashi <kobayasi@res.kutc.kansai-u.ac.jp>\n"
 "Language-Team: -\n"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: ../compare.c:382 ../compare.c:384 ../modes.c:193 ../modes.c:200
 #: ../modes.c:815 ../modes.c:817 ../output.c:106 ../output.c:113
-#: ../output.c:193 ../output.c:202 ../output.c:380
+#: ../output.c:201 ../output.c:210 ../output.c:404
 msgid "%b %d %H:%M:%S"
 msgstr ""
 
@@ -114,41 +114,46 @@ msgstr ""
 msgid "                                -E[ie][cb]<name>\n"
 msgstr ""
 
-#: ../main.c:40
+#: ../main.c:41
+#, c-format
+msgid "  -g           look up addresses in GeoIP database\n"
+msgstr ""
+
+#: ../main.c:43
 #, c-format
 msgid "  -i <file>    initialize DNS cache with entries from file\n"
 msgstr ""
 
-#: ../main.c:41
+#: ../main.c:44
 #, c-format
 msgid "  -M <number>  only show this amount of entries\n"
 msgstr ""
 
-#: ../main.c:42
+#: ../main.c:45
 #, fuzzy, c-format
 msgid "  -m <count>   only show entries with at least so many incidents\n"
 msgstr ""
 "         -m <カウント>\n"
 "                     少なくとも多い事件に限ったエントリを表示するだけ\n"
 
-#: ../main.c:43
+#: ../main.c:46
 #, fuzzy, c-format
 msgid "  -N           resolve service names\n"
 msgstr "         -N          サービス名を解決する\n"
 
-#: ../main.c:44
+#: ../main.c:47
 #, fuzzy, c-format
 msgid "  -n           resolve host names\n"
 msgstr "         -n          ホスト名を解決する\n"
 
-#: ../main.c:45
+#: ../main.c:48
 #, fuzzy, c-format
 msgid "  -O <order>   define the sort order (see the man page for details)\n"
 msgstr ""
 "         -O <順序>   並べ変えの順序を定義する\n"
 "                     (詳細についてはマニュアルページを参照)\n"
 
-#: ../main.c:46
+#: ../main.c:49
 #, fuzzy, c-format
 msgid ""
 "  -P <format>  use parsers for specific formats (defaults to netfilter)\n"
@@ -156,211 +161,232 @@ msgstr ""
 "         -P <フォーマット>\n"
 "                     指定フォーマットの走査のみを使う\n"
 
-#: ../main.c:47
+#: ../main.c:50
 #, c-format
 msgid "               i: ipchains, n: netfilter, f: ipfilter, c: cisco ios\n"
 msgstr ""
 
-#: ../main.c:48
+#: ../main.c:51
 #, c-format
 msgid ""
 "               p: cisco pix, e: netscreen, l: lancom, s: snort, b: ipfw\n"
 msgstr ""
 
-#: ../main.c:49
+#: ../main.c:52
 #, fuzzy, c-format
 msgid "  -p           differentiate protocols\n"
 msgstr "         -p          プロトコルを区別する\n"
 
-#: ../main.c:50
+#: ../main.c:53
 #, fuzzy, c-format
 msgid "  -s           differentiate source ports\n"
 msgstr "         -s          送信元 IP ポートを区別する\n"
 
-#: ../main.c:51
+#: ../main.c:54
 #, c-format
 msgid "  -U <title>   set report and status page title and email subject\n"
 msgstr ""
 
-#: ../main.c:52
+#: ../main.c:55
 #, fuzzy, c-format
 msgid "  -v           verbose, specify twice for more info\n"
 msgstr "         -v          冗長にする，２度指定するとさらに冗長になる\n"
 
-#: ../main.c:53
+#: ../main.c:56
 #, fuzzy, c-format
 msgid "  -y           differentiate TCP options\n"
 msgstr "         -y          TCP オプションを区別する\n"
 
-#: ../main.c:56
+#: ../main.c:59
 #, c-format
 msgid "Log summary mode (default):\n"
 msgstr "ログ集計モード (デフォルト):\n"
 
-#: ../main.c:57
+#: ../main.c:60
 #, fuzzy, c-format
 msgid "  -C <email>   carbon copy recipients\n"
 msgstr "         -C <email>  カーボンコピー受信者\n"
 
-#: ../main.c:58
+#: ../main.c:61
 #, fuzzy, c-format
 msgid "  -e           show end times\n"
 msgstr "         -e          終了時刻を表示する\n"
 
-#: ../main.c:59
+#: ../main.c:62
 #, fuzzy, c-format
 msgid "  -F <email>   report sender address (defaults to '%s')\n"
 msgstr ""
 "         -F <email>\n"
 "                     レポートの送信者アドレス\n"
 
-#: ../main.c:60
+#: ../main.c:63
 #, fuzzy, c-format
 msgid "  -l <time>    process recent events only (defaults to off)\n"
 msgstr ""
 "         -l <時刻>\n"
 "                     最近のイベントのみを処理する(デフォルト off)\n"
 
-#: ../main.c:61
+#: ../main.c:64
 #, fuzzy, c-format
 msgid "  -o <file>    specify output file\n"
 msgstr ""
 "         -o <ファイル>\n"
 "                     出力ファイルを指定する\n"
 
-#: ../main.c:62
+#: ../main.c:65
 #, fuzzy, c-format
 msgid "  -S           do not differentiate source IP addresses\n"
 msgstr "         -S          送信元 IP アドレスを区別しない\n"
 
-#: ../main.c:63
+#: ../main.c:66
 #, fuzzy, c-format
 msgid "  -T <email>   send report by email to this address\n"
 msgstr ""
 "         -F <email>\n"
 "                     レポートの送信者アドレス\n"
 
-#: ../main.c:64
+#: ../main.c:67
 #, fuzzy, c-format
 msgid "  -t           show start times\n"
 msgstr "         -t          開始時刻を表示する\n"
 
-#: ../main.c:65
+#: ../main.c:68
 #, fuzzy, c-format
 msgid "  -W           activate whois lookups for source addresses\n"
 msgstr "         -W          送信元アドレスの whois 検索を有効にする\n"
 
-#: ../main.c:66
+#: ../main.c:69
 #, fuzzy, c-format
 msgid "  -w           HTML output\n"
 msgstr "         -w          HTML 出力\n"
 
-#: ../main.c:67
+#: ../main.c:70
 #, fuzzy, c-format
 msgid "  -z           show time interval\n"
 msgstr "         -z          時刻間隔を表示する\n"
 
-#: ../main.c:70
+#: ../main.c:73
 #, c-format
 msgid "Realtime response mode:\n"
 msgstr "実時間応答モード:\n"
 
-#: ../main.c:71
+#: ../main.c:74
 #, fuzzy, c-format
 msgid "  -R           realtime response as daemon (default action: log only)\n"
 msgstr ""
 "         -R          daemonとして実時間対応 (デフォルト動作: ログのみ)\n"
 
-#: ../main.c:72
+#: ../main.c:75
 #, fuzzy, c-format
 msgid "  -a <count>   alert threshold (defaults to %d entries)\n"
 msgstr ""
 "         -a <カウント>\n"
 "                     警告の閾値 (デフォルト %d エントリ)\n"
 
-#: ../main.c:73
+#: ../main.c:76
 #, fuzzy, c-format
 msgid "  -l <time>    forget events this old (defaults to %d hours)\n"
 msgstr ""
 "         -l <time>   これより古いイベントを忘れる (デフォルト %d 時間)\n"
 
-#: ../main.c:74
+#: ../main.c:77
 #, fuzzy, c-format
 msgid "  -k <IP/net>  add this IP address or net to the list of known hosts\n"
 msgstr ""
 "         -k <IP/net> 既知のホストのリストにこの IP アドレスまたは net を追加"
 "する\n"
 
-#: ../main.c:75
+#: ../main.c:78
 #, fuzzy, c-format
 msgid "  -A           invoke notification script if threshold is reached\n"
 msgstr "         -A          閾値に達した時に通知スクリプトを起動する\n"
 
-#: ../main.c:76
+#: ../main.c:79
 #, fuzzy, c-format
 msgid "  -B           invoke response action script (e.g. block host)\n"
 msgstr ""
 "         -B          応答スクリプトを起動する (例えばホストをブロックする\n"
 
-#: ../main.c:77
+#: ../main.c:80
 #, fuzzy, c-format
 msgid "  -X <port>    activate internal status information web server\n"
 msgstr "         -X          内部状態の情報のウェブサーバを有効にする\n"
 
-#: ../main.c:103
+#: ../main.c:106
 msgid "You can contact the author at <bw@inside-security.de>."
 msgstr ""
 
-#: ../main.c:105
+#: ../main.c:108
 msgid "Compile-time options of this version:"
 msgstr ""
 
-#: ../main.c:106
+#: ../main.c:109
 #, c-format
 msgid "Short name limit "
 msgstr ""
 
-#: ../main.c:108 ../main.c:114 ../main.c:120 ../main.c:126
+#: ../main.c:111 ../main.c:117 ../main.c:123 ../main.c:129 ../main.c:135
 msgid "enabled"
 msgstr ""
 
-#: ../main.c:110 ../main.c:116 ../main.c:122 ../main.c:128
+#: ../main.c:113 ../main.c:119 ../main.c:125 ../main.c:131 ../main.c:139
 msgid "disabled"
 msgstr ""
 
-#: ../main.c:112
+#: ../main.c:115
 #, c-format
 msgid "Zlib support "
 msgstr ""
 
-#: ../main.c:118
+#: ../main.c:121
 #, c-format
 msgid "Gettext (i18n) support "
 msgstr ""
 
-#: ../main.c:124
+#: ../main.c:127
 #, c-format
 msgid "GNU adns support "
 msgstr ""
 
-#: ../main.c:282
+#: ../main.c:133
+#, c-format
+msgid "GeoIP support "
+msgstr ""
+
+#: ../main.c:301
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 1 (expected [ie]): %s\n"
 msgstr ""
 
-#: ../main.c:283 ../main.c:300 ../main.c:309 ../main.c:453
+#: ../main.c:302 ../main.c:319 ../main.c:328 ../main.c:341 ../main.c:448
+#: ../main.c:457 ../main.c:504
 #, c-format
 msgid "Exiting\n"
 msgstr "終了\n"
 
-#: ../main.c:299
+#: ../main.c:318
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 2 (expected [hpcb]): %s\n"
 msgstr ""
 
-#: ../main.c:308
+#: ../main.c:327
 #, c-format
 msgid "Illegal inclusion/exclusion pos. 3 (expected [sd]): %s\n"
+msgstr ""
+
+#: ../main.c:340
+#, c-format
+msgid "GeoIP requested but not supported by this version\n"
+msgstr ""
+
+#: ../main.c:447
+#, c-format
+msgid "Error opening GeoIP IPv4 database\n"
+msgstr ""
+
+#: ../main.c:456
+#, c-format
+msgid "Error opening GeoIP IPv6 database\n"
 msgstr ""
 
 #: ../modes.c:108
@@ -383,7 +409,7 @@ msgstr "処理中\n"
 msgid "Unrecognized entries or tokens can be submitted at\n"
 msgstr ""
 
-#: ../modes.c:146 ../modes.c:393 ../modes.c:784 ../rcfile.c:379
+#: ../modes.c:146 ../modes.c:393 ../modes.c:784 ../rcfile.c:391
 #, c-format
 msgid "Closing '%s'\n"
 msgstr "'%s' を閉じています\n"
@@ -403,7 +429,7 @@ msgstr "出力ファイル '%s' を開いています\n"
 msgid "Sending\n"
 msgstr "送信中...\n"
 
-#: ../modes.c:246 ../net.c:341 ../net.c:344
+#: ../modes.c:246 ../net.c:349 ../net.c:352
 msgid "%A %B %d %H:%M:%S %Z %Y"
 msgstr ""
 
@@ -590,11 +616,11 @@ msgstr "%d 時間より古いイベントが破棄されます"
 msgid "Response mode: Log%s%s"
 msgstr "応答モード: log%s%s"
 
-#: ../modes.c:697 ../net.c:350
+#: ../modes.c:697 ../net.c:358
 msgid ", notify"
 msgstr ", 通知"
 
-#: ../modes.c:697 ../net.c:350
+#: ../modes.c:697 ../net.c:358
 msgid ", respond"
 msgstr ", 応答"
 
@@ -673,315 +699,324 @@ msgstr " (%d バイト)"
 msgid "source"
 msgstr ""
 
-#: ../net.c:199 ../net.c:208
+#: ../net.c:199 ../net.c:212
 #, fuzzy
 msgid "hostname"
 msgstr "<td>ホスト名</td>"
 
-#: ../net.c:201 ../net.c:211
+#: ../net.c:202 ../net.c:215
+msgid "geoip"
+msgstr ""
+
+#: ../net.c:205 ../net.c:219
 #, fuzzy
 msgid "port"
 msgstr " port %d"
 
-#: ../net.c:203 ../net.c:213
+#: ../net.c:207 ../net.c:221
 #, fuzzy
 msgid "service"
 msgstr "<td>サービス</td>"
 
-#: ../net.c:206
+#: ../net.c:210
 #, fuzzy
 msgid "destination"
 msgstr "<td>宛先</td>"
 
-#: ../net.c:216
+#: ../net.c:224
 msgid "opts"
 msgstr ""
 
-#: ../net.c:217
+#: ../net.c:225
 msgid "time remaining"
 msgstr ""
 
-#: ../net.c:218
+#: ../net.c:226
 msgid "action"
 msgstr ""
 
-#: ../net.c:270 ../net.c:272 ../net.c:337
+#: ../net.c:278 ../net.c:280 ../net.c:345
 msgid "Information"
 msgstr ""
 
-#: ../net.c:276 ../net.c:278 ../net.c:375
+#: ../net.c:284 ../net.c:286 ../net.c:383
 msgid "Options"
 msgstr ""
 
-#: ../net.c:282 ../net.c:284 ../net.c:403
+#: ../net.c:290 ../net.c:292 ../net.c:411
 #, fuzzy
 msgid "Packet cache"
 msgstr "<h2>パケットキャッシュ</h2>\n"
 
-#: ../net.c:288 ../net.c:290 ../net.c:472
+#: ../net.c:296 ../net.c:298 ../net.c:490
 #, fuzzy
 msgid "Host status"
 msgstr "<h2>ホスト状態</h2>\n"
 
-#: ../net.c:293
+#: ../net.c:301
 msgid "Reload"
 msgstr ""
 
-#: ../net.c:342
+#: ../net.c:350
 msgid "Daemon start time"
 msgstr ""
 
-#: ../net.c:345
+#: ../net.c:353
 msgid "Current time"
 msgstr ""
 
-#: ../net.c:348
+#: ../net.c:356
 msgid "Running time"
 msgstr ""
 
-#: ../net.c:350
+#: ../net.c:358
 msgid "Log"
 msgstr ""
 
-#: ../net.c:351
+#: ../net.c:359
 #, fuzzy
 msgid "Response mode"
 msgstr "応答モード: log%s%s"
 
-#: ../net.c:353
+#: ../net.c:361
 msgid "Lines seen"
 msgstr ""
 
-#: ../net.c:354
+#: ../net.c:362
 msgid "Hits"
 msgstr ""
 
-#: ../net.c:355
+#: ../net.c:363
 msgid "Old/excluded/malformed"
 msgstr ""
 
-#: ../net.c:362
+#: ../net.c:370
 msgid "Entries in packet cache"
 msgstr ""
 
-#: ../net.c:369
+#: ../net.c:377
 msgid "Entries in host status"
 msgstr ""
 
-#: ../net.c:377
+#: ../net.c:385
 msgid "Parameter"
 msgstr ""
 
-#: ../net.c:379
+#: ../net.c:387
 msgid "Decrease"
 msgstr ""
 
-#: ../net.c:381
+#: ../net.c:389
 msgid "Current"
 msgstr ""
 
-#: ../net.c:383
+#: ../net.c:391
 msgid "Increase"
 msgstr ""
 
-#: ../net.c:385
+#: ../net.c:393
 #, fuzzy
 msgid "Alert threshold"
 msgstr "Alert threshold is one attempt"
 
-#: ../net.c:387
+#: ../net.c:395
 msgid "Discard timeout"
 msgstr ""
 
-#: ../net.c:388
+#: ../net.c:396
 msgid "Minimum count in packet cache"
 msgstr ""
 
-#: ../net.c:390 ../net.c:392
+#: ../net.c:398 ../net.c:400
 msgid "Top amount of entries in packet cache"
 msgstr ""
 
-#: ../net.c:395 ../net.c:397
+#: ../net.c:403 ../net.c:405
 msgid "Refresh time"
 msgstr ""
 
-#: ../net.c:419 ../net.c:528
+#: ../net.c:427 ../net.c:556
 msgid "%Y/%m/%d %H:%M:%S"
 msgstr ""
 
-#: ../net.c:456 ../net.c:558
+#: ../net.c:474 ../net.c:596
 msgid "drop"
 msgstr ""
 
-#: ../net.c:458
+#: ../net.c:476
 msgid "escalate"
 msgstr ""
 
-#: ../net.c:493 ../net.c:509 ../net.c:515 ../net.c:521
+#: ../net.c:511 ../net.c:532 ../net.c:538 ../net.c:549
 msgid "<td>any</td>"
 msgstr "<td>何でも</td>"
 
-#: ../net.c:503
+#: ../net.c:521
 #, fuzzy
 msgid "<td>(known host)</td>"
 msgstr "<td>ログホスト</td>"
 
-#: ../net.c:505
+#: ../net.c:523
 #, fuzzy
 msgid "<td>(known net)</td>"
 msgstr "<td>ポート</td>"
 
-#: ../net.c:605
+#: ../net.c:643
 #, fuzzy, c-format
 msgid "Rejected connection from unallowed IP address %s port %i"
 msgstr "許可されていない ip %s ポート %i からの Rejected 接続"
 
-#: ../net.c:614
+#: ../net.c:652
 #, c-format
 msgid "Connect from %s port %i"
 msgstr "%s ポート %i からの接続"
 
-#: ../net.c:677
+#: ../net.c:715
 msgid "Authorization failed"
 msgstr "認証失敗"
 
-#: ../net.c:680
+#: ../net.c:718
 #, fuzzy
 msgid "Authorization required"
 msgstr "認証失敗"
 
-#: ../net.c:757
+#: ../net.c:795
 msgid "Bad request"
 msgstr ""
 
-#: ../net.c:762
+#: ../net.c:800
 msgid "Redirect"
 msgstr ""
 
-#: ../net.c:762
+#: ../net.c:800
 msgid "You should be redirected to the <a href=\"/\">root directory</a>"
 msgstr ""
 
-#: ../net.c:774
+#: ../net.c:812
 #, c-format
 msgid "Requested function: %s"
 msgstr ""
 
-#: ../net.c:777
+#: ../net.c:815
 msgid "Connection closed"
 msgstr "接続が閉じました"
 
-#: ../output.c:200
+#: ../output.c:208
 #, c-format
 msgid " to "
 msgstr " to "
 
-#: ../output.c:255
+#: ../output.c:263
 #, c-format
 msgid " packet"
 msgstr " パケット "
 
-#: ../output.c:257
+#: ../output.c:265
 #, c-format
 msgid " packets"
 msgstr " パケット"
 
-#: ../output.c:261
+#: ../output.c:269
 #, fuzzy, c-format
 msgid " (%lu bytes)"
 msgstr " (%d バイト)"
 
-#: ../output.c:264
+#: ../output.c:272
 #, c-format
 msgid " from %s"
 msgstr " from %s"
 
-#: ../output.c:280 ../output.c:293
+#: ../output.c:292 ../output.c:309
 #, c-format
 msgid " port %d"
 msgstr " port %d"
 
-#: ../output.c:286
+#: ../output.c:298
 #, c-format
 msgid " to %s"
 msgstr " to %s"
 
-#: ../output.c:313
+#: ../output.c:329
 #, fuzzy, c-format
 msgid "<th>start</th>"
 msgstr "<td>開始</td>"
 
-#: ../output.c:316
+#: ../output.c:332
 #, fuzzy, c-format
 msgid "<th>end</th>"
 msgstr "<td>終了</td>"
 
-#: ../output.c:319
+#: ../output.c:335
 #, fuzzy, c-format
 msgid "<th>interval</th>"
 msgstr "<td>間隔</td>"
 
-#: ../output.c:322
+#: ../output.c:338
 #, fuzzy, c-format
 msgid "<th>loghost</th>"
 msgstr "<td>ログホスト</td>"
 
-#: ../output.c:325
+#: ../output.c:341
 #, fuzzy, c-format
 msgid "<th>chain</th>"
 msgstr "<td>チェイン</td>"
 
-#: ../output.c:328
+#: ../output.c:344
 #, fuzzy, c-format
 msgid "<th>target</th>"
 msgstr "<td>目標</td>"
 
-#: ../output.c:331
+#: ../output.c:347
 #, fuzzy, c-format
 msgid "<th>interface</th>"
 msgstr "<td>インターフェイス</td>"
 
-#: ../output.c:334
+#: ../output.c:350
 #, fuzzy, c-format
 msgid "<th>proto</th>"
 msgstr "<td>プロトコル</td>"
 
-#: ../output.c:337
+#: ../output.c:353
 #, fuzzy, c-format
 msgid "<th>bytes</th>"
 msgstr "<td>バイト</td>"
 
-#: ../output.c:340
+#: ../output.c:356
 #, fuzzy, c-format
 msgid "<th>source</th>"
 msgstr "<td>送信元</td>"
 
-#: ../output.c:342 ../output.c:356
+#: ../output.c:358 ../output.c:376
 #, fuzzy, c-format
 msgid "<th>hostname</th>"
 msgstr "<td>ホスト名</td>"
 
-#: ../output.c:344
+#: ../output.c:361 ../output.c:379
+#, fuzzy, c-format
+msgid "<th>geoip</th>"
+msgstr "<td>opts</td>"
+
+#: ../output.c:364
 #, fuzzy, c-format
 msgid "<th>whois information</th>"
 msgstr "<td>whois 情報</td>"
 
-#: ../output.c:348 ../output.c:360
+#: ../output.c:368 ../output.c:384
 #, fuzzy, c-format
 msgid "<th>port</th>"
 msgstr "<td>ポート</td>"
 
-#: ../output.c:350 ../output.c:362
+#: ../output.c:370 ../output.c:386
 #, fuzzy, c-format
 msgid "<th>service</th>"
 msgstr "<td>サービス</td>"
 
-#: ../output.c:354
+#: ../output.c:374
 #, fuzzy, c-format
 msgid "<th>destination</th>"
 msgstr "<td>宛先</td>"
 
-#: ../output.c:366
+#: ../output.c:390
 #, fuzzy, c-format
 msgid "<th>opts</th>"
 msgstr "<td>opts</td>"
@@ -1001,27 +1036,27 @@ msgstr ""
 msgid "Error in configuration file '%s' line %d, assuming 'true'\n"
 msgstr ""
 
-#: ../rcfile.c:281
+#: ../rcfile.c:293
 #, fuzzy, c-format
 msgid "Unrecognized option in configuration file '%s' line %d\n"
 msgstr "Unrecognized option in rcfile: %s"
 
-#: ../rcfile.c:332
+#: ../rcfile.c:344
 #, fuzzy, c-format
 msgid "Unrecognized entry in DNS cache file '%s' line %d\n"
 msgstr "Unrecognized option in rcfile: %s"
 
-#: ../rcfile.c:349
+#: ../rcfile.c:361
 #, c-format
 msgid "%s is not a regular file, ignoring.\n"
 msgstr "%s は通常のファイルではありません。無視します。\n"
 
-#: ../rcfile.c:358
+#: ../rcfile.c:370
 #, fuzzy, c-format
 msgid "Opening DNS cache file '%s'\n"
 msgstr "入力ファイル '%s' を開いています\n"
 
-#: ../rcfile.c:360
+#: ../rcfile.c:372
 #, fuzzy, c-format
 msgid "Opening configuration file '%s'\n"
 msgstr "入力ファイル '%s' を開いています\n"
@@ -1192,26 +1227,26 @@ msgstr "(既知のホスト)\n"
 msgid "(excluded host)\n"
 msgstr "(除外するホスト)\n"
 
-#: ../whois.c:226
+#: ../whois.c:260
 #, fuzzy, c-format
 msgid "Looking up whois info for %s(/%d) from cache\n"
 msgstr "キャッシュから %s の whois 情報を検索しています\n"
 
-#: ../whois.c:233
+#: ../whois.c:267
 #, c-format
 msgid "Looking up whois info for %s\n"
 msgstr "%s の whois 情報を検索しています\n"
 
-#: ../whois.c:254
+#: ../whois.c:288
 #, c-format
 msgid "lookup failed: %s\n"
 msgstr "検索に失敗: %s\n"
 
-#: ../main.h:314
+#: ../main.h:318
 msgid "fwlogwatch summary"
 msgstr "fwlogwatch の一覧"
 
-#: ../main.h:324
+#: ../main.h:328
 msgid "fwlogwatch status"
 msgstr "fwlogwatch の状態"
 

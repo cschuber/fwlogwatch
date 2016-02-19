@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: cisco_pix.h,v 1.19 2013/05/23 15:04:14 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: cisco_pix.h,v 1.20 2016/02/19 16:09:27 bwess Exp $ */
 
 #ifndef _CISCO_PIX_H
 #define _CISCO_PIX_H

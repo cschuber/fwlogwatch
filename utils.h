@@ -1,5 +1,5 @@
-/* Copyright (C) 2000-2013 Boris Wesslowski */
-/* $Id: utils.h,v 1.33 2013/05/23 15:04:15 bwess Exp $ */
+/* Copyright (C) 2000-2016 Boris Wesslowski */
+/* $Id: utils.h,v 1.34 2016/02/19 16:09:27 bwess Exp $ */
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -29,5 +29,8 @@ void add_input_file(char *name);
 void free_input_file(void);
 void generate_email_header(FILE * fd);
 void fdprintf(int fd, char *format, ...);
+#ifdef HAVE_GEOIP
+const char *geoip_lookup(struct in6_addr *ip);
+#endif
 
 #endif

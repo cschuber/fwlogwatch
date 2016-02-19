@@ -1,4 +1,4 @@
-$Id: README,v 1.32 2013/05/23 15:04:14 bwess Exp $
+$Id: README,v 1.33 2016/02/19 16:09:27 bwess Exp $
 
 fwlogwatch is a security tool written in C by Boris Wesslowski originally for
 RUS-CERT. It is a packet filter/firewall/IDS log analyzer with support for a
@@ -27,7 +27,7 @@ FEATURES
     files.
   - Can recognize 'last message repeated' entries concerning the firewall.
   - Integrated resolver for protocols, services and host names.
-  - Can do lookups in the whois database.
+  - Can do lookups in the GeoIP and whois databases.
   - Own DNS and whois information cache and GNU adns support for faster
     lookups.
   - Hosts, networks, ports, chains and branches (targets) can be selected
@@ -105,10 +105,11 @@ INSTALLATION
   /usr/local/sbin) and the man page, 'make install-config' will also
   install a sample configuration file in /etc.
 
-- Zlib/Gettext/GNU adns
-  If you define HAVE_ZLIB, HAVE_GETTEXT and HAVE_ADNS fwlogwatch will be
-  compiled with zlib, gettext and adns support. The output of fwlogwatch -V
-  will contain an overview of the compiler options used.
+- Zlib/Gettext/GNU adns/GeoIP
+  If you define HAVE_ZLIB, HAVE_GETTEXT, HAVE_ADNS and HAVE_GEOIP
+  fwlogwatch will be compiled with zlib, gettext, adns and GeoIP support.
+  The output of fwlogwatch -V will contain an overview of the compiler
+  options used.
 
   You will need the zlib compression library version 1.0.9 or newer and
   it's header files to be able to use zlib support.
@@ -119,6 +120,11 @@ INSTALLATION
 
   The GNU adns library and header files must be installed to build fwlogwatch
   with support for faster, asynchronous DNS lookups.
+
+  The GeoIP legacy library and header files are required to compile and use
+  fwlogwatch with IP-to-country-lookup support. The current GeoLite Country
+  databases for IPv4 and IPv6 can be downloaded from
+  http://dev.maxmind.com/geoip/legacy/geolite/
 
 - Linux
   For ipchains you will need at least kernel 2.2.10 (which you should have
